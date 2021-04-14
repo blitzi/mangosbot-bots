@@ -60,7 +60,7 @@ uint32 SpellIdValue::Calculate()
             }
         }
 
-        char* spellName = pSpellInfo->SpellName[loc];
+        char* spellName = pSpellInfo->SpellName[0];
         if (!useByItem && (tolower(spellName[0]) != firstSymbol || strlen(spellName) != spellLength || !Utf8FitTo(spellName, wnamepart)))
             continue;
 
