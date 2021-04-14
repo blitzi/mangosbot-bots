@@ -2192,7 +2192,11 @@ void PlayerbotFactory::InitInventoryTrade()
         break;
     case ITEM_QUALITY_UNCOMMON:
         stacks = 1;
-        count = urand(1, proto->GetMaxStackSize() / 2);
+
+		int max = proto->GetMaxStackSize() / 2;
+
+		if(max > 0)
+			count = urand(1, max);
         break;
     }
 
