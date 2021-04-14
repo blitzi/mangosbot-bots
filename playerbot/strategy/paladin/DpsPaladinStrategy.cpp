@@ -62,8 +62,8 @@ void DpsPaladinStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
     GenericPaladinStrategy::InitTriggers(triggers);
 
     triggers.push_back(new TriggerNode(
-        "seal",
-        NextAction::array(0, new NextAction("seal of wisdom", 90.0f), NULL)));
+		"seal",
+		NextAction::array(0, new NextAction("seal of command", 89.0f), NULL)));
 
     triggers.push_back(new TriggerNode(
         "low health",
