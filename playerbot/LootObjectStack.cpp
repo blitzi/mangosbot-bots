@@ -159,10 +159,9 @@ bool LootObject::IsLootPossible(Player* bot)
     if (creature && sServerFacade.GetDeathState(creature) == CORPSE)
     {
         if (creature->m_loot)
-            if (!creature->m_loot->CanLoot(bot))
-                return false;
+            if (creature->m_loot->CanLoot(bot))
+                return true;
     }
-
 
     if (skillId == SKILL_NONE)
         return true;
