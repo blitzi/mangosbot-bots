@@ -269,8 +269,17 @@ bool PlayerbotAIConfig::Initialize()
     BarGoLink::SetOutputState(config.GetBoolDefault("AiPlayerbot.ShowProgressBars", false));
 
     RandomPlayerbotFactory::CreateRandomBots();
+
+	sLog.outString("Init Playerbot Factory...");
+
     PlayerbotFactory::Init();
+
+	sLog.outString("Randomize Items...");
+
     sRandomItemMgr.Init();
+
+	sLog.outString("Init Auctionbot...");
+
     auctionbot.Init();
     sRandomItemMgr.InitAfterAhBot();
 
