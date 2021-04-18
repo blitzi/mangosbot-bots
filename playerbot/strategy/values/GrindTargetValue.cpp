@@ -66,7 +66,7 @@ Unit* GrindTargetValue::FindTargetForGrinding(int assistCount)
         if (!bot->InBattleGround() && (int)unit->getLevel() - (int)bot->getLevel() > 4 && !unit->GetObjectGuid().IsPlayer())
             continue;
 
-        if (!needForQuest(unit) && (urand(0, 100) < 75 || context->GetValue<TravelTarget*>("travel target")->Get()->isWorking()))
+        if (!needForQuest(unit) && (context->GetValue<TravelTarget*>("travel target")->Get()->isWorking()))
             continue;
 
         //if (bot->InBattleGround() && bot->GetDistance(unit) > 40.0f)
@@ -96,7 +96,7 @@ Unit* GrindTargetValue::FindTargetForGrinding(int assistCount)
         else
         {
             float newdistance = bot->GetDistance(unit);
-            if (!result || (newdistance < distance && urand(0, abs(distance - newdistance)) > sPlayerbotAIConfig.sightDistance * 0.1))
+            if (!result || (newdistance < distance))
             {
                 distance = newdistance;
                 result = unit;
