@@ -115,7 +115,71 @@ bool AttackersValue::IsPossibleTarget(Unit *attacker, Player *bot)
         rti = bot->GetGroup()->GetTargetIcon(7) == attacker->GetObjectGuid();
 
     PlayerbotAI* ai = bot->GetPlayerbotAI();
-    
+    	
+	bool groupHasTank = false;
+	bool tankHasAggro = false;
+	bool targetIsNonElite = !c || !c->IsElite();
+	bool targetIsAlmostDead = !c || c->GetHealthPercent() < 50;
+	float highestThreat = 0;
+	float myThreat = 0;  
+	float tankThreat = 0;
+	bool waitForTankAggro = true;
+	bool iAmTank = ai->IsTank(bot);
+
+	if (attacker)
+	{
+		highestThreat = attacker->getThreatManager().GetHighestThreat();
+		myThreat = attacker->getThreatManager().getThreat(bot);
+		float myMaxDamage = bot->GetFloatValue(UNIT_FIELD_MAXDAMAGE);
+		uint32 maxSpellDmg = 0;
+
+		for (int i = 0; i < MAX_SPELL_SCHOOL; ++i)
+		{
+			uint32 spellDmg = bot->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + i);
+
+			if (spellDmg > maxSpellDmg)
+				maxSpellDmg = spellDmg;
+		}
+
+		myMaxDamage += maxSpellDmg;//fantasy aggro value for testing
+
+		if (highestThreat > 0)
+		{			
+			float myAggroInPct = ((100.0f / highestThreat) * (myThreat + myMaxDamage));			
+			waitForTankAggro = c->GetHealthPercent() > 90 && myAggroInPct > 90;
+		}
+	}
+
+	Group* group = bot->GetGroup();
+
+	if (group)
+	{
+
+		for (GroupReference *ref = group->GetFirstMember(); ref; ref = ref->next())
+		{
+			Player* p = ref->getSource();
+
+			if (ai->IsTank(p) && p->IsAlive())
+			{
+				groupHasTank = true;
+
+				if (attacker)
+				{
+					HostileReference* target = attacker->getThreatManager().getCurrentVictim();
+
+					if (target)
+					{
+						tankThreat = attacker->getThreatManager().getThreat(p);
+						
+						if (tankThreat >= highestThreat && highestThreat > 0)
+							tankHasAggro = true;
+					}
+				}
+			}
+		}
+	}
+
+
     bool leaderHasThreat = false;
     if (attacker && bot->GetGroup() && ai->GetMaster())
         leaderHasThreat = attacker->getThreatManager().getThreat(ai->GetMaster());
@@ -163,7 +227,10 @@ bool AttackersValue::IsPossibleTarget(Unit *attacker, Player *bot)
 #endif
             (
 #ifdef CMANGOS
-                (!isMemberBotGroup && ai->HasStrategy("attack tagged", BOT_STATE_NON_COMBAT)) || leaderHasThreat || !c->HasLootRecipient() || c->IsTappedBy(bot)
+                ((!isMemberBotGroup && ai->HasStrategy("attack tagged", BOT_STATE_NON_COMBAT)) || leaderHasThreat || !c->HasLootRecipient() || c->IsTappedBy(bot)) &&
+				(!groupHasTank || (
+				 (groupHasTank && tankHasAggro && !waitForTankAggro) || iAmTank || targetIsNonElite || targetIsAlmostDead))
+
 #endif
 #ifndef MANGOSBOT_TWO
 #ifdef MANGOS
@@ -177,7 +244,9 @@ bool AttackersValue::IsPossibleTarget(Unit *attacker, Player *bot)
 
 bool AttackersValue::IsValidTarget(Unit *attacker, Player *bot)
 {
-    return  IsPossibleTarget(attacker, bot) &&
+	bool possibleTarget = IsPossibleTarget(attacker, bot);
+
+    return possibleTarget &&
         (sServerFacade.GetThreatManager(attacker).getCurrentVictim() ||
             attacker->GetGuidValue(UNIT_FIELD_TARGET) || attacker->GetObjectGuid().IsPlayer() ||
             attacker->GetObjectGuid() == bot->GetPlayerbotAI()->GetAiObjectContext()->GetValue<ObjectGuid>("pull target")->Get());
