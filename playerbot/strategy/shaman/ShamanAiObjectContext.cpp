@@ -89,6 +89,7 @@ namespace ai
                 creators["mana spring totem"] = &TriggerFactoryInternal::mana_spring_totem;
                 creators["flametongue totem"] = &TriggerFactoryInternal::flametongue_totem;
                 creators["strength of earth totem"] = &TriggerFactoryInternal::strength_of_earth_totem;
+                creators["tremor totem"] = &TriggerFactoryInternal::tremor_totem;
                 creators["magma totem"] = &TriggerFactoryInternal::magma_totem;
                 creators["searing totem"] = &TriggerFactoryInternal::searing_totem;
                 creators["wind shear"] = &TriggerFactoryInternal::wind_shear;
@@ -137,6 +138,7 @@ namespace ai
             static Trigger* mana_spring_totem(PlayerbotAI* ai) { return new ManaSpringTotemTrigger(ai); }
             static Trigger* flametongue_totem(PlayerbotAI* ai) { return new FlametongueTotemTrigger(ai); }
             static Trigger* strength_of_earth_totem(PlayerbotAI* ai) { return new StrengthOfEarthTotemTrigger(ai); }
+            static Trigger* tremor_totem(PlayerbotAI* ai) { return new TremorTotemTrigger(ai); }
             static Trigger* magma_totem(PlayerbotAI* ai) { return new MagmaTotemTrigger(ai); }
             static Trigger* searing_totem(PlayerbotAI* ai) { return new SearingTotemTrigger(ai); }
             static Trigger* wind_shear(PlayerbotAI* ai) { return new WindShearInterruptSpellTrigger(ai); }
@@ -170,6 +172,7 @@ namespace ai
                 creators["water shield"] = &AiObjectContextInternal::water_shield;
                 creators["lightning shield"] = &AiObjectContextInternal::lightning_shield;
                 creators["strength of earth totem"] = &AiObjectContextInternal::strength_of_earth_totem;
+                creators["tremor totem"] = &AiObjectContextInternal::tremor_totem;
                 creators["flametongue totem"] = &AiObjectContextInternal::flametongue_totem;
                 creators["searing totem"] = &AiObjectContextInternal::searing_totem;
                 creators["magma totem"] = &AiObjectContextInternal::magma_totem;
@@ -241,6 +244,7 @@ namespace ai
             static Action* water_shield(PlayerbotAI* ai) { return new CastWaterShieldAction(ai); }
             static Action* lightning_shield(PlayerbotAI* ai) { return new CastLightningShieldAction(ai); }
             static Action* strength_of_earth_totem(PlayerbotAI* ai) { return new CastStrengthOfEarthTotemAction(ai); }
+            static Action* tremor_totem(PlayerbotAI* ai) { return new CastTremorTotemAction(ai); }
             static Action* flametongue_totem(PlayerbotAI* ai) { return new CastFlametongueTotemAction(ai); }
             static Action* magma_totem(PlayerbotAI* ai) { return new CastMagmaTotemAction(ai); }
             static Action* searing_totem(PlayerbotAI* ai) { return new CastSearingTotemAction(ai); }

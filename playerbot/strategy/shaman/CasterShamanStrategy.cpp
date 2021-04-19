@@ -45,10 +45,6 @@ void CasterShamanStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
         NextAction::array(0, new NextAction("flametongue weapon", 23.0f), NULL)));
 
     triggers.push_back(new TriggerNode(
-        "searing totem",
-        NextAction::array(0, new NextAction("searing totem", 19.0f), NULL)));
-
-    triggers.push_back(new TriggerNode(
         "shock",
         NextAction::array(0, new NextAction("earth shock", 20.0f), NULL)));
 

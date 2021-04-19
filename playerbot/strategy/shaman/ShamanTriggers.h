@@ -56,6 +56,11 @@ namespace ai
         StrengthOfEarthTotemTrigger(PlayerbotAI* ai) : TotemTrigger(ai, "strength of earth totem") {}
     };
 
+	class TremorTotemTrigger : public TotemTrigger {
+	public:
+		TremorTotemTrigger(PlayerbotAI* ai) : TotemTrigger(ai, "tremor totem") {}
+	};
+
     class MagmaTotemTrigger : public TotemTrigger {
     public:
         MagmaTotemTrigger(PlayerbotAI* ai) : TotemTrigger(ai, "magma totem", 3) {}
