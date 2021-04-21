@@ -25,8 +25,4 @@ void TotemsShamanStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
     triggers.push_back(new TriggerNode(
         "tremor totem",
         NextAction::array(0, new NextAction("tremor totem", 18.0f), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "flametongue totem",
-        NextAction::array(0, new NextAction("flametongue totem", 17.0f), NULL)));
 }
