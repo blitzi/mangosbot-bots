@@ -7,6 +7,7 @@ namespace ai
     BUFF_TRIGGER(RighteousFuryTrigger, "righteous fury", "righteous fury")
 
     BUFF_TRIGGER(RetributionAuraTrigger, "retribution aura", "retribution aura")
+    BUFF_TRIGGER(SanctityAuraTrigger, "sanctity aura", "sanctity aura")
 
 	class CrusaderAuraTrigger : public BuffTrigger
 	{

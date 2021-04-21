@@ -39,6 +39,12 @@ namespace ai
 		CastRetributionAuraAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "retribution aura") {}
 	};
 
+	class CastSanctityAuraAction : public CastBuffSpellAction
+	{
+	public:
+		CastSanctityAuraAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "sanctity aura") {}
+	};
+
 	class CastConcentrationAuraAction : public CastBuffSpellAction
 	{
 	public:

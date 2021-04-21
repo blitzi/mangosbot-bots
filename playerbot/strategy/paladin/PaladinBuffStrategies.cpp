@@ -43,6 +43,10 @@ void PaladinBuffDpsStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
     triggers.push_back(new TriggerNode(
         "blessing",
         NextAction::array(0, new NextAction("blessing of might", ACTION_HIGH + 8), NULL)));
+
+	triggers.push_back(new TriggerNode(
+		"sanctity aura",
+		NextAction::array(0, new NextAction("sanctity aura", 90.0f), NULL)));
 }
 
 void PaladinShadowResistanceStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
@@ -77,8 +81,8 @@ void PaladinBuffArmorStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 void PaladinBuffAoeStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
     triggers.push_back(new TriggerNode(
-        "retribution aura",
-        NextAction::array(0, new NextAction("retribution aura", 90.0f), NULL)));
+        "sanctity aura",
+        NextAction::array(0, new NextAction("sanctity aura", 90.0f), NULL)));
 }
 
 void PaladinBuffThreatStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
