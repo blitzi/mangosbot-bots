@@ -13,6 +13,12 @@ namespace ai
     {
     public:
         CastJudgementOfWisdomAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "judgement of wisdom") {}
+    };   
+	
+	class CastJudgementAction : public CastMeleeSpellAction
+    {
+    public:
+        CastJudgementAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "judgement") {}
     };
 
     class CastJudgementOfJusticeAction : public CastMeleeSpellAction

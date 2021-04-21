@@ -19,6 +19,10 @@ void GenericPaladinStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
         "low health",
         NextAction::array(0, new NextAction("divine protection", ACTION_CRITICAL_HEAL + 2), new NextAction("holy light", ACTION_CRITICAL_HEAL + 2), NULL)));
 
+	triggers.push_back(new TriggerNode(
+		"judgement",
+		NextAction::array(0, new NextAction("judgement", ACTION_HIGH + 2), NULL)));
+
     triggers.push_back(new TriggerNode(
         "party member low health",
         NextAction::array(0, new NextAction("holy light on party", ACTION_CRITICAL_HEAL + 1), NULL)));

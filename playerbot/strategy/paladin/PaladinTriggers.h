@@ -25,6 +25,7 @@ namespace ai
 
     DEBUFF_TRIGGER(JudgementOfLightTrigger, "judgement of light", "judgement of light")
     DEBUFF_TRIGGER(JudgementOfWisdomTrigger, "judgement of wisdom", "judgement of wisdom")
+    DEBUFF_TRIGGER(JudgementTrigger, "judgement", "judgement")
 
     class BlessingOnPartyTrigger : public BuffOnPartyTrigger
     {

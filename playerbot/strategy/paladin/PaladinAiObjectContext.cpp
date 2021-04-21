@@ -108,6 +108,7 @@ namespace ai
             TriggerFactoryInternal()
             {
                 creators["judgement of wisdom"] = &TriggerFactoryInternal::judgement_of_wisdom;
+                creators["judgement"] = &TriggerFactoryInternal::judgement;
                 creators["judgement of light"] = &TriggerFactoryInternal::judgement_of_light;
                 creators["blessing"] = &TriggerFactoryInternal::blessing;
                 creators["seal"] = &TriggerFactoryInternal::seal;
@@ -142,6 +143,7 @@ namespace ai
             static Trigger* holy_shield(PlayerbotAI* ai) { return new HolyShieldTrigger(ai); }
             static Trigger* righteous_fury(PlayerbotAI* ai) { return new RighteousFuryTrigger(ai); }
             static Trigger* judgement_of_wisdom(PlayerbotAI* ai) { return new JudgementOfWisdomTrigger(ai); }
+            static Trigger* judgement(PlayerbotAI* ai) { return new JudgementTrigger(ai); }
             static Trigger* judgement_of_light(PlayerbotAI* ai) { return new JudgementOfLightTrigger(ai); }
             static Trigger* blessing(PlayerbotAI* ai) { return new BlessingTrigger(ai); }
             static Trigger* seal(PlayerbotAI* ai) { return new SealTrigger(ai); }
@@ -215,6 +217,7 @@ namespace ai
                 creators["exorcism"] = &AiObjectContextInternal::exorcism;
                 creators["judgement of light"] = &AiObjectContextInternal::judgement_of_light;
                 creators["judgement of wisdom"] = &AiObjectContextInternal::judgement_of_wisdom;
+                creators["judgement"] = &AiObjectContextInternal::judgement;
                 creators["divine shield"] = &AiObjectContextInternal::divine_shield;
                 creators["divine protection"] = &AiObjectContextInternal::divine_protection;
                 creators["divine protection on party"] =&AiObjectContextInternal::divine_protection_on_party;
@@ -280,6 +283,7 @@ namespace ai
             static Action* exorcism(PlayerbotAI* ai) { return new CastExorcismAction(ai); }
             static Action* judgement_of_light(PlayerbotAI* ai) { return new CastJudgementOfLightAction(ai); }
             static Action* judgement_of_wisdom(PlayerbotAI* ai) { return new CastJudgementOfWisdomAction(ai); }
+            static Action* judgement(PlayerbotAI* ai) { return new CastJudgementAction(ai); }
             static Action* divine_shield(PlayerbotAI* ai) { return new CastDivineShieldAction(ai); }
             static Action* divine_protection(PlayerbotAI* ai) { return new CastDivineProtectionAction(ai); }
             static Action* divine_protection_on_party(PlayerbotAI* ai) { return new CastDivineProtectionOnPartyAction(ai); }
