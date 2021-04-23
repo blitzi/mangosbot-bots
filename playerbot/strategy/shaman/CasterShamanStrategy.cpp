@@ -52,9 +52,9 @@ void CasterShamanStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
         "frost shock snare",
         NextAction::array(0, new NextAction("frost shock", 21.0f), NULL)));
 
-    triggers.push_back(new TriggerNode(
-        "medium aoe",
-        NextAction::array(0, new NextAction("flametongue totem", ACTION_LIGHT_HEAL), NULL)));
+	triggers.push_back(new TriggerNode(
+		"medium aoe",
+		NextAction::array(0, new NextAction("fire nova", 25.0f), NULL)));
 }
 
 void CasterAoeShamanStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
