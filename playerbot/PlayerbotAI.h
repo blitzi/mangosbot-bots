@@ -332,6 +332,7 @@ public:
     Player* GetMaster() { return master; }
     bool isRealPlayer() { return master ? (master == bot) : false; }
     Player* GetGroupMaster() { return bot->GetGroup() ? (sObjectMgr.GetPlayer(bot->GetGroup()->GetLeaderGuid()) ? sObjectMgr.GetPlayer(bot->GetGroup()->GetLeaderGuid()) : master) : master; }
+	bool GroupHasHealer();
     uint32 GetFixedBotNumer(BotTypeNumber typeNumber, uint32 maxNum = 100, uint32 cyclePerMin = 1);
     GrouperType PlayerbotAI::GetGrouperType();
     bool HasPlayerNearby(float range = sPlayerbotAIConfig.reactDistance);

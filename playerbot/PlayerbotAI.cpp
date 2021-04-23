@@ -1515,6 +1515,23 @@ GrouperType PlayerbotAI::GetGrouperType()
    return LEADER_5;
 }
 
+bool PlayerbotAI::GroupHasHealer()
+{
+	Group* group = bot->GetGroup();
+
+	if (group)
+	{
+		uint32 bcount = 0;
+		for (GroupReference *gref = group->GetFirstMember(); gref; gref = gref->next())
+		{
+			if(IsHeal(gref->getSource()))
+				return true;
+		}
+	}
+
+	return false;
+}
+
 bool PlayerbotAI::HasPlayerNearby(float range)
 {
     float sqRange = range * range;
