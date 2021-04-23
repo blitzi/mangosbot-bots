@@ -54,12 +54,16 @@ DpsPaladinStrategy::DpsPaladinStrategy(PlayerbotAI* ai) : GenericPaladinStrategy
 
 NextAction** DpsPaladinStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("crusader strike", ACTION_NORMAL + 1), NULL);
+    return NextAction::array(0, new NextAction("crusader strike", 88), NULL);
 }
 
 void DpsPaladinStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
     GenericPaladinStrategy::InitTriggers(triggers);
+
+	triggers.push_back(new TriggerNode(
+		"crusader strike",
+		NextAction::array(0, new NextAction("crusader strike", 88.0f), NULL)));
 
     triggers.push_back(new TriggerNode(
 		"seal",
