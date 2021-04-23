@@ -172,7 +172,7 @@ namespace ai
 		{
 			return new ActionNode("judgement",
 				/*P*/ NULL,
-				/*A*/ NextAction::array(0, new NextAction("judgement"), NULL),
+				/*A*/ NULL,
 				/*C*/ NULL);
 		}
         static ActionNode* divine_shield(PlayerbotAI* ai)
