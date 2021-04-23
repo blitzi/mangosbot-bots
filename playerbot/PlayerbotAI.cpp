@@ -25,6 +25,7 @@
 #include "strategy/values/PositionValue.h"
 #include "ServerFacade.h"
 #include "TravelMgr.h"
+#include "ChatHelper.h"
 
 using namespace ai;
 using namespace std;
@@ -208,6 +209,9 @@ void PlayerbotAI::UpdateAIInternal(uint32 elapsed)
 
 void PlayerbotAI::HandleTeleportAck()
 {
+    if (isRealPlayer())
+        return;
+
 	bot->GetMotionMaster()->Clear(true);
 	bot->InterruptMoving(1);
 	if (bot->IsBeingTeleportedNear())
@@ -1312,6 +1316,13 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
     if (oldSel)
         bot->SetSelectionGuid(oldSel);
 
+    if (HasStrategy("debug spell", BOT_STATE_NON_COMBAT))
+    {
+        ostringstream out;
+        out << "Casting " <<ChatHelper::formatSpell(pSpellInfo);
+        TellMasterNoFacing(out);
+    }
+
     return true;
 }
 
@@ -1532,7 +1543,7 @@ bool PlayerbotAI::GroupHasHealer()
 	return false;
 }
 
-bool PlayerbotAI::HasPlayerNearby(float range)
+bool PlayerbotAI::HasPlayerNearby(WorldPosition* pos, float range)
 {
     float sqRange = range * range;
     for (auto& player : sRandomPlayerbotMgr.GetPlayers())
@@ -1542,7 +1553,7 @@ bool PlayerbotAI::HasPlayerNearby(float range)
             if (player->GetMapId() != bot->GetMapId())
                 continue;
 
-            if (player->GetDistance(bot, false, DIST_CALC_NONE) < sqRange)
+            if (pos->sqDistance(&WorldPosition(player)) < sqRange)
                 return true;
         }
     }
@@ -1576,7 +1587,8 @@ enum ActivityType
     TRAVEL_ACTIVITY = 3,
     OUT_OF_PARTY_ACTIVITY = 4,
     PACKET_ACTIVITY = 5,
-    ALL_ACTIVITY = 6
+    DETAILED_MOVE_ACTIVITY = 6,
+    ALL_ACTIVITY = 7
 };
 
    General function to check if a bot is allowed to be active or not.
@@ -1608,6 +1620,10 @@ bool PlayerbotAI::AllowActive(ActivityType activityType)
     if (activityType == OUT_OF_PARTY_ACTIVITY || activityType == GRIND_ACTIVITY) //Many bots nearby. Do not do heavy area checks.
         if (HasManyPlayersNearby())
             return false;
+
+    //Bots don't need to move using pathfinder.
+    if (activityType == DETAILED_MOVE_ACTIVITY)
+        return false;
 
     //All exceptions are now done. 
     //Below is code to have a specified % of bots active at all times.
@@ -1864,7 +1880,7 @@ string PlayerbotAI::HandleRemoteCommand(string command)
     else if (command == "movement")
     {
         LastMovement& data = *GetAiObjectContext()->GetValue<LastMovement&>("last movement");
-        ostringstream out; out << data.lastMoveToX << " " << data.lastMoveToY << " " << data.lastMoveToZ << " " << bot->GetMapId() << " " << data.lastMoveToOri;
+        ostringstream out; out << data.lastMoveShort.getX() << " " << data.lastMoveShort.getY() << " " << data.lastMoveShort.getZ() << " " << data.lastMoveShort.getMapId() << " " << data.lastMoveShort.getO();
         return out.str();
     }
     else if (command == "target")
@@ -1901,6 +1917,47 @@ string PlayerbotAI::HandleRemoteCommand(string command)
     else if (command == "values")
     {
         return GetAiObjectContext()->FormatValues();
+    }
+    else if (command == "travel")
+    {
+        ostringstream out;
+
+        TravelTarget* target = GetAiObjectContext()->GetValue<TravelTarget*>("travel target")->Get();
+        if (target->getDestination()) {
+            out << "Destination = " << target->getDestination()->getName();
+
+            out << ": " << target->getDestination()->getTitle();
+
+            out << " vis: " << target->getDestination()->getVisitors();
+
+            out << " Location = " << target->getPosition()->print();
+
+            if (!(*target->getPosition() == WorldPosition()))
+            {
+                out << "(" << target->getPosition()->getAreaName() << ")";
+                out << " at: " << target->getPosition()->distance(bot) << "y";
+                out << " vis: " << target->getPosition()->getVisitors();
+            }
+        }
+        out << " Status = ";
+        if (target->getStatus() == TRAVEL_STATUS_NONE)
+            out << " none";
+        else if (target->getStatus() == TRAVEL_STATUS_PREPARE)
+            out << " prepare";
+        else if (target->getStatus() == TRAVEL_STATUS_TRAVEL)
+            out << " travel";
+        else if (target->getStatus() == TRAVEL_STATUS_WORK)
+            out << " work";
+        else if (target->getStatus() == TRAVEL_STATUS_COOLDOWN)
+            out << " cooldown";
+        else if (target->getStatus() == TRAVEL_STATUS_EXPIRED)
+            out << " expired";
+
+        out << " Expire in " << (target->getTimeLeft()/1000) << "s";
+
+        out << " Retry " << target->getRetryCount(true) << "/" << target->getRetryCount(false);
+
+        return out.str();
     }
     ostringstream out; out << "invalid command: " << command;
     return out.str();
