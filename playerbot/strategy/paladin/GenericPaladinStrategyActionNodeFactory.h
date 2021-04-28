@@ -26,7 +26,6 @@ namespace ai
             creators["lay on hands on party"] = &lay_on_hands_on_party;
             creators["hammer of wrath"] = &hammer_of_wrath;
             creators["retribution aura"] = &retribution_aura;
-            creators["sanctity aura"] = &sanctity_aura;
             creators["blessing of kings"] = &blessing_of_kings;
             creators["blessing of wisdom"] = &blessing_of_wisdom;
             creators["blessing of kings on party"] = &blessing_of_kings_on_party;
@@ -77,13 +76,6 @@ namespace ai
                 /*C*/ NULL);
         }
 		
-		static ActionNode* sanctity_aura(PlayerbotAI* ai)
-        {
-            return new ActionNode ("sanctity aura",
-                /*P*/ NULL,
-                /*A*/ NextAction::array(0, new NextAction("retribution aura"), NULL),
-                /*C*/ NULL);
-        }
         static ActionNode* lay_on_hands(PlayerbotAI* ai)
         {
             return new ActionNode ("lay on hands",

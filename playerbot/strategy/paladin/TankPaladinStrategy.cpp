@@ -35,7 +35,7 @@ void TankPaladinStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
         NextAction::array(0, new NextAction("hammer of the righteous", ACTION_HIGH + 6), new NextAction("avenger's shield", ACTION_HIGH + 6), NULL)));
 
     triggers.push_back(new TriggerNode(
-        "medium aoe",
+        "light aoe",
         NextAction::array(0, new NextAction("consecration", ACTION_HIGH + 6), NULL)));
 
     triggers.push_back(new TriggerNode(

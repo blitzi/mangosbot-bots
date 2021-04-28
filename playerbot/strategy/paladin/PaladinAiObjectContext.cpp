@@ -9,6 +9,7 @@
 #include "PaladinBuffStrategies.h"
 #include "../NamedObjectContext.h"
 #include "HealPaladinStrategy.h"
+#include "../generic/PullStrategy.h"
 
 using namespace ai;
 
@@ -28,6 +29,7 @@ namespace ai
                 creators["boost"] = &paladin::StrategyFactoryInternal::boost;
                 creators["bthreat"] = &paladin::StrategyFactoryInternal::bthreat;
                 creators["cc"] = &paladin::StrategyFactoryInternal::cc;
+				creators["pull"] = &paladin::StrategyFactoryInternal::pull;
             }
 
         private:
@@ -36,6 +38,7 @@ namespace ai
             static Strategy* boost(PlayerbotAI* ai) { return new PaladinBoostStrategy(ai); }
             static Strategy* bthreat(PlayerbotAI* ai) { return new PaladinBuffThreatStrategy(ai); }
             static Strategy* cc(PlayerbotAI* ai) { return new PaladinCcStrategy(ai); }
+			static Strategy* pull(PlayerbotAI* ai) { return new PullStrategy(ai, "avenger's shield"); }
         };
 
         class ResistanceStrategyFactoryInternal : public NamedObjectContext<Strategy>

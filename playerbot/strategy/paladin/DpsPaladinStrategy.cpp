@@ -14,6 +14,7 @@ public:
         creators["seal of command"] = &seal_of_command;
         creators["blessing of might"] = &blessing_of_might;
         creators["crusader strike"] = &crusader_strike;
+		creators["sanctity aura"] = &sanctity_aura;
     }
 
 private:
@@ -45,6 +46,13 @@ private:
             /*A*/ NextAction::array(0, new NextAction("melee"), NULL),
             /*C*/ NULL);
     }
+	static ActionNode* sanctity_aura(PlayerbotAI* ai)
+	{
+		return new ActionNode("sanctity aura",
+			/*P*/ NULL,
+			/*A*/ NextAction::array(0, new NextAction("retribution aura"), NULL),
+			/*C*/ NULL);
+	}
 };
 
 DpsPaladinStrategy::DpsPaladinStrategy(PlayerbotAI* ai) : GenericPaladinStrategy(ai)
