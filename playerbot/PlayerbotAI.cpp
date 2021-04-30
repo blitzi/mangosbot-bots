@@ -229,7 +229,6 @@ void PlayerbotAI::HandleTeleportAck()
 	else if (bot->IsBeingTeleportedFar())
 	{
         bot->GetSession()->HandleMoveWorldportAckOpcode();
-		SetNextCheckDelay(sPlayerbotAIConfig.globalCoolDown);
 	}
 }
 
@@ -239,7 +238,6 @@ void PlayerbotAI::Reset()
         return;
 
     currentEngine = engines[BOT_STATE_NON_COMBAT];
-    nextAICheckDelay = 0;
     whispers.clear();
 
     aiObjectContext->GetValue<Unit*>("old target")->Set(NULL);
@@ -429,8 +427,7 @@ void PlayerbotAI::HandleBotOutgoingPacket(const WorldPacket& packet)
 
 		uint32 delaytime;
 		p >> delaytime;
-		if (delaytime <= 1000)
-			IncreaseNextCheckDelay(delaytime);
+
 		return;
 	}
 	default:
@@ -447,13 +444,6 @@ void PlayerbotAI::SpellInterrupted(uint32 spellid)
     time_t now = time(0);
     if (now <= lastSpell.time)
         return;
-
-    uint32 castTimeSpent = 1000 * (now - lastSpell.time);
-    uint32 globalCooldown = CalculateGlobalCooldown(lastSpell.id);
-    if (castTimeSpent < globalCooldown)
-        SetNextCheckDelay(globalCooldown - castTimeSpent);
-    else
-        SetNextCheckDelay(sPlayerbotAIConfig.reactDelay);
 
     lastSpell.id = 0;
 }
@@ -514,21 +504,23 @@ void PlayerbotAI::DoNextAction()
 {
     if (bot->IsBeingTeleported() || (GetMaster() && GetMaster()->IsBeingTeleported()))
     {
-        SetNextCheckDelay(sPlayerbotAIConfig.globalCoolDown);
         return;
     }
 
     if (bot->IsTaxiFlying() || bot->IsFlying())
     {
-        SetNextCheckDelay(sPlayerbotAIConfig.passiveDelay);
         return;
     }
 
     bool minimal = !AllowActive(ALL_ACTIVITY);
 
-    if (IsActive() && !bot->GetGroup() && minimal)
+    if (!bot->GetGroup() && minimal)
     {
-        SetNextCheckDelay(sPlayerbotAIConfig.passiveDelay / 2);
+        return;
+    }
+
+    if (IsEating() || IsDrinking())
+    {
         return;
     }
 
@@ -539,15 +531,6 @@ void PlayerbotAI::DoNextAction()
 
     if (currentEngine == engines[BOT_STATE_DEAD] && sServerFacade.IsAlive(bot))
         ChangeEngine(BOT_STATE_NON_COMBAT);
-
-    if ((nextAICheckDelay > 2000) && sServerFacade.IsInCombat(bot))
-        SetNextCheckDelay(sPlayerbotAIConfig.reactDelay);
-
-    if (minimal)
-    {
-        SetNextCheckDelay(sPlayerbotAIConfig.passiveDelay);
-        //return;
-    }
 
     Group *group = bot->GetGroup();
     // test BG master set
@@ -573,19 +556,24 @@ void PlayerbotAI::DoNextAction()
 
     if (master)
 	{
+        if (IsEating() || IsDrinking())
+        {
+            return;
+        }
+
 		if (master->m_movementInfo.HasMovementFlag(MOVEFLAG_WALK_MODE)) bot->m_movementInfo.AddMovementFlag(MOVEFLAG_WALK_MODE);
 		else bot->m_movementInfo.RemoveMovementFlag(MOVEFLAG_WALK_MODE);
 
-        if (master->IsSitState() && nextAICheckDelay < 1000)
+        if (master->IsSitState())
         {
             if (!sServerFacade.isMoving(bot) && sServerFacade.GetDistance2d(bot, master) < 10.0f)
                 bot->SetStandState(UNIT_STAND_STATE_SIT);
         }
-        else if (nextAICheckDelay < 1000)
+        else
             bot->SetStandState(UNIT_STAND_STATE_STAND);
 	}
 	else if (bot->m_movementInfo.HasMovementFlag(MOVEFLAG_WALK_MODE)) bot->m_movementInfo.RemoveMovementFlag(MOVEFLAG_WALK_MODE);
-    else if ((nextAICheckDelay < 1000) && bot->IsSitState()) bot->SetStandState(UNIT_STAND_STATE_STAND);
+    else if (bot->IsSitState()) bot->SetStandState(UNIT_STAND_STATE_STAND);
 }
 
 void PlayerbotAI::ReInitCurrentEngine()
@@ -980,7 +968,18 @@ bool PlayerbotAI::HasAura(string name, Unit* unit, bool maxStack)
 			if (IsRealAura(bot, aura, unit))
             {
                 uint32 maxStackAmount = aura->GetSpellProto()->StackAmount;
-                return maxStack && maxStackAmount ? aura->GetStackAmount() >= maxStackAmount : true;
+                uint32 maxProcCharges = aura->GetSpellProto()->procCharges;                   
+
+                if (maxStack)
+                {
+                    if(maxStackAmount)
+                        return aura->GetStackAmount() >= maxStackAmount;
+
+                    if (maxProcCharges)
+                        return aura->GetHolder()->GetAuraCharges() >= maxProcCharges;
+                }
+
+                return true;
             }
 		}
     }
@@ -1146,10 +1145,15 @@ uint8 PlayerbotAI::GetManaPercent() const
 
 bool PlayerbotAI::CastSpell(string name, Unit* target, Item* itemTarget)
 {
+    currentCastTime = 0;
     bool result = CastSpell(aiObjectContext->GetValue<uint32>("spell id", name)->Get(), target, itemTarget);
     if (result)
     {
-        aiObjectContext->GetValue<time_t>("last spell cast time", name)->Set(time(0));
+        aiObjectContext->GetValue<time_t>("last spell cast time", name)->Set(currentCastTime);
+    }
+    else
+    {
+        aiObjectContext->GetValue<time_t>("last spell cast time", name)->Set(0);
     }
 
     return result;
@@ -1215,7 +1219,6 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
 
     if (failWithDelay)
     {
-        SetNextCheckDelay(sPlayerbotAIConfig.globalCoolDown);
         return false;
     }
 
@@ -1282,7 +1285,6 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
     if (sServerFacade.isMoving(bot) && spell->GetCastTime())
     {
         bot->StopMoving();
-        SetNextCheckDelay(sPlayerbotAIConfig.globalCoolDown);
         spell->cancel();
         //delete spell;
         return false;
@@ -1330,21 +1332,20 @@ void PlayerbotAI::WaitForSpellCast(Spell *spell)
 {
     const SpellEntry* const pSpellInfo = spell->m_spellInfo;
 
-    float castTime = spell->GetCastTime();
-	if (IsChanneledSpell(pSpellInfo))
+    currentCastTime = spell->GetCastTime();
+    if (IsChanneledSpell(pSpellInfo))
     {
         int32 duration = GetSpellDuration(pSpellInfo);
         if (duration > 0)
-            castTime += duration;
+            currentCastTime += duration;
     }
 
-    castTime = ceil(castTime);
+    currentCastTime = ceil(currentCastTime);
 
     uint32 globalCooldown = CalculateGlobalCooldown(pSpellInfo->Id);
-    if (castTime < globalCooldown)
-        castTime = globalCooldown;
 
-    SetNextCheckDelay(castTime + sPlayerbotAIConfig.reactDelay);
+    if (currentCastTime < globalCooldown)
+        currentCastTime = globalCooldown;
 }
 
 void PlayerbotAI::InterruptSpell()
@@ -2403,4 +2404,14 @@ uint32 PlayerbotAI::GetBuffedCount(Player* player, string spellname)
         return bcount;
     }
     return 0;
+}
+
+bool PlayerbotAI::IsEating()
+{
+    return HasAura(27094, bot) && bot->GetHealthPercent() < 100;
+}
+
+bool PlayerbotAI::IsDrinking()
+{
+    return HasAura(27089, bot) && bot->HasMana() && bot->GetPowerPercent() < 100;
 }

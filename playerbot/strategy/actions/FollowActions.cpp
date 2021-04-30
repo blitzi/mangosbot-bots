@@ -26,7 +26,6 @@ bool FollowAction::Execute(Event event)
         moved = MoveTo(loc.mapid, loc.coord_x, loc.coord_y, loc.coord_z);
     }
 
-    if (moved) ai->SetNextCheckDelay(sPlayerbotAIConfig.reactDelay);
     return moved;
 }
 
@@ -75,7 +74,6 @@ bool FleeToMasterAction::Execute(Event event)
         return false;
     }
     ai->TellMaster("Wait for me!");
-    ai->SetNextCheckDelay(3000);
     return true;
 }
 

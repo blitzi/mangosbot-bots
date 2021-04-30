@@ -5,13 +5,15 @@
 #include "Engine.h"
 #include "../PlayerbotAIConfig.h"
 #include "../PerformanceMonitor.h"
+#include <playerbot/strategy/values/LastSpellCastValue.h>
+#include <playerbot/ServerFacade.h>
 
 using namespace ai;
 using namespace std;
 
 Engine::Engine(PlayerbotAI* ai, AiObjectContext *factory) : PlayerbotAIAware(ai), aiObjectContext(factory)
 {
-    lastRelevance = 0.0f;
+    lastCastRelevance = 0.0f;
     testMode = false;
 }
 
@@ -161,7 +163,7 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
                     }
                 }
 
-                if (action->isPossible() && relevance)
+                if (action->isPossible() && relevance && (!lastCastRelevance || (relevance > ACTION_CRITICAL_HEAL && relevance > lastCastRelevance)))
                 {
                     if (!skipPrerequisites)
                     {
@@ -178,10 +180,14 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
                     if (pmo) pmo->finish();
 
                     if (actionExecuted)
-                    {
+                    {                                                                     
+                        if (ai->GetAiObjectContext()->GetValue<bool>("is casting spell")->Get())
+                        {
+                            lastCastRelevance = relevance;                                      
+                        }
+
                         LogAction("A:%s - OK", action->getName().c_str());
                         MultiplyAndPush(actionNode->getContinuers(), 0, false, event, "cont");
-                        lastRelevance = relevance;
                         delete actionNode;
                         break;
                     }
@@ -198,18 +204,21 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
                 }
             }
             else
-            {
-                lastRelevance = relevance;
+            {               
                 LogAction("A:%s - USELESS", action->getName().c_str());
             }
             delete actionNode;
         }
     }
     while (basket && ++iterations <= iterationsPerTick);
+  
+    if (ai->GetAiObjectContext()->GetValue<bool>("is casting spell")->Get() == false)
+    {
+        lastCastRelevance = 0;
+    }     
 
     if (!basket)
     {
-        lastRelevance = 0.0f;
         PushDefaultActions();
         if (queue.Peek() && depth < 2)
             return DoNextAction(unit, depth + 1, minimal);

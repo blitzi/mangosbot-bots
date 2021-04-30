@@ -81,7 +81,7 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget)
 
    if (bot->IsNonMeleeSpellCasted(true))
       return false;
-
+   
    uint8 bagIndex = item->GetBagSlot();
    uint8 slot = item->GetSlot();
    uint8 spell_index = 0;
@@ -227,8 +227,7 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget)
    if (sServerFacade.isMoving(bot))
    {
        bot->StopMoving();
-       ai->SetNextCheckDelay(sPlayerbotAIConfig.globalCoolDown);
-      return false;
+       return false;
    }
 
    for (int i = 0; i < MAX_ITEM_PROTO_SPELLS; i++)
@@ -288,11 +287,18 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget)
    ItemPrototype const* proto = item->GetProto();
    bool isDrink = proto->Spells[0].SpellCategory == 59;
    bool isFood = proto->Spells[0].SpellCategory == 11;
+
+   const SpellEntry* const pSpellInfo = sServerFacade.LookupSpellInfo(proto->Spells[0].SpellId);
+
+   //check if item aura already exists
+   if (ai->HasAura(pSpellInfo->Id, bot))
+       return false;
+
    if (proto->Class == ITEM_CLASS_CONSUMABLE && (proto->SubClass == ITEM_SUBCLASS_FOOD || proto->SubClass == ITEM_SUBCLASS_CONSUMABLE) &&
        (isFood || isDrink))
    {
       if (sServerFacade.IsInCombat(bot))
-         return false;
+         return false;           
 
       bot->addUnitState(UNIT_STAND_STATE_SIT);
       ai->InterruptSpell();
@@ -315,18 +321,11 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget)
           p = hp;
           TellConsumableUse(item, "Eating", p);
       }
-      if(!bot->IsInCombat() && !bot->InBattleGround())
-          ai->SetNextCheckDelay(27000.0f * (100 - p) / 100.0f);
 
-      if (!bot->IsInCombat() && bot->InBattleGround())
-          ai->SetNextCheckDelay(20000.0f * (100 - p) / 100.0f);
-
-      //ai->SetNextCheckDelay(27000.0f * (100 - p) / 100.0f);
       bot->GetSession()->HandleUseItemOpcode(packet);
       return true;
    }
 
-   ai->SetNextCheckDelay(sPlayerbotAIConfig.globalCoolDown);
    ai->TellMasterNoFacing(out.str());
    bot->GetSession()->HandleUseItemOpcode(packet);
    return true;

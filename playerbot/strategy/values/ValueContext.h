@@ -71,6 +71,7 @@
 #include "SkipSpellsListValue.h"
 #include "SnareTargetValue.h"
 #include "Stances.h"
+#include "IsCastingSpell.h"
 
 namespace ai
 {
@@ -80,6 +81,7 @@ namespace ai
         ValueContext()
         {
             creators["active spell"] = &ValueContext::active_spell;
+            creators["is casting spell"] = &ValueContext::is_casting_spell;
             creators["craft"] = &ValueContext::craft;
             creators["collision"] = &ValueContext::collision;
             creators["skip spells list"] = &ValueContext::skip_spells_list_value;
@@ -223,6 +225,7 @@ namespace ai
         static UntypedValue* inside_target(PlayerbotAI* ai) { return new InsideTargetValue(ai); }
         static UntypedValue* range(PlayerbotAI* ai) { return new RangeValue(ai); }
         static UntypedValue* active_spell(PlayerbotAI* ai) { return new ActiveSpellValue(ai); }
+        static UntypedValue* is_casting_spell(PlayerbotAI* ai) { return new IsCastingSpell(ai); }
         static UntypedValue* group(PlayerbotAI* ai) { return new IsInGroupValue(ai); }
         static UntypedValue* craft(PlayerbotAI* ai) { return new CraftValue(ai); }
         static UntypedValue* collision(PlayerbotAI* ai) { return new CollisionValue(ai); }

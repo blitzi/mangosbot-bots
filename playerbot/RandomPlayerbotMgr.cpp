@@ -191,11 +191,6 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed)
 
     //SetNextCheckDelay((uint32)max(1000, int(2000 * notDiv * sPlayerbotAIConfig.randomBotUpdateInterval) / 1000));
 
-    if (playerBots.size() < int(sPlayerbotAIConfig.minRandomBots / 2))
-        SetNextCheckDelay((uint32)max(1000, int(1000 * notDiv * sPlayerbotAIConfig.randomBotUpdateInterval) / 1000));
-    else
-        SetNextCheckDelay((uint32)max(1000, int(2000 * notDiv * sPlayerbotAIConfig.randomBotUpdateInterval) / 1000));
-
     list<uint32> bots = GetBots();
     int botCount = bots.size();
 
@@ -2425,8 +2420,7 @@ void RandomPlayerbotMgr::PrintStats()
         perRace[bot->getRace()]++;
         perClass[bot->getClass()]++;
 
-        if (bot->GetPlayerbotAI()->IsActive())
-            active++;
+        active++;
 
         if (bot->GetPlayerbotAI()->GetAiObjectContext()->GetValue<bool>("random bot update")->Get())
             update++;

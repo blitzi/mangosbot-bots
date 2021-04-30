@@ -84,7 +84,6 @@ bool OpenLootAction::DoLoot(LootObject& lootObject)
         WorldPacket packet(CMSG_LOOT, 8);
         packet << lootObject.guid;
         bot->GetSession()->HandleLootOpcode(packet);
-        ai->SetNextCheckDelay(sPlayerbotAIConfig.lootDelay);
         return true;
     }
 

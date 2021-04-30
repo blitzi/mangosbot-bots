@@ -316,9 +316,6 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
             sPlayerbotAIConfig.log(4, out.str().c_str());
     }
 
-    if (!react)
-        WaitForReach(startPosition.distance(movePosition));
-
     bot->HandleEmoteState(0);
     if (bot->IsSitState())
         bot->SetStandState(UNIT_STAND_STATE_STAND);
@@ -623,21 +620,6 @@ bool MovementAction::ChaseTo(WorldObject* obj)
     return true;
 }
 
-void MovementAction::WaitForReach(float distance)
-{
-    float delay = 1000.0f * distance / bot->GetSpeed(MOVE_RUN) + sPlayerbotAIConfig.reactDelay;
-
-    if (delay > sPlayerbotAIConfig.maxWaitForMove)
-        delay = sPlayerbotAIConfig.maxWaitForMove;
-
-    Unit* target = *ai->GetAiObjectContext()->GetValue<Unit*>("current target");
-    Unit* player = *ai->GetAiObjectContext()->GetValue<Unit*>("enemy player target");
-    if ((player || target) && delay > sPlayerbotAIConfig.globalCoolDown)
-        delay = sPlayerbotAIConfig.globalCoolDown;
-
-    ai->SetNextCheckDelay((uint32)delay);
-}
-
 bool MovementAction::Flee(Unit *target)
 {
     Player* master = GetMaster();
@@ -829,7 +811,6 @@ bool SetFacingTargetAction::Execute(Event event)
         return true;
 
     sServerFacade.SetFacingTo(bot, target);
-    ai->SetNextCheckDelay(sPlayerbotAIConfig.globalCoolDown);
     return true;
 }
 

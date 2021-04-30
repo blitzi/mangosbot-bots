@@ -324,6 +324,9 @@ public:
     bool HasSkill(SkillType skill);
     bool IsAllowedCommand(string text);
     float GetRange(string type);
+
+    bool IsDrinking();
+    bool IsEating();
     
 private:
     void _fillGearScoreData(Player *player, Item* item, std::vector<uint32>* gearScore, uint32& twoHandScore);
@@ -373,6 +376,7 @@ protected:
     map<string, time_t> whispers;
     pair<ChatMsg, time_t> currentChat;
     static set<string> unsecuredCommands;
+    float currentCastTime;
 
 };
 

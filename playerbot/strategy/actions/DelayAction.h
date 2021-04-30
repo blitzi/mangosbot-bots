@@ -17,7 +17,6 @@ namespace ai
         {
             uint32 delay = sPlayerbotAIConfig.passiveDelay + sPlayerbotAIConfig.globalCoolDown;
 
-            ai->SetNextCheckDelay(delay);
             return true;
         }
 

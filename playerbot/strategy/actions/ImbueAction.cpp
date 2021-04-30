@@ -43,7 +43,6 @@ bool ImbueWithPoisonAction::Execute(Event event)
          if (poison)
          {
             ai->ImbueItem(poison, EQUIPMENT_SLOT_MAINHAND);
-            ai->SetNextCheckDelay(5);
          }
       }
       //... and offhand
@@ -58,7 +57,6 @@ bool ImbueWithPoisonAction::Execute(Event event)
          if (poison)
          {
             ai->ImbueItem(poison, EQUIPMENT_SLOT_OFFHAND);
-            ai->SetNextCheckDelay(5);
          }
       }
 
@@ -98,7 +96,6 @@ bool ImbueWithStoneAction::Execute(Event event)
       if (stone)
       {
          ai->ImbueItem(stone, EQUIPMENT_SLOT_MAINHAND);
-         ai->SetNextCheckDelay(5);
       }
    }
    //... and offhand
@@ -109,7 +106,6 @@ bool ImbueWithStoneAction::Execute(Event event)
       if (stone)
       {
          ai->ImbueItem(stone, EQUIPMENT_SLOT_OFFHAND);
-         ai->SetNextCheckDelay(5);
       }
    }
 
@@ -149,7 +145,6 @@ bool ImbueWithOilAction::Execute(Event event)
       if (oil)
       {
          ai->ImbueItem(oil, EQUIPMENT_SLOT_MAINHAND);
-         ai->SetNextCheckDelay(5);
       }
    }
 }
@@ -171,7 +166,6 @@ bool TryEmergencyAction::Execute(Event event)
       if (bandage)
       {
          ai->ImbueItem(bandage, bot);
-         ai->SetNextCheckDelay(8);
       }
    }
 
