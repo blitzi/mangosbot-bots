@@ -19,7 +19,7 @@ private:
     {
         return new ActionNode ("shadow bolt",
             /*P*/ NULL,
-            /*A*/ NextAction::array(0, new NextAction("shoot"), NULL),
+            /*A*/ NULL,
             /*C*/ NULL);
     }
 };
