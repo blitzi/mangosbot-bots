@@ -20,7 +20,7 @@ void TankPaladinStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 
     triggers.push_back(new TriggerNode(
         "seal",
-        NextAction::array(0, new NextAction("seal of light", 90.0f), NULL)));
+        NextAction::array(0, new NextAction("seal of righteousness", 90.0f), NULL)));
 
     triggers.push_back(new TriggerNode(
         "judgement of light",
