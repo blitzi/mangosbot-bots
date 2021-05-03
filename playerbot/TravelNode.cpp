@@ -49,7 +49,7 @@ uint32 TravelNode::doPathStep(WorldPosition startPos, WorldPosition endPos, Unit
     else
 #ifdef IKE_PATHFINDER
     {
-        PathFinder path(startPos.getMapId(), startPos.getMapEntry()->Instanceable() ? startPos.getInstanceId() : 0);
+        PathFinder path(startPos.getMapId(), 0); // startPos.getMapEntry()->Instanceable() ? startPos.getInstanceId() : 0);
 
         path.setAreaCost(8, 10.0f);
         path.setAreaCost(11, 5.0f);
@@ -173,19 +173,36 @@ void TravelNode::cropUselessLinks()
             if (std::find(toRemove.begin(), toRemove.end(), firstNode) != toRemove.end())
                 continue;
 
+            if (std::find(toRemove.begin(), toRemove.end(), secondNode) != toRemove.end())
+                continue;
+
             if (firstNode->hasLinkTo(secondNode))
             {
                 //Is it quicker to go past first node to reach second node instead of going directly?
                 if (firstLength + firstNode->linkLengthTo(secondNode) < secondLength * 1.1)
                 {
+                    if (secondNode->hasLinkTo(this) && !firstNode->hasLinkTo(this))
+                        continue;
+
                     toRemove.push_back(secondNode);
                 }
             }
-            else if(firstNode->hasCompleteRouteTo(secondNode))
+            else
             {
+                TravelNodeRoute route = sTravelNodeMap.getRoute(firstNode, secondNode, false);
+
+                if (route.isEmpty())
+                    continue;
+
+                if (route.hasNode(this))
+                    continue;
+
                 //Is it quicker to go past first (and multiple) nodes to reach the second node instead of going directly?
-                if (firstLength + firstNode->getRouteTo(secondNode).getLength() < secondLength * 1.1)
+                if (firstLength + route.getLength() < secondLength * 1.1)
                 {
+                    if (secondNode->hasLinkTo(this) && !firstNode->hasLinkTo(this))
+                        continue;
+
                     toRemove.push_back(secondNode);
                 }
             }
@@ -260,23 +277,25 @@ bool TravelNode::canPathNode(WorldPosition* startPos, WorldPosition* endPos, Uni
 
 bool TravelNode::canPathNode(TravelNode* endNode, Unit* bot, vector<WorldPosition>& ppath) 
 { 
+    WorldPosition startPos = *getPosition();
     if (hasPathTo(endNode))
     {
         ppath = getPathTo(endNode);
-        return true;
-    }
 
-    //if (!bot || bot->GetMapId() != getMapId() || bot->GetMapId() != endNode->getMapId())
-    //    return false;
+        if (hasCompletePathto(endNode))
+            return true;
+ 
+        if (ppath.size() > 1)
+        {
+            startPos = ppath.back();
+            ppath.pop_back();
+        }
+    }
 
     WorldPosition* endPos = endNode->getPosition();
 
-    //if (!point.getMap()->IsLoaded(point.getX(), point.getY()) || !endPos->getMap()->IsLoaded(endPos->getX(), endPos->getY()))
-    //    return false;
-
-    bool canPath = canPathNode(endNode->getPosition(), bot, ppath);
-    if(canPath)
-        pathNode(endNode, ppath);
+    bool canPath = canPathNode(&startPos, endNode->getPosition(), bot, ppath);
+    pathNode(endNode, ppath);
     return canPath; 
 }
 
@@ -492,18 +511,20 @@ TravelNode* TravelNodeRoute::getNextNode(Unit* bot, WorldPosition* startPosition
     if (!paths.empty() && (nodes.size() > 1 || (!nodes[0]->doTransport(nodes[1]) && !nodes[0]->doPortal(nodes[1]))))
         finalPath = paths[0];
 
-    if (nodes.size() > 1 && (nodes[0]->doTransport(nodes[1]) || nodes[0]->doPortal(nodes[1])))
+    if (nodes.size() > 1 && (nodes[0]->doTransport(nodes[1]) || (nodes[0]->doPortal(nodes[1]))))
     {
         isTeleport = true;
         nextNode = nodes[1];
     }
-
     if (paths.empty())
     {
         if (isTeleport)
             longPath.push_back(*nodes[0]->getPosition());
         else
-            longPath.push_back(*nextNode->getPosition());
+        {
+            //longPath.push_back(*nextNode->getPosition());
+            nextNode = nodes[1];
+        }
     }
 
     //We now check if the bot is perhaps already on or near the route somewhere.
@@ -698,7 +719,7 @@ TravelNode* TravelNodeMap::getNode(WorldPosition* pos, vector<WorldPosition>& pp
     return NULL;
 }
 
-TravelNodeRoute TravelNodeMap::getRoute(TravelNode* start, TravelNode* goal)
+TravelNodeRoute TravelNodeMap::getRoute(TravelNode* start, TravelNode* goal, bool saveRoute)
 {
     //sLog.outError("Path from %s to %s", start->getName().c_str(), goal->getName().c_str());
 
@@ -776,9 +797,10 @@ TravelNodeRoute TravelNodeMap::getRoute(TravelNode* start, TravelNode* goal)
 
             reverse(path.begin(), path.end());
 
-            start->routeNode(goal, path);
+            if(saveRoute)
+                start->routeNode(goal, path);
 
-            return start->getRouteTo(goal);
+            return TravelNodeRoute(path);
         }
 
         for (const auto& children : currentNode->children)// for each successor n' of n
@@ -806,7 +828,8 @@ TravelNodeRoute TravelNodeMap::getRoute(TravelNode* start, TravelNode* goal)
         }
     }
 
-    start->routeNode(goal, TravelNodeRoute());
+    if(saveRoute)
+        start->routeNode(goal, TravelNodeRoute());
 
     return TravelNodeRoute();
 }

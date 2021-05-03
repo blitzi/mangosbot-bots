@@ -3,14 +3,15 @@
 
 #include "TravelMgr.h"
 #include "TravelNode.h"
+#include "PlayerbotAI.h"
 #include "TravelNodeStore.h"
 
 #include "ObjectMgr.h"
 #include <numeric>
 #include <iomanip>
 
-#include <MotionGenerators/PathFinder.h>
-
+#include "MotionGenerators/PathFinder.h"
+#include "PlayerbotAI.h"
 
 using namespace ai;
 using namespace MaNGOS;
@@ -59,6 +60,24 @@ WorldPosition WorldPosition::lastInRange(vector<WorldPosition> list, float minDi
 
     return rPoint;
 };
+
+WorldPosition WorldPosition::firstOutRange(vector<WorldPosition> list, float minDist, float maxDist)
+{
+    WorldPosition rPoint;
+
+    for (auto& p : list)
+    {
+        if (minDist > 0 && distance(p) < minDist)
+            return p;
+
+        if (maxDist > 0 && distance(p) > maxDist)
+            return p;
+
+        rPoint = p;
+    }
+
+    return rPoint;
+}
 
 //Returns true if (on the x-y plane) the position is inside the three points.
 bool WorldPosition::isInside(WorldPosition* p1, WorldPosition* p2, WorldPosition* p3)
@@ -299,54 +318,14 @@ string QuestObjectiveTravelDestination::getTitle() {
     return out.str();
 }
 
-//Coppy from reputation GetFactionReaction
-static inline ReputationRank GetFReaction(FactionTemplateEntry const* thisTemplate, FactionTemplateEntry const* otherTemplate)
-{
-    MANGOS_ASSERT(thisTemplate)
-        MANGOS_ASSERT(otherTemplate)
-
-        // Original logic begins
-
-        if (otherTemplate->factionGroupMask & thisTemplate->enemyGroupMask)
-            return REP_HOSTILE;
-
-    if (thisTemplate->enemyFaction[0] && otherTemplate->faction)
-    {
-        for (unsigned int i : thisTemplate->enemyFaction)
-        {
-            if (i == otherTemplate->faction)
-                return REP_HOSTILE;
-        }
-    }
-
-    if (otherTemplate->factionGroupMask & thisTemplate->friendGroupMask)
-        return REP_FRIENDLY;
-
-    if (thisTemplate->friendFaction[0] && otherTemplate->faction)
-    {
-        for (unsigned int i : thisTemplate->friendFaction)
-        {
-            if (i == otherTemplate->faction)
-                return REP_FRIENDLY;
-        }
-    }
-
-    if (thisTemplate->factionGroupMask & otherTemplate->friendGroupMask)
-        return REP_FRIENDLY;
-
-    if (otherTemplate->friendFaction[0] && thisTemplate->faction)
-    {
-        for (unsigned int i : otherTemplate->friendFaction)
-        {
-            if (i == thisTemplate->faction)
-                return REP_FRIENDLY;
-        }
-    }
-    return REP_NEUTRAL;
-}
-
 bool RpgTravelDestination::isActive(Player* bot)
 {
+    PlayerbotAI* ai = bot->GetPlayerbotAI();
+    AiObjectContext* context = ai->GetAiObjectContext();
+
+    if (AI_VALUE(uint8, "bag space") <= 80 && (AI_VALUE(uint8, "durability") >= 80 || AI_VALUE(uint32, "repair cost") > bot->GetMoney()))
+        return false;
+
     //Once the target rpged with it is added to the ignore list. We can now move on.
     set<ObjectGuid>& ignoreList = bot->GetPlayerbotAI()->GetAiObjectContext()->GetValue<set<ObjectGuid>&>("ignore rpg target")->Get();
 
@@ -360,7 +339,7 @@ bool RpgTravelDestination::isActive(Player* bot)
 
     CreatureInfo const* cInfo = this->getCreatureInfo();
     FactionTemplateEntry const* factionEntry = sFactionTemplateStore.LookupEntry(cInfo->Faction);
-    ReputationRank reaction = GetFReaction(bot->GetFactionTemplateEntry(), factionEntry);
+    ReputationRank reaction = ai->getReaction(factionEntry);
 
     return reaction > REP_NEUTRAL;
 }
@@ -1085,6 +1064,9 @@ void TravelMgr::LoadQuestTravelTable()
         if (!area->exploreFlag)
             continue;
 
+        if (u.type == 1) //Test to see if only picking units will improve coverage.
+            continue;
+
         auto iloc = exploreLocs.find(area->ID);
 
         int32 guid = u.type == 0 ? u.guid : u.guid * -1;
@@ -1514,8 +1496,8 @@ void TravelMgr::LoadQuestTravelTable()
                     continue;
 
                 FactionTemplateEntry const* factionEntry = sFactionTemplateStore.LookupEntry(cInfo->Faction);
-                ReputationRank reactionHum = GetFReaction(humanFaction, factionEntry);
-                ReputationRank reactionOrc = GetFReaction(orcFaction, factionEntry);
+                ReputationRank reactionHum = PlayerbotAI::GetFactionReaction(humanFaction, factionEntry);
+                ReputationRank reactionOrc = PlayerbotAI::GetFactionReaction(orcFaction, factionEntry);
 
                 if (reactionHum >= REP_NEUTRAL || reactionOrc >= REP_NEUTRAL)
                     continue;
@@ -1530,7 +1512,7 @@ void TravelMgr::LoadQuestTravelTable()
 
     bool preloadNodePaths = false;             //Calculate paths using pathfinder.
     bool preloadUnlinkedPaths = true;         //Try to connect points currently unlinked.
-    bool preloadReLinkFullyLinked = false;    //Retry nodes that are fully linked.
+    bool preloadReLinkFullyLinked = true;     //Retry nodes that are fully linked.
     bool preloadWorldPaths = true;            //Try to load paths in overworld.
     bool preloadInstancePaths = true;         //Try to load paths in instances.
     bool preloadSubPrint = true;              //Print output every 2%.
@@ -1572,7 +1554,7 @@ void TravelMgr::LoadQuestTravelTable()
 
                 for (auto& startNode : sTravelNodeMap.getNodes())
                 {
-                    if (!startNode->getPosition()->getMapEntry()->Instanceable())
+                    if (startNode->getPosition()->getMapEntry() && !startNode->getPosition()->getMapEntry()->Instanceable())
                         continue;
 
                     uint32 mapId = startNode->getMapId();
@@ -1694,7 +1676,20 @@ void TravelMgr::LoadQuestTravelTable()
 
     }
 
+    bool removeLowLinkNodes = false;
 
+    if (removeLowLinkNodes)
+    {
+        for(uint32 i = 0; i< sTravelNodeMap.getNodes().size(); i++)
+        {
+            TravelNode* node = sTravelNodeMap.getNodes()[i];
+            if (node->getNodeMap(true).size() < 5)
+            {
+                sTravelNodeMap.removeNode(node);
+                i--;
+            }
+        }
+    }
 
     bool preloadLinkRoutes = false;
 
@@ -1728,16 +1723,29 @@ void TravelMgr::LoadQuestTravelTable()
 
         sLog.outString(">> Loaded " SIZEFMTD " navigation link routes.", sTravelNodeMap.getNodes().size());
     }
-
+   
     bool cleanUpNodeLinks = false;
+    bool CleanUpSubPrint = true;              //Print output every 2%.
 
     if (cleanUpNodeLinks)
     {
+        //Routes
+        BarGoLink bar(sTravelNodeMap.getNodes().size());
+
+        uint32 cur = 0, max = sTravelNodeMap.getNodes().size();
+        
         //Clean up node links
         for (auto& startNode : sTravelNodeMap.getNodes())
         {
+            bar.step();
              startNode->cropUselessLinks();            
+
+             cur++;
+             if (CleanUpSubPrint && (cur * 10) / max > ((cur - 1) * 10) / max)
+                 sTravelNodeMap.printMap();
         }
+
+        sLog.outString(">> Cleaned " SIZEFMTD " nodes.", sTravelNodeMap.getNodes().size());
     }
 
     sTravelNodeMap.printMap();
@@ -1926,7 +1934,7 @@ vector<WorldPosition*> TravelMgr::getNextPoint(WorldPosition* center, vector<Wor
     //List of weights based on distance (Gausian curve that starts at 100 and lower to 1 at 1000 distance)
     vector<uint32> weights;
 
-    std::transform(points.begin(), points.end(), std::back_inserter(weights), [center](WorldPosition* point) { return 1+1000 * exp(-1 * pow(point->distance(center) / 400.0, 2)); });
+    std::transform(points.begin(), points.end(), std::back_inserter(weights), [center](WorldPosition* point) { return 1 + 1000 * exp(-1 * pow(point->distance(center) / 400.0, 2)); });
 
     //Total sum of all those weights.
     uint32 sum = std::accumulate(weights.begin(), weights.end(), 0);
