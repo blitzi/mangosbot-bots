@@ -99,6 +99,7 @@
 
         void pathNode(TravelNode* node, vector<WorldPosition> path) { if (this != node) { paths.insert_or_assign(node, path); } }
         bool hasPathTo(TravelNode* node) { return paths.find(node) != paths.end(); }
+        bool hasCompletePathto(TravelNode* node) { return hasPathTo(node) && !getPathTo(node).empty() ? getPathTo(node).back() == *node->getPosition() : false; }
         float getPathLength(vector<WorldPosition>& ppath);
         vector<WorldPosition> getPathTo(TravelNode* node) { for (auto& path : paths) { if (path.first == node) return path.second; }; vector<WorldPosition> retVec;  return retVec; }
         float getPathLength(TravelNode* node) { return getPathLength(getPathTo(node)); };
@@ -195,7 +196,7 @@
         TravelNode* getRandomNode(WorldPosition* pos) {vector<TravelNode*> rNodes = getNodes(pos); if (rNodes.empty()) return NULL; return  rNodes[urand(0, rNodes.size() - 1)]; }
 
         //Finds the best nodePath between two nodes
-        TravelNodeRoute getRoute(TravelNode* start, TravelNode* goal);
+        TravelNodeRoute getRoute(TravelNode* start, TravelNode* goal, bool saveRoute = true);
 
         //Find the best node between two positions
         TravelNodeRoute getRoute(WorldPosition* startPos, WorldPosition* endPos, vector<WorldPosition>& startPath, Unit* bot = NULL);

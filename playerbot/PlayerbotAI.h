@@ -328,6 +328,10 @@ public:
     bool IsDrinking();
     bool IsEating();
 
+
+    static ReputationRank GetFactionReaction(FactionTemplateEntry const* thisTemplate, FactionTemplateEntry const* otherTemplate);
+    static bool AddAura(Unit* unit, uint32 spellId);
+    ReputationRank getReaction(FactionTemplateEntry const* factionTemplate) { return GetFactionReaction(bot->GetFactionTemplateEntry(), factionTemplate);}
     
 private:
     void _fillGearScoreData(Player *player, Item* item, std::vector<uint32>* gearScore, uint32& twoHandScore);
@@ -350,6 +354,7 @@ public:
 
 	bool GroupHasHealer();
     GrouperType PlayerbotAI::GetGrouperType();
+    GrouperType GetGrouperType();
     bool HasPlayerNearby(WorldPosition* pos, float range = sPlayerbotAIConfig.reactDistance);
     bool HasPlayerNearby(float range = sPlayerbotAIConfig.reactDistance) {return HasPlayerNearby(&WorldPosition(bot), range);};
     bool HasManyPlayersNearby(uint32 trigerrValue = 20, float range = sPlayerbotAIConfig.sightDistance);

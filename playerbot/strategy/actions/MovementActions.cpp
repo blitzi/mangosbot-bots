@@ -118,6 +118,8 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
 
     if (totalDistance < minDist)
     {
+        if(lastMove.lastMoveShort.distance(endPosition) < maxDistChange)
+            AI_VALUE(LastMovement&, "last movement").setLong(WorldPosition());
         bot->StopMoving();
         return false;
     }
@@ -137,10 +139,18 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
         else if (nextStart.distance(movePath.back()) < 5.0f)
             movePath.clear(); //We arrived at the end of the previous path. Clear it and recalulate.   
         else
-        movePosition = startPosition.lastInRange(movePath, -1.0, maxDist);
+        {
+            movePosition = startPosition.lastInRange(movePath, -1.0, maxDist);
+
+            if (movePosition.distance(startPosition) < 5.0f)
+            {
+                movePosition = movePath.back(); //We are at the end of an incomplete path. Head to the next node.
+                movePath.clear();
+            }
+        }
     }
 
-    if (movePosition == WorldPosition() && movePath.size() == 0)
+    if (movePosition == WorldPosition())
     {
         movePosition = endPosition;
 
@@ -170,6 +180,8 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
                             ai->TellMasterNoFacing("I have no path");
                         return false;
                     }
+
+                    movePosition = endPosition;
                 }
                 else
                 {
@@ -186,17 +198,29 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
                     //'Wait and get on' transport code should go here.
                     if (isTeleport && (longPath.size() == 0 || longPath.back().distance(&startPosition) < 5.0f))
                     {
-                        if (ai->HasStrategy("debug move", BOT_STATE_NON_COMBAT))
-                            ai->TellMasterNoFacing("Teleporting to" + nextNode->getName());
-                        return bot->TeleportTo(nextNode->getMapId(), nextNode->getX(), nextNode->getY(), nextNode->getZ(), nextNode->getO());
+                        if (!ai->isRealPlayer() || startNode->doTransport(nextNode))
+                        {
+                            if (ai->HasStrategy("debug move", BOT_STATE_NON_COMBAT))
+                                ai->TellMasterNoFacing("Teleporting to" + nextNode->getName());
+                            return bot->TeleportTo(nextNode->getMapId(), nextNode->getX(), nextNode->getY(), nextNode->getZ(), nextNode->getO());
+                        }
                     }
 
                     //We can skip ahead on the path.
-                    if (startNode != nextNode && !shortPath.empty())
+                    if (startNode != nextNode)
                     {
                         //Can we move from start position to the closest point on the route?
-                        if (!detailedMove || nextNode->canPathNode(&startPosition, &shortPath.front(), bot, movePath))
-                            movePath.insert(movePath.end(), shortPath.begin(), shortPath.end());
+                        if (!shortPath.empty())
+                        {
+                            if (!detailedMove || nextNode->canPathNode(&startPosition, &shortPath.front(), bot, movePath))
+                                movePath.insert(movePath.end(), shortPath.begin(), shortPath.end());
+                            else
+                                movePath = longPath;
+                        }
+                        else if(longPath.empty() || longPath.back().distance(&startPosition) < 5.0f)
+                        {
+                            movePosition = *nextNode->getPosition();
+                        }
                         else
                             movePath = longPath;
                     }
@@ -246,36 +270,42 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
                 }
 
                 sTravelNodeMap.m_nMapMtx.unlock_shared();
-
-                //Move along the path as far as we are allowed.
-                movePosition = startPosition.lastInRange(movePath, -1.0, maxDist);
-
-                AI_VALUE(LastMovement&, "last movement").setLong(endPosition);
-                AI_VALUE(LastMovement&, "last movement").setPath(movePath);
             }
             else
 #endif
             {
-                //No node-route found.
-                if (totalDistance > maxDist) //Crop movement to react distance to prevent flying bots.
-                {
-                    //Use standard pathfinder to find a route. 
-                    PathFinder path(bot);
-                    path.calculate(x, y, z, false);
-                    PathType type = path.getPathType();
-                    PointsArray& points = path.getPath();
-                    movePath = startPosition.getPath(points);
-
-                    if (type == PATHFIND_NOPATH)
-                        return false;
-
-                    movePosition = startPosition.lastInRange(movePath, -1.0, maxDist);                    
-
-                    AI_VALUE(LastMovement&, "last movement").setLong(endPosition);
-                    AI_VALUE(LastMovement&, "last movement").setPath(movePath);
-                }
+                //Use standard pathfinder to find a route. 
+                movePosition = endPosition;
             }
         }
+    }
+
+    if (movePath.empty() && movePosition.distance(startPosition) > maxDist)
+    {
+        //Use standard pathfinder to find a route. 
+        PathFinder path(bot);
+        path.calculate(movePosition.getX(), movePosition.getY(), movePosition.getZ(), false);
+        PathType type = path.getPathType();
+        PointsArray& points = path.getPath();
+        movePath = startPosition.getPath(points);
+
+        if (type == PATHFIND_NOPATH)
+            return false;
+        else if (type == PATHFIND_INCOMPLETE)
+            movePath.push_back(movePosition); //We want partial paths to end at the place where we should move to.
+    }
+
+    if (!movePath.empty())
+    {
+        movePosition = startPosition.lastInRange(movePath, -1.0, maxDist);
+
+        AI_VALUE(LastMovement&, "last movement").setLong(endPosition);
+        AI_VALUE(LastMovement&, "last movement").setPath(movePath);
+    }
+    else
+    {
+        AI_VALUE(LastMovement&, "last movement").setLong(movePosition);
+        AI_VALUE(LastMovement&, "last movement").setPath(movePath);
     }
 
     if (movePosition == WorldPosition())
