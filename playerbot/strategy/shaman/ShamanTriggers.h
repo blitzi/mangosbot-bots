@@ -173,7 +173,7 @@ namespace ai
 
     class ShockTrigger : public InterruptEnemyHealerTrigger {
     public:
-        ShockTrigger(PlayerbotAI* ai) : InterruptEnemyHealerTrigger(ai, "earth shock") {}
+        ShockTrigger(PlayerbotAI* ai) : InterruptEnemyHealerTrigger(ai, "earth shock interrupt heal") {}
         virtual bool IsActive();
     };
 
@@ -183,6 +183,7 @@ namespace ai
     };
 
     DEBUFF_TRIGGER(FlameshockTrigger, "flame shock", "flame shock");
+    DEBUFF_TRIGGER(EarthshockTrigger, "earth shock", "earth shock");
 
     class HeroismTrigger : public BoostTrigger
     {
