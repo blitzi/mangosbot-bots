@@ -142,6 +142,10 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
             Event event = basket->getEvent();
             if (minimal && (relevance < 100))
                 continue;
+
+            if(lastCastRelevance && relevance < lastCastRelevance)
+                continue;
+
             // NOTE: queue.Pop() deletes basket
             ActionNode* actionNode = queue.Pop();
             Action* action = InitializeAction(actionNode);
@@ -163,7 +167,7 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
                     }
                 }
 
-                if (action->isPossible() && relevance && (!lastCastRelevance || (relevance > ACTION_CRITICAL_HEAL && relevance > lastCastRelevance)))
+                if (action->isPossible() && relevance)
                 {
                     if (!skipPrerequisites)
                     {

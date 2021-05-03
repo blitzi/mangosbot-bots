@@ -73,6 +73,9 @@ namespace ai
             creators["shoot"] = &ActionContext::shoot;
             creators["lifeblood"] = &ActionContext::lifeblood;
             creators["arcane torrent"] = &ActionContext::arcane_torrent;
+            creators["pull start"] = &ActionContext::pull_start;
+            creators["pull finish"] = &ActionContext::pull_finish;
+            creators["start pull"] = &ActionContext::start_pull;
             creators["end pull"] = &ActionContext::end_pull;
             creators["healthstone"] = &ActionContext::healthstone;
             creators["healing potion"] = &ActionContext::healing_potion;
@@ -178,6 +181,9 @@ namespace ai
         static Action* arcane_torrent(PlayerbotAI* ai) { return new CastArcaneTorrentAction(ai); }
         static Action* mana_tap(PlayerbotAI* ai) { return new CastManaTapAction(ai); }
         static Action* war_stomp(PlayerbotAI* ai) { return new CastWarStompAction(ai); }
+        static Action* pull_start(PlayerbotAI* ai) { return new Action(ai); }
+        static Action* pull_finish(PlayerbotAI* ai) { return new Action(ai); }
+        static Action* start_pull(PlayerbotAI* ai) { return new ChangeCombatStrategyAction(ai, "+pull"); }
         static Action* end_pull(PlayerbotAI* ai) { return new ChangeCombatStrategyAction(ai, "-pull"); }
 
         static Action* emote(PlayerbotAI* ai) { return new EmoteAction(ai); }

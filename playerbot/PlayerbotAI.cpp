@@ -524,14 +524,6 @@ void PlayerbotAI::DoNextAction()
         return;
     }
 
-    currentEngine->DoNextAction(NULL, 0, minimal);
-
-    if (currentEngine != engines[BOT_STATE_DEAD] && !sServerFacade.IsAlive(bot))
-        ChangeEngine(BOT_STATE_DEAD);
-
-    if (currentEngine == engines[BOT_STATE_DEAD] && sServerFacade.IsAlive(bot))
-        ChangeEngine(BOT_STATE_NON_COMBAT);
-
     Group *group = bot->GetGroup();
     // test BG master set
     if ((!master || master->GetPlayerbotAI()) && group)
@@ -555,12 +547,7 @@ void PlayerbotAI::DoNextAction()
     }
 
     if (master)
-	{
-        if (IsEating() || IsDrinking())
-        {
-            return;
-        }
-
+	{    
 		if (master->m_movementInfo.HasMovementFlag(MOVEFLAG_WALK_MODE)) bot->m_movementInfo.AddMovementFlag(MOVEFLAG_WALK_MODE);
 		else bot->m_movementInfo.RemoveMovementFlag(MOVEFLAG_WALK_MODE);
 
@@ -574,6 +561,14 @@ void PlayerbotAI::DoNextAction()
 	}
 	else if (bot->m_movementInfo.HasMovementFlag(MOVEFLAG_WALK_MODE)) bot->m_movementInfo.RemoveMovementFlag(MOVEFLAG_WALK_MODE);
     else if (bot->IsSitState()) bot->SetStandState(UNIT_STAND_STATE_STAND);
+
+    currentEngine->DoNextAction(NULL, 0, minimal);
+
+    if (currentEngine != engines[BOT_STATE_DEAD] && !sServerFacade.IsAlive(bot))
+        ChangeEngine(BOT_STATE_DEAD);
+
+    if (currentEngine == engines[BOT_STATE_DEAD] && sServerFacade.IsAlive(bot))
+        ChangeEngine(BOT_STATE_NON_COMBAT);
 }
 
 void PlayerbotAI::ReInitCurrentEngine()

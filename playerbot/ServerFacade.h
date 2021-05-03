@@ -210,7 +210,7 @@ class ServerFacade
 #ifdef CMANGOS          
             return //bot->GetMapId() == wo->GetMapId() &&
                 (
-                    bot->IsWithinLOSInMap(wo, true) ||
+                    bot->IsWithinLOSInMap(wo, false) ||
                     GetDistance2d(bot, wo) <= sPlayerbotAIConfig.tooCloseDistance
                 );
 #endif

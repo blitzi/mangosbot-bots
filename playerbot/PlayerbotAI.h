@@ -327,6 +327,7 @@ public:
 
     bool IsDrinking();
     bool IsEating();
+
     
 private:
     void _fillGearScoreData(Player *player, Item* item, std::vector<uint32>* gearScore, uint32& twoHandScore);
@@ -335,6 +336,8 @@ private:
 public:
 	Player* GetBot() { return bot; }
     Player* GetMaster() { return master; }
+    string GetPullAction() { return pullAction; };
+    void SetPullAction(string action) { this->pullAction = action; }
 
     //Checks if the bot is really a player. Players always have themselves as master.
     bool isRealPlayer() { return master ? (master == bot) : false; } 
@@ -377,6 +380,7 @@ protected:
     pair<ChatMsg, time_t> currentChat;
     static set<string> unsecuredCommands;
     float currentCastTime;
+    string pullAction;
 
 };
 
