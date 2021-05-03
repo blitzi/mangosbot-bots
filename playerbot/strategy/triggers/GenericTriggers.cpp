@@ -53,9 +53,7 @@ bool BuffTrigger::IsActive()
 {
     Unit* target = GetTarget();
 	return SpellTrigger::IsActive() &&
-        !ai->HasAura(spell, target, true)/* &&
-        (!AI_VALUE2(bool, "has mana", "self target") || AI_VALUE2(uint8, "mana", "self target") > sPlayerbotAIConfig.mediumMana)*/
-        ;
+        !ai->HasAura(spell, target, false);
 }
 
 Value<Unit*>* BuffOnPartyTrigger::GetTargetValue()
@@ -459,4 +457,44 @@ bool IsMountedTrigger::IsActive()
 bool CorpseNearTrigger::IsActive()
 {
     return bot->GetCorpse() && bot->GetCorpse()->IsWithinDistInMap(bot, CORPSE_RECLAIM_RADIUS, true);
+}
+
+
+bool BossfightTrigger::IsActive()
+{
+    if (!AI_VALUE(uint8, "attacker count"))
+        return false;
+
+    Unit* currentTarget = AI_VALUE(Unit*, "current target");
+    if (currentTarget)
+    {
+        Creature* c = dynamic_cast<Creature*>(currentTarget);
+
+        if (c)
+        {
+            uint32 rank = c->GetCreatureInfo()->Rank;
+
+            if (rank == CREATURE_ELITE_NORMAL)
+            {
+                int x = 0;
+            }
+            if (rank == CREATURE_ELITE_ELITE)
+            {
+                int x = 0;
+            }
+            if (rank == CREATURE_ELITE_RAREELITE)
+            {
+                int x = 0;
+            }
+            if (rank == CREATURE_ELITE_WORLDBOSS)
+            {
+                int x = 0;
+            }
+            if (rank == CREATURE_ELITE_RARE)
+            {
+                int x = 0;
+            }
+        }
+    }
+        return true;
 }

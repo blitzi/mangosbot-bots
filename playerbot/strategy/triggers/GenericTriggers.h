@@ -224,6 +224,14 @@ namespace ai
         HighAoeTrigger(PlayerbotAI* ai) : AoeTrigger(ai, 4, 20.0f) {}
     };
 
+
+    class BossfightTrigger : public Trigger
+    {
+    public:
+        BossfightTrigger(PlayerbotAI* ai) : Trigger(ai, "bossfight") {}
+        virtual bool IsActive();
+    };
+
     class BuffTrigger : public SpellTrigger
     {
     public:
