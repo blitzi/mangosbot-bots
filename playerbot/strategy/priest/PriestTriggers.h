@@ -49,6 +49,25 @@ namespace ai
             ; }
     };
 
+    class PrayerOfMendingOnTankTrigger : public BuffOnTankTrigger {
+    public:
+        PrayerOfMendingOnTankTrigger(PlayerbotAI* ai) : BuffOnTankTrigger(ai, "prayer of mending", 1) {}
+
+        virtual bool IsActive() {
+            return BuffOnTankTrigger::IsActive() &&
+                !ai->HasAura("prayer of mending", GetTarget()) &&
+#ifdef MANGOS
+                (ai->GetBot()->IsInSameGroupWith((Player*)GetTarget()) || ai->GetBot()->IsInSameRaidWith((Player*)GetTarget())) &&
+#endif
+#ifdef CMANGOS
+                (ai->GetBot()->IsInGroup((Player*)GetTarget(), true) || ai->GetBot()->IsInGroup((Player*)GetTarget()))
+#endif               
+                ;
+        }
+
+        virtual string getName() { return spell + " on tank"; }
+    };
+
     class PrayerOfSpiritTrigger : public BuffOnPartyTrigger {
     public:
         PrayerOfSpiritTrigger(PlayerbotAI* ai) : BuffOnPartyTrigger(ai, "prayer of spirit", 2) {}
