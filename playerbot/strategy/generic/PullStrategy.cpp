@@ -47,7 +47,7 @@ private:
         return new ActionNode(ai->GetPullAction(),
             /*P*/ NULL,
             /*A*/ NULL,
-            /*C*/ NextAction::array(0, new NextAction("follow", 103), NULL));
+            /*C*/ NextAction::array(0, new NextAction("end pull", 102), NULL));
     }
     static ActionNode* pull_finish(PlayerbotAI* ai)
     {
