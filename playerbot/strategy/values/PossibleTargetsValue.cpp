@@ -13,8 +13,8 @@ using namespace MaNGOS;
 
 void PossibleTargetsValue::FindUnits(list<Unit*> &targets)
 {
-    MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck u_check(bot, range);
-    MaNGOS::UnitListSearcher<MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck> searcher(targets, u_check);
+    MaNGOS::AnyEnemyInObjectRangeCheck u_check(bot, range);
+    MaNGOS::UnitListSearcher<MaNGOS::AnyEnemyInObjectRangeCheck> searcher(targets, u_check);
     Cell::VisitAllObjects(bot, searcher, range);
 }
 

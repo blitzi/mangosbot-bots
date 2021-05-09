@@ -328,6 +328,7 @@ public:
     bool IsDrinking();
     bool IsEating();
 
+    bool IsCasting();
 
     static ReputationRank GetFactionReaction(FactionTemplateEntry const* thisTemplate, FactionTemplateEntry const* otherTemplate);
     static bool AddAura(Unit* unit, uint32 spellId);
@@ -353,7 +354,6 @@ public:
     uint32 GetFixedBotNumer(BotTypeNumber typeNumber, uint32 maxNum = 100, uint32 cyclePerMin = 1); 
 
 	bool GroupHasHealer();
-    GrouperType PlayerbotAI::GetGrouperType();
     GrouperType GetGrouperType();
     bool HasPlayerNearby(WorldPosition* pos, float range = sPlayerbotAIConfig.reactDistance);
     bool HasPlayerNearby(float range = sPlayerbotAIConfig.reactDistance) {return HasPlayerNearby(&WorldPosition(bot), range);};
@@ -389,3 +389,25 @@ protected:
 
 };
 
+
+namespace MaNGOS
+{
+    class AnyEnemyInObjectRangeCheck
+    {
+    public:
+        AnyEnemyInObjectRangeCheck(WorldObject const* obj, float range) : i_obj(obj), i_range(range)
+        {
+            i_controlledByPlayer = obj->IsControlledByPlayer();
+        }
+        WorldObject const& GetFocusObject() const { return *i_obj; }
+        bool operator()(Unit* u) const
+        {
+            return u->IsAlive() && i_obj->CanAttackSpell(u) && i_obj->IsWithinDistInMap(u, i_range) && i_obj->IsWithinLOSInMap(u);
+        }
+    private:
+        WorldObject const* i_obj;
+        bool i_controlledByPlayer;
+        float i_range;
+    };
+
+};

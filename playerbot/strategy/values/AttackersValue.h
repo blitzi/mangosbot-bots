@@ -15,6 +15,10 @@ namespace ai
         void AddAttackersOf(Group* group, set<Unit*>& targets);
         void AddAttackersOf(Player* player, set<Unit*>& targets);
 		void RemoveNonThreating(set<Unit*>& targets);
+		void RemoveNonEliteTargets(set<Unit*>& targets);
+		void RemoveNonTotemTargets(set<Unit*>& targets);
+        bool ListContainsElite(set<Unit*>& targets) const;
+        bool ListContainsTotem(set<Unit*>& targets) const;
 
     public:
         static bool IsPossibleTarget(Unit* attacker, Player *bot);

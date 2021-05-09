@@ -167,7 +167,7 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
                     }
                 }
 
-                if (action->isPossible() && relevance)
+                if (relevance && action->isPossible())
                 {
                     if (!skipPrerequisites)
                     {
@@ -216,11 +216,6 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
     }
     while (basket && ++iterations <= iterationsPerTick);
   
-    if (ai->GetAiObjectContext()->GetValue<bool>("is casting spell")->Get() == false)
-    {
-        lastCastRelevance = 0;
-    }     
-
     if (!basket)
     {
         PushDefaultActions();
@@ -244,6 +239,10 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
     if (!actionExecuted)
         LogAction("no actions executed");
 
+    if (ai->GetAiObjectContext()->GetValue<bool>("is casting spell")->Get() == false)
+    {
+        lastCastRelevance = 0;
+    }     
     queue.RemoveExpired();
     return actionExecuted;
 }

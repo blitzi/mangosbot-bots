@@ -74,8 +74,8 @@ bool AddGatheringLootAction::AddLoot(ObjectGuid guid)
     if (sServerFacade.IsDistanceGreaterThan(sServerFacade.GetDistance2d(bot, wo), INTERACTION_DISTANCE))
     {
         list<Unit*> targets;
-        MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck u_check(bot, sPlayerbotAIConfig.lootDistance);
-        MaNGOS::UnitListSearcher<MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck> searcher(targets, u_check);
+        MaNGOS::AnyEnemyInObjectRangeCheck u_check(bot, sPlayerbotAIConfig.lootDistance);
+        MaNGOS::UnitListSearcher<MaNGOS::AnyEnemyInObjectRangeCheck> searcher(targets, u_check);
         Cell::VisitAllObjects(wo, searcher, sPlayerbotAIConfig.spellDistance);
         if (!targets.empty())
         {

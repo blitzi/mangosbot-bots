@@ -502,27 +502,22 @@ void PlayerbotAI::ChangeEngine(BotState type)
 
 void PlayerbotAI::DoNextAction()
 {
-    if (bot->IsBeingTeleported() || (GetMaster() && GetMaster()->IsBeingTeleported()))
-    {
+    if (IsCasting())
         return;
-    }
+
+    if (bot->IsBeingTeleported() || (GetMaster() && GetMaster()->IsBeingTeleported()))
+        return;
 
     if (bot->IsTaxiFlying() || bot->IsFlying())
-    {
         return;
-    }
 
     bool minimal = !AllowActive(ALL_ACTIVITY);
 
     if (!bot->GetGroup() && minimal)
-    {
         return;
-    }
 
     if (IsEating() || IsDrinking())
-    {
         return;
-    }
 
     Group *group = bot->GetGroup();
     // test BG master set
@@ -745,47 +740,6 @@ bool PlayerbotAI::IsHeal(Player* player)
     }
     return false;
 }
-
-
-
-namespace MaNGOS
-{
-
-    class UnitByGuidInRangeCheck
-    {
-    public:
-        UnitByGuidInRangeCheck(WorldObject const* obj, ObjectGuid guid, float range) : i_obj(obj), i_range(range), i_guid(guid) {}
-        WorldObject const& GetFocusObject() const { return *i_obj; }
-        bool operator()(Unit* u)
-        {
-            return u->GetObjectGuid() == i_guid && i_obj->IsWithinDistInMap(u, i_range);
-        }
-    private:
-        WorldObject const* i_obj;
-        float i_range;
-        ObjectGuid i_guid;
-    };
-
-    class GameObjectByGuidInRangeCheck
-    {
-    public:
-        GameObjectByGuidInRangeCheck(WorldObject const* obj, ObjectGuid guid, float range) : i_obj(obj), i_range(range), i_guid(guid) {}
-        WorldObject const& GetFocusObject() const { return *i_obj; }
-        bool operator()(GameObject* u)
-        {
-            if (u && i_obj->IsWithinDistInMap(u, i_range) && sServerFacade.isSpawned(u) && u->GetGOInfo() && u->GetObjectGuid() == i_guid)
-                return true;
-
-            return false;
-        }
-    private:
-        WorldObject const* i_obj;
-        float i_range;
-        ObjectGuid i_guid;
-    };
-
-};
-
 
 Unit* PlayerbotAI::GetUnit(ObjectGuid guid)
 {
@@ -2492,4 +2446,19 @@ bool PlayerbotAI::IsEating()
 bool PlayerbotAI::IsDrinking()
 {
     return HasAura(27089, bot) && bot->HasMana() && bot->GetPowerPercent() < 100;
+}
+
+bool PlayerbotAI::IsCasting()
+{
+    LastSpellCast& lastSpell = aiObjectContext->GetValue<LastSpellCast& >("last spell cast")->Get();
+
+    if (lastSpell.id)
+    {
+        Spell* spell = bot->FindCurrentSpellBySpellId(lastSpell.id);
+        if (spell && spell->getState() != SPELL_STATE_FINISHED)
+            return true;
+
+    }
+
+    return false;
 }

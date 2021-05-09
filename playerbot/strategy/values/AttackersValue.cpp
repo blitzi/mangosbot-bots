@@ -26,6 +26,14 @@ list<ObjectGuid> AttackersValue::Calculate()
         AddAttackersOf(group, targets);
 
     RemoveNonThreating(targets);
+
+    //if there is an elite mob between all the other mobs, tanks should focus them
+    if (ai->IsTank(ai->GetBot()) && ListContainsElite(targets))
+        RemoveNonEliteTargets(targets);
+
+    //if there are totems between all the other targets, the group should focus them
+    if (!ai->IsTank(ai->GetBot()) && ListContainsTotem(targets))
+        RemoveNonTotemTargets(targets);
     
 	for (set<Unit*>::iterator i = targets.begin(); i != targets.end(); i++)
 		result.push_back((*i)->GetObjectGuid());
@@ -66,8 +74,8 @@ void AttackersValue::AddAttackersOf(Player* player, set<Unit*>& targets)
         return;
 
 	list<Unit*> units;
-	MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck u_check(player, sPlayerbotAIConfig.sightDistance);
-    MaNGOS::UnitListSearcher<MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck> searcher(units, u_check);
+	AnyEnemyInObjectRangeCheck u_check(player, sPlayerbotAIConfig.sightDistance);
+    UnitListSearcher<AnyEnemyInObjectRangeCheck> searcher(units, u_check);
     Cell::VisitAllObjects(player, searcher, sPlayerbotAIConfig.sightDistance);
 	for (list<Unit*>::iterator i = units.begin(); i != units.end(); i++)
     {
@@ -104,6 +112,68 @@ void AttackersValue::RemoveNonThreating(set<Unit*>& targets)
         else
             ++tIter;
     }
+}
+
+void AttackersValue::RemoveNonEliteTargets(set<Unit*>& targets)
+{
+    for (set<Unit*>::iterator tIter = targets.begin(); tIter != targets.end();)
+    {
+        Unit* unit = *tIter;
+        Creature* c = dynamic_cast<Creature*>(unit);
+        if (c && !c->IsElite())
+        {
+            set<Unit*>::iterator tIter2 = tIter;
+            ++tIter;
+            targets.erase(tIter2);
+        }
+        else
+            ++tIter;
+    }
+}
+
+void AttackersValue::RemoveNonTotemTargets(set<Unit*>& targets)
+{
+    for (set<Unit*>::iterator tIter = targets.begin(); tIter != targets.end();)
+    {
+        Unit* unit = *tIter;
+        Creature* c = dynamic_cast<Creature*>(unit);
+        if (c && !c->IsTotem())
+        {
+            set<Unit*>::iterator tIter2 = tIter;
+            ++tIter;
+            targets.erase(tIter2);
+        }
+        else
+            ++tIter;
+    }
+}
+
+
+bool AttackersValue::ListContainsElite(set<Unit*>& targets) const
+{
+    for (auto t : targets)
+    {
+        Creature* c = dynamic_cast<Creature*>(t);
+
+        if (c && c->IsElite())
+            return true;
+    }
+
+    return false;
+}
+
+
+bool AttackersValue::ListContainsTotem(set<Unit*>& targets) const
+{
+    for (auto t : targets)
+    {
+        Creature* c = dynamic_cast<Creature*>(t);
+
+        if (c && c->IsTotem())
+            return true;
+    }
+
+    return false;
 }
 
 bool AttackersValue::IsPossibleTarget(Unit *attacker, Player *bot)
@@ -248,7 +318,7 @@ bool AttackersValue::IsValidTarget(Unit *attacker, Player *bot)
 
     return possibleTarget &&
         (sServerFacade.GetThreatManager(attacker).getCurrentVictim() ||
-            attacker->GetGuidValue(UNIT_FIELD_TARGET) || attacker->GetObjectGuid().IsPlayer() ||
+            attacker->GetGuidValue(UNIT_FIELD_TARGET) || attacker->GetObjectGuid().IsPlayer() || attacker->GetCreatureType() == CREATURE_TYPE_TOTEM ||
             attacker->GetObjectGuid() == bot->GetPlayerbotAI()->GetAiObjectContext()->GetValue<ObjectGuid>("pull target")->Get());
 }
 
