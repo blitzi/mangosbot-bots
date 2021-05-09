@@ -69,6 +69,13 @@ namespace ai
     class SearingTotemTrigger : public TotemTrigger {
     public:
         SearingTotemTrigger(PlayerbotAI* ai) : TotemTrigger(ai, "searing totem", 1) {}
+
+        virtual bool IsActive()
+        {
+            bool isDungeon = ai->GetBot()->GetMap()->IsDungeon();
+
+            return !isDungeon && TotemTrigger::IsActive();
+        }
     };
 
     class WindShearInterruptSpellTrigger : public InterruptSpellTrigger
