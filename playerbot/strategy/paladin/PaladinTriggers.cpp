@@ -17,6 +17,13 @@ bool SealTrigger::IsActive()
         AI_VALUE2(bool, "combat", "self target");
 }
 
+bool SealOfWisdomTrigger::IsActive()
+{
+    bool lowMana = AI_VALUE2(bool, "has mana", "self target") && AI_VALUE2(uint8, "mana", "self target") < sPlayerbotAIConfig.mediumMana;
+
+    return SealTrigger::IsActive() && lowMana;
+}
+
 bool CrusaderAuraTrigger::IsActive()
 {
 	Unit* target = GetTarget();

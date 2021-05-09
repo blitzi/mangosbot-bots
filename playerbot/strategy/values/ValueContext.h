@@ -72,6 +72,7 @@
 #include "SnareTargetValue.h"
 #include "Stances.h"
 #include "IsCastingSpell.h"
+#include "TankWithoutAuraValue.h"
 
 namespace ai
 {
@@ -101,6 +102,7 @@ namespace ai
             creators["nearest corpses"] = &ValueContext::nearest_corpses;
             creators["log level"] = &ValueContext::log_level;
             creators["party member without aura"] = &ValueContext::party_member_without_aura;
+            creators["tank without aura"] = &ValueContext::tank_without_aura;
             creators["attacker without aura"] = &ValueContext::attacker_without_aura;
             creators["party member to heal"] = &ValueContext::party_member_to_heal;
             creators["party member to resurrect"] = &ValueContext::party_member_to_resurrect;
@@ -297,6 +299,7 @@ namespace ai
         static UntypedValue* all_targets(PlayerbotAI* ai) { return new AllTargetsValue(ai); }
         static UntypedValue* nearest_adds(PlayerbotAI* ai) { return new NearestAddsValue(ai); }
         static UntypedValue* party_member_without_aura(PlayerbotAI* ai) { return new PartyMemberWithoutAuraValue(ai); }
+        static UntypedValue* tank_without_aura(PlayerbotAI* ai) { return new TankWithoutAuraValue(ai); }
         static UntypedValue* attacker_without_aura(PlayerbotAI* ai) { return new AttackerWithoutAuraTargetValue(ai); }
         static UntypedValue* party_member_to_heal(PlayerbotAI* ai) { return new PartyMemberToHeal(ai); }
         static UntypedValue* party_member_to_resurrect(PlayerbotAI* ai) { return new PartyMemberToResurrect(ai); }

@@ -206,6 +206,12 @@ namespace ai
         virtual bool IsActive() { return AI_VALUE2(list<Item*>, "inventory items", "conjured water").empty(); }
     };
 
+    class RangeAoeTrigger : public AoeTrigger
+    {
+    public:
+        RangeAoeTrigger(PlayerbotAI* ai) : AoeTrigger(ai, 1, 15.0f) {}
+    };
+
     class LightAoeTrigger : public AoeTrigger
     {
     public:
@@ -249,6 +255,16 @@ namespace ai
 		virtual Value<Unit*>* GetTargetValue();
 		virtual string getName() { return spell + " on party"; }
     };
+
+    class BuffOnTankTrigger : public BuffTrigger
+    {
+    public:
+        BuffOnTankTrigger(PlayerbotAI* ai, string spell, int checkInterval = 1) : BuffTrigger(ai, spell, checkInterval) {}
+    public:
+        virtual Value<Unit*>* GetTargetValue();
+        virtual string getName() { return spell + " on tank"; }
+    };
+
 
     class NoAttackersTrigger : public Trigger
     {

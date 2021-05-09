@@ -19,9 +19,16 @@ namespace ai
 	class SealTrigger : public BuffTrigger
 	{
 	public:
-		SealTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "seal of justice") {}
+		SealTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "any seal placeholder") {}
 		virtual bool IsActive();
 	};
+
+    class SealOfWisdomTrigger : public SealTrigger
+    {
+    public:
+        SealOfWisdomTrigger(PlayerbotAI* ai) : SealTrigger(ai) {}
+        virtual bool IsActive();
+    };
 
     DEBUFF_TRIGGER(JudgementOfLightTrigger, "judgement of light", "judgement of light")
     DEBUFF_TRIGGER(JudgementOfWisdomTrigger, "judgement of wisdom", "judgement of wisdom")

@@ -115,6 +115,7 @@ namespace ai
                 creators["judgement of light"] = &TriggerFactoryInternal::judgement_of_light;
                 creators["blessing"] = &TriggerFactoryInternal::blessing;
                 creators["seal"] = &TriggerFactoryInternal::seal;
+                creators["seal of wisdom"] = &TriggerFactoryInternal::seal_of_wisdom;
                 creators["art of war"] = &TriggerFactoryInternal::art_of_war;
                 creators["blessing on party"] = &TriggerFactoryInternal::blessing_on_party;
                 creators["crusader aura"] = &TriggerFactoryInternal::crusader_aura;
@@ -150,6 +151,7 @@ namespace ai
             static Trigger* judgement_of_light(PlayerbotAI* ai) { return new JudgementOfLightTrigger(ai); }
             static Trigger* blessing(PlayerbotAI* ai) { return new BlessingTrigger(ai); }
             static Trigger* seal(PlayerbotAI* ai) { return new SealTrigger(ai); }
+            static Trigger* seal_of_wisdom(PlayerbotAI* ai) { return new SealOfWisdomTrigger(ai); }
             static Trigger* art_of_war(PlayerbotAI* ai) { return new ArtOfWarTrigger(ai); }
             static Trigger* blessing_on_party(PlayerbotAI* ai) { return new BlessingOnPartyTrigger(ai); }
             static Trigger* crusader_aura(PlayerbotAI* ai) { return new CrusaderAuraTrigger(ai); }
