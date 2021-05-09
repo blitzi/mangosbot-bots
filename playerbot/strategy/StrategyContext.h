@@ -35,6 +35,7 @@
 #include "generic/RpgStrategy.h"
 #include "generic/TravelStrategy.h"
 #include "generic/RTSCStrategy.h"
+#include "generic/ForceFollowStrategy.h"
 
 namespace ai
 {
@@ -87,7 +88,7 @@ namespace ai
             creators["debug move"] = &StrategyContext::debug_move;
             creators["debug rpg"] = &StrategyContext::debug_rpg;
             creators["debug spell"] = &StrategyContext::debug_spell;
-            creators["rtsc"] = &StrategyContext::rtsc;
+            creators["rtsc"] = &StrategyContext::rtsc;            
         }
 
     private:
@@ -136,6 +137,7 @@ namespace ai
         static Strategy* debug_rpg(PlayerbotAI* ai) { return new DebugRpgStrategy(ai); }
         static Strategy* debug_spell(PlayerbotAI* ai) { return new DebugSpellStrategy(ai); }
         static Strategy* rtsc(PlayerbotAI* ai) { return new RTSCStrategy(ai); }
+        
     };
 
     class MovementStrategyContext : public NamedObjectContext<Strategy>
@@ -148,6 +150,7 @@ namespace ai
             creators["runaway"] = &MovementStrategyContext::runaway;
             creators["flee from adds"] = &MovementStrategyContext::flee_from_adds;
             creators["guard"] = &MovementStrategyContext::guard;
+            creators["force follow"] = &MovementStrategyContext::force_follow;
         }
 
     private:
@@ -156,6 +159,7 @@ namespace ai
         static Strategy* stay(PlayerbotAI* ai) { return new StayStrategy(ai); }
         static Strategy* runaway(PlayerbotAI* ai) { return new RunawayStrategy(ai); }
         static Strategy* flee_from_adds(PlayerbotAI* ai) { return new FleeFromAddsStrategy(ai); }
+        static Strategy* force_follow(PlayerbotAI* ai) { return new ForceFollowStrategy(ai); }
     };
 
     class AssistStrategyContext : public NamedObjectContext<Strategy>
