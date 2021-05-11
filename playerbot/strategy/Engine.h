@@ -113,7 +113,6 @@ namespace ai
         std::list<Multiplier*> multipliers;
         AiObjectContext* aiObjectContext;
         std::map<string, Strategy*> strategies;
-        float lastCastRelevance;
         string lastAction;
 
     public:

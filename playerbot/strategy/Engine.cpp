@@ -13,7 +13,6 @@ using namespace std;
 
 Engine::Engine(PlayerbotAI* ai, AiObjectContext *factory) : PlayerbotAIAware(ai), aiObjectContext(factory)
 {
-    lastCastRelevance = 0.0f;
     testMode = false;
 }
 
@@ -143,9 +142,6 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
             if (minimal && (relevance < 100))
                 continue;
 
-            if(lastCastRelevance && relevance < lastCastRelevance)
-                continue;
-
             // NOTE: queue.Pop() deletes basket
             ActionNode* actionNode = queue.Pop();
             Action* action = InitializeAction(actionNode);
@@ -185,11 +181,6 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
 
                     if (actionExecuted)
                     {                                                                     
-                        if (ai->GetAiObjectContext()->GetValue<bool>("is casting spell")->Get())
-                        {
-                            lastCastRelevance = relevance;                                      
-                        }
-
                         LogAction("A:%s - OK", action->getName().c_str());
                         MultiplyAndPush(actionNode->getContinuers(), 0, false, event, "cont");
                         delete actionNode;
@@ -239,10 +230,6 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
     if (!actionExecuted)
         LogAction("no actions executed");
 
-    if (ai->GetAiObjectContext()->GetValue<bool>("is casting spell")->Get() == false)
-    {
-        lastCastRelevance = 0;
-    }     
     queue.RemoveExpired();
     return actionExecuted;
 }

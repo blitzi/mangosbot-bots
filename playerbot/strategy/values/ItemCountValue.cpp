@@ -10,7 +10,7 @@ list<Item*> InventoryItemValueBase::Find(string qualifier)
 
     Player* bot = InventoryAction::ai->GetBot();
 
-    list<Item*> items = InventoryAction::parseItems(qualifier);
+    list<Item*> items = InventoryAction::parseItems(qualifier, ITERATE_ITEMS_IN_BAGS, false);
     for (list<Item*>::iterator i = items.begin(); i != items.end(); i++)
         result.push_back(*i);
 

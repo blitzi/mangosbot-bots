@@ -12,6 +12,7 @@
 #include "strategy/actions/LogLevelAction.h"
 #include "strategy/values/LastSpellCastValue.h"
 #include "LootObjectStack.h"
+#include "LootMgr.h"
 #include "PlayerbotAIConfig.h"
 #include "PlayerbotAI.h"
 #include "PlayerbotFactory.h"
@@ -26,6 +27,7 @@
 #include "ServerFacade.h"
 #include "TravelMgr.h"
 #include "ChatHelper.h"
+#include "strategy/actions/LootAction.cpp"
 
 using namespace ai;
 using namespace std;
@@ -517,7 +519,11 @@ void PlayerbotAI::DoNextAction()
         return;
 
     if (IsEating() || IsDrinking())
-        return;
+        return;    
+
+    LootObject loot = aiObjectContext->GetValue<LootObject>("loot target")->Get();
+
+    //if(loot && loot->)
 
     Group *group = bot->GetGroup();
     // test BG master set
@@ -557,13 +563,13 @@ void PlayerbotAI::DoNextAction()
 	else if (bot->m_movementInfo.HasMovementFlag(MOVEFLAG_WALK_MODE)) bot->m_movementInfo.RemoveMovementFlag(MOVEFLAG_WALK_MODE);
     else if (bot->IsSitState()) bot->SetStandState(UNIT_STAND_STATE_STAND);
 
-    currentEngine->DoNextAction(NULL, 0, minimal);
-
     if (currentEngine != engines[BOT_STATE_DEAD] && !sServerFacade.IsAlive(bot))
         ChangeEngine(BOT_STATE_DEAD);
 
     if (currentEngine == engines[BOT_STATE_DEAD] && sServerFacade.IsAlive(bot))
         ChangeEngine(BOT_STATE_NON_COMBAT);
+
+    currentEngine->DoNextAction(NULL, 0, minimal);
 }
 
 void PlayerbotAI::ReInitCurrentEngine()
@@ -686,6 +692,9 @@ void PlayerbotAI::ResetStrategies(bool load)
 
 bool PlayerbotAI::IsRanged(Player* player)
 {
+    if (!player->GetObjectGuid().IsPlayer())
+        return false;
+
     PlayerbotAI* botAi = player->GetPlayerbotAI();
     if (botAi && !player->InBattleGround())
         return botAi->ContainsStrategy(STRATEGY_TYPE_RANGED);
@@ -707,38 +716,32 @@ bool PlayerbotAI::IsRanged(Player* player)
 
 bool PlayerbotAI::IsTank(Player* player)
 {
+    if (!player->GetObjectGuid().IsPlayer())
+        return false;
+
     PlayerbotAI* botAi = player->GetPlayerbotAI();
-    if (botAi)
+    if (botAi && botAi->GetBot()->IsPlayer())
         return botAi->ContainsStrategy(STRATEGY_TYPE_TANK);
 
-    switch (player->getClass())
-    {
-    case CLASS_PALADIN:
-    case CLASS_WARRIOR:
-#ifdef MANGOSBOT_TWO
-    case CLASS_DEATH_KNIGHT:
-#endif
-        return true;
-    case CLASS_DRUID:
-        return HasAnyAuraOf(player, "bear form", "dire bear form", NULL);
-    }
-    return false;
+    if(player->getClass() == CLASS_DRUID)
+        return HasAnyAuraOf(player, "cat form", "bear form", "dire bear form", NULL);
+
+    return AiFactory::GetPlayerRoles(player) & BotRoles::BOT_ROLE_TANK;
 }
 
 bool PlayerbotAI::IsHeal(Player* player)
 {
+    if (!player->GetObjectGuid().IsPlayer())
+        return false;
+
     PlayerbotAI* botAi = player->GetPlayerbotAI();
     if (botAi)
         return botAi->ContainsStrategy(STRATEGY_TYPE_HEAL);
 
-    switch (player->getClass())
-    {
-    case CLASS_PRIEST:
-        return true;
-    case CLASS_DRUID:
+    if(player->getClass() == CLASS_DRUID)
         return HasAnyAuraOf(player, "tree of life form", NULL);
-    }
-    return false;
+    
+     return AiFactory::GetPlayerRoles(player) & BotRoles::BOT_ROLE_HEALER;
 }
 
 Unit* PlayerbotAI::GetUnit(ObjectGuid guid)
@@ -2440,25 +2443,52 @@ uint32 PlayerbotAI::GetBuffedCount(Player* player, string spellname)
 
 bool PlayerbotAI::IsEating()
 {
-    return HasAura(27094, bot) && bot->GetHealthPercent() < 100;
+    for (auto spell : GetBot()->GetSpellAuraHolderMap())
+    {
+        const SpellEntry* proto = spell.second->GetSpellProto();
+
+        if (proto && proto->Category == 11)
+            return bot->GetHealthPercent() < 100;
+    }
+    
+    return HasAura(27094, bot) && bot->GetHealthPercent() < 100;;
 }
 
 bool PlayerbotAI::IsDrinking()
 {
-    return HasAura(27089, bot) && bot->HasMana() && bot->GetPowerPercent() < 100;
+    for (auto spell : GetBot()->GetSpellAuraHolderMap())
+    {
+        const SpellEntry* proto = spell.second->GetSpellProto();
+
+        if (proto && proto->Category == 59)
+            return bot->HasMana() && bot->GetPowerPercent() < 100;
+    }
+
+    return HasAura(27089, bot) && bot->HasMana() && bot->GetPowerPercent() < 100;;
 }
 
 bool PlayerbotAI::IsCasting()
 {
+    for (auto e : GetBot()->m_events.GetEvents())
+    {
+        SpellEvent* spellEvent = dynamic_cast<SpellEvent*>(e.second);
+
+        if (spellEvent)
+        {
+            Spell* spell = spellEvent->GetSpell();
+
+            if (spell && spell->m_spellInfo->Id && !spell->IsAutoRepeat())
+            {
+                return true;
+            }
+        }        
+    }
+
     LastSpellCast& lastSpell = aiObjectContext->GetValue<LastSpellCast& >("last spell cast")->Get();
 
-    if (lastSpell.id)
-    {
-        Spell* spell = bot->FindCurrentSpellBySpellId(lastSpell.id);
-        if (spell && spell->getState() != SPELL_STATE_FINISHED)
-            return true;
-
-    }
+    Spell* spell = bot->FindCurrentSpellBySpellId(lastSpell.id);
+    if (spell && spell->getState() != SPELL_STATE_FINISHED)
+        return true;
 
     return false;
 }

@@ -182,7 +182,7 @@ void InventoryAction::TellItem(ItemPrototype const * proto, int count, bool soul
     ai->TellMaster(out.str());
 }
 
-list<Item*> InventoryAction::parseItems(string text, IterateItemsMask mask)
+list<Item*> InventoryAction::parseItems(string text, IterateItemsMask mask, bool checkForSubclass)
 {
     set<Item*> found;
     size_t pos = text.find(" ");
@@ -255,12 +255,15 @@ list<Item*> InventoryAction::parseItems(string text, IterateItemsMask mask)
         found.insert(visitor.GetResult().begin(), visitor.GetResult().end());
     }
 
-    uint32 itemClass = MAX_ITEM_CLASS, itemSubClass = 0;
-    if (chat->parseItemClass(text, &itemClass, &itemSubClass))
+    if (checkForSubclass)
     {
-        FindItemsToTradeByClassVisitor visitor(itemClass, itemSubClass, count);
-        IterateItems(&visitor, mask);
-        found.insert(visitor.GetResult().begin(), visitor.GetResult().end());
+        uint32 itemClass = MAX_ITEM_CLASS, itemSubClass = 0;
+        if (chat->parseItemClass(text, &itemClass, &itemSubClass))
+        {
+            FindItemsToTradeByClassVisitor visitor(itemClass, itemSubClass, count);
+            IterateItems(&visitor, mask);
+            found.insert(visitor.GetResult().begin(), visitor.GetResult().end());
+        }
     }
 
     uint32 fromSlot = chat->parseSlot(text);
