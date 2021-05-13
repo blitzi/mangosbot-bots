@@ -34,16 +34,22 @@ namespace ai
     DEBUFF_TRIGGER(JudgementOfWisdomTrigger, "judgement of wisdom", "judgement of wisdom")
     DEBUFF_TRIGGER(JudgementTrigger, "judgement", "judgement")
 
+    class BlessingOfSalvationOnPartyTrigger : public BuffOnPartyTrigger
+    {
+    public:
+        BlessingOfSalvationOnPartyTrigger(PlayerbotAI* ai) : BuffOnPartyTrigger(ai, "blessing of salvation", 1) {}
+    };
+
     class BlessingOnPartyTrigger : public BuffOnPartyTrigger
     {
     public:
-        BlessingOnPartyTrigger(PlayerbotAI* ai) : BuffOnPartyTrigger(ai, "blessing of kings,blessing of might,blessing of wisdom", 2) {}
+        BlessingOnPartyTrigger(PlayerbotAI* ai) : BuffOnPartyTrigger(ai, "blessing of kings,blessing of might,blessing of wisdom", 1) {}
     };
 
     class BlessingTrigger : public BuffTrigger
     {
     public:
-        BlessingTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "blessing of sanctuary", 2) {}
+        BlessingTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "blessing of sanctuary", 1) {}
         virtual bool IsActive();
     };
 

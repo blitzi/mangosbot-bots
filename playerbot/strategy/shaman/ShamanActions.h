@@ -205,6 +205,11 @@ namespace ai
 		CastPurgeAction(PlayerbotAI* ai) : CastSpellAction(ai, "purge") {}
 	};
 
+    class CastShamanisticRageAction : public CastBuffSpellAction {
+    public:
+        CastShamanisticRageAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "shamanistic rage") {}
+    };
+
 	class CastStormstrikeAction : public CastMeleeSpellAction {
 	public:
 		CastStormstrikeAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "stormstrike") {}

@@ -3,6 +3,7 @@
 #include "SpellIdValue.h"
 #include "../../PlayerbotAIConfig.h"
 #include "../../ServerFacade.h"
+#include <regex>
 
 using namespace ai;
 
@@ -33,9 +34,7 @@ uint32 SpellIdValue::Calculate()
     char firstSymbol = tolower(namepart[0]);
     int spellLength = wnamepart.length();
 
-    int loc = bot->GetSession()->GetSessionDbcLocale();
-
-    set<uint32> spellIds;
+    std::vector<uint32> spellIds;
     for (PlayerSpellMap::iterator itr = bot->GetSpellMap().begin(); itr != bot->GetSpellMap().end(); ++itr)
     {
         uint32 spellId = itr->first;
@@ -61,10 +60,26 @@ uint32 SpellIdValue::Calculate()
         }
 
         char* spellName = pSpellInfo->SpellName[0];
+        char spellNameWithRank[256];
+        
+        if (pSpellInfo->Rank[0])
+        {
+            sprintf(spellNameWithRank, "%s %s", spellName, pSpellInfo->Rank[0]);
+        }
+        
         if (!useByItem && (tolower(spellName[0]) != firstSymbol || strlen(spellName) != spellLength || !Utf8FitTo(spellName, wnamepart)))
-            continue;
+        {       
+            if (!spellNameWithRank || (!useByItem && (tolower(spellNameWithRank[0]) != firstSymbol || strlen(spellNameWithRank) != spellLength || !Utf8FitTo(spellNameWithRank, wnamepart))))
+                continue;
 
-        spellIds.insert(spellId);
+        }
+
+        spellIds.push_back(spellId);
+    }
+
+    if (Utf8FitTo("consecration rank 1", wnamepart))
+    {
+        int x = 0;
     }
 
     Pet* pet = bot->GetPet();
@@ -83,22 +98,35 @@ uint32 SpellIdValue::Calculate()
             if (pSpellInfo->Effect[0] == SPELL_EFFECT_LEARN_SPELL)
                 continue;
 
-            char* spellName = pSpellInfo->SpellName[loc];
+            char* spellName = pSpellInfo->SpellName[0];
             if (tolower(spellName[0]) != firstSymbol || strlen(spellName) != spellLength || !Utf8FitTo(spellName, wnamepart))
                 continue;
 
-            spellIds.insert(spellId);
+            spellIds.push_back(spellId);
         }
     }
 
     if (spellIds.empty()) return 0;
 
+    sort(spellIds.begin(), spellIds.end(), [](uint32 spellIdA, uint32 spellIdB) -> bool {
+        const SpellEntry* pSpellInfoA = sServerFacade.LookupSpellInfo(spellIdA);
+        const SpellEntry* pSpellInfoB = sServerFacade.LookupSpellInfo(spellIdB);
+
+        string rankA = regex_replace(pSpellInfoA->Rank[0], regex("[^0-9]*([0-9]+).*"), std::string("$1"));
+        string rankB = regex_replace(pSpellInfoB->Rank[0], regex("[^0-9]*([0-9]+).*"), std::string("$1"));
+
+        return std::atoi(rankA.c_str()) < std::atoi(rankB.c_str());
+    });
+
+
     int saveMana = (int) round(AI_VALUE(double, "mana save level"));
     int rank = 1;
     int highest = 0;
     int lowest = 0;
-    for (set<uint32>::reverse_iterator i = spellIds.rbegin(); i != spellIds.rend(); ++i)
+    for (std::vector<uint32>::reverse_iterator i = spellIds.rbegin(); i != spellIds.rend(); ++i)
     {
+        const SpellEntry* pSpellInfo = sServerFacade.LookupSpellInfo(*i);
+
         if (!highest) highest = *i;
         if (saveMana == rank) return *i;
         lowest = *i;

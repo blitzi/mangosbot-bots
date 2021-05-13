@@ -88,6 +88,11 @@ void PaladinBuffAoeStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 void PaladinBuffThreatStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
     triggers.push_back(new TriggerNode(
+        "blessing of salvation on party",
+        NextAction::array(0, new NextAction("blessing of salvation on party", ACTION_HIGH + 8), NULL)));
+
+
+    triggers.push_back(new TriggerNode(
         "righteous fury",
         NextAction::array(0, new NextAction("righteous fury", ACTION_HIGH + 8), NULL)));
 }

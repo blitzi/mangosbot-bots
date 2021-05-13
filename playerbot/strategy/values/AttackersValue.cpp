@@ -189,7 +189,7 @@ bool AttackersValue::IsPossibleTarget(Unit *attacker, Player *bot)
 	bool groupHasTank = false;
 	bool tankHasAggro = false;
 	bool targetIsNonElite = !c || !c->IsElite();
-	bool targetIsAlmostDead = !c || c->GetHealthPercent() < 50;
+    bool targetIsAlmostDead = false;//!c || c->GetHealthPercent() < 50;
 	float highestThreat = 0;
 	float myThreat = 0;  
 	float tankThreat = 0;

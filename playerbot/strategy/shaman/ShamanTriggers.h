@@ -90,6 +90,22 @@ namespace ai
         WaterShieldTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "water shield") {}
     };
 
+
+    class ShamanisticRageTrigger : public BuffTrigger
+    {
+    public:
+        ShamanisticRageTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "shamanistic rage") {}
+
+        virtual bool IsActive()
+        {
+            return 
+                AI_VALUE(uint8, "attacker count") >= 1 &&
+                AI_VALUE2(bool, "has mana", "self target") &&
+                AI_VALUE2(uint8, "mana", "self target") < sPlayerbotAIConfig.lowMana &&
+                BuffTrigger::IsActive();
+        }
+    };
+
     class LightningShieldTrigger : public BuffTrigger
     {
     public:

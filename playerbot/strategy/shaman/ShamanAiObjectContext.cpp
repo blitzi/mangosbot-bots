@@ -95,6 +95,7 @@ namespace ai
                 creators["wind shear"] = &TriggerFactoryInternal::wind_shear;
                 creators["purge"] = &TriggerFactoryInternal::purge;
                 creators["shaman weapon"] = &TriggerFactoryInternal::shaman_weapon;
+                creators["shamanistic rage"] = &TriggerFactoryInternal::shamanistic_rage;
                 creators["water shield"] = &TriggerFactoryInternal::water_shield;
                 creators["lightning shield"] = &TriggerFactoryInternal::lightning_shield;
                 creators["water breathing"] = &TriggerFactoryInternal::water_breathing;
@@ -146,6 +147,7 @@ namespace ai
             static Trigger* wind_shear(PlayerbotAI* ai) { return new WindShearInterruptSpellTrigger(ai); }
             static Trigger* purge(PlayerbotAI* ai) { return new PurgeTrigger(ai); }
             static Trigger* shaman_weapon(PlayerbotAI* ai) { return new ShamanWeaponTrigger(ai); }
+            static Trigger* shamanistic_rage(PlayerbotAI* ai) { return new ShamanisticRageTrigger(ai); }
             static Trigger* water_shield(PlayerbotAI* ai) { return new WaterShieldTrigger(ai); }
             static Trigger* lightning_shield(PlayerbotAI* ai) { return new LightningShieldTrigger(ai); }
             static Trigger* shock(PlayerbotAI* ai) { return new ShockTrigger(ai); }
@@ -203,6 +205,7 @@ namespace ai
                 creators["riptide"] = &AiObjectContextInternal::riptide;
                 creators["riptide on party"] = &AiObjectContextInternal::riptide_on_party;
                 creators["stormstrike"] = &AiObjectContextInternal::stormstrike;
+                creators["shamanistic rage"] = &AiObjectContextInternal::shamanistic_rage;
                 creators["lava lash"] = &AiObjectContextInternal::lava_lash;
                 creators["fire nova"] = &AiObjectContextInternal::fire_nova;
                 creators["ancestral spirit"] = &AiObjectContextInternal::ancestral_spirit;
@@ -275,6 +278,7 @@ namespace ai
             static Action* riptide(PlayerbotAI* ai) { return new CastRiptideAction(ai); }
             static Action* riptide_on_party(PlayerbotAI* ai) { return new CastRiptideOnPartyAction(ai); }
             static Action* stormstrike(PlayerbotAI* ai) { return new CastStormstrikeAction(ai); }
+            static Action* shamanistic_rage(PlayerbotAI* ai) { return new CastShamanisticRageAction(ai); }
             static Action* lava_lash(PlayerbotAI* ai) { return new CastLavaLashAction(ai); }
             static Action* ancestral_spirit(PlayerbotAI* ai) { return new CastAncestralSpiritAction(ai); }
             static Action* wind_shear_on_enemy_healer(PlayerbotAI* ai) { return new CastWindShearOnEnemyHealerAction(ai); }

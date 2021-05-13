@@ -11,7 +11,7 @@ TankPaladinStrategy::TankPaladinStrategy(PlayerbotAI* ai) : GenericPaladinStrate
 
 NextAction** TankPaladinStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("melee", ACTION_NORMAL), NULL);
+    return NextAction::array(0, new NextAction("consecration rank 1", ACTION_EMERGENCY), new NextAction("melee", ACTION_NORMAL), NULL);
 }
 
 void TankPaladinStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
@@ -20,7 +20,7 @@ void TankPaladinStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 
     triggers.push_back(new TriggerNode(
         "range aoe",
-        NextAction::array(0, new NextAction("consecration", ACTION_HIGH + 8), NULL)));
+        NextAction::array(0, new NextAction("consecration rank 1", ACTION_EMERGENCY), NULL)));
 
 	triggers.push_back(new TriggerNode(
 		"holy shield",
@@ -34,4 +34,11 @@ void TankPaladinStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
         "seal",
         NextAction::array(0, new NextAction("seal of vengeance", ACTION_HIGH + 5), NULL)));
 
+    triggers.push_back(new TriggerNode(
+        "lose aggro",
+        NextAction::array(0, new NextAction("consecration", ACTION_HIGH + 9), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "lose aggro",
+        NextAction::array(0, new NextAction("avenging wrath", ACTION_EMERGENCY+5), NULL)));
 }

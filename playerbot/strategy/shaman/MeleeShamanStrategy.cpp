@@ -11,6 +11,7 @@ public:
     MeleeShamanStrategyActionNodeFactory()
     {
         creators["stormstrike"] = &stormstrike;
+        creators["shamanistic rage"] = &shamanistic_rage;
         creators["lava lash"] = &lava_lash;
         creators["magma totem"] = &magma_totem;
     }
@@ -20,6 +21,13 @@ private:
         return new ActionNode ("stormstrike",
             /*P*/ NULL,
             /*A*/ NextAction::array(0, new NextAction("lava lash"), NULL),
+            /*C*/ NULL);
+    }
+    static ActionNode* shamanistic_rage(PlayerbotAI* ai)
+    {
+        return new ActionNode("shamanistic rage",
+            /*P*/ NULL,
+            /*A*/ NextAction::array(0, new NextAction("mana potion"), NULL),
             /*C*/ NULL);
     }
     static ActionNode* lava_lash(PlayerbotAI* ai)
@@ -51,6 +59,10 @@ NextAction** MeleeShamanStrategy::getDefaultActions()
 void MeleeShamanStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
     GenericShamanStrategy::InitTriggers(triggers);
+
+    triggers.push_back(new TriggerNode(
+        "shamanistic rage",
+        NextAction::array(0, new NextAction("shamanistic rage", ACTION_EMERGENCY + 5), NULL)));
 
     triggers.push_back(new TriggerNode(
         "shaman weapon",

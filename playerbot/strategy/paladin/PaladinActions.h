@@ -201,6 +201,14 @@ namespace ai
         virtual string getName() { return "blessing of sanctuary on party";}
 	};
 
+	class CastBlessingOfSalvationOnPartyAction : public BuffOnPartyAction
+	{
+	public:
+		CastBlessingOfSalvationOnPartyAction(PlayerbotAI* ai) : BuffOnPartyAction(ai, "blessing of salvation") {}
+		virtual string getName() { return "blessing of salvation on party"; }
+		//virtual Value<Unit*>* GetTargetValue();
+	};
+
     class CastHolyLightAction : public CastHealingSpellAction
     {
     public:
@@ -267,7 +275,19 @@ namespace ai
     {
     public:
 	    CastConsecrationAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "consecration") {}
+    }; 
+	
+	class CastAvengingWrathAction : public CastBuffSpellAction
+    {
+    public:
+		CastAvengingWrathAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "avenging wrath") {}
     };
+
+	class CastConsecration1Action : public CastMeleeSpellAction
+	{
+	public:
+		CastConsecration1Action(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "consecration rank 1") {}
+	};
 
     class CastHolyWrathAction : public CastMeleeSpellAction
     {

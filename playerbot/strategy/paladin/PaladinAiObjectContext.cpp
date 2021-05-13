@@ -118,6 +118,7 @@ namespace ai
                 creators["seal of wisdom"] = &TriggerFactoryInternal::seal_of_wisdom;
                 creators["art of war"] = &TriggerFactoryInternal::art_of_war;
                 creators["blessing on party"] = &TriggerFactoryInternal::blessing_on_party;
+                creators["blessing of salvation on party"] = &TriggerFactoryInternal::blessing_of_salvation_on_party;
                 creators["crusader aura"] = &TriggerFactoryInternal::crusader_aura;
                 creators["retribution aura"] = &TriggerFactoryInternal::retribution_aura;
                 creators["sanctity aura"] = &TriggerFactoryInternal::sanctity_aura;
@@ -154,6 +155,7 @@ namespace ai
             static Trigger* seal_of_wisdom(PlayerbotAI* ai) { return new SealOfWisdomTrigger(ai); }
             static Trigger* art_of_war(PlayerbotAI* ai) { return new ArtOfWarTrigger(ai); }
             static Trigger* blessing_on_party(PlayerbotAI* ai) { return new BlessingOnPartyTrigger(ai); }
+            static Trigger* blessing_of_salvation_on_party(PlayerbotAI* ai) { return new BlessingOfSalvationOnPartyTrigger(ai); }
             static Trigger* crusader_aura(PlayerbotAI* ai) { return new CrusaderAuraTrigger(ai); }
             static Trigger* retribution_aura(PlayerbotAI* ai) { return new RetributionAuraTrigger(ai); }
             static Trigger* sanctity_aura(PlayerbotAI* ai) { return new SanctityAuraTrigger(ai); }
@@ -196,6 +198,7 @@ namespace ai
                 creators["blessing of kings on party"] = &AiObjectContextInternal::blessing_of_kings_on_party;
                 creators["blessing of might on party"] = &AiObjectContextInternal::blessing_of_might_on_party;
                 creators["blessing of wisdom on party"] = &AiObjectContextInternal::blessing_of_wisdom_on_party;
+                creators["blessing of salvation on party"] = &AiObjectContextInternal::blessing_of_salvation_on_party;
                 creators["redemption"] = &AiObjectContextInternal::redemption;
                 creators["crusader strike"] = &AiObjectContextInternal::crusader_strike;
                 creators["crusader aura"] = &AiObjectContextInternal::crusader_aura;
@@ -203,6 +206,8 @@ namespace ai
                 creators["devotion aura"] = &AiObjectContextInternal::devotion_aura;
                 creators["holy wrath"] = &AiObjectContextInternal::holy_wrath;
                 creators["consecration"] = &AiObjectContextInternal::consecration;
+                creators["consecration rank 1"] = &AiObjectContextInternal::consecration1;
+                creators["avenging wrath"] = &AiObjectContextInternal::avenging_wrath;
                 creators["cleanse disease"] = &AiObjectContextInternal::cleanse_disease;
                 creators["cleanse poison"] = &AiObjectContextInternal::cleanse_poison;
                 creators["cleanse magic"] = &AiObjectContextInternal::cleanse_magic;
@@ -262,6 +267,7 @@ namespace ai
             static Action* blessing_of_kings_on_party(PlayerbotAI* ai) { return new CastBlessingOfKingsOnPartyAction(ai); }
             static Action* blessing_of_might_on_party(PlayerbotAI* ai) { return new CastBlessingOfMightOnPartyAction(ai); }
             static Action* blessing_of_wisdom_on_party(PlayerbotAI* ai) { return new CastBlessingOfWisdomOnPartyAction(ai); }
+            static Action* blessing_of_salvation_on_party(PlayerbotAI* ai) { return new CastBlessingOfSalvationOnPartyAction(ai); }
             static Action* redemption(PlayerbotAI* ai) { return new CastRedemptionAction(ai); }
             static Action* crusader_strike(PlayerbotAI* ai) { return new CastCrusaderStrikeAction(ai); }
             static Action* crusader_aura(PlayerbotAI* ai) { return new CastCrusaderAuraAction(ai); }
@@ -269,6 +275,8 @@ namespace ai
             static Action* devotion_aura(PlayerbotAI* ai) { return new CastDevotionAuraAction(ai); }
             static Action* holy_wrath(PlayerbotAI* ai) { return new CastHolyWrathAction(ai); }
             static Action* consecration(PlayerbotAI* ai) { return new CastConsecrationAction(ai); }
+            static Action* consecration1(PlayerbotAI* ai) { return new CastConsecration1Action(ai); }
+            static Action* avenging_wrath(PlayerbotAI* ai) { return new CastAvengingWrathAction(ai); }
             static Action* cleanse_poison(PlayerbotAI* ai) { return new CastCleansePoisonAction(ai); }
             static Action* cleanse_disease(PlayerbotAI* ai) { return new CastCleanseDiseaseAction(ai); }
             static Action* cleanse_magic(PlayerbotAI* ai) { return new CastCleanseMagicAction(ai); }
