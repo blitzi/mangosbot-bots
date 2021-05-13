@@ -2477,7 +2477,8 @@ bool PlayerbotAI::IsCasting()
         {
             Spell* spell = spellEvent->GetSpell();
 
-            if (spell && spell->m_spellInfo->Id && !spell->IsAutoRepeat())
+            if (spell && spell->m_spellInfo->Id &&
+                !spell->IsAutoRepeat())
             {
                 return true;
             }
@@ -2487,7 +2488,7 @@ bool PlayerbotAI::IsCasting()
     LastSpellCast& lastSpell = aiObjectContext->GetValue<LastSpellCast& >("last spell cast")->Get();
 
     Spell* spell = bot->FindCurrentSpellBySpellId(lastSpell.id);
-    if (spell && spell->getState() != SPELL_STATE_FINISHED)
+    if (spell && spell->getState() != SPELL_STATE_FINISHED  && !spell->IsAutoRepeat())
         return true;
 
     return false;
