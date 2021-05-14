@@ -206,6 +206,13 @@ namespace ai
 	public:
 		CastBlessingOfSalvationOnPartyAction(PlayerbotAI* ai) : BuffOnPartyAction(ai, "blessing of salvation") {}
 		virtual string getName() { return "blessing of salvation on party"; }
+		virtual bool isUseful() { 
+			
+		if (GetTarget() && ai->IsTank((Player*)GetTarget()))
+			return false;
+
+			return BuffOnPartyAction::isUseful();
+		}
 		//virtual Value<Unit*>* GetTargetValue();
 	};
 
