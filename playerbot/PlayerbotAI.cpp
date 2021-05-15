@@ -1382,7 +1382,9 @@ bool PlayerbotAI::HasAuraToDispel(Unit* target, uint32 dispelType)
 			if (!isPositiveSpell && isHostile)
 				continue;
 
-			if (sPlayerbotAIConfig.dispelAuraDuration && aura->GetAuraDuration() && aura->GetAuraDuration() < (int32)sPlayerbotAIConfig.dispelAuraDuration)
+            int32 duration = aura->GetAuraDuration();
+
+			if (sPlayerbotAIConfig.dispelAuraDuration && aura->GetAuraDuration() > 0 && aura->GetAuraDuration() < (int32)sPlayerbotAIConfig.dispelAuraDuration)
 			    return false;
 
 			if (canDispel(entry, dispelType))
@@ -2460,11 +2462,11 @@ bool PlayerbotAI::IsDrinking()
     {
         const SpellEntry* proto = spell.second->GetSpellProto();
 
-        if (proto && proto->Category == 59)
+        if (proto && proto->Category == 59 || strcmp(proto->SpellName[0], "Drink") == 0)
             return bot->HasMana() && bot->GetPowerPercent() < 100;
     }
 
-    return HasAura(27089, bot) && bot->HasMana() && bot->GetPowerPercent() < 100;;
+    return HasAura(27089, bot) && bot->HasMana() && bot->GetPowerPercent() < 100;
 }
 
 bool PlayerbotAI::IsCasting()
