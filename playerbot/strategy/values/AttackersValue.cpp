@@ -233,7 +233,7 @@ bool AttackersValue::IsPossibleTarget(Unit *attacker, Player *bot)
 			{
 				groupHasTank = true;
 
-				if (attacker)
+				/*if (attacker)
 				{
 					HostileReference* target = attacker->getThreatManager().getCurrentVictim();
 
@@ -244,7 +244,7 @@ bool AttackersValue::IsPossibleTarget(Unit *attacker, Player *bot)
 						if (tankThreat >= highestThreat && highestThreat > 0)
 							tankHasAggro = true;
 					}
-				}
+				}*/
 			}
 		}
 	}
@@ -299,7 +299,7 @@ bool AttackersValue::IsPossibleTarget(Unit *attacker, Player *bot)
 #ifdef CMANGOS
                 ((!isMemberBotGroup && ai->HasStrategy("attack tagged", BOT_STATE_NON_COMBAT)) || leaderHasThreat || !c->HasLootRecipient() || c->IsTappedBy(bot)) &&
 				(!groupHasTank || (
-				 (groupHasTank && tankHasAggro && !waitForTankAggro) || iAmTank || targetIsNonElite || targetIsAlmostDead))
+				 (groupHasTank && !waitForTankAggro) || iAmTank || targetIsNonElite || targetIsAlmostDead))
 
 #endif
 #ifndef MANGOSBOT_TWO
