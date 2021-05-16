@@ -55,7 +55,7 @@ bool PlayerbotAIConfig::Initialize()
     globalCoolDown = (uint32) config.GetIntDefault("AiPlayerbot.GlobalCooldown", 500);
     maxWaitForMove = config.GetIntDefault("AiPlayerbot.MaxWaitForMove", 3000);
     expireActionTime = config.GetIntDefault("AiPlayerbot.ExpireActionTime", 5000);
-    dispelAuraDuration = config.GetIntDefault("AiPlayerbot.DispelAuraDuration", 7000);
+    dispelAuraDuration = config.GetIntDefault("AiPlayerbot.DispelAuraDuration", 2500);
     reactDelay = (uint32) config.GetIntDefault("AiPlayerbot.ReactDelay", 100);
     passiveDelay = (uint32) config.GetIntDefault("AiPlayerbot.PassiveDelay", 4000);
     repeatDelay = (uint32) config.GetIntDefault("AiPlayerbot.RepeatDelay", 5000);
@@ -72,7 +72,7 @@ bool PlayerbotAIConfig::Initialize()
     healDistance = config.GetFloatDefault("AiPlayerbot.HealDistance", 20.0f);
     reactDistance = config.GetFloatDefault("AiPlayerbot.ReactDistance", 150.0f);
     grindDistance = config.GetFloatDefault("AiPlayerbot.GrindDistance", 75.0f);
-    aggroDistance = config.GetFloatDefault("AiPlayerbot.AggroDistance", 22.0f);
+    aggroDistance = config.GetFloatDefault("AiPlayerbot.AggroDistance", 26.0f);
     lootDistance = config.GetFloatDefault("AiPlayerbot.LootDistance", 15.0f);
     fleeDistance = config.GetFloatDefault("AiPlayerbot.FleeDistance", 7.5f);
     tooCloseDistance = config.GetFloatDefault("AiPlayerbot.TooCloseDistance", 5.0f);
