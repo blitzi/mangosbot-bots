@@ -42,14 +42,7 @@ Unit* PartyMemberValue::FindPartyMember(FindPlayerPredicate &predicate, bool ign
         {
             if (ref->getSource() != bot)
             {
-                if (ref->getSubGroup() != bot->GetSubGroup())
-                {
-                    nearestGroupPlayers.push_back(ref->getSource()->GetObjectGuid());
-                }
-                else
-                {
-                    nearestGroupPlayers.push_front(ref->getSource()->GetObjectGuid());
-                }
+                nearestGroupPlayers.push_back(ref->getSource()->GetObjectGuid());
             }
         }
     }
@@ -58,6 +51,8 @@ Unit* PartyMemberValue::FindPartyMember(FindPlayerPredicate &predicate, bool ign
         nearestGroupPlayers.insert(nearestGroupPlayers.end(), nearestPlayers.begin(), nearestPlayers.end());
 
     nearestPlayers = nearestGroupPlayers;
+    nearestPlayers.sort();
+    nearestPlayers.unique();
 
     list<Player*> healers, tanks, others, masters;
     if (master) masters.push_back(master);
