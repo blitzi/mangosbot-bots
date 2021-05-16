@@ -237,7 +237,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             break;
         case CLASS_PALADIN:
             if (tab == 1)
-                engine->addStrategies("tank", "tank aoe", "bthreat", "cure", "barmor", "bstats", "close", "cc", NULL);
+                engine->addStrategies("tank", "tank aoe", "bthreat", "cure", "barmor", "close", "cc", NULL);
 			else if(tab == 0)
                 engine->addStrategies("heal", "bmana", "cure", "flee", "barmor", "ranged", NULL);
             else
@@ -402,7 +402,7 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
             break;
         case CLASS_PALADIN:
             if (tab == 1)
-                nonCombatEngine->addStrategies("bthreat", "tank aoe", "barmor", "bstats", NULL);
+                nonCombatEngine->addStrategies("bthreat", "tank aoe", "barmor", NULL);
             else if (tab == 0)
                 nonCombatEngine->addStrategies("dps assist", "barmor", "bmana", NULL);
             else
