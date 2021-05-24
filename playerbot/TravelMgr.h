@@ -26,6 +26,7 @@ namespace ai
     public:
         //Constructors
         WorldPosition() { wLoc = WorldLocation(); }
+        WorldPosition(WorldLocation loc) { wLoc = loc; }
         WorldPosition(uint32 mapid, float x, float y, float z = 0, float orientation = 0) { wLoc = WorldLocation(mapid, x, y, z, orientation); }
         WorldPosition(WorldObject* wo) { wLoc = WorldLocation(wo->GetMapId(), wo->GetPositionX(), wo->GetPositionY(), wo->GetPositionZ(), wo->GetOrientation()); }
         WorldPosition(vector<WorldPosition*> list, WorldPositionConst conType);
@@ -363,6 +364,25 @@ namespace ai
     protected:
         uint32 areaId;
     };
+
+    //A location with zone exploration target(s) 
+    class GrindTravelDestination : public TravelDestination
+    {
+    public:
+        GrindTravelDestination(uint32 entry1, float radiusMin1, float radiusMax1) : TravelDestination(radiusMin1, radiusMax1) {
+            entry = entry1;
+        }
+
+        static uint32 moneyNeeded(Player* bot);
+
+        virtual bool isActive(Player* bot);
+        virtual CreatureInfo const* getCreatureInfo() { return ObjectMgr::GetCreatureTemplate(entry); }
+        virtual string getName() { return "GrindTravelDestination"; }
+        virtual uint32 getEntry() { return entry; }
+        virtual string getTitle();
+    protected:
+        uint32 entry;
+    };
    
     //A quest destination container for quick lookup of all destinations related to a quest.
     struct QuestContainer
@@ -472,13 +492,15 @@ namespace ai
         void Clear();
         void LoadQuestTravelTable();
 
-        vector <WorldPosition*> getNextPoint(WorldPosition* center, vector<WorldPosition*> points);
+        vector <WorldPosition*> getNextPoint(WorldPosition* center, vector<WorldPosition*> points, uint32 amount = 1);
+        vector <WorldPosition> getNextPoint(WorldPosition center, vector<WorldPosition> points, uint32 amount = 1);
         QuestStatusData* getQuestStatus(Player* bot, uint32 questId);
         bool getObjectiveStatus(Player* bot, Quest const* pQuest, uint32 objective);
         uint32 getDialogStatus(Player* pPlayer, int32 questgiver, Quest const* pQuest);
         vector<TravelDestination *> getQuestTravelDestinations(Player* bot, uint32 questId = -1, bool ignoreFull = false, bool ignoreInactive = false, float maxDistance = 5000, bool ignoreObjectives = false);
         vector<TravelDestination*> getRpgTravelDestinations(Player* bot, bool ignoreFull = false, bool ignoreInactive = false, float maxDistance = 5000);
         vector<TravelDestination*> getExploreTravelDestinations(Player* bot, bool ignoreFull = false, bool ignoreInactive = false);
+        vector<TravelDestination*> getGrindTravelDestinations(Player* bot, bool ignoreFull = false, bool ignoreInactive = false, float maxDistance = 5000);
 
 
         void setNullTravelTarget(Player* player);
@@ -499,6 +521,7 @@ namespace ai
 
         vector<QuestTravelDestination*> questGivers;
         vector<RpgTravelDestination*> rpgNpcs;
+        vector<GrindTravelDestination*> grindMobs;
         
         std::unordered_map<uint32, ExploreTravelDestination*> exploreLocs;
         std::unordered_map<uint32, QuestContainer *> quests;

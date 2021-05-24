@@ -573,35 +573,45 @@ bool TravelPath::makeShortCut(WorldPosition startPos, float maxDist)
 {
     if (getPath().empty())
         return false;
-
+    float maxDistSq = maxDist * maxDist;
     float minDist = -1;
+    float totalDist = fullPath.begin()->point.sqDistance(startPos);
     vector<PathNodePoint> newPath;
     WorldPosition firstNode;
-    for (auto p : fullPath) //cycle over the full path
+
+    for (auto & p : fullPath) //cycle over the full path
     {
         if (p.point.getMapId() != startPos.getMapId())
             continue;
 
         float curDist = p.point.sqDistance(startPos);
 
-        if (curDist < sPlayerbotAIConfig.tooCloseDistance * sPlayerbotAIConfig.tooCloseDistance) //We are on the path. No shortcut.
-            return false;
+        if (&p != &fullPath.front())
+            totalDist += p.point.sqDistance(std::prev(&p)->point);
+
+        if (curDist < sPlayerbotAIConfig.tooCloseDistance * sPlayerbotAIConfig.tooCloseDistance) //We are on the path. This is a good starting point
+        {
+            minDist = curDist;
+            totalDist = curDist;
+            newPath.clear();
+        }     
 
         if (p.type != NODE_PREPATH) //Only look at the part after the first node and in the same map.
         {
             if (!firstNode)
                 firstNode = p.point;
 
-            if (minDist == -1 || curDist < minDist) //Start building from the last closest point.
+            if (minDist == -1 || curDist < minDist || (curDist < maxDistSq && curDist < totalDist / 2)) //Start building from the last closest point or a point that is close but far on the path.
             {
                 minDist = curDist;
+                totalDist = curDist;
                 newPath.clear();
             }
         }
         newPath.push_back(p);
     }
 
-    if (newPath.empty() || minDist > maxDist)
+    if (newPath.empty() || minDist > maxDistSq)
     {
         clear();
         return false;
@@ -684,7 +694,7 @@ WorldPosition TravelPath::getNextPoint(WorldPosition startPos, float maxDist, bo
         //Transport with entry. 
         if (p->type == NODE_TRANSPORT && p->entry)
         {
-            if (nextP->type != NODE_TRANSPORT)
+            if (nextP->type != NODE_TRANSPORT && prevP->type != NODE_TRANSPORT) //We are not using the transport. Skip it.
                 continue;
 
             if (startPos.distance(prevP->point) > 5.0f)
@@ -1007,6 +1017,9 @@ TravelNode* TravelNodeMap::getNode(WorldPosition* pos, vector<WorldPosition>& pp
 
 TravelNodeRoute TravelNodeMap::getRoute(TravelNode* start, TravelNode* goal, Unit* bot)
 {
+    
+    float botSpeed = bot ? bot->GetSpeed(MOVE_RUN) : 7.0f;
+
     if(start == goal)
         return TravelNodeRoute();
 
@@ -1087,7 +1100,7 @@ TravelNodeRoute TravelNodeMap::getRoute(TravelNode* start, TravelNode* goal, Uni
             if ((childNode->open || childNode->close) && childNode->m_g <= g) // n' is already in opend or closed with a lower cost g(n')
                 continue; // consider next successor
 
-            h = childNode->dataNode->getDistance(goalStub->dataNode);
+            h = childNode->dataNode->getDistance(goalStub->dataNode) / botSpeed;
             f = g + h; // compute f(n')
             childNode->m_f = f;
             childNode->m_g = g;
@@ -1339,7 +1352,7 @@ void TravelNodeMap::printNodeStore()
     sPlayerbotAIConfig.log(nodeStore, "    public:");
     sPlayerbotAIConfig.log(nodeStore, "    static void loadNodes()");
     sPlayerbotAIConfig.log(nodeStore, "    {");
-    sPlayerbotAIConfig.log(nodeStore, "        TravelNode* nodes[%d];", anodes.size());
+    sPlayerbotAIConfig.log(nodeStore, "        TravelNode** nodes = new TravelNode*[%d];", anodes.size());
 
     for (uint32 i = 0; i < anodes.size(); i++)
     {
@@ -1373,6 +1386,8 @@ void TravelNodeMap::printNodeStore()
             sPlayerbotAIConfig.log(nodeStore, out.str().c_str());
         }
     }
+
+    sPlayerbotAIConfig.log(nodeStore, "	   delete[] nodes;");
 
     sPlayerbotAIConfig.log(nodeStore, "	}");
     sPlayerbotAIConfig.log(nodeStore, "};");

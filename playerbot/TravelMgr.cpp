@@ -726,6 +726,67 @@ string ExploreTravelDestination::getTitle()
     return points[0]->getAreaName();
 };
 
+uint32 GrindTravelDestination::moneyNeeded(Player* bot)
+{
+    PlayerbotAI* ai = bot->GetPlayerbotAI();
+    AiObjectContext* context = ai->GetAiObjectContext();
+
+    uint32 level = bot->getLevel();
+
+    uint32 moneyWanted = 1000; //We want atleast 10 silver.
+
+    moneyWanted = std::max(moneyWanted, AI_VALUE(uint32, "repair cost") * 2); //Or twice the current repair cost.
+
+    moneyWanted = std::max(moneyWanted, level * level * level); //Or level^2 (10s @ lvl10, 3g @ lvl30, 20g @ lvl60, 50g @ lvl80)
+
+    return moneyWanted;
+}
+
+bool GrindTravelDestination::isActive(Player* bot)
+{
+    PlayerbotAI* ai = bot->GetPlayerbotAI();
+    AiObjectContext* context = ai->GetAiObjectContext();
+    
+    if (moneyNeeded(bot) < bot->GetMoney())
+        return false;
+
+    CreatureInfo const* cInfo = this->getCreatureInfo();
+
+    int32 botLevel = bot->getLevel();
+
+    uint8 botPowerLevel = AI_VALUE(uint8, "durability");
+    float levelMod = botPowerLevel / 500.0f; //(0-0.2f)
+    float levelBoost = botPowerLevel / 50.0f; //(0-2.0f)
+
+    int32 maxLevel = std::max(botLevel * (0.5f + levelMod), botLevel - 5.0f + levelBoost);
+ 
+    if (cInfo->MaxLevel > maxLevel) //@lvl5 max = 3, @lvl60 max = 57
+        return false;
+
+    int32 minLevel = std::max(botLevel * (0.4f + levelMod), botLevel - 12.0f + levelBoost);
+
+    if (cInfo->MaxLevel < minLevel) //@lvl5 min = 3, @lvl60 max = 50
+        return false;
+
+    if (cInfo->MinLootGold == 0)
+        return false;
+
+    FactionTemplateEntry const* factionEntry = sFactionTemplateStore.LookupEntry(cInfo->Faction);
+    ReputationRank reaction = ai->getReaction(factionEntry);
+
+    return reaction < REP_NEUTRAL;
+}
+
+string GrindTravelDestination::getTitle() {
+    ostringstream out;
+
+    out << "grind mob ";
+
+    out << " " << ChatHelper::formatWorldEntry(entry);
+
+    return out.str();
+}
+
 TravelTarget::~TravelTarget() {
     if (!tDestination)
         return;
@@ -846,6 +907,12 @@ bool TravelTarget::isTraveling() {
         return false;
     }
 
+    if (!ai->HasStrategy("travel", BOT_STATE_NON_COMBAT))
+    {
+        setTarget(sTravelMgr.nullTravelDestination, sTravelMgr.nullWorldPosition, true);
+        return false;
+    }
+
     return true;
 }
 
@@ -870,6 +937,12 @@ bool TravelTarget::isWorking() {
         return false;
     }
     */
+
+    if (!ai->HasStrategy("travel", BOT_STATE_NON_COMBAT))
+    {
+        setTarget(sTravelMgr.nullTravelDestination, sTravelMgr.nullWorldPosition, true);
+        return false;
+    }
 
     return true;
 }
@@ -1355,7 +1428,8 @@ void TravelMgr::LoadQuestTravelTable()
     //Rpg locations
     for (auto& u : units)
     {
-        RpgTravelDestination* loc;
+        RpgTravelDestination* rLoc;
+        GrindTravelDestination* gLoc;
 
         if (u.type != 0)
             continue;
@@ -1385,16 +1459,28 @@ void TravelMgr::LoadQuestTravelTable()
         {
             if ((cInfo->NpcFlags & *i) != 0)
             {
-                loc = new RpgTravelDestination(u.entry, sPlayerbotAIConfig.tooCloseDistance, sPlayerbotAIConfig.sightDistance);
-                loc->setExpireDelay(5 * 60 * 1000);
-                loc->setMaxVisitors(15, 0);
+                rLoc = new RpgTravelDestination(u.entry, sPlayerbotAIConfig.tooCloseDistance, sPlayerbotAIConfig.sightDistance);
+                rLoc->setExpireDelay(5 * 60 * 1000);
+                rLoc->setMaxVisitors(15, 0);
 
                 point = WorldPosition(u.map, u.x, u.y, u.z, u.o);
                 pointsMap.insert_or_assign(u.guid, point);
-                loc->addPoint(&pointsMap.find(u.guid)->second);
-                rpgNpcs.push_back(loc);
+                rLoc->addPoint(&pointsMap.find(u.guid)->second);
+                rpgNpcs.push_back(rLoc);
                 break;
             }
+        }
+
+        if (cInfo->MinLootGold > 0)
+        {
+            gLoc = new GrindTravelDestination(u.entry, sPlayerbotAIConfig.tooCloseDistance, sPlayerbotAIConfig.sightDistance);
+            gLoc->setExpireDelay(5 * 60 * 1000);
+            gLoc->setMaxVisitors(100, 0);
+
+            point = WorldPosition(u.map, u.x, u.y, u.z, u.o);
+            pointsMap.insert_or_assign(u.guid, point);
+            gLoc->addPoint(&pointsMap.find(u.guid)->second);
+            grindMobs.push_back(gLoc);
         }
     }
 
@@ -2331,7 +2417,7 @@ uint32 TravelMgr::getDialogStatus(Player* pPlayer, int32 questgiver, Quest const
 }
 
 //Selects a random WorldPosition from a list. Use a distance weighted distribution.
-vector<WorldPosition*> TravelMgr::getNextPoint(WorldPosition* center, vector<WorldPosition*> points) {
+vector<WorldPosition*> TravelMgr::getNextPoint(WorldPosition* center, vector<WorldPosition*> points, uint32 amount) {
     vector<WorldPosition*> retVec;
 
     if (points.size() == 1)
@@ -2352,14 +2438,61 @@ vector<WorldPosition*> TravelMgr::getNextPoint(WorldPosition* center, vector<Wor
     uint32 rnd = urand(0, sum);
 
     //Pick a random point based on weights.
-    for (unsigned i = 0; i < points.size(); ++i)
-        if (rnd < weights[i])
-        {
-            retVec.push_back(points[i]);
-            return retVec;
-        }
-        else
-            rnd -= weights[i];
+    for (uint32 nr = 0; nr < amount; nr++)
+    {
+        for (unsigned i = 0; i < points.size(); ++i)
+            if (rnd < weights[i] && (retVec.empty() || std::find(retVec.begin(), retVec.end(), points[i]) == retVec.end()))
+            {
+                retVec.push_back(points[i]);
+                break;
+            }
+            else
+                rnd -= weights[i];
+    }
+
+    if (!retVec.empty())
+        return retVec;
+
+    assert(!"No valid point found.");
+
+    return retVec;
+}
+
+vector<WorldPosition> TravelMgr::getNextPoint(WorldPosition center, vector<WorldPosition> points, uint32 amount) {
+    vector<WorldPosition> retVec;
+
+    if (points.size() == 1)
+    {
+        retVec.push_back(points[0]);
+        return retVec;
+    }
+
+    //List of weights based on distance (Gausian curve that starts at 100 and lower to 1 at 1000 distance)
+    vector<uint32> weights;
+
+    std::transform(points.begin(), points.end(), std::back_inserter(weights), [center](WorldPosition point) { return 1 + 1000 * exp(-1 * pow(point.distance(center) / 400.0, 2)); });
+
+    //Total sum of all those weights.
+    uint32 sum = std::accumulate(weights.begin(), weights.end(), 0);
+
+    //Pick a random number in that range.
+    uint32 rnd = urand(0, sum);
+
+    //Pick a random point based on weights.
+    for (uint32 nr = 0; nr < amount; nr++)
+    {
+        for (unsigned i = 0; i < points.size(); ++i)
+            if (rnd < weights[i] && (retVec.empty() || std::find(retVec.begin(), retVec.end(), points[i]) == retVec.end()))
+            {
+                retVec.push_back(points[i]);
+                break;
+            }
+            else
+                rnd -= weights[i];
+    }
+
+    if (!retVec.empty())
+        return retVec;
 
     assert(!"No valid point found.");
 
@@ -2502,6 +2635,28 @@ vector<TravelDestination*> TravelMgr::getExploreTravelDestinations(Player* bot, 
     return retTravelLocations;
 }
 
+vector<TravelDestination*> TravelMgr::getGrindTravelDestinations(Player* bot, bool ignoreFull, bool ignoreInactive, float maxDistance)
+{
+    WorldPosition botLocation(bot);
+
+    vector<TravelDestination*> retTravelLocations;
+
+    for (auto& dest : grindMobs)
+    {
+        if (!ignoreInactive && !dest->isActive(bot))
+            continue;
+
+        if (dest->isFull(ignoreFull))
+            continue;
+
+        if (maxDistance > 0 && dest->distanceTo(&botLocation) > maxDistance)
+            continue;
+
+        retTravelLocations.push_back(dest);
+    }
+
+    return retTravelLocations;
+}
 
 void TravelMgr::setNullTravelTarget(Player* player)
 {

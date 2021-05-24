@@ -166,9 +166,9 @@ bool BGJoinAction::JoinQueue(uint32 type)
    WorldPacket packet(CMSG_BATTLEMASTER_JOIN, 20);
 #ifdef MANGOSBOT_ZERO
    packet << guid << mapId << instanceId << joinAsGroup;
-   sLog.outBasic("Bot #%u <%s> (%d %s) queued for BG (%s)", bot->GetGUIDLow(), bot->GetName(), bot->getLevel(), bot->GetTeam() == ALLIANCE ? "A" : "H", _bgType);
+   sLog.outBasic("Bot #%d %s:%d <%s> queued %s", bot->GetGUIDLow(), bot->GetTeam() == ALLIANCE ? "A" : "H", bot->getLevel(), bot->GetName(), _bgType);
 #else
-   sLog.outBasic("Bot #%u <%s> (%d %s) queued for %s (%s)", bot->GetGUIDLow(), bot->GetName(), bot->getLevel(), bot->GetTeam() == ALLIANCE ? "A" : "H", isRated ? "Rated Arena" : isArena ? "Arena" : "BG", _bgType);
+   sLog.outBasic("Bot #%d %s:%d <%s> queued %s %s", bot->GetGUIDLow(), bot->GetTeam() == ALLIANCE ? "A" : "H", bot->getLevel(), bot->GetName(), _bgType, isRated ? "Rated Arena" : isArena ? "Arena" : "");
    if (!isArena)
    {
        packet << guid << bgTypeId_ << instanceId << joinAsGroup;
@@ -212,7 +212,7 @@ bool BGLeaveAction::Execute(Event event)
         type = arenaType;
     }
 #endif
-    sLog.outDetail("Bot %u (%u %s) leaves queue (%s).", bot->GetGUIDLow(), bot->getLevel(), bot->GetTeam() == ALLIANCE ? "A" : "H", isArena ? "Arena" : "BG");
+    sLog.outDetail("Bot #%d %s:%d <%s> leaves %s queue", bot->GetGUIDLow(), bot->GetTeam() == ALLIANCE ? "A" : "H", bot->getLevel(), bot->GetName(), isArena ? "Arena" : "BG");
 
     WorldPacket packet(CMSG_BATTLEFIELD_PORT, 20);
 #ifdef MANGOSBOT_ZERO
@@ -413,6 +413,10 @@ bool BGStatusAction::Execute(Event event)
             ai->SetMaster(NULL);
         ai->ChangeStrategy("-warsong", BOT_STATE_COMBAT);
         ai->ChangeStrategy("-warsong", BOT_STATE_NON_COMBAT);
+        ai->ChangeStrategy("-arathi", BOT_STATE_COMBAT);
+        ai->ChangeStrategy("-arathi", BOT_STATE_NON_COMBAT);
+        ai->ChangeStrategy("-battleground", BOT_STATE_COMBAT);
+        ai->ChangeStrategy("-battleground", BOT_STATE_NON_COMBAT);
         ai->ChangeStrategy("-arena", BOT_STATE_COMBAT);
         ai->ChangeStrategy("-arena", BOT_STATE_NON_COMBAT);
         sLog.outBasic("Bot #%d <%s> leaves %s (%s).", bot->GetGUIDLow(), bot->GetName(), isArena ? "Arena" : "BG", _bgType);
@@ -435,11 +439,8 @@ bool BGStatusAction::Execute(Event event)
         ai->GetAiObjectContext()->GetValue<ObjectGuid>("bg master")->Set(ObjectGuid());
         ai::PositionMap& posMap = context->GetValue<ai::PositionMap&>("position")->Get();
         ai::PositionEntry pos = context->GetValue<ai::PositionMap&>("position")->Get()["bg objective"];
-        ai::PositionEntry posWp = context->GetValue<ai::PositionMap&>("position")->Get()["bg waypoint"];
         pos.Reset();
-        posWp.Reset();
         posMap["bg objective"] = pos;
-        posMap["bg waypoint"] = posWp;
     }
     if (statusid == STATUS_WAIT_QUEUE) //bot is in queue
     {
@@ -559,17 +560,12 @@ bool BGStatusAction::Execute(Event event)
         bot->GetSession()->HandleBattlefieldPortOpcode(packet);
 #endif
 
-        //ai->ResetStrategies(!IsRandomBot);
         ai->ResetStrategies(false);
-        ai->ChangeStrategy("-bg,-rpg,-travel,-grind", BOT_STATE_NON_COMBAT);
+        //ai->ChangeStrategy("-bg,-rpg,-travel,-grind", BOT_STATE_NON_COMBAT);
         ai::PositionMap& posMap = context->GetValue<ai::PositionMap&>("position")->Get();
         ai::PositionEntry pos = context->GetValue<ai::PositionMap&>("position")->Get()["bg objective"];
-        ai::PositionEntry posWp = context->GetValue<ai::PositionMap&>("position")->Get()["bg waypoint"];
         pos.Reset();
-        posWp.Reset();
         posMap["bg objective"] = pos;
-        posMap["bg waypoint"] = posWp;
-        //ai->ChangeStrategy("-bg", BOT_STATE_COMBAT);
 
         return true;
     }

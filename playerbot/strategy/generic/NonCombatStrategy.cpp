@@ -49,71 +49,11 @@ void NonCombatStrategy::InitTriggers(std::list<TriggerNode*>& triggers)
 
 }
 
-void LfgStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
-{
-    triggers.push_back(new TriggerNode(
-        "often",
-        NextAction::array(0, new NextAction("lfg join", relevance), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "seldom",
-        NextAction::array(0, new NextAction("lfg leave", relevance), NULL)));
-}
-
-LfgStrategy::LfgStrategy(PlayerbotAI* ai) : PassTroughStrategy(ai)
-{
-}
-
 void CollisionStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
     triggers.push_back(new TriggerNode(
         "collision",
         NextAction::array(0, new NextAction("move out of collision", 2.0f), NULL)));
-}
-
-void BGStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
-{
-    triggers.push_back(new TriggerNode(
-        "often",
-        NextAction::array(0, new NextAction("bg join", relevance), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "often",
-        NextAction::array(0, new NextAction("bg status check", relevance), NULL)));
-}
-
-BGStrategy::BGStrategy(PlayerbotAI* ai) : PassTroughStrategy(ai)
-{
-}
-
-void WarsongStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
-{
-    triggers.push_back(new TriggerNode(
-        "no possible targets",
-        NextAction::array(0, new NextAction("bg tactics ws", 1.0f), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "dead",
-        NextAction::array(0, new NextAction("bg tactics ws", ACTION_EMERGENCY), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "player has flag",
-        NextAction::array(0, new NextAction("bg tactics ws", ACTION_EMERGENCY + 2), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "enemy flagcarrier near",
-        NextAction::array(0, new NextAction("bg tactics ws", ACTION_EMERGENCY + 2), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "medium mana",
-        NextAction::array(0, new NextAction("drink", 1.0f), NULL)));
-}
-
-void ArenaStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
-{
-    triggers.push_back(new TriggerNode(
-        "no possible targets",
-        NextAction::array(0, new NextAction("arena tactics", 1.0f), NULL)));
 }
 
 void MountStrategy::InitTriggers(std::list<TriggerNode*> &triggers)

@@ -73,6 +73,60 @@ bool MovementAction::MoveNear(WorldObject* target, float distance)
     return false;
 }
 
+bool MovementAction::MoveToLOS(WorldObject* target, bool ranged)
+{
+    if (!target)
+        return false;
+
+    //ostringstream out; out << "Moving to LOS!";
+    //bot->Say(out.str(), LANG_UNIVERSAL);
+
+    // test
+    return MoveNear((Unit*)target);
+
+    float x = target->GetPositionX();
+    float y = target->GetPositionY();
+    float z = target->GetPositionZ();
+
+    if (!ranged)
+        return MoveTo((Unit*)target);
+
+    //Use standard pathfinder to find a route. 
+    PathFinder path(bot);
+    path.calculate(x, y, z, false);
+    PathType type = path.getPathType();
+    if (type != PATHFIND_NORMAL && type != PATHFIND_INCOMPLETE)
+        return false;
+
+    PointsArray& points = path.getPath();
+
+    float dist = FLT_MAX;
+    PositionEntry dest;
+
+    for (auto& point : points)
+    {
+        if (!target->IsWithinLOS(point.x, point.y, point.z))
+            continue;
+
+        float distPoint = target->GetDistance(point.x, point.y, point.z, DIST_CALC_NONE);
+        if (distPoint < dist)
+        {
+            dist = distPoint;
+            dest.Set(point.x, point.y, point.z, target->GetMapId());
+
+            if (ranged)
+                break;
+        }
+    }
+
+    if (dest.isSet())
+        return MoveTo(dest.mapId, dest.x, dest.y, dest.z);
+    else
+        ai->TellError("All paths not in LOS");
+
+    return false;
+}
+
 bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, bool react)
 {
     UpdateMovementState();
@@ -201,14 +255,17 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
 
     if (!movePath.empty())
     {
-        movePath.makeShortCut(startPosition, maxDist);
+        if(movePath.makeShortCut(startPosition, maxDist))
+            if(ai->HasStrategy("debug move", BOT_STATE_NON_COMBAT))
+                ai->TellMasterNoFacing("Found a shortcut.");
 
         if (movePath.empty())
         {
 
             AI_VALUE(LastMovement&, "last movement").setPath(movePath);
 
-            ai->TellMasterNoFacing("Too far from path. Rebuilding.");
+            if (ai->HasStrategy("debug move", BOT_STATE_NON_COMBAT))
+                ai->TellMasterNoFacing("Too far from path. Rebuilding.");
             return true;
         }
 
@@ -277,7 +334,8 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
         movePath.clear();
         AI_VALUE(LastMovement&, "last movement").setPath(movePath);
 
-        ai->TellMasterNoFacing("No point. Rebuilding.");
+        if (ai->HasStrategy("debug move", BOT_STATE_NON_COMBAT))
+            ai->TellMasterNoFacing("No point. Rebuilding.");
         return false;
     }
 
@@ -623,7 +681,7 @@ bool MovementAction::ChaseTo(WorldObject* obj)
     MotionMaster &mm = *bot->GetMotionMaster();
     mm.Clear();
 
-    mm.MoveChase((Unit*)obj);
+    mm.MoveChase((Unit*)obj, ai->IsRanged(bot) ? 25.0f : 0.f);
     return true;
 }
 

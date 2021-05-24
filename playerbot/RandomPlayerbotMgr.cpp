@@ -219,7 +219,7 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed)
         return;
 
     int maxAllowedBotCount = GetEventValue(0, "bot_count");
-    if (!maxAllowedBotCount || (maxAllowedBotCount < sPlayerbotAIConfig.minRandomBots || maxAllowedBotCount > sPlayerbotAIConfig.maxRandomBots))
+    if (!maxAllowedBotCount || ((uint32)maxAllowedBotCount < sPlayerbotAIConfig.minRandomBots || (uint32)maxAllowedBotCount > sPlayerbotAIConfig.maxRandomBots))
     {
         maxAllowedBotCount = urand(sPlayerbotAIConfig.minRandomBots, sPlayerbotAIConfig.maxRandomBots);
         SetEventValue(0, "bot_count", maxAllowedBotCount,
@@ -234,10 +234,17 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed)
 
     // Fix possible divide by zero if maxAllowedBotCount is smaller then sPlayerbotAIConfig.randomBotsPerInterval
     uint32 notDiv = 1;
-    if (maxAllowedBotCount >  sPlayerbotAIConfig.randomBotsPerInterval)
+    if (maxAllowedBotCount > (int)sPlayerbotAIConfig.randomBotsPerInterval)
         notDiv =  maxAllowedBotCount / sPlayerbotAIConfig.randomBotsPerInterval;
 
     //SetNextCheckDelay((uint32)max(1000, int(2000 * notDiv * sPlayerbotAIConfig.randomBotUpdateInterval) / 1000));
+
+    if (playerBots.size() < int(sPlayerbotAIConfig.minRandomBots / 4))
+        SetNextCheckDelay((uint32)max(500, int(500 * notDiv * sPlayerbotAIConfig.randomBotUpdateInterval) / 1000));
+    else if (playerBots.size() < int(sPlayerbotAIConfig.minRandomBots / 2))
+        SetNextCheckDelay((uint32)max(1000, int(1000 * notDiv * sPlayerbotAIConfig.randomBotUpdateInterval) / 1000));
+    else
+        SetNextCheckDelay((uint32)max(1000, int(2000 * notDiv * sPlayerbotAIConfig.randomBotUpdateInterval) / 1000));
 
     list<uint32> bots = GetBots();
     int botCount = bots.size();
@@ -245,7 +252,7 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed)
     PerformanceMonitorOperation *pmo = sPerformanceMonitor.start(PERF_MON_TOTAL,
             playerBots.size() < maxAllowedBotCount ? "RandomPlayerbotMgr::Login" : "RandomPlayerbotMgr::UpdateAIInternal");
 
-    if (botCount < maxAllowedBotCount)
+    if (bots.size() < sPlayerbotAIConfig.minRandomBots)
     {
         AddRandomBots();
     }
@@ -267,7 +274,7 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed)
         if (time(NULL) > (BgCheckTimer + 30))
             activateCheckBgQueueThread();
 
-        if (BgBotsActive && bgBotsCount < 40)
+        if (BgBotsActive && bgBotsCount < 60)
         {
             for (int i = BG_BRACKET_ID_FIRST; i < MAX_BATTLEGROUND_BRACKETS; ++i)
             {
@@ -292,9 +299,12 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed)
                             }
                         }
 #endif
-                        AddBgBot(queueTypeId, bracketId);
-                        bgBotsCount++;
-                        continue;
+                        for (auto i = 0; i < 10; ++i)
+                        {
+                            AddBgBot(queueTypeId, bracketId);
+                            bgBotsCount++;
+                            continue;
+                        }
                     }
                     if (!visual_players && !bg_players && bgBotsCount < 5)
                     {
@@ -306,7 +316,7 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed)
         }
     }
 
-    int botProcessed = 0;
+    uint32 botProcessed = 0;
     for (list<uint32>::iterator i = bots.begin(); i != bots.end(); ++i)
     {
         uint32 bot = *i;
@@ -314,13 +324,7 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed)
 			botProcessed++;
 		}
 
-        if (playerBots.size() < int(sPlayerbotAIConfig.minRandomBots / 4) && botProcessed >= sPlayerbotAIConfig.randomBotsPerInterval)
-            break;
-        else if (playerBots.size() < int(sPlayerbotAIConfig.minRandomBots / 2) && botProcessed >= int(sPlayerbotAIConfig.randomBotsPerInterval / 2))
-            break;
-        else if (playerBots.size() < sPlayerbotAIConfig.minRandomBots && botProcessed >= int(sPlayerbotAIConfig.randomBotsPerInterval / 5))
-            break;
-        else if (playerBots.size() >= sPlayerbotAIConfig.minRandomBots && botProcessed >= int(sPlayerbotAIConfig.randomBotsPerInterval / 30))
+        if (botProcessed >= sPlayerbotAIConfig.randomBotsPerInterval)
             break;
     }   
 
@@ -331,34 +335,23 @@ uint32 RandomPlayerbotMgr::AddRandomBots()
 {
     set<uint32> bots;
 
-    if (!currentBots.size())
-    {
-        QueryResult* results = PlayerbotDatabase.PQuery(
-            "select `bot` from ai_playerbot_random_bots where event = 'add'");
+    QueryResult* results = PlayerbotDatabase.PQuery(
+        "select `bot` from ai_playerbot_random_bots where event = 'add'");
 
-        if (results)
-        {
-            do
-            {
-                Field* fields = results->Fetch();
-                uint32 bot = fields[0].GetUInt32();
-                bots.insert(bot);
-            } while (results->NextRow());
-            delete results;
-        }
-    }
-    else
+    if (results)
     {
-        for (list<uint32>::iterator i = currentBots.begin(); i != currentBots.end(); i++)
+        do
         {
-            uint32 bot = *i;
+            Field* fields = results->Fetch();
+            uint32 bot = fields[0].GetUInt32();
             bots.insert(bot);
-        }
+        } while (results->NextRow());
+        delete results;
     }
 
     vector<uint32> guids;
     int maxAllowedBotCount = GetEventValue(0, "bot_count");
-    int maxAllowedNewBotCount = maxAllowedBotCount - currentBots.size();
+    int maxAllowedNewBotCount = max((int)(sPlayerbotAIConfig.randomBotsPerInterval / 4), (int)(maxAllowedBotCount - currentBots.size()));
     for (list<uint32>::iterator i = sPlayerbotAIConfig.randomBotAccounts.begin(); i != sPlayerbotAIConfig.randomBotAccounts.end(); i++)
     {
         uint32 accountId = *i;
@@ -399,7 +392,7 @@ uint32 RandomPlayerbotMgr::AddRandomBots()
                 SetEventValue(bot, "version", MANGOSBOT_VERSION, sPlayerbotAIConfig.maxRandomBotInWorldTime);
                 bots.insert(bot);
                 currentBots.push_back(bot);
-                sLog.outBasic("Bot #%d %s:%d <%s>: log in", guid, IsAlliance(race) == ALLIANCE ? "A" : "H", level, name);
+                sLog.outDetail("Bot #%d %s:%d <%s>: log in", guid, IsAlliance(race) ? "A" : "H", level, name);
                 if (guids.size() >= min((int)(sPlayerbotAIConfig.randomBotsPerInterval / 4), maxAllowedNewBotCount))
                 {
                     delete result;
@@ -540,7 +533,7 @@ void RandomPlayerbotMgr::CheckBgQueue()
         }
     }
 
-    int check_time = count > 0 ? 60 : 30;
+    int check_time = count > 0 ? 180 : 30;
 
     if (time(NULL) < (BgCheckTimer + check_time))
     {
@@ -1087,6 +1080,9 @@ void RandomPlayerbotMgr::AddBgBot(BattleGroundQueueTypeId queueTypeId, BattleGro
             if (!bot->GetBGAccessByLevel(bgTypeId))
                 continue;
 
+            if (bot->GetPlayerbotAI()->IsHeal(bot) && urand(0, 5))
+                continue;
+
             // add only x2 - x9 level
             //if (!visual && bracketId < BG_BRACKET_ID_LAST && (bot->getLevel() < ((bracketId * 10) + 12)))
             //	continue;
@@ -1458,7 +1454,7 @@ bool RandomPlayerbotMgr::ProcessBot(uint32 bot)
 		if (!player || !player->GetGroup())
 		{
             if (player)
-                sLog.outDetail("Bot #%d %s:%d <%s>: log out", bot, IsAlliance(player->getRace()) == ALLIANCE ? "A" : "H", player->getLevel(), player->GetName());
+                sLog.outDetail("Bot #%d %s:%d <%s>: log out", bot, IsAlliance(player->getRace()) ? "A" : "H", player->getLevel(), player->GetName());
             else
                 sLog.outDetail("Bot #%d: log out", bot);
 
@@ -1475,7 +1471,7 @@ bool RandomPlayerbotMgr::ProcessBot(uint32 bot)
 
     if (!player)
     {
-        if ((urand(0, 100) > 50) && currentBots.size() >= (sPlayerbotAIConfig.minRandomBots / 2)) // less lag during bots login
+        if (urand(0, 100) > 50) // less lag during bots login
         {
             return true;
         }
@@ -1518,9 +1514,9 @@ bool RandomPlayerbotMgr::ProcessBot(uint32 bot)
     uint32 logout = GetEventValue(bot, "logout");
     if (player && !logout && !isValid)
     {
-        sLog.outBasic("Bot #%d %s:%d <%s>: log out", bot, IsAlliance(player->getRace()) == ALLIANCE ? "A" : "H", player->getLevel(), player->GetName());
+        sLog.outBasic("Bot #%d %s:%d <%s>: log out", bot, IsAlliance(player->getRace()) ? "A" : "H", player->getLevel(), player->GetName());
         LogoutPlayerBot(bot);
-        SetEventValue(bot, "logout", 1, sPlayerbotAIConfig.maxRandomBotInWorldTime);
+        SetEventValue(bot, "logout", 1, urand(sPlayerbotAIConfig.minRandomBotInWorldTime, sPlayerbotAIConfig.maxRandomBotInWorldTime));
         return true;
     }
 
@@ -1699,17 +1695,23 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot, vector<WorldLocation> &locs
         return;
     }
 
-    vector<WorldLocation> tlocs = locs;
+    vector<WorldPosition> tlocs;
+
+    for (auto& loc : locs)
+        tlocs.push_back(WorldPosition(loc));
+
+    //Get 10 locations that are reasonable near to the bot. No location is excluded only less likely. Works across maps.
+    tlocs = sTravelMgr.getNextPoint(WorldPosition(bot), tlocs, 10);
 
     //Do not teleport to maps disabled in config
     //tlocs.erase(std::remove_if(tlocs.begin(), tlocs.end(), [bot](WorldLocation const& l) {vector<uint32>::iterator i = find(sPlayerbotAIConfig.randomBotMaps.begin(), sPlayerbotAIConfig.randomBotMaps.end(), l.mapid); return i == sPlayerbotAIConfig.randomBotMaps.end(); }), tlocs.end());
 
     //5% + 0.1% per level chance node on different map in selection.
-    tlocs.erase(std::remove_if(tlocs.begin(), tlocs.end(), [bot](WorldLocation const& l) {return l.mapid != bot->GetMapId() && urand(1, 100) > 0.5 * bot->getLevel(); }), tlocs.end());
+    //tlocs.erase(std::remove_if(tlocs.begin(), tlocs.end(), [bot](WorldLocation const& l) {return l.mapid != bot->GetMapId() && urand(1, 100) > 0.5 * bot->getLevel(); }), tlocs.end());
 
     //Continent is about 20.000 large
     //Bot will travel 0-5000 units + 75-150 units per level.
-    tlocs.erase(std::remove_if(tlocs.begin(), tlocs.end(), [bot](WorldLocation const& l) {return l.mapid == bot->GetMapId() && sServerFacade.GetDistance2d(bot, l.coord_x, l.coord_y) > urand(0, 5000) + bot->getLevel() * 15 * urand(5, 10); }), tlocs.end());
+    //tlocs.erase(std::remove_if(tlocs.begin(), tlocs.end(), [bot](WorldLocation const& l) {return l.mapid == bot->GetMapId() && sServerFacade.GetDistance2d(bot, l.coord_x, l.coord_y) > urand(0, 5000) + bot->getLevel() * 15 * urand(5, 10); }), tlocs.end());
 
     if (tlocs.empty())
     {
@@ -1721,7 +1723,7 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot, vector<WorldLocation> &locs
     for (int attemtps = 0; attemtps < 10; ++attemtps)
     {
         int index = urand(0, tlocs.size() - 1);
-        WorldLocation loc = tlocs[index];
+        WorldLocation loc = tlocs[index].getLocation();
 
 #ifndef MANGOSBOT_ZERO
         // Teleport to Dark Portal area if event is in progress
@@ -2109,7 +2111,10 @@ void RandomPlayerbotMgr::Refresh(Player* bot)
 
 bool RandomPlayerbotMgr::IsRandomBot(Player* bot)
 {
-	return IsRandomBot(bot->GetObjectGuid());
+    if (bot)
+        return IsRandomBot(bot->GetGUIDLow());
+
+    return false;
 }
 
 bool RandomPlayerbotMgr::IsRandomBot(uint32 bot)
