@@ -405,9 +405,6 @@ void RpgAction::spell(ObjectGuid guid)
 
     if (oldSelection)
         bot->SetSelectionGuid(oldSelection);
-
-    if (!ai->hasRealPlayerMaster())
-        ai->SetNextCheckDelay(sPlayerbotAIConfig.rpgDelay);
 }
 
 

@@ -237,15 +237,6 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed)
     if (maxAllowedBotCount > (int)sPlayerbotAIConfig.randomBotsPerInterval)
         notDiv =  maxAllowedBotCount / sPlayerbotAIConfig.randomBotsPerInterval;
 
-    //SetNextCheckDelay((uint32)max(1000, int(2000 * notDiv * sPlayerbotAIConfig.randomBotUpdateInterval) / 1000));
-
-    if (playerBots.size() < int(sPlayerbotAIConfig.minRandomBots / 4))
-        SetNextCheckDelay((uint32)max(500, int(500 * notDiv * sPlayerbotAIConfig.randomBotUpdateInterval) / 1000));
-    else if (playerBots.size() < int(sPlayerbotAIConfig.minRandomBots / 2))
-        SetNextCheckDelay((uint32)max(1000, int(1000 * notDiv * sPlayerbotAIConfig.randomBotUpdateInterval) / 1000));
-    else
-        SetNextCheckDelay((uint32)max(1000, int(2000 * notDiv * sPlayerbotAIConfig.randomBotUpdateInterval) / 1000));
-
     list<uint32> bots = GetBots();
     int botCount = bots.size();
 

@@ -227,16 +227,10 @@ void PlayerbotAI::HandleTeleportAck()
 		p << (uint32) 0; // supposed to be flags? not used currently
 		p << (uint32) time(0); // time - not currently used
         bot->GetSession()->HandleMoveTeleportAckOpcode(p);
-
-        // add delay to simulate teleport delay
-        SetNextCheckDelay(urand(1000, 5000));
 	}
 	else if (bot->IsBeingTeleportedFar())
 	{
         bot->GetSession()->HandleMoveWorldportAckOpcode();
-
-        // add delay to simulate teleport delay
-        SetNextCheckDelay(urand(5000, 10000));
 	}
 }
 
@@ -547,12 +541,6 @@ void PlayerbotAI::DoNextAction()
 
     if (IsEating() || IsDrinking())
         return;    
-
-    if (minimal)
-    {
-        SetNextCheckDelay(sPlayerbotAIConfig.passiveDelay);
-        //return;
-    }
 
     Group *group = bot->GetGroup();
     // test BG master set
@@ -1447,7 +1435,6 @@ bool PlayerbotAI::CastSpell(uint32 spellId, float x, float y, float z, Item* ite
 
     if (failWithDelay)
     {
-        SetNextCheckDelay(sPlayerbotAIConfig.globalCoolDown);
         return false;
     }
 
@@ -1496,7 +1483,6 @@ bool PlayerbotAI::CastSpell(uint32 spellId, float x, float y, float z, Item* ite
     if (sServerFacade.isMoving(bot) && spell->GetCastTime())
     {
         bot->StopMoving();
-        SetNextCheckDelay(sPlayerbotAIConfig.globalCoolDown);
         spell->cancel();
         //delete spell;
         return false;

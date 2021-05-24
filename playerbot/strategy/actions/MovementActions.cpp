@@ -704,8 +704,6 @@ void MovementAction::WaitForReach(float distance)
 
     if (delay < 0)
         delay = 0;
-
-    ai->SetNextCheckDelay((uint32)delay);
 }
 
 bool MovementAction::Flee(Unit *target)
@@ -899,7 +897,6 @@ bool SetFacingTargetAction::Execute(Event event)
         return true;
 
     sServerFacade.SetFacingTo(bot, target);
-    ai->SetNextCheckDelay(sPlayerbotAIConfig.globalCoolDown);
     return true;
 }
 
