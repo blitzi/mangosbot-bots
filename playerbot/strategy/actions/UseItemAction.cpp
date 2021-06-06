@@ -291,7 +291,7 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget)
    const SpellEntry* const pSpellInfo = sServerFacade.LookupSpellInfo(proto->Spells[0].SpellId);
 
    //check if item aura already exists
-   if (ai->HasAura(pSpellInfo->Id, bot))
+   if (pSpellInfo && ai->HasAura(pSpellInfo->Id, bot))
        return false;
 
    if (proto->Class == ITEM_CLASS_CONSUMABLE && (proto->SubClass == ITEM_SUBCLASS_FOOD || proto->SubClass == ITEM_SUBCLASS_CONSUMABLE) &&
