@@ -208,6 +208,7 @@ namespace ai
                 creators["consecration"] = &AiObjectContextInternal::consecration;
                 creators["consecration rank 1"] = &AiObjectContextInternal::consecration1;
                 creators["avenging wrath"] = &AiObjectContextInternal::avenging_wrath;
+                creators["righteous defense"] = &AiObjectContextInternal::righteous_defense;
                 creators["cleanse disease"] = &AiObjectContextInternal::cleanse_disease;
                 creators["cleanse poison"] = &AiObjectContextInternal::cleanse_poison;
                 creators["cleanse magic"] = &AiObjectContextInternal::cleanse_magic;
@@ -277,6 +278,7 @@ namespace ai
             static Action* consecration(PlayerbotAI* ai) { return new CastConsecrationAction(ai); }
             static Action* consecration1(PlayerbotAI* ai) { return new CastConsecration1Action(ai); }
             static Action* avenging_wrath(PlayerbotAI* ai) { return new CastAvengingWrathAction(ai); }
+            static Action* righteous_defense(PlayerbotAI* ai) { return new CastRighteousDefenseAction(ai); }
             static Action* cleanse_poison(PlayerbotAI* ai) { return new CastCleansePoisonAction(ai); }
             static Action* cleanse_disease(PlayerbotAI* ai) { return new CastCleanseDiseaseAction(ai); }
             static Action* cleanse_magic(PlayerbotAI* ai) { return new CastCleanseMagicAction(ai); }

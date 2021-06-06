@@ -87,8 +87,20 @@ bool OutNumberedTrigger::IsActive()
 bool BuffTrigger::IsActive()
 {
     Unit* target = GetTarget();
-	return SpellTrigger::IsActive() &&
+    return SpellTrigger::IsActive() &&
         !ai->HasAura(spell, target, false);
+}
+
+Value<Unit*>* PartyMemberHasAggroTrigger::GetTargetValue()
+{
+    return context->GetValue<Unit*>("party member with aggro");
+}
+
+bool PartyMemberHasAggroTrigger::IsActive()
+{
+    Unit* target = GetTarget();
+
+    return target;
 }
 
 Value<Unit*>* BuffOnPartyTrigger::GetTargetValue()

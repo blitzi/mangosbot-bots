@@ -106,6 +106,14 @@ namespace ai
 		virtual bool IsActive();
 	};
 
+    class PartyMemberHasAggroTrigger : public Trigger {
+    public:
+        PartyMemberHasAggroTrigger(PlayerbotAI* ai) : Trigger(ai, "party member has aggro") {}
+        virtual string GetTargetName() { return "current target"; }
+		virtual bool IsActive();
+        virtual Value<Unit*>* GetTargetValue();
+    };
+
 	class SpellTrigger : public Trigger
 	{
 	public:

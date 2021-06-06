@@ -40,5 +40,9 @@ void TankPaladinStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 
     triggers.push_back(new TriggerNode(
         "lose aggro",
-        NextAction::array(0, new NextAction("avenging wrath", ACTION_EMERGENCY+5), NULL)));
+        NextAction::array(0, new NextAction("avenging wrath", ACTION_EMERGENCY+5), NULL))); 
+    
+    triggers.push_back(new TriggerNode(
+        "party member has aggro",
+        NextAction::array(0, new NextAction("righteous defense", ACTION_EMERGENCY+9), NULL)));
 }

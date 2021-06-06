@@ -288,6 +288,12 @@ namespace ai
     {
     public:
 		CastAvengingWrathAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "avenging wrath") {}
+    };	
+	
+	class CastRighteousDefenseAction : public CastSpellAction
+    {
+    public:
+		CastRighteousDefenseAction(PlayerbotAI* ai) : CastSpellAction(ai, "righteous defense") {}
     };
 
 	class CastConsecration1Action : public CastMeleeSpellAction
