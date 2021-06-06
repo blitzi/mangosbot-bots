@@ -27,6 +27,7 @@
 #include "ServerFacade.h"
 #include "TravelMgr.h"
 #include "ChatHelper.h"
+#include <playerbot/strategy/values/MoveTargetValue.h>
 #include "strategy/actions/LootAction.cpp"
 
 using namespace ai;
@@ -536,7 +537,11 @@ void PlayerbotAI::DoNextAction()
 
     bool minimal = !AllowActive(ALL_ACTIVITY);
 
-    if (!bot->GetGroup() && minimal)
+    currentEngine->DoNextAction(NULL, 0, minimal);
+
+    if (IsActive() && minimal && urand(0, 4))
+    {
+        SetNextCheckDelay(sPlayerbotAIConfig.passiveDelay / 2);
         return;
 
     if (IsEating() || IsDrinking())
@@ -801,6 +806,24 @@ Unit* PlayerbotAI::GetUnit(ObjectGuid guid)
         return NULL;
 
     return sObjectAccessor.GetUnit(*bot, guid);
+}
+
+Unit* PlayerbotAI::GetUnit(CreatureDataPair const* creatureDataPair)
+{
+    if (!creatureDataPair)
+        return NULL;
+
+    ObjectGuid guid(HIGHGUID_UNIT, creatureDataPair->second.id, creatureDataPair->first);
+
+    if (!guid)
+        return NULL;
+
+    Map* map = sMapMgr.FindMap(creatureDataPair->second.mapid);
+
+    if (!map)
+        return NULL;
+
+    return map->GetUnit(guid);
 }
 
 
@@ -2096,6 +2119,12 @@ string PlayerbotAI::HandleRemoteCommand(string command)
     {
         LastMovement& data = *GetAiObjectContext()->GetValue<LastMovement&>("last movement");
         ostringstream out; out << data.lastMoveShort.getX() << " " << data.lastMoveShort.getY() << " " << data.lastMoveShort.getZ() << " " << data.lastMoveShort.getMapId() << " " << data.lastMoveShort.getO();
+        return out.str();
+    }
+    else if (command == "move")
+    {
+        MoveTarget* data = *GetAiObjectContext()->GetValue<MoveTarget*>("move target");
+        ostringstream out; out << data->getName() << " " << data->getRelevance() << " " << data->getDist(bot) << " " << data->getPos().print();
         return out.str();
     }
     else if (command == "target")
