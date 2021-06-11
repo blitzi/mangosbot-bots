@@ -232,19 +232,6 @@ bool AttackersValue::IsPossibleTarget(Unit *attacker, Player *bot)
 			if (ai->IsTank(p) && p->IsAlive())
 			{
 				groupHasTank = true;
-
-				/*if (attacker)
-				{
-					HostileReference* target = attacker->getThreatManager().getCurrentVictim();
-
-					if (target)
-					{
-						tankThreat = attacker->getThreatManager().getThreat(p);
-						
-						if (tankThreat >= highestThreat && highestThreat > 0)
-							tankHasAggro = true;
-					}
-				}*/
 			}
 		}
 	}
@@ -257,7 +244,6 @@ bool AttackersValue::IsPossibleTarget(Unit *attacker, Player *bot)
     bool isMemberBotGroup = false;
     if (bot->GetGroup() && ai->GetMaster() && ai->GetMaster()->GetPlayerbotAI() && !ai->GetMaster()->GetPlayerbotAI()->isRealPlayer())
         isMemberBotGroup = true;
-
 
     return attacker &&
         attacker->IsInWorld() &&
@@ -273,12 +259,6 @@ bool AttackersValue::IsPossibleTarget(Unit *attacker, Player *bot)
 #endif
         !attacker->HasStealthAura() &&
         !attacker->HasInvisibilityAura() &&
-#ifdef CMANGOS
-        //!attacker->IsStunned() &&
-#endif
-#ifdef MANGOS
-        //!attacker->hasUnitState(UNIT_STAT_STUNNED) &&
-#endif
         !((attacker->IsPolymorphed() ||
         bot->GetPlayerbotAI()->HasAura("sap", attacker) ||
         sServerFacade.IsCharmed(attacker) ||
@@ -288,28 +268,13 @@ bool AttackersValue::IsPossibleTarget(Unit *attacker, Player *bot)
         bot->IsWithinDistInMap(attacker, sPlayerbotAIConfig.sightDistance) &&
         !(attacker->GetCreatureType() == CREATURE_TYPE_CRITTER) &&
         !(sPlayerbotAIConfig.IsInPvpProhibitedZone(attacker->GetAreaId()) && (attacker->GetObjectGuid().IsPlayer() || attacker->GetObjectGuid().IsPet())) &&
-        (!c || (
-#ifdef MANGOS
-            !c->IsInEvadeMode() &&
-#endif
-#ifdef CMANGOS
-            !c->GetCombatManager().IsInEvadeMode() &&
-#endif
+        (!c ||
             (
-#ifdef CMANGOS
-                ((!isMemberBotGroup && ai->HasStrategy("attack tagged", BOT_STATE_NON_COMBAT)) || leaderHasThreat || !c->HasLootRecipient() || c->IsTappedBy(bot)) &&
-				(!groupHasTank || (
-				 (groupHasTank && !waitForTankAggro) || iAmTank || targetIsNonElite || targetIsAlmostDead))
-
-#endif
-#ifndef MANGOSBOT_TWO
-#ifdef MANGOS
-                !attacker->HasFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_TAPPED) || bot->IsTappedByMeOrMyGroup(c)
-#endif
-#endif
-                )
+                !c->GetCombatManager().IsInEvadeMode() &&            
+                (ai->HasStrategy("attack tagged", BOT_STATE_NON_COMBAT) || (!attacker->HasFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_TAPPED) || c->IsTappedBy(bot))) &&
+			    (!groupHasTank || ((groupHasTank && !waitForTankAggro) || iAmTank || targetIsNonElite || targetIsAlmostDead))
             )
-            );
+        );
 }
 
 bool AttackersValue::IsValidTarget(Unit *attacker, Player *bot)
