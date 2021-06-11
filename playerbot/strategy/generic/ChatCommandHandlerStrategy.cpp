@@ -181,6 +181,7 @@ ChatCommandHandlerStrategy::ChatCommandHandlerStrategy(PlayerbotAI* ai) : PassTr
     supported.push_back("gb");
     supported.push_back("bank");
     supported.push_back("invite");
+    supported.push_back("use");
     supported.push_back("spell");
     supported.push_back("rti");
     supported.push_back("position");

@@ -18,6 +18,13 @@ bool UseItemAction::Execute(Event event)
 
    if (gos.empty())
    {
+       Player* master = GetMaster();
+       if (master && master->GetSelectionGuid())
+           gos.push_back(master->GetSelectionGuid());
+   }
+
+   if (gos.empty())
+   {
       if (items.size() > 1)
       {
          list<Item*>::iterator i = items.begin();
