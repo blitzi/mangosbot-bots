@@ -20,15 +20,11 @@ using namespace ai;
 void MovementAction::CreateWp(Player* wpOwner, float x, float y, float z, float o, uint32 entry, bool important)
 {
     float dist = wpOwner->GetDistance(x, y, z);
-    float delay = 5000.0f; // 1000.0f * dist / wpOwner->GetSpeed(MOVE_RUN) + sPlayerbotAIConfig.reactDelay;
 
-    //if(!important)
-    //    delay *= 0.25;
-
-    Creature* wpCreature = wpOwner->SummonCreature(entry, x, y, z - 1, o, TEMPSPAWN_TIMED_DESPAWN, delay);
+    Creature* wpCreature = wpOwner->SummonCreature(entry, x, y, z - 1, o, TEMPSPAWN_TIMED_DESPAWN, 1000);
 
     if (!important)
-        wpCreature->SetObjectScale(0.2f);
+        wpCreature->SetObjectScale(0.1f);
 
 }
 
@@ -140,7 +136,6 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
 
     float minDist = sPlayerbotAIConfig.targetPosRecalcDistance; //Minium distance a bot should move.
     float maxDist = sPlayerbotAIConfig.reactDistance;           //Maxium distance a bot can move in one single action.
-
 
     bool generatePath = !bot->IsFlying() && !bot->HasMovementFlag(MOVEFLAG_SWIMMING) && !bot->IsInWater() && !sServerFacade.IsUnderwater(bot);
     
@@ -318,8 +313,9 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
                 for (auto& transport : movePosition.getTransports(entry))
                     if (movePosition.sqDistance2d(WorldPosition((WorldObject*)transport)) < 5 * 5)
                         transport->AddPassenger(bot, true);
-            }            
-            WaitForReach(100.0f);
+            }        
+
+            ai->GetMoveTimer()->Reset(250);
             return true;
         }
         //if (!isTransport && bot->GetTransport())
@@ -373,8 +369,8 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
         sPlayerbotAIConfig.log("bot_movement.csv", out.str().c_str());
     }
 
-    if (!react)
-        WaitForReach(startPosition.distance(movePosition)- 10.0f);
+    if(!react)
+        ai->GetMoveTimer()->Reset(250);
 
     bot->HandleEmoteState(0);
     if (bot->IsSitState())
@@ -688,22 +684,6 @@ float MovementAction::MoveDelay(float distance)
     return distance / bot->GetSpeed(MOVE_RUN);
 }
 
-void MovementAction::WaitForReach(float distance)
-{
-    float delay = 1000.0f * MoveDelay(distance) + sPlayerbotAIConfig.reactDelay;
-
-    if (delay > sPlayerbotAIConfig.maxWaitForMove)
-        delay = sPlayerbotAIConfig.maxWaitForMove;
-
-    Unit* target = *ai->GetAiObjectContext()->GetValue<Unit*>("current target");
-    Unit* player = *ai->GetAiObjectContext()->GetValue<Unit*>("enemy player target");
-    if ((player || target) && delay > sPlayerbotAIConfig.globalCoolDown)
-        delay = sPlayerbotAIConfig.globalCoolDown;
-
-    if (delay < 0)
-        delay = 0;
-}
-
 bool MovementAction::Flee(Unit *target)
 {
     Player* master = GetMaster();
@@ -892,9 +872,11 @@ bool SetFacingTargetAction::Execute(Event event)
         return false;
 
     if (bot->IsTaxiFlying()|| bot->IsFlying())
-        return true;
+        return true; 
 
     sServerFacade.SetFacingTo(bot, target);
+
+    ai->GetMoveTimer()->Reset(250);
     return true;
 }
 

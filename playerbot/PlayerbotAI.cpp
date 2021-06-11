@@ -70,14 +70,14 @@ void PacketHandlingHelper::AddPacket(const WorldPacket& packet)
 
 
 PlayerbotAI::PlayerbotAI() : PlayerbotAIBase(), bot(NULL), aiObjectContext(NULL),
-    currentEngine(NULL), chatHelper(this), chatFilter(this), accountId(0), security(NULL), master(NULL), currentState(BOT_STATE_NON_COMBAT)
+    currentEngine(NULL), chatHelper(this), chatFilter(this), accountId(0), security(NULL), master(NULL), currentState(BOT_STATE_NON_COMBAT), moveUpdateTimer(0)
 {
     for (int i = 0 ; i < BOT_STATE_MAX; i++)
         engines[i] = NULL;
 }
 
 PlayerbotAI::PlayerbotAI(Player* bot) :
-    PlayerbotAIBase(), chatHelper(this), chatFilter(this), security(bot), master(NULL)
+    PlayerbotAIBase(), chatHelper(this), chatFilter(this), security(bot), master(NULL), moveUpdateTimer(0)
 {
 	this->bot = bot;
 
@@ -172,6 +172,8 @@ void PlayerbotAI::UpdateAIInternal(uint32 elapsed)
 {
     if (bot->IsBeingTeleported() || !bot->IsInWorld())
         return;
+
+    moveUpdateTimer.Update(elapsed);
 
     PerformanceMonitorOperation *pmo = sPerformanceMonitor.start(PERF_MON_TOTAL, "PlayerbotAI::UpdateAIInternal");
     ExternalEventHelper helper(aiObjectContext);
@@ -517,6 +519,9 @@ void PlayerbotAI::DoNextAction()
     if (bot->IsTaxiFlying() || bot->IsFlying())
         return;
 
+    if (IsEating() || IsDrinking())
+        return;
+
     // change engine if just died
     if (currentEngine != engines[BOT_STATE_DEAD] && !sServerFacade.IsAlive(bot))
     {
@@ -536,16 +541,6 @@ void PlayerbotAI::DoNextAction()
     }
 
     bool minimal = !AllowActive(ALL_ACTIVITY);
-
-    currentEngine->DoNextAction(NULL, 0, minimal);
-
-    if (IsActive() && minimal && urand(0, 4))
-    {
-        SetNextCheckDelay(sPlayerbotAIConfig.passiveDelay / 2);
-        return;
-
-    if (IsEating() || IsDrinking())
-        return;    
 
     Group *group = bot->GetGroup();
     // test BG master set
@@ -2751,7 +2746,7 @@ bool PlayerbotAI::IsDrinking()
     {
         const SpellEntry* proto = spell.second->GetSpellProto();
 
-        if (proto && proto->Category == 59 || strcmp(proto->SpellName[0], "Drink") == 0)
+        if (proto != NULL && proto->Category == 59 || strcmp(proto->SpellName[0], "Drink") == 0)
             return bot->HasMana() && bot->GetPowerPercent() < 100;
     }
 

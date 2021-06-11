@@ -370,6 +370,7 @@ public:
     bool IsOpposing(Player* player);
     static bool IsOpposing(uint8 race1, uint8 race2);
     PlayerbotSecurity* GetSecurity() { return &security; }
+    ShortTimeTracker* GetMoveTimer() { return &moveUpdateTimer; }
 
 protected:
 	Player* bot;
@@ -391,7 +392,7 @@ protected:
     static set<string> unsecuredCommands;
     float currentCastTime;
     string pullAction;
-
+    ShortTimeTracker moveUpdateTimer;
 };
 
 

@@ -12,6 +12,8 @@ namespace ai
             bot = ai->GetBot();
         }
 
+        virtual bool isPossible() { return ai->GetMoveTimer()->Passed(); }
+
     protected:
         bool ChaseTo(WorldObject *obj);
         bool MoveNear(uint32 mapId, float x, float y, float z, float distance = sPlayerbotAIConfig.contactDistance);
@@ -23,7 +25,6 @@ namespace ai
         bool Follow(Unit* target, float distance = sPlayerbotAIConfig.followDistance);
         bool Follow(Unit* target, float distance, float angle);
         float MoveDelay(float distance);
-        void WaitForReach(float distance);
         bool IsMovingAllowed(Unit* target);
         bool IsMovingAllowed(uint32 mapId, float x, float y, float z);
         bool IsMovingAllowed();
