@@ -20,10 +20,16 @@ public:
         {
             uint64 guid = group->GetTargetIcon(4);
             if (guid && attacker->GetObjectGuid() == ObjectGuid(guid))
-                return;
+                return;   
         }
-        if (!result || result->GetHealth() > attacker->GetHealth())
-            result = attacker;
+
+        Unit* victim = attacker->GetVictim();
+
+        if (victim && sServerFacade.IsFriendlyTo(ai->GetBot(), victim))
+        {
+            if (!result || result->GetHealth() > attacker->GetHealth())
+                result = attacker;
+        }
     }
 
 protected:
@@ -57,9 +63,16 @@ public:
             if (guid && attacker->GetObjectGuid() == ObjectGuid(guid))
                 return;
         }
-        if (!result || result->GetHealth() < attacker->GetHealth())
-            result = attacker;
-    }
+
+        Unit* victim = attacker->GetVictim();
+
+        if (victim && sServerFacade.IsFriendlyTo(ai->GetBot(), victim))
+        {
+            if (!result || result->GetHealth() < attacker->GetHealth())
+                result = attacker;
+        }
+     }
+
 
 protected:
     float maxHealth;

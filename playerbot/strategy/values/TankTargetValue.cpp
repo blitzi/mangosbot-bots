@@ -19,6 +19,11 @@ public:
         Player* bot = ai->GetBot();
         if (IsCcTarget(creature)) return;
 
+        Unit* target = creature->GetTarget();
+
+        if (target && sServerFacade.IsFriendlyTo(bot, target) == false)
+            return;
+
         float threat = threatManager->getThreat(bot);
         if (!result || (minThreat - threat) > 0.1f)
         {
