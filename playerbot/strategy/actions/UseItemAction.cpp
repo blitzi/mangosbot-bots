@@ -40,10 +40,21 @@ bool UseItemAction::Execute(Event event)
    }
    else
    {
-      if (items.empty())
-         return UseGameObject(*gos.begin());
-      else
-         return UseItemOnGameObject(*items.begin(), *gos.begin());
+       if (items.empty())
+           return UseGameObject(*gos.begin());
+       else
+       {
+           bool tryUse = UseItemOnGameObject(*items.begin(), *gos.begin());
+        
+           if (tryUse == false)
+           {
+               return UseItemAuto(*items.begin());
+           }
+
+           return tryUse;
+       }
+
+
    }
 
     ai->TellError("No items (or game objects) available");
