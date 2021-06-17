@@ -102,7 +102,7 @@ bool MovementAction::MoveToLOS(WorldObject* target, bool ranged)
                 CreateWp(bot, point.x, point.y, point.z, 0.0, 15631);
 
             float distPoint = target->GetDistance(point.x, point.y, point.z, DIST_CALC_NONE);
-            if (distPoint < dist && target->IsWithinLOS(point.x, point.y, point.z + bot->GetCollisionHeight()))
+            if (distPoint < dist && target->IsWithinLOS(point.x, point.y, point.z + bot->GetCollisionHeight(), false, true))
             {
                 dist = distPoint;
                 dest.Set(point.x, point.y, point.z, target->GetMapId());
@@ -315,7 +315,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
                         transport->AddPassenger(bot, true);
             }        
 
-            ai->GetMoveTimer()->Reset(250);
+            WaitForReach(100.0f);
             return true;
         }
         //if (!isTransport && bot->GetTransport())
@@ -369,8 +369,13 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
         sPlayerbotAIConfig.log("bot_movement.csv", out.str().c_str());
     }
 
-    if(!react)
-        ai->GetMoveTimer()->Reset(250);
+    if (!react)
+    {
+        if (totalDistance > maxDist)
+            WaitForReach(startPosition.distance(movePosition) - 10.0f);
+        else
+            WaitForReach(startPosition.distance(movePosition));
+    }
 
     bot->HandleEmoteState(0);
     if (bot->IsSitState())
@@ -659,6 +664,24 @@ bool MovementAction::Follow(Unit* target, float distance, float angle)
 #endif
             angle);
     return true;
+}
+
+void MovementAction::WaitForReach(float distance)
+{
+    float delay = 1000.0f * MoveDelay(distance) + sPlayerbotAIConfig.reactDelay;
+
+    if (delay > sPlayerbotAIConfig.maxWaitForMove)
+        delay = sPlayerbotAIConfig.maxWaitForMove;
+
+    Unit* target = *ai->GetAiObjectContext()->GetValue<Unit*>("current target");
+    Unit* player = *ai->GetAiObjectContext()->GetValue<Unit*>("enemy player target");
+    if ((player || target) && delay > sPlayerbotAIConfig.globalCoolDown)
+        delay = sPlayerbotAIConfig.globalCoolDown;
+
+    if (delay < 0)
+        delay = 0;
+
+    ai->GetMoveTimer()->Reset(delay);
 }
 
 bool MovementAction::ChaseTo(WorldObject* obj)

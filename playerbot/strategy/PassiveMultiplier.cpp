@@ -15,6 +15,7 @@ PassiveMultiplier::PassiveMultiplier(PlayerbotAI* ai) : Multiplier(ai, "passive"
         allowedActions.push_back("nc");
         allowedActions.push_back("reset ai");
         allowedActions.push_back("check mount state");
+        allowedActions.push_back("drop target");
     }
 
     if (allowedParts.empty())
