@@ -140,6 +140,7 @@ namespace ai
                 creators["hammer of justice on snare target"] = &TriggerFactoryInternal::hammer_of_justice_on_snare_target;
                 creators["divine favor"] = &TriggerFactoryInternal::divine_favor;
                 creators["turn undead"] = &TriggerFactoryInternal::turn_undead;
+                creators["avenging wrath"] = &TriggerFactoryInternal::avenging_wrath;
             }
 
         private:
@@ -173,6 +174,7 @@ namespace ai
             static Trigger* CleanseCurePartyMemberMagic(PlayerbotAI* ai) { return new CleanseCurePartyMemberMagicTrigger(ai); }
             static Trigger* hammer_of_justice_on_enemy_target(PlayerbotAI* ai) { return new HammerOfJusticeEnemyHealerTrigger(ai); }
             static Trigger* hammer_of_justice_on_snare_target(PlayerbotAI* ai) { return new HammerOfJusticeSnareTrigger(ai); }
+            static Trigger* avenging_wrath(PlayerbotAI* ai) { return new AvengingWrathTrigger(ai); }
         };
     };
 };
@@ -232,6 +234,7 @@ namespace ai
                 creators["divine shield"] = &AiObjectContextInternal::divine_shield;
                 creators["divine protection"] = &AiObjectContextInternal::divine_protection;
                 creators["divine protection on party"] =&AiObjectContextInternal::divine_protection_on_party;
+                creators["blessing of protection on party"] =&AiObjectContextInternal::blessing_of_protection_on_party;
                 creators["hammer of justice"] = &AiObjectContextInternal::hammer_of_justice;
                 creators["flash of light on party"] = &AiObjectContextInternal::flash_of_light_on_party;
                 creators["holy light"] = &AiObjectContextInternal::holy_light;
@@ -302,6 +305,7 @@ namespace ai
             static Action* divine_shield(PlayerbotAI* ai) { return new CastDivineShieldAction(ai); }
             static Action* divine_protection(PlayerbotAI* ai) { return new CastDivineProtectionAction(ai); }
             static Action* divine_protection_on_party(PlayerbotAI* ai) { return new CastDivineProtectionOnPartyAction(ai); }
+            static Action* blessing_of_protection_on_party(PlayerbotAI* ai) { return new CastBlessingOfProtectionOnPartyAction(ai); }
             static Action* hammer_of_justice(PlayerbotAI* ai) { return new CastHammerOfJusticeAction(ai); }
             static Action* flash_of_light_on_party(PlayerbotAI* ai) { return new CastFlashOfLightOnPartyAction(ai); }
             static Action* holy_light(PlayerbotAI* ai) { return new CastHolyLightAction(ai); }

@@ -272,6 +272,14 @@ namespace ai
         virtual string getName() { return "divine protection on party"; }
     };
 
+	class CastBlessingOfProtectionOnPartyAction : public HealPartyMemberAction
+	{
+	public:
+		CastBlessingOfProtectionOnPartyAction(PlayerbotAI* ai) : HealPartyMemberAction(ai, "blessing of protection") {}
+
+		virtual string getName() { return "blessing of protection on party"; }
+	};
+
 	class CastDivineShieldAction: public CastBuffSpellAction
 	{
 	public:

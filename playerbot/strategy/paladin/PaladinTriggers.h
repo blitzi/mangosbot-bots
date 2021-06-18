@@ -148,4 +148,10 @@ namespace ai
     public:
         TurnUndeadTrigger(PlayerbotAI* ai) : HasCcTargetTrigger(ai, "turn undead") {}
     };
+
+    class AvengingWrathTrigger : public BoostTrigger
+    {
+    public:
+        AvengingWrathTrigger(PlayerbotAI* ai) : BoostTrigger(ai, "avenging wrath") {}
+    };
 }

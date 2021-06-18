@@ -22,10 +22,6 @@ void TankPaladinStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
         "range aoe",
         NextAction::array(0, new NextAction("consecration rank 1", ACTION_EMERGENCY), NULL)));
 
-	triggers.push_back(new TriggerNode(
-		"holy shield",
-		NextAction::array(0, new NextAction("holy shield", ACTION_HIGH + 7), NULL)));
-
     triggers.push_back(new TriggerNode(
         "seal of wisdom",
         NextAction::array(0, new NextAction("seal of wisdom", ACTION_HIGH + 6), NULL)));
