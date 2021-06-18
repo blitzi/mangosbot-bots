@@ -106,11 +106,24 @@ bool CastCustomSpellAction::Execute(Event event)
     else if (target == bot) spellName << "self";
     else spellName << target->GetName();
 
-    if (!bot->GetTrader() && !ai->CanCastSpell(spell, target, true, itemTarget))
+    if (!bot->GetTrader())
     {
-        msg << "Cannot cast " << spellName.str();
-        ai->TellError(msg.str());
-        return false;
+        if (!ai->CanCastSpell(spell, target, true, itemTarget))
+        {
+            target = bot;
+
+            if (!ai->CanCastSpell(spell, target, true, itemTarget))
+            {
+                target = NULL;
+                
+                if (!ai->CanCastSpell(spell, target, true, itemTarget))
+                {
+                    msg << "Cannot cast " << spellName.str();
+                    ai->TellError(msg.str());
+                    return false;
+                }                
+            }
+        }        
     }
 
     MotionMaster &mm = *bot->GetMotionMaster();
