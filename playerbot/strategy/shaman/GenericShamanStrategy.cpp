@@ -147,8 +147,8 @@ void GenericShamanStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 void ShamanBuffDpsStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
     triggers.push_back(new TriggerNode(
-        "lightning shield",
-        NextAction::array(0, new NextAction("lightning shield", 22.0f), NULL)));
+        "water shield",
+        NextAction::array(0, new NextAction("water shield", 22.0f), NULL)));
 }
 
 void ShamanBuffManaStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
