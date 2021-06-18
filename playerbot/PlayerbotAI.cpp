@@ -510,18 +510,6 @@ void PlayerbotAI::ChangeEngine(BotState type)
 
 void PlayerbotAI::DoNextAction()
 {
-    if (IsCasting())
-        return;
-
-    if (bot->IsBeingTeleported() || (GetMaster() && GetMaster()->IsBeingTeleported()))
-        return;
-
-    if (bot->IsTaxiFlying() || bot->IsFlying())
-        return;
-
-    if (IsEating() || IsDrinking())
-        return;
-
     // change engine if just died
     if (currentEngine != engines[BOT_STATE_DEAD] && !sServerFacade.IsAlive(bot))
     {
@@ -532,6 +520,18 @@ void PlayerbotAI::DoNextAction()
         ChangeEngine(BOT_STATE_DEAD);
         return;
     }
+
+    if (bot->IsBeingTeleported() || (GetMaster() && GetMaster()->IsBeingTeleported()))
+        return;
+
+    if (bot->IsTaxiFlying() || bot->IsFlying())
+        return;
+
+    if (IsEating() || IsDrinking())
+        return;
+
+    if (IsCasting())
+        return;    
 
     // change engine if just ressed
     if (currentEngine == engines[BOT_STATE_DEAD] && sServerFacade.IsAlive(bot))
@@ -2764,7 +2764,8 @@ bool PlayerbotAI::IsCasting()
             Spell* spell = spellEvent->GetSpell();
 
             if (spell && spell->m_spellInfo->Id &&
-                !spell->IsAutoRepeat())
+                !spell->IsAutoRepeat() &&
+                spell->GetCastTime())
             {
                 return true;
             }

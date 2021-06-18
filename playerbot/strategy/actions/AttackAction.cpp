@@ -68,8 +68,7 @@ bool AttackAction::Attack(Unit* target)
     {
         msg << " is not on my sight";
         if (verbose) ai->TellError(msg.str());
-        if (!ChaseTo(target))
-            return false;
+        return false;
     }
     if (sServerFacade.UnitIsDead(target))
     {
