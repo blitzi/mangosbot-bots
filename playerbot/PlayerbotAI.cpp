@@ -281,6 +281,7 @@ bool PlayerbotAI::IsAllowedCommand(string text)
         unsecuredCommands.insert("who");
         unsecuredCommands.insert("wts");
         unsecuredCommands.insert("sendmail");
+        unsecuredCommands.insert("invite");
     }
 
     for (set<string>::iterator i = unsecuredCommands.begin(); i != unsecuredCommands.end(); ++i)
@@ -517,6 +518,14 @@ void PlayerbotAI::DoNextAction()
         bot->GetMotionMaster()->Clear();
         bot->GetMotionMaster()->MoveIdle();
 
+        //Death Count to prevent skeleton piles
+        Player* master = GetMaster();
+        if (!master || (master && master->GetPlayerbotAI()))
+        {
+            uint32 dCount = aiObjectContext->GetValue<uint32>("death count")->Get();
+            aiObjectContext->GetValue<uint32>("death count")->Set(++dCount);
+        }
+
         ChangeEngine(BOT_STATE_DEAD);
         return;
     }
@@ -566,7 +575,7 @@ void PlayerbotAI::DoNextAction()
 
     if (master)
 	{    
-		if (master->m_movementInfo.HasMovementFlag(MOVEFLAG_WALK_MODE)) bot->m_movementInfo.AddMovementFlag(MOVEFLAG_WALK_MODE);
+		if (master->m_movementInfo.HasMovementFlag(MOVEFLAG_WALK_MODE) && sServerFacade.GetDistance2d(bot, master) < 20.0f) bot->m_movementInfo.AddMovementFlag(MOVEFLAG_WALK_MODE);
 		else bot->m_movementInfo.RemoveMovementFlag(MOVEFLAG_WALK_MODE);
 
         if (master->IsSitState())
@@ -652,12 +661,12 @@ list<string> PlayerbotAI::GetStrategies(BotState type)
     return e->GetStrategies();
 }
 
-bool PlayerbotAI::DoSpecificAction(string name, Event event, bool silent)
+bool PlayerbotAI::DoSpecificAction(string name, Event event, bool silent, string qualifier)
 {
     for (int i = 0 ; i < BOT_STATE_MAX; i++)
     {
         ostringstream out;
-        ActionResult res = engines[i]->ExecuteAction(name, event);
+        ActionResult res = engines[i]->ExecuteAction(name, event, qualifier);
         switch (res)
         {
         case ACTION_RESULT_UNKNOWN:
@@ -743,7 +752,7 @@ bool PlayerbotAI::IsRanged(Player* player)
         return false;
 
     PlayerbotAI* botAi = player->GetPlayerbotAI();
-    if (botAi && !player->InBattleGround())
+    if (botAi)
         return botAi->ContainsStrategy(STRATEGY_TYPE_RANGED);
 
     switch (player->getClass())
@@ -840,6 +849,24 @@ GameObject* PlayerbotAI::GetGameObject(ObjectGuid guid)
         return NULL;
 
     Map* map = bot->GetMap();
+    if (!map)
+        return NULL;
+
+    return map->GetGameObject(guid);
+}
+
+GameObject* PlayerbotAI::GetGameObject(GameObjectDataPair const* gameObjectDataPair)
+{
+    if (!gameObjectDataPair)
+        return NULL;
+
+    ObjectGuid guid(HIGHGUID_GAMEOBJECT, gameObjectDataPair->second.id, gameObjectDataPair->first);
+
+    if (!guid)
+        return NULL;
+
+    Map* map = sMapMgr.FindMap(gameObjectDataPair->second.mapid);
+
     if (!map)
         return NULL;
 
@@ -1699,7 +1726,7 @@ enum BotTypeNumber
 };
 */
 
-uint32 PlayerbotAI::GetFixedBotNumer(BotTypeNumber typeNumber, uint32 maxNum, uint32 cyclePerMin)
+uint32 PlayerbotAI::GetFixedBotNumer(BotTypeNumber typeNumber, uint32 maxNum, float cyclePerMin)
 {
     std::mt19937 rng(typeNumber);
     uint32 randseed = rng();                                       //Seed random number

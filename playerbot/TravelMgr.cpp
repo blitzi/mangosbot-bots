@@ -18,6 +18,8 @@
 #include "Transports.h"
 #include <playerbot/strategy/StrategyContext.h>
 
+#include "strategy/values/SharedValueContext.h"
+
 using namespace ai;
 using namespace MaNGOS;
 
@@ -54,6 +56,11 @@ WorldPosition::WorldPosition(ObjectGuid guid)
     case HIGHGUID_CORPSE:
         return;
     }
+}
+
+WorldPosition::WorldPosition(GuidPosition gpos)
+{
+    wLoc = gpos.getPosition().wLoc;
 }
 
 WorldPosition::WorldPosition(vector<WorldPosition*> list, WorldPositionConst conType)
@@ -358,7 +365,10 @@ void WorldPosition::loadMapAndVMap(uint32 mapId, int x, int y)
 {
     string fileName = "load_map_grid.csv";
 
-    if ( !VMAP::VMapFactory::createOrGetVMapManager()->IsTileLoaded(mapId, x, y) && !sTravelMgr.isBadVmap(mapId, x, y))
+    //This needs to be disabled or maps will not load.
+    //Needs more testing to check for impact on movement.
+    if(false)
+    if (!VMAP::VMapFactory::createOrGetVMapManager()->IsTileLoaded(mapId, x, y) && !sTravelMgr.isBadVmap(mapId, x, y))
     {
         // load VMAPs for current map/grid...
         const MapEntry* i_mapEntry = sMapStore.LookupEntry(mapId);
@@ -562,6 +572,43 @@ vector<GameObjectDataPair const*> WorldPosition::getGameObjectsNear(float radius
     FindPointGameObjectData worker(*this, radius, entry);
     sObjectMgr.DoGOData(worker);
     return worker.GetResult();
+}
+
+Unit* GuidPosition::getUnit()
+{
+    if (!*this)
+        return nullptr;
+
+    if (IsPlayer())
+        return sObjectAccessor.FindPlayer(*this);
+
+    return point.getMap()->GetAnyTypeCreature(*this);
+}
+
+GameObject* GuidPosition::getGameObject()
+{
+    if (!*this)
+        return nullptr;
+
+    return point.getMap()->GetGameObject(*this);
+}
+
+
+bool GuidPosition::isDead()
+{
+    if (!point.getMap())
+        return false;
+
+    if (!point.getMap()->IsLoaded(point.getX(), point.getY()))
+        return false;
+
+    if (IsUnit() && getUnit() && getUnit()->IsInWorld() && getUnit()->IsAlive())
+        return false;
+
+    if (IsGameObject() && getGameObject() && getGameObject()->IsInWorld())
+        return false;
+
+    return true;
 }
 
 vector<WorldPosition*> TravelDestination::getPoints(bool ignoreFull) {
@@ -1161,7 +1208,26 @@ void TravelMgr::LoadQuestTravelTable()
     if (!sTravelMgr.quests.empty())
         return;
     // Clearing store (for reloading case)
-    Clear();
+    Clear();    
+
+    /* remove this
+    questGuidMap cQuestMap = GAI_VALUE(questGuidMap,"quest objects");
+       
+    for (auto cQuest : cQuestMap)
+    {
+        sLog.outErrorDb("[Quest id: %d]", cQuest.first);
+
+        for (auto cObj : cQuest.second)
+        {
+            sLog.outErrorDb(" [Objective type: %d]", cObj.first);
+
+            for (auto cCre : cObj.second)
+            {
+                sLog.outErrorDb(" %s %d", cCre.GetTypeName(), cCre.GetEntry());
+            }
+        }
+    }    
+    */
 
     struct unit { uint32 guid; uint32 type; uint32 entry; uint32 map; float  x; float  y; float  z;  float  o; uint32 c; } t_unit;
     vector<unit> units;
@@ -1285,7 +1351,6 @@ void TravelMgr::LoadQuestTravelTable()
     }
 
     bool loadQuestData = true;
-
 
     if (loadQuestData)
     {
@@ -2834,26 +2899,40 @@ vector<WorldPosition*> TravelMgr::getNextPoint(WorldPosition* center, vector<Wor
 vector<WorldPosition> TravelMgr::getNextPoint(WorldPosition center, vector<WorldPosition> points, uint32 amount) {
     vector<WorldPosition> retVec;
 
-    if (points.size() == 1)
+    if (points.size() < 2)
     {
-        retVec.push_back(points[0]);
+        if (points.size() == 1)
+            retVec.push_back(points[0]);
         return retVec;
     }
 
-    //List of weights based on distance (Gausian curve that starts at 100 and lower to 1 at 1000 distance)
+    retVec = points;
+
+    
     vector<uint32> weights;
 
-    std::transform(points.begin(), points.end(), std::back_inserter(weights), [center](WorldPosition point) { return 1 + 1000 * exp(-1 * pow(point.distance(center) / 400.0, 2)); });
+    //List of weights based on distance (Gausian curve that starts at 100 and lower to 1 at 1000 distance)
+    //std::transform(retVec.begin(), retVec.end(), std::back_inserter(weights), [center](WorldPosition point) { return 1 + 1000 * exp(-1 * pow(point.distance(center) / 400.0, 2)); });
+
+    //List of weights based on distance (Twice the distance = half the weight). Caps out at 200.0000 range.
+    std::transform(retVec.begin(), retVec.end(), std::back_inserter(weights), [center](WorldPosition point) { return 200000/(1+point.distance(center)); });
+
+    std::mt19937 gen(time(0));
+
+    weighted_shuffle(retVec.begin(), retVec.end(), weights.begin(), weights.end(), gen);
+
+    vector<float> dists;
 
     //Total sum of all those weights.
+    /*
     uint32 sum = std::accumulate(weights.begin(), weights.end(), 0);
-
-    //Pick a random number in that range.
-    uint32 rnd = urand(0, sum);
 
     //Pick a random point based on weights.
     for (uint32 nr = 0; nr < amount; nr++)
     {
+        //Pick a random number in that range.
+        uint32 rnd = urand(0, sum);
+
         for (unsigned i = 0; i < points.size(); ++i)
             if (rnd < weights[i] && (retVec.empty() || std::find(retVec.begin(), retVec.end(), points[i]) == retVec.end()))
             {
@@ -2863,11 +2942,7 @@ vector<WorldPosition> TravelMgr::getNextPoint(WorldPosition center, vector<World
             else
                 rnd -= weights[i];
     }
-
-    if (!retVec.empty())
-        return retVec;
-
-    assert(!"No valid point found.");
+    */
 
     return retVec;
 }
@@ -3045,31 +3120,46 @@ void TravelMgr::setNullTravelTarget(Player* player)
         target->setTarget(sTravelMgr.nullTravelDestination, sTravelMgr.nullWorldPosition, true);
 }
 
-void TravelMgr::addMapTransfer(WorldPosition start, WorldPosition end, float portalDistance)
+void TravelMgr::addMapTransfer(WorldPosition start, WorldPosition end, float portalDistance, bool makeShortcuts)
 {
-    if (start.getMapId() == end.getMapId())
+    uint32 sMap = start.getMapId();
+    uint32 eMap = end.getMapId();
+
+    if (sMap == eMap)
         return;
-
+    
     //Calculate shortcuts.
-    for (auto& mapTrans : mapTransfers)
-    {
-        if (mapTrans.isTo(start) && !mapTrans.isFrom(end)) // [S1 >MT> E1 -> S2] >THIS> E2
+    if(makeShortcuts)
+        for (auto& mapTransfers : mapTransfersMap)
         {
-            float newDistToEnd = mapTransDistance(*mapTrans.getPointFrom(), start) + portalDistance;
-            if (mapTransDistance(*mapTrans.getPointFrom(), end) > newDistToEnd)
-                mapTransfers.push_back(mapTransfer(*mapTrans.getPointFrom(), end, newDistToEnd));
-        }
+            uint32 sMapt = mapTransfers.first.first;
+            uint32 eMapt = mapTransfers.first.second;
 
-        if (mapTrans.isFrom(end) && !mapTrans.isTo(start)) // S1 >THIS> [E1 -> S2 >MT> E2]
-        {
-            float newDistToEnd = portalDistance + mapTransDistance(end, *mapTrans.getPointTo());
-            if (mapTransDistance(start, *mapTrans.getPointTo()) > newDistToEnd)
-                mapTransfers.push_back(mapTransfer(start, *mapTrans.getPointTo(), newDistToEnd));
+            for (auto& mapTransfer : mapTransfers.second)
+            {
+                if (eMapt == sMap && sMapt != eMap) // [S1 >MT> E1 -> S2] >THIS> E2
+                {
+                    float newDistToEnd = mapTransDistance(*mapTransfer.getPointFrom(), start) + portalDistance;
+                    if (mapTransDistance(*mapTransfer.getPointFrom(), end) > newDistToEnd)
+                        addMapTransfer(*mapTransfer.getPointFrom(), end, newDistToEnd, false);
+                }
+
+                if (sMapt == eMap && eMapt != sMap) // S1 >THIS> [E1 -> S2 >MT> E2]
+                {
+                    float newDistToEnd = portalDistance + mapTransDistance(end, *mapTransfer.getPointTo());
+                    if (mapTransDistance(start, *mapTransfer.getPointTo()) > newDistToEnd)
+                        addMapTransfer(start, *mapTransfer.getPointTo(), newDistToEnd, false);
+                }
+            }
         }
-    }
 
     //Add actual transfer.
-    mapTransfers.push_back(mapTransfer(start, end, portalDistance));
+    auto mapTransfers = mapTransfersMap.find(make_pair(start.getMapId(), end.getMapId()));
+    
+    if (mapTransfers == mapTransfersMap.end())
+        mapTransfersMap.insert({ { sMap, eMap }, {mapTransfer(start, end, portalDistance)} });
+    else
+        mapTransfers->second.push_back(mapTransfer(start, end, portalDistance));        
 };
 
 void TravelMgr::loadMapTransfers()
@@ -3085,21 +3175,26 @@ void TravelMgr::loadMapTransfers()
 
 float TravelMgr::mapTransDistance(WorldPosition start, WorldPosition end)
 {
-    if (start.getMapId() == end.getMapId())
+    uint32 sMap = start.getMapId();
+    uint32 eMap = end.getMapId();
+
+    if (sMap == eMap)
         return start.distance(end);
 
     float minDist = 200000;
 
-    for (auto & mapTrans : mapTransfers)
-    {
-        if (!mapTrans.isUsefull(start, end))
-            continue;
+    auto mapTransfers = mapTransfersMap.find({ sMap, eMap });
+    
+    if (mapTransfers == mapTransfersMap.end())
+        return minDist;
 
+    for (auto& mapTrans : mapTransfers->second)
+    {
         float dist = mapTrans.distance(start, end);
 
         if (dist < minDist)
             minDist = dist;
-    }
+    }    
 
     return minDist;
 }

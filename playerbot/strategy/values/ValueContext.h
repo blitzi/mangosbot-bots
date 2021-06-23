@@ -73,6 +73,7 @@
 #include "SnareTargetValue.h"
 #include "Stances.h"
 #include "MoveTargetValue.h"
+#include "QuestValues.h"
 #include "IsCastingSpell.h"
 #include "TankWithoutAuraValue.h"
 #include "PartyMemberWithAggroValue.h"
@@ -204,7 +205,7 @@ namespace ai
             creators["already seen players"] = &ValueContext::already_seen_players;
             creators["rpg target"] = &ValueContext::rpg_target;
             creators["ignore rpg target"] = &ValueContext::ignore_rpg_target;
-			creators["travel target"] = &ValueContext::travel_target;			
+            creators["travel target"] = &ValueContext::travel_target;			
             creators["talk target"] = &ValueContext::talk_target;
             creators["pull target"] = &ValueContext::pull_target;
             creators["group"] = &ValueContext::group;
@@ -213,6 +214,7 @@ namespace ai
             creators["party member without item"] = &ValueContext::party_member_without_item;
             creators["party member without food"] = &ValueContext::party_member_without_food;
             creators["party member without water"] = &ValueContext::party_member_without_water;
+            creators["death count"] = &ValueContext::death_count;
 
             creators["bg type"] = &ValueContext::bg_type;
             creators["arena type"] = &ValueContext::arena_type;
@@ -222,6 +224,11 @@ namespace ai
             creators["team flag carrier"] = &ValueContext::team_fc;
 
             creators["move target"] = &ValueContext::move_target;
+
+            creators["active quest givers"] = &ValueContext::active_quest_givers;
+            creators["active quest takers"] = &ValueContext::active_quest_takers;
+            creators["active quest objectives"] = &ValueContext::active_quest_objectives;
+            creators["free quest log slots"] = &ValueContext::free_quest_log_slots;
         }
 
     private:
@@ -351,11 +358,17 @@ namespace ai
         static UntypedValue* nearest_non_bot_players(PlayerbotAI* ai) { return new NearestNonBotPlayersValue(ai); }
         static UntypedValue* skip_spells_list_value(PlayerbotAI* ai) { return new SkipSpellsListValue(ai); }
         static UntypedValue* rpg_target(PlayerbotAI* ai) { return new RpgTargetValue(ai); }
-		static UntypedValue* travel_target(PlayerbotAI* ai) { return new TravelTargetValue(ai); }
+        static UntypedValue* travel_target(PlayerbotAI* ai) { return new TravelTargetValue(ai); }
         static UntypedValue* ignore_rpg_target(PlayerbotAI* ai) { return new IgnoreRpgTargetValue(ai); }
         static UntypedValue* talk_target(PlayerbotAI* ai) { return new TalkTargetValue(ai); }
         static UntypedValue* pull_target(PlayerbotAI* ai) { return new PullTargetValue(ai); }
+        static UntypedValue* death_count(PlayerbotAI* ai) { return new DeathCountValue(ai); }
 
         static UntypedValue* move_target(PlayerbotAI* ai) { return new MoveTargetValue(ai); }
+
+        static UntypedValue* active_quest_givers(PlayerbotAI* ai) { return new ActiveQuestGiversValue(ai); }
+        static UntypedValue* active_quest_takers(PlayerbotAI* ai) { return new ActiveQuestTakersValue(ai); }
+        static UntypedValue* active_quest_objectives(PlayerbotAI* ai) { return new ActiveQuestObjectivesValue(ai); }
+        static UntypedValue* free_quest_log_slots(PlayerbotAI* ai) { return new FreeQuestLogSlotValue(ai); }
 };
 };

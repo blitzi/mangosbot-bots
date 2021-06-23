@@ -1,6 +1,7 @@
 #pragma once
 
 #include "MoveSplineInitArgs.h"
+#include <boost/functional/hash.hpp>
 
 namespace G3D
 {
@@ -20,6 +21,8 @@ namespace ai
         WP_CLOSEST = 3
     };
 
+    class GuidPosition;
+
     //Extension of WorldLocation with distance functions.
     class WorldPosition
     {
@@ -27,10 +30,13 @@ namespace ai
         //Constructors
         WorldPosition() { wLoc = WorldLocation(); }
         WorldPosition(const WorldLocation loc) { wLoc = loc; }
+        WorldPosition(const WorldPosition& pos) { wLoc = pos.wLoc; visitors = pos.visitors; }
         WorldPosition(uint32 mapid, float x, float y, float z = 0, float orientation = 0) { wLoc = WorldLocation(mapid, x, y, z, orientation); }
         WorldPosition(const WorldObject* wo) { wLoc = WorldLocation(wo->GetMapId(), wo->GetPositionX(), wo->GetPositionY(), wo->GetPositionZ(), wo->GetOrientation()); }
-        WorldPosition(const CreatureDataPair const* cdPair) { if (cdPair) { wLoc = WorldLocation(cdPair->second.mapid, cdPair->second.posX, cdPair->second.posY, cdPair->second.posZ, cdPair->second.orientation); } }
+        WorldPosition(CreatureDataPair const* cdPair) { if (cdPair) { wLoc = WorldLocation(cdPair->second.mapid, cdPair->second.posX, cdPair->second.posY, cdPair->second.posZ, cdPair->second.orientation); } }
+        WorldPosition(GameObjectDataPair const* cdPair) { if (cdPair) { wLoc = WorldLocation(cdPair->second.mapid, cdPair->second.posX, cdPair->second.posY, cdPair->second.posZ, cdPair->second.orientation); } }
         WorldPosition(ObjectGuid guid);
+        WorldPosition(GuidPosition gpos);
         WorldPosition(vector<WorldPosition*> list, WorldPositionConst conType);
         WorldPosition(vector<WorldPosition> list, WorldPositionConst conType);
         WorldPosition(uint32 mapid, std::pair<int, int> grid) { wLoc = WorldLocation(mapid, (32 - grid.first) * SIZE_OF_GRIDS, (32 - grid.second) * SIZE_OF_GRIDS, 0, 0); }
@@ -39,6 +45,7 @@ namespace ai
         void setX(float x) { wLoc.coord_x = x; }
         void setY(float y) { wLoc.coord_y = y; }
         void setZ(float z) { wLoc.coord_z = z; }
+        void setLocation(const WorldLocation loc) { wLoc = loc; }
 
         void addVisitor() { visitors++; }
         void remVisitor() { visitors--; }
@@ -150,6 +157,31 @@ namespace ai
     private:
         WorldLocation wLoc;
         uint32 visitors = 0;        
+    };
+
+    class GuidPosition : public ObjectGuid
+    {
+    public:
+        GuidPosition() : ObjectGuid() {}
+        GuidPosition(ObjectGuid guid) : ObjectGuid(guid) { point = WorldPosition(guid); }
+        template<class T>
+        GuidPosition(ObjectGuid guid, T) : ObjectGuid(guid) { point = WorlsPosition(T); }
+        GuidPosition(CreatureDataPair const* dataPair) : ObjectGuid(HIGHGUID_UNIT, dataPair->second.id, dataPair->first)  { point = WorldPosition(dataPair); }
+        GuidPosition(GameObjectDataPair const* dataPair) : ObjectGuid(HIGHGUID_GAMEOBJECT, dataPair->second.id, dataPair->first) { point = WorldPosition(dataPair); }
+        GuidPosition(const GuidPosition& guidp) : ObjectGuid(guidp) { point = guidp.point; }
+
+        CreatureData* getCreatureData() { return IsCreature() ? sObjectMgr.GetCreatureData(GetCounter()) : nullptr; }
+        CreatureInfo const* GetCreatureTemplate() {return IsCreature() ? sObjectMgr.GetCreatureTemplate(GetEntry()) : nullptr; };
+
+        WorldPosition getPosition() { return point; }
+
+        WorldObject* GetWorldObject() {return point.getMap()->GetWorldObject(*this);}
+        Unit* getUnit();
+        GameObject* getGameObject();
+
+        bool isDead(); //For loaded grids check if the unit/object is unloaded/dead.
+    private:
+        WorldPosition point = WorldPosition();
     };
 
     template<class T>
@@ -511,12 +543,33 @@ namespace ai
         void Clear();
         void LoadQuestTravelTable();
 
+        template <class D, class W, class URBG>
+        void weighted_shuffle
+        (D first, D last
+            , W first_weight, W last_weight
+            , URBG&& g)
+        {
+            while (first != last && first_weight != last_weight)
+            {
+                std::discrete_distribution<int> dd(first_weight, last_weight);
+                auto i = dd(g);
+
+                if (i)
+                {
+                    swap(*first, *std::next(first, i));
+                    swap(*first_weight, *std::next(first_weight, i));
+                }
+                ++first;
+                ++first_weight;
+            }
+        }
+
         vector <WorldPosition*> getNextPoint(WorldPosition* center, vector<WorldPosition*> points, uint32 amount = 1);
         vector <WorldPosition> getNextPoint(WorldPosition center, vector<WorldPosition> points, uint32 amount = 1);
         QuestStatusData* getQuestStatus(Player* bot, uint32 questId);
         bool getObjectiveStatus(Player* bot, Quest const* pQuest, uint32 objective);
         uint32 getDialogStatus(Player* pPlayer, int32 questgiver, Quest const* pQuest);
-        vector<TravelDestination *> getQuestTravelDestinations(Player* bot, uint32 questId = -1, bool ignoreFull = false, bool ignoreInactive = false, float maxDistance = 5000, bool ignoreObjectives = false);
+        vector<TravelDestination*> getQuestTravelDestinations(Player* bot, uint32 questId = -1, bool ignoreFull = false, bool ignoreInactive = false, float maxDistance = 5000, bool ignoreObjectives = false);
         vector<TravelDestination*> getRpgTravelDestinations(Player* bot, bool ignoreFull = false, bool ignoreInactive = false, float maxDistance = 5000);
         vector<TravelDestination*> getExploreTravelDestinations(Player* bot, bool ignoreFull = false, bool ignoreInactive = false);
         vector<TravelDestination*> getGrindTravelDestinations(Player* bot, bool ignoreFull = false, bool ignoreInactive = false, float maxDistance = 5000);
@@ -524,7 +577,7 @@ namespace ai
 
         void setNullTravelTarget(Player* player);
 
-        void addMapTransfer(WorldPosition start, WorldPosition end, float portalDistance = 0.1f);
+        void addMapTransfer(WorldPosition start, WorldPosition end, float portalDistance = 0.1f, bool makeShortcuts = true);
         void loadMapTransfers();
         float mapTransDistance(WorldPosition start, WorldPosition end);
 
@@ -533,22 +586,22 @@ namespace ai
 
         void addBadVmap(uint32 mapId, int x, int y) { badVmap.push_back(make_tuple(mapId, x, y)); }
         void addBadMmap(uint32 mapId, int x, int y) { badMmap.push_back(make_tuple(mapId, x, y)); }
-        bool isBadVmap(uint32 mapId, int x, int y) { return std::find(badVmap.begin(), badVmap.end(), make_tuple(mapId, x, y)) != badVmap.end();}
+        bool isBadVmap(uint32 mapId, int x, int y) { return std::find(badVmap.begin(), badVmap.end(), make_tuple(mapId, x, y)) != badVmap.end(); }
         bool isBadMmap(uint32 mapId, int x, int y) { return std::find(badMmap.begin(), badMmap.end(), make_tuple(mapId, x, y)) != badMmap.end(); }
     protected:
-        void logQuestError(uint32 errorNr, Quest * quest, uint32 objective = 0, uint32 unitId = 0, uint32 itemId = 0);
+        void logQuestError(uint32 errorNr, Quest* quest, uint32 objective = 0, uint32 unitId = 0, uint32 itemId = 0);
 
         vector<QuestTravelDestination*> questGivers;
         vector<RpgTravelDestination*> rpgNpcs;
         vector<GrindTravelDestination*> grindMobs;
-        
+
         std::unordered_map<uint32, ExploreTravelDestination*> exploreLocs;
-        std::unordered_map<uint32, QuestContainer *> quests;
+        std::unordered_map<uint32, QuestContainer*> quests;
         std::unordered_map<int32, WorldPosition> pointsMap;
 
-        vector<tuple<uint32,int,int>> badVmap, badMmap;
+        vector<tuple<uint32, int, int>> badVmap, badMmap;
 
-        vector<mapTransfer> mapTransfers;
+        std::unordered_map<pair<uint32, uint32>, vector<mapTransfer>, boost::hash<pair<uint32, uint32>>> mapTransfersMap;
     };
 }
 

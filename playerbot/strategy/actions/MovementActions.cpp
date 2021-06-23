@@ -408,7 +408,15 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
         return bot->TeleportTo(movePosition.getMapId(), movePosition.getX(), movePosition.getY(), movePosition.getZ(), startPosition.getAngleTo(movePosition));
     }
 
-    mm.MovePoint(movePosition.getMapId(), movePosition.getX(), movePosition.getY(), movePosition.getZ(), FORCED_MOVEMENT_RUN, generatePath);
+    // walk if master walks and is close
+    bool masterWalking = false;
+    if (ai->GetMaster())
+    {
+        if (ai->GetMaster()->m_movementInfo.HasMovementFlag(MOVEFLAG_WALK_MODE) && sServerFacade.GetDistance2d(bot, ai->GetMaster()) < 20.0f)
+            masterWalking = true;
+    }
+
+    mm.MovePoint(movePosition.getMapId(), movePosition.getX(), movePosition.getY(), movePosition.getZ(), masterWalking ? FORCED_MOVEMENT_WALK : FORCED_MOVEMENT_RUN, generatePath);
 
     AI_VALUE(LastMovement&, "last movement").setShort(movePosition);            
 #endif
@@ -519,7 +527,8 @@ bool MovementAction::IsMovingAllowed()
             sServerFacade.IsInRoots(bot) ||
             bot->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION) ||
             bot->HasAuraType(SPELL_AURA_MOD_CONFUSE) || sServerFacade.IsCharmed(bot) ||
-            bot->HasAuraType(SPELL_AURA_MOD_STUN) || bot->IsFlying())
+            bot->HasAuraType(SPELL_AURA_MOD_STUN) || bot->IsFlying() ||
+            bot->hasUnitState(UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL))
         return false;
 
     MotionMaster &mm = *bot->GetMotionMaster();
@@ -636,9 +645,6 @@ bool MovementAction::Follow(Unit* target, float distance, float angle)
         ai->InterruptSpell();
     }
 
-    //if (sServerFacade.isMoving(bot))
-    //    return false;
-
     AI_VALUE(LastMovement&, "last movement").Set(target);
     ClearIdleState();
 
@@ -648,7 +654,7 @@ bool MovementAction::Follow(Unit* target, float distance, float angle)
         if (currentTarget && currentTarget->GetObjectGuid() == target->GetObjectGuid()) return false;
     }
 
-    //if(mm.GetCurrent()->GetMovementGeneratorType() != FOLLOW_MOTION_TYPE)
+    if(mm.GetCurrent()->GetMovementGeneratorType() != FOLLOW_MOTION_TYPE)
         mm.Clear();
 
     mm.MoveFollow(target,
@@ -902,6 +908,20 @@ bool SetFacingTargetAction::Execute(Event event)
 bool SetFacingTargetAction::isUseful()
 {
     return !AI_VALUE2(bool, "facing", "current target");
+}
+
+bool SetFacingTargetAction::isPossible()
+{
+    if (sServerFacade.IsFrozen(bot) || bot->IsPolymorphed() ||
+        (sServerFacade.UnitIsDead(bot) && !bot->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST)) ||
+        bot->IsBeingTeleported() ||
+        bot->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION) ||
+        bot->HasAuraType(SPELL_AURA_MOD_CONFUSE) || sServerFacade.IsCharmed(bot) ||
+        bot->HasAuraType(SPELL_AURA_MOD_STUN) || bot->IsFlying() ||
+        bot->hasUnitState(UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL))
+        return false;
+
+    return true;
 }
 
 bool SetBehindTargetAction::Execute(Event event)
