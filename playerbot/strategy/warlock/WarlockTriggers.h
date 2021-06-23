@@ -89,6 +89,12 @@ namespace ai
     {
     public:
         FearTrigger(PlayerbotAI* ai) : HasCcTargetTrigger(ai, "fear") {}
+        
+        virtual bool IsActive()
+        {
+            bool isDungeon = ai->GetBot()->GetMap()->IsDungeon();
+            return !isDungeon && HasCcTargetTrigger::IsActive();
+        }
     };
 
     class AmplifyCurseTrigger : public BuffTrigger

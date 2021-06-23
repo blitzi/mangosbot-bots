@@ -25,7 +25,7 @@ private:
     {
         return new ActionNode ("banish",
             /*P*/ NULL,
-            /*A*/ NextAction::array(0, new NextAction("fear"), NULL),
+            /*A*/ NULL,
             /*C*/ NULL);
     }
 };
