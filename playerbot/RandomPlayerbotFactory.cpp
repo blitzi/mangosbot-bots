@@ -135,7 +135,8 @@ bool RandomPlayerbotFactory::CreateRandomBot(uint8 cls)
         if (entry->Race != race || entry->Gender != gender)
             continue;
 
-        switch (entry->GenType)
+#ifndef MANGOSBOT_TWO
+        switch (entry->BaseSection)
         {
         case SECTION_TYPE_SKIN:
             skinColors.push_back(entry->Color);
@@ -150,6 +151,23 @@ bool RandomPlayerbotFactory::CreateRandomBot(uint8 cls)
             hairs.push_back(pair<uint8, uint8>(entry->Type, entry->Color));
             break;
         }    
+#else
+        switch (entry->BaseSection)
+        {
+        case SECTION_TYPE_SKIN:
+            skinColors.push_back(entry->Color);
+            break;
+        case SECTION_TYPE_FACE:
+            faces.push_back(pair<uint8, uint8>(entry->VariationIndex, entry->Color));
+            break;
+        case SECTION_TYPE_FACIAL_HAIR:
+            facialHairTypes.push_back(entry->Color);
+            break;
+        case SECTION_TYPE_HAIR:
+            hairs.push_back(pair<uint8, uint8>(entry->VariationIndex, entry->Color));
+            break;
+        }
+#endif
     }
 
     uint8 skinColor = skinColors[urand(0, skinColors.size() - 1)];

@@ -293,7 +293,7 @@ bool Engine::MultiplyAndPush(NextAction** actions, float forceRelevance, bool sk
     return pushed;
 }
 
-ActionResult Engine::ExecuteAction(string name, Event event)
+ActionResult Engine::ExecuteAction(string name, Event event, string qualifier)
 {
 	bool result = false;
 
@@ -306,6 +306,16 @@ ActionResult Engine::ExecuteAction(string name, Event event)
     {
         delete actionNode;
         return ACTION_RESULT_UNKNOWN;
+    }
+
+
+
+    if (!qualifier.empty())
+    {
+        Qualified* q = dynamic_cast<Qualified*>(action);
+
+        if (q)
+            q->Qualify(qualifier);
     }
 
     if (!action->isPossible())
@@ -522,9 +532,12 @@ bool Engine::ListenAndExecute(Action* action, Event event)
         out << "do: ";
         out << action->getName();
         if (actionExecuted)
-            out << " 1";
+            out << " 1 (";
         else
-            out << " 0";
+            out << " 0 (";
+
+        out << action->getRelevance() << ")";
+
         ai->TellMasterNoFacing(out);
     }
 
