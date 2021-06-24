@@ -136,7 +136,7 @@ bool RandomPlayerbotFactory::CreateRandomBot(uint8 cls)
             continue;
 
 #ifndef MANGOSBOT_TWO
-        switch (entry->BaseSection)
+        switch (entry->GenType)
         {
         case SECTION_TYPE_SKIN:
             skinColors.push_back(entry->Color);
@@ -150,7 +150,7 @@ bool RandomPlayerbotFactory::CreateRandomBot(uint8 cls)
         case SECTION_TYPE_HAIR:
             hairs.push_back(pair<uint8, uint8>(entry->Type, entry->Color));
             break;
-        }    
+        }
 #else
         switch (entry->BaseSection)
         {
