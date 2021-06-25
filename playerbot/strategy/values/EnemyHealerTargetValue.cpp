@@ -15,7 +15,7 @@ Unit* EnemyHealerTargetValue::Calculate()
     for (list<ObjectGuid>::iterator i = attackers.begin(); i != attackers.end(); ++i)
     {
         Unit* unit = ai->GetUnit(*i);
-        if (!unit || unit == target)
+        if (!unit)
             continue;
 
         if (sServerFacade.GetDistance2d(bot, unit) > ai->GetRange("spell"))

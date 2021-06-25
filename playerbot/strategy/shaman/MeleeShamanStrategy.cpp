@@ -83,6 +83,14 @@ void MeleeShamanStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
     triggers.push_back(new TriggerNode(
         "enemy too close for melee",
         NextAction::array(0, new NextAction("move out of enemy contact", ACTION_NORMAL + 8), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "windfury totem",
+        NextAction::array(0, new NextAction("windfury totem", 19.0f), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "strength of earth totem",
+        NextAction::array(0, new NextAction("strength of earth totem", 19.0f), NULL)));
 }
 
 void MeleeAoeShamanStrategy::InitTriggers(std::list<TriggerNode*> &triggers)

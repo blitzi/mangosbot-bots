@@ -613,6 +613,7 @@ namespace ai
     public:
         virtual Value<Unit*>* GetTargetValue();
         virtual string getName() { return spell + " on enemy healer"; }
+        virtual bool IsActive();
     };
 
     class RandomBotUpdateTrigger : public RandomTrigger

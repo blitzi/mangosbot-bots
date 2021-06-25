@@ -323,6 +323,12 @@ Value<Unit*>* InterruptEnemyHealerTrigger::GetTargetValue()
     return context->GetValue<Unit*>("enemy healer target", spell);
 }
 
+bool InterruptEnemyHealerTrigger::IsActive()
+{
+    Unit* target = context->GetValue<Unit*>("enemy healer target")->Get();
+    return target;
+}
+
 Value<Unit*>* SnareTargetTrigger::GetTargetValue()
 {
     return context->GetValue<Unit*>("snare target", spell);

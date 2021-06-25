@@ -46,19 +46,23 @@ void CasterShamanStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 
     triggers.push_back(new TriggerNode(
         "shock",
-        NextAction::array(0, new NextAction("earth shock", 20.0f), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "flame shock",
-        NextAction::array(0, new NextAction("flame shock", 20.0f), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "frost shock snare",
-        NextAction::array(0, new NextAction("frost shock", 21.0f), NULL)));
+        NextAction::array(0, new NextAction("earth shock", 30.0f), NULL)));
 
 	triggers.push_back(new TriggerNode(
 		"medium aoe",
 		NextAction::array(0, new NextAction("fire nova", 25.0f), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "tremor totem",
+        NextAction::array(0, new NextAction("tremor totem", 19.0f), NULL))); 
+    
+    triggers.push_back(new TriggerNode(
+        "grace of air totem",
+        NextAction::array(0, new NextAction("grace of air totem", 18.0f), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "totem of wrath",
+        NextAction::array(0, new NextAction("totem of wrath", 24.0f), NULL)));
 }
 
 void CasterAoeShamanStrategy::InitTriggers(std::list<TriggerNode*> &triggers)

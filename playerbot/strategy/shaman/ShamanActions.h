@@ -158,6 +158,18 @@ namespace ai
     {
     public:
         CastWindfuryTotemAction(PlayerbotAI* ai) : CastTotemAction(ai, "windfury totem") {}
+    };   
+    
+    class CastWrathTotemAction : public CastTotemAction
+    {
+    public:
+        CastWrathTotemAction(PlayerbotAI* ai) : CastTotemAction(ai, "totem of wrath") {}
+    };
+
+    class CastWrathOfAirTotemAction : public CastTotemAction
+    {
+    public:
+        CastWrathOfAirTotemAction(PlayerbotAI* ai) : CastTotemAction(ai, "wrath of air totem") {}
     };
 
     class CastGraceOfAirTotemAction : public CastTotemAction
@@ -197,7 +209,6 @@ namespace ai
 	public:
 		CastAncestralSpiritAction(PlayerbotAI* ai) : ResurrectPartyMemberAction(ai, "ancestral spirit") {}
 	};
-
 
 	class CastPurgeAction : public CastSpellAction
 	{

@@ -26,7 +26,7 @@ private:
     {
         return new ActionNode ("earth shock",
             /*P*/ NULL,
-            /*A*/ NextAction::array(0, new NextAction("flame shock"), NULL),
+            /*A*/ NULL,
             /*C*/ NULL);
     }
     static ActionNode* flametongue_weapon(PlayerbotAI* ai)
@@ -103,14 +103,6 @@ void GenericShamanStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
     CombatStrategy::InitTriggers(triggers);
 
-    triggers.push_back(new TriggerNode(
-        "wind shear",
-        NextAction::array(0, new NextAction("wind shear", 23.0f), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "wind shear on enemy healer",
-        NextAction::array(0, new NextAction("wind shear on enemy healer", 23.0f), NULL)));
-
 	triggers.push_back(new TriggerNode(
         "purge",
 		NextAction::array(0, new NextAction("purge", ACTION_EMERGENCY), NULL)));
@@ -124,7 +116,7 @@ void GenericShamanStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 		NextAction::array(0, new NextAction("riptide on party", 25.0f), NULL)));
 
 	triggers.push_back(new TriggerNode(
-		"medium aoe heal",
+		"low aoe heal",
 		NextAction::array(0, new NextAction("chain heal", 27.0f), NULL)));
 
 	triggers.push_back(new TriggerNode(

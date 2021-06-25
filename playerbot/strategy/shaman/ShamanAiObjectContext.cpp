@@ -85,7 +85,9 @@ namespace ai
             TriggerFactoryInternal()
             {
                 creators["grace of air totem"] = &TriggerFactoryInternal::grace_of_air_totem;
+                creators["wrath of air totem"] = &TriggerFactoryInternal::wrath_of_air_totem;
                 creators["windfury totem"] = &TriggerFactoryInternal::windfury_totem;
+                creators["totem of wrath"] = &TriggerFactoryInternal::wrath_totem;
                 creators["mana spring totem"] = &TriggerFactoryInternal::mana_spring_totem;
                 creators["flametongue totem"] = &TriggerFactoryInternal::flametongue_totem;
                 creators["strength of earth totem"] = &TriggerFactoryInternal::strength_of_earth_totem;
@@ -120,6 +122,7 @@ namespace ai
                 creators["party member cure poison"] = &TriggerFactoryInternal::party_member_cure_poison;
                 creators["cure disease"] = &TriggerFactoryInternal::cure_disease;
                 creators["party member cure disease"] = &TriggerFactoryInternal::party_member_cure_disease;
+                creators["earth shield on tank"] = &TriggerFactoryInternal::earth_shield_on_tank;
             }
 
         private:
@@ -137,7 +140,9 @@ namespace ai
             static Trigger* water_breathing_on_party(PlayerbotAI* ai) { return new WaterBreathingOnPartyTrigger(ai); }
             static Trigger* water_walking_on_party(PlayerbotAI* ai) { return new WaterWalkingOnPartyTrigger(ai); }
             static Trigger* windfury_totem(PlayerbotAI* ai) { return new WindfuryTotemTrigger(ai); }
+            static Trigger* wrath_totem(PlayerbotAI* ai) { return new WrathTotemTrigger(ai); }
             static Trigger* grace_of_air_totem(PlayerbotAI* ai) { return new GraceOfAirTotemTrigger(ai); }
+            static Trigger* wrath_of_air_totem(PlayerbotAI* ai) { return new WrathOfAirTotemTrigger(ai); }
             static Trigger* mana_spring_totem(PlayerbotAI* ai) { return new ManaSpringTotemTrigger(ai); }
             static Trigger* flametongue_totem(PlayerbotAI* ai) { return new FlametongueTotemTrigger(ai); }
             static Trigger* strength_of_earth_totem(PlayerbotAI* ai) { return new StrengthOfEarthTotemTrigger(ai); }
@@ -159,6 +164,7 @@ namespace ai
             static Trigger* party_member_cure_poison(PlayerbotAI* ai) { return new PartyMemberCurePoisonTrigger(ai); }
             static Trigger* cure_disease(PlayerbotAI* ai) { return new CureDiseaseTrigger(ai); }
             static Trigger* party_member_cure_disease(PlayerbotAI* ai) { return new PartyMemberCureDiseaseTrigger(ai); }
+            static Trigger* earth_shield_on_tank(PlayerbotAI* ai) { return new EarthShieldOnTankTrigger(ai); }
         };
     };
 };
@@ -183,6 +189,8 @@ namespace ai
                 creators["searing totem"] = &AiObjectContextInternal::searing_totem;
                 creators["magma totem"] = &AiObjectContextInternal::magma_totem;
                 creators["windfury totem"] = &AiObjectContextInternal::windfury_totem;
+                creators["totem of wrath"] = &AiObjectContextInternal::wrath_totem;
+                creators["wrath of air totem"] = &AiObjectContextInternal::wrath_of_air_totem;
                 creators["grace of air totem"] = &AiObjectContextInternal::grace_of_air_totem;
                 creators["mana spring totem"] = &AiObjectContextInternal::mana_spring_totem;
                 creators["mana tide totem"] = &AiObjectContextInternal::mana_tide_totem;
@@ -257,6 +265,8 @@ namespace ai
             static Action* searing_totem(PlayerbotAI* ai) { return new CastSearingTotemAction(ai); }
             static Action* fire_nova(PlayerbotAI* ai) { return new CastFireNovaAction(ai); }
             static Action* windfury_totem(PlayerbotAI* ai) { return new CastWindfuryTotemAction(ai); }
+            static Action* wrath_totem(PlayerbotAI* ai) { return new CastWrathTotemAction(ai); }
+            static Action* wrath_of_air_totem(PlayerbotAI* ai) { return new CastWrathOfAirTotemAction(ai); }
             static Action* grace_of_air_totem(PlayerbotAI* ai) { return new CastGraceOfAirTotemAction(ai); }
             static Action* mana_spring_totem(PlayerbotAI* ai) { return new CastManaSpringTotemAction(ai); }
             static Action* mana_tide_totem(PlayerbotAI* ai) { return new CastManaTideTotemAction(ai); }

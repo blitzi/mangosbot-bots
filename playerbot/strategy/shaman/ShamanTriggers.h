@@ -24,6 +24,11 @@ namespace ai
         int attackerCount;
     };
 
+    class WrathTotemTrigger : public TotemTrigger {
+    public:
+        WrathTotemTrigger(PlayerbotAI* ai) : TotemTrigger(ai, "totem of wrath") {}
+    };
+
     class WindfuryTotemTrigger : public TotemTrigger {
     public:
         WindfuryTotemTrigger(PlayerbotAI* ai) : TotemTrigger(ai, "windfury totem") {}
@@ -33,6 +38,12 @@ namespace ai
     {
     public:
         GraceOfAirTotemTrigger(PlayerbotAI* ai) : TotemTrigger(ai, "grace of air totem") {}
+    };
+
+    class WrathOfAirTotemTrigger : public TotemTrigger
+    {
+    public:
+        WrathOfAirTotemTrigger(PlayerbotAI* ai) : TotemTrigger(ai, "wrath of air totem") {}
     };
 
     class ManaSpringTotemTrigger : public TotemTrigger {
@@ -194,9 +205,9 @@ namespace ai
         PartyMemberCleanseSpiritDiseaseTrigger(PlayerbotAI* ai) : PartyMemberNeedCureTrigger(ai, "cleanse spirit", DISPEL_DISEASE) {}
     };
 
-    class ShockTrigger : public InterruptEnemyHealerTrigger {
+    class ShockTrigger : public InterruptSpellTrigger {
     public:
-        ShockTrigger(PlayerbotAI* ai) : InterruptEnemyHealerTrigger(ai, "earth shock interrupt heal") {}
+        ShockTrigger(PlayerbotAI* ai) : InterruptSpellTrigger(ai, "earth shock") {}
         virtual bool IsActive();
     };
 
@@ -254,5 +265,22 @@ namespace ai
     {
     public:
         PartyMemberCureDiseaseTrigger(PlayerbotAI* ai) : PartyMemberNeedCureTrigger(ai, "cure disease", DISPEL_DISEASE) {}
+    };
+
+    class EarthShieldOnTankTrigger : public BuffOnTankTrigger {
+    public:
+        EarthShieldOnTankTrigger(PlayerbotAI* ai) : BuffOnTankTrigger(ai, "earth shield", 1) {}
+
+        virtual bool IsActive() {
+            return BuffOnTankTrigger::IsActive() &&
+                !ai->HasAura("earth shield", GetTarget()) &&
+#ifdef MANGOS
+                (ai->GetBot()->IsInSameGroupWith((Player*)GetTarget()) || ai->GetBot()->IsInSameRaidWith((Player*)GetTarget())) &&
+#endif
+#ifdef CMANGOS
+                (ai->GetBot()->IsInGroup((Player*)GetTarget(), true) || ai->GetBot()->IsInGroup((Player*)GetTarget()))
+#endif               
+                ;
+        }
     };
 }
