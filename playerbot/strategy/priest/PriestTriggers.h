@@ -64,8 +64,6 @@ namespace ai
 #endif               
                 ;
         }
-
-        virtual string getName() { return spell + " on tank"; }
     };
 
     class PrayerOfSpiritTrigger : public BuffOnPartyTrigger {
