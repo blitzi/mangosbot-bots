@@ -208,7 +208,6 @@ namespace ai
     class ShockTrigger : public InterruptSpellTrigger {
     public:
         ShockTrigger(PlayerbotAI* ai) : InterruptSpellTrigger(ai, "earth shock") {}
-        virtual bool IsActive();
     };
 
     class FrostShockSnareTrigger : public SnareTargetTrigger {
@@ -282,5 +281,10 @@ namespace ai
 #endif               
                 ;
         }
+    };
+
+    class LightningBoltTrigger : public SpellCanBeCastTrigger {
+    public:
+        LightningBoltTrigger(PlayerbotAI* ai) : SpellCanBeCastTrigger(ai, "lightning bolt") {}
     };
 }

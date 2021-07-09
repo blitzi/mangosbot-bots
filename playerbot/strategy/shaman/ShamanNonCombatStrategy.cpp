@@ -30,16 +30,40 @@ void ShamanNonCombatStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
         NextAction::array(0, new NextAction("water walking on party", 11.0f), NULL)));
 
     triggers.push_back(new TriggerNode(
-        "critical health",
-        NextAction::array(0, new NextAction("healing wave", 70.0f), NULL)));
+        "party member medium health",
+        NextAction::array(0, new NextAction("lesser healing wave on party", 25.0f), NULL)));
 
     triggers.push_back(new TriggerNode(
-        "party member critical health",
-        NextAction::array(0, new NextAction("healing wave on party", 60.0f), NULL)));
+        "almost full aoe heal",
+        NextAction::array(0, new NextAction("chain heal", 20.0f), NULL)));
 
     triggers.push_back(new TriggerNode(
         "medium aoe heal",
         NextAction::array(0, new NextAction("chain heal", 27.0f), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "low aoe heal",
+        NextAction::array(0, new NextAction("chain heal", 30.0f), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "critical aoe heal",
+        NextAction::array(0, new NextAction("chain heal", ACTION_CRITICAL_HEAL), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "almost full health",
+        NextAction::array(0, new NextAction("lesser healing wave", 18.0f), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "party member almost full health",
+        NextAction::array(0, new NextAction("lesser healing wave on party", 17.0f), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "critical health",
+        NextAction::array(0, new NextAction("healing wave", ACTION_CRITICAL_HEAL + 2), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "party member critical health",
+        NextAction::array(0, new NextAction("healing wave on party", ACTION_CRITICAL_HEAL + 1), NULL)));
 
     triggers.push_back(new TriggerNode(
         "cure poison",
@@ -56,6 +80,10 @@ void ShamanNonCombatStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
     triggers.push_back(new TriggerNode(
         "party member cure disease",
         NextAction::array(0, new NextAction("cure disease on party", 30.0f), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "party member to heal out of spell range",
+        NextAction::array(0, new NextAction("reach party member to heal", ACTION_CRITICAL_HEAL + 1), NULL)));
 }
 
 void ShamanNonCombatStrategy::InitMultipliers(std::list<Multiplier*> &multipliers)

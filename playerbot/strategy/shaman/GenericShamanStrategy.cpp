@@ -107,25 +107,25 @@ void GenericShamanStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
         "purge",
 		NextAction::array(0, new NextAction("purge", ACTION_EMERGENCY), NULL)));
 
-	triggers.push_back(new TriggerNode(
-        "party member medium health",
-		NextAction::array(0, new NextAction("lesser healing wave on party", 25.0f), NULL)));
+    triggers.push_back(new TriggerNode(
+        "low health",
+        NextAction::array(0, new NextAction("healing wave", ACTION_CRITICAL_HEAL + 2), NULL)));
 
-	triggers.push_back(new TriggerNode(
+    triggers.push_back(new TriggerNode(
         "party member low health",
-		NextAction::array(0, new NextAction("riptide on party", 25.0f), NULL)));
+        NextAction::array(0, new NextAction("healing wave on party", ACTION_CRITICAL_HEAL + 1), NULL)));
 
-	triggers.push_back(new TriggerNode(
-		"low aoe heal",
-		NextAction::array(0, new NextAction("chain heal", 27.0f), NULL)));
+    triggers.push_back(new TriggerNode(
+        "critical health",
+        NextAction::array(0, new NextAction("lesser healing wave", ACTION_CRITICAL_HEAL + 4), NULL)));
 
-	triggers.push_back(new TriggerNode(
-		"medium health",
-		NextAction::array(0, new NextAction("lesser healing wave", 26.0f), NULL)));
+    triggers.push_back(new TriggerNode(
+        "party member critical health",
+        NextAction::array(0, new NextAction("lesser healing wave party", ACTION_CRITICAL_HEAL + 3), NULL)));
 
-	triggers.push_back(new TriggerNode(
-		"low health",
-		NextAction::array(0, new NextAction("riptide", 26.0f), NULL)));
+    triggers.push_back(new TriggerNode(
+        "critical aoe heal",
+        NextAction::array(0, new NextAction("chain heal", ACTION_CRITICAL_HEAL), NULL)));
 
 	triggers.push_back(new TriggerNode(
 		"heroism",

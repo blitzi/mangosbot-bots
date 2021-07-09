@@ -123,6 +123,7 @@ namespace ai
                 creators["cure disease"] = &TriggerFactoryInternal::cure_disease;
                 creators["party member cure disease"] = &TriggerFactoryInternal::party_member_cure_disease;
                 creators["earth shield on tank"] = &TriggerFactoryInternal::earth_shield_on_tank;
+                creators["lightning bolt"] = &TriggerFactoryInternal::lightning_bolt;
             }
 
         private:
@@ -165,6 +166,7 @@ namespace ai
             static Trigger* cure_disease(PlayerbotAI* ai) { return new CureDiseaseTrigger(ai); }
             static Trigger* party_member_cure_disease(PlayerbotAI* ai) { return new PartyMemberCureDiseaseTrigger(ai); }
             static Trigger* earth_shield_on_tank(PlayerbotAI* ai) { return new EarthShieldOnTankTrigger(ai); }
+            static Trigger* lightning_bolt(PlayerbotAI* ai) { return new LightningBoltTrigger(ai); }
         };
     };
 };
