@@ -208,8 +208,10 @@ namespace ai
 		virtual string getName() { return "blessing of salvation on party"; }
 		virtual bool isUseful() { 
 			
-		if (GetTarget() && ai->IsTank((Player*)GetTarget()))
-			return false;
+			Player* target = (Player*)GetTarget();
+
+			if (target && ai->IsTank(target))
+				return false;
 
 			return BuffOnPartyAction::isUseful();
 		}

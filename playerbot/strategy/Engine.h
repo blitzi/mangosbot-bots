@@ -9,6 +9,13 @@
 
 namespace ai
 {
+    enum BotState
+    {
+        BOT_STATE_COMBAT = 0,
+        BOT_STATE_NON_COMBAT = 1,
+        BOT_STATE_DEAD = 2
+    };
+
     class ActionExecutionListener
     {
     public:
@@ -61,7 +68,7 @@ namespace ai
     class Engine : public PlayerbotAIAware
     {
     public:
-        Engine(PlayerbotAI* ai, AiObjectContext *factory);
+        Engine(PlayerbotAI* ai, AiObjectContext *factory, BotState botState);
 
 	    void Init();
         void addStrategy(string name);
@@ -114,11 +121,13 @@ namespace ai
         AiObjectContext* aiObjectContext;
         std::map<string, Strategy*> strategies;
         string lastAction;
+        BotState engineState;
 
     public:
 		bool testMode;
 
     private:
         ActionExecutionListeners actionExecutionListeners;
+        float lastCastRelevance;
     };
 }

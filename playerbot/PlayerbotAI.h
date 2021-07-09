@@ -79,12 +79,6 @@ enum HealingItemDisplayId
    MAJOR_DREAMLESS_SLEEP_POTION = 37845,
 };
 
-enum BotState
-{
-    BOT_STATE_COMBAT = 0,
-    BOT_STATE_NON_COMBAT = 1,
-    BOT_STATE_DEAD = 2
-};
 
 #define BOT_STATE_MAX 3
 
@@ -374,6 +368,7 @@ public:
     static bool IsOpposing(uint8 race1, uint8 race2);
     PlayerbotSecurity* GetSecurity() { return &security; }
     ShortTimeTracker* GetMoveTimer() { return &moveUpdateTimer; }
+    ShortTimeTracker* GetSpellTimer() { return &spellUpdateTimer; }
 
 protected:
 	Player* bot;
@@ -396,6 +391,7 @@ protected:
     float currentCastTime;
     string pullAction;
     ShortTimeTracker moveUpdateTimer;
+    ShortTimeTracker spellUpdateTimer;
 };
 
 

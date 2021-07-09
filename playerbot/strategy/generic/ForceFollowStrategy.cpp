@@ -23,7 +23,7 @@ float ForceFollowMultiplier::GetValue(Action* action)
         return 1.0f;
 
     string name = action->getName();
-    if (name == "follow" || name == "co")
+    if (name == "follow" || name == "co" || name == "nc" || name == "drop target")
         return 1.0f;
 
     uint32 spellId = AI_VALUE2(uint32, "spell id", name);
@@ -40,8 +40,13 @@ float ForceFollowMultiplier::GetValue(Action* action)
         , bot
 #endif
     );
+
     if (spellId && castTime > 0)
-        return 0.0f;
+    {
+        float distance = sServerFacade.GetDistance2d(ai->GetBot(), ai->GetMaster());
+
+        return distance > 5 ? 0.0f : 1.0f;
+    }        
 
     return 1.0f;
 }

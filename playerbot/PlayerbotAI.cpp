@@ -70,14 +70,14 @@ void PacketHandlingHelper::AddPacket(const WorldPacket& packet)
 
 
 PlayerbotAI::PlayerbotAI() : PlayerbotAIBase(), bot(NULL), aiObjectContext(NULL),
-    currentEngine(NULL), chatHelper(this), chatFilter(this), accountId(0), security(NULL), master(NULL), currentState(BOT_STATE_NON_COMBAT), moveUpdateTimer(0)
+    currentEngine(NULL), chatHelper(this), chatFilter(this), accountId(0), security(NULL), master(NULL), currentState(BOT_STATE_NON_COMBAT), moveUpdateTimer(0), spellUpdateTimer(0)
 {
     for (int i = 0 ; i < BOT_STATE_MAX; i++)
         engines[i] = NULL;
 }
 
 PlayerbotAI::PlayerbotAI(Player* bot) :
-    PlayerbotAIBase(), chatHelper(this), chatFilter(this), security(bot), master(NULL), moveUpdateTimer(0)
+    PlayerbotAIBase(), chatHelper(this), chatFilter(this), security(bot), master(NULL), moveUpdateTimer(0), spellUpdateTimer(0)
 {
 	this->bot = bot;
 
@@ -168,12 +168,33 @@ PlayerbotAI::~PlayerbotAI()
         delete aiObjectContext;
 }
 
+int counter = 0;
+
 void PlayerbotAI::UpdateAIInternal(uint32 elapsed)
 {
     if (bot->IsBeingTeleported() || !bot->IsInWorld())
         return;
 
     moveUpdateTimer.Update(elapsed);
+    spellUpdateTimer.Update(elapsed);
+
+    /*if (HasStrategy("debug update", BOT_STATE_NON_COMBAT))
+    {
+        if (IsCasting())
+        {
+            counter += elapsed;
+
+            ostringstream out; out << "casting " << counter;
+            TellMaster(out.str());
+        }
+        else
+        {
+            ostringstream o; o << "update timer " << elapsed;
+            TellMaster(o.str());
+
+            counter = 0.0f;
+        }
+    }*/
 
     PerformanceMonitorOperation *pmo = sPerformanceMonitor.start(PERF_MON_TOTAL, "PlayerbotAI::UpdateAIInternal");
     ExternalEventHelper helper(aiObjectContext);
@@ -530,6 +551,15 @@ void PlayerbotAI::DoNextAction()
         return;
     }
 
+    if (currentEngine != engines[BOT_STATE_DEAD] && !sServerFacade.IsAlive(bot))
+        ChangeEngine(BOT_STATE_DEAD);
+
+    if (currentEngine == engines[BOT_STATE_DEAD] && sServerFacade.IsAlive(bot))
+    {
+        ChangeEngine(BOT_STATE_NON_COMBAT);
+        aiObjectContext->GetValue<Unit*>("current target")->Set(NULL);
+    }
+
     if (bot->IsBeingTeleported() || (GetMaster() && GetMaster()->IsBeingTeleported()))
         return;
 
@@ -538,16 +568,6 @@ void PlayerbotAI::DoNextAction()
 
     if (IsEating() || IsDrinking())
         return;
-
-    if (IsCasting())
-        return;    
-
-    // change engine if just ressed
-    if (currentEngine == engines[BOT_STATE_DEAD] && sServerFacade.IsAlive(bot))
-    {
-        ChangeEngine(BOT_STATE_NON_COMBAT);
-        return;
-    }
 
     bool minimal = !AllowActive(ALL_ACTIVITY);
 
@@ -573,29 +593,24 @@ void PlayerbotAI::DoNextAction()
         }
     }
 
-    if (master)
-	{    
-		if (master->m_movementInfo.HasMovementFlag(MOVEFLAG_WALK_MODE) && sServerFacade.GetDistance2d(bot, master) < 20.0f) bot->m_movementInfo.AddMovementFlag(MOVEFLAG_WALK_MODE);
-		else bot->m_movementInfo.RemoveMovementFlag(MOVEFLAG_WALK_MODE);
-
-        if (master->IsSitState())
+    if (currentEngine->DoNextAction(NULL, 0, minimal) == false)
+    {
+        if (master)
         {
-            if (!sServerFacade.isMoving(bot) && sServerFacade.GetDistance2d(bot, master) < 10.0f)
-                bot->SetStandState(UNIT_STAND_STATE_SIT);
+            if (master->m_movementInfo.HasMovementFlag(MOVEFLAG_WALK_MODE) && sServerFacade.GetDistance2d(bot, master) < 20.0f) bot->m_movementInfo.AddMovementFlag(MOVEFLAG_WALK_MODE);
+            else bot->m_movementInfo.RemoveMovementFlag(MOVEFLAG_WALK_MODE);
+
+            if (master->IsSitState())
+            {
+                if (!sServerFacade.isMoving(bot) && sServerFacade.GetDistance2d(bot, master) < 10.0f)
+                    bot->SetStandState(UNIT_STAND_STATE_SIT);
+            }
+            else
+                bot->SetStandState(UNIT_STAND_STATE_STAND);
         }
-        else
-            bot->SetStandState(UNIT_STAND_STATE_STAND);
-	}
-	else if (bot->m_movementInfo.HasMovementFlag(MOVEFLAG_WALK_MODE)) bot->m_movementInfo.RemoveMovementFlag(MOVEFLAG_WALK_MODE);
-    else if (bot->IsSitState()) bot->SetStandState(UNIT_STAND_STATE_STAND);
-
-    if (currentEngine != engines[BOT_STATE_DEAD] && !sServerFacade.IsAlive(bot))
-        ChangeEngine(BOT_STATE_DEAD);
-
-    if (currentEngine == engines[BOT_STATE_DEAD] && sServerFacade.IsAlive(bot))
-        ChangeEngine(BOT_STATE_NON_COMBAT);
-
-    currentEngine->DoNextAction(NULL, 0, minimal);
+        else if (bot->m_movementInfo.HasMovementFlag(MOVEFLAG_WALK_MODE)) bot->m_movementInfo.RemoveMovementFlag(MOVEFLAG_WALK_MODE);
+        else if (bot->IsSitState()) bot->SetStandState(UNIT_STAND_STATE_STAND);
+    }
 
     /*if (!bot->m_movementInfo.HasMovementFlag(MOVEFLAG_FALLING) && !sServerFacade.IsInCombat(bot))
     {
@@ -1386,6 +1401,8 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
     if (sServerFacade.isMoving(bot) && spell->GetCastTime())
     {
         bot->StopMoving();
+        bot->GetMotionMaster()->Clear();
+
         spell->cancel();
         //delete spell;
         return false;

@@ -7,11 +7,14 @@
 #include "../PerformanceMonitor.h"
 #include <playerbot/strategy/values/LastSpellCastValue.h>
 #include <playerbot/ServerFacade.h>
+#include <chrono>
+
 
 using namespace ai;
 using namespace std;
+using namespace chrono;
 
-Engine::Engine(PlayerbotAI* ai, AiObjectContext *factory) : PlayerbotAIAware(ai), aiObjectContext(factory)
+Engine::Engine(PlayerbotAI* ai, AiObjectContext *factory, BotState botState) : PlayerbotAIAware(ai), aiObjectContext(factory), engineState(botState), lastCastRelevance(0.0f)
 {
     testMode = false;
 }
@@ -127,9 +130,16 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
     bool actionExecuted = false;
     ActionBasket* basket = NULL;
 
+    milliseconds currentMs = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+
     time_t currentTime = time(0);
     aiObjectContext->Update();
     ProcessTriggers();
+
+    bool wasCasting = ai->IsCasting();
+
+    if (lastCastRelevance > 0 && wasCasting == false)
+        lastCastRelevance = 0.0f;
 
     int iterations = 0;
     int iterationsPerTick = queue.Size() * (minimal ? 1 : sPlayerbotAIConfig.iterationsPerTick);
@@ -142,12 +152,15 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
             if (minimal && (relevance < 100))
                 continue;
 
+            if (lastCastRelevance > 0 && wasCasting && relevance - 30 < lastCastRelevance)
+                continue;
+
             // NOTE: queue.Pop() deletes basket
             ActionNode* actionNode = queue.Pop();
             Action* action = InitializeAction(actionNode);
 
-            if(action)
-                action->setRelevance(relevance);
+            if (action)            
+                action->setRelevance(relevance);            
 
             if (!action)
             {
@@ -166,9 +179,16 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
                         break;
                     }
                 }
-
+  
                 if (relevance && action->isPossible())
                 {
+                    if (lastCastRelevance > wasCasting)
+                    {
+                        ai->GetBot()->CastStop();
+                        ai->GetBot()->StopMoving();
+                        ai->GetBot()->GetMotionMaster()->Clear();
+                    }
+
                     if (!skipPrerequisites)
                     {
                         LogAction("A:%s - PREREQ", action->getName().c_str());
@@ -184,7 +204,18 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
                     if (pmo) pmo->finish();
 
                     if (actionExecuted)
-                    {                                                                     
+                    {                 
+                        if (ai->IsCasting())
+                        {
+                            lastCastRelevance = relevance;
+                        }
+
+                        if (HasStrategy("debug update"))
+                        {        
+                            ostringstream o; o << "execute Action " << action->getName();
+                            ai->TellMaster(o.str());                            
+                        }
+
                         LogAction("A:%s - OK", action->getName().c_str());
                         MultiplyAndPush(actionNode->getContinuers(), 0, false, event, "cont");
                         delete actionNode;
@@ -211,6 +242,14 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
     }
     while (basket && ++iterations <= iterationsPerTick);
   
+
+    if (HasStrategy("debug update"))
+    {
+        milliseconds ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+        ostringstream o; o << engineState << ", iterations: " << iterations << " depth " << depth << " time " << (ms - currentMs).count();
+        ai->TellMaster(o.str());
+    }
+
     if (!basket)
     {
         PushDefaultActions();
@@ -235,6 +274,7 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
         LogAction("no actions executed");
 
     queue.RemoveExpired();
+
     return actionExecuted;
 }
 
@@ -307,8 +347,6 @@ ActionResult Engine::ExecuteAction(string name, Event event, string qualifier)
         delete actionNode;
         return ACTION_RESULT_UNKNOWN;
     }
-
-
 
     if (!qualifier.empty())
     {

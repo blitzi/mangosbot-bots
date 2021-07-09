@@ -901,7 +901,7 @@ bool SetFacingTargetAction::Execute(Event event)
 
     sServerFacade.SetFacingTo(bot, target);
 
-    ai->GetMoveTimer()->Reset(250);
+    ai->GetMoveTimer()->Reset(10);
     return true;
 }
 

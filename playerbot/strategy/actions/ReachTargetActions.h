@@ -20,7 +20,10 @@ namespace ai
         }
         virtual bool isUseful()
 		{
-            return sServerFacade.IsDistanceGreaterThan(AI_VALUE2(float, "distance", GetTargetName()), (distance + sPlayerbotAIConfig.contactDistance));
+            float dist1 = AI_VALUE2(float, "distance", GetTargetName());
+            float dist2 = (distance + sPlayerbotAIConfig.contactDistance);
+
+            return sServerFacade.IsDistanceGreaterThan(dist1, dist2);
         }
         virtual string GetTargetName() { return "current target"; }
 

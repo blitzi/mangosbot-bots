@@ -25,7 +25,10 @@ float PullMultiplier::GetValue(Action* action)
     if (ai->GetPullAction() == name ||
         name == "reach spell" ||
         name == "follow" ||
-        name == "-pull")
+        name == "co" ||
+        name == "nc" ||
+        name == "-pull" ||
+        name == "drop target")
         return 1.0f;
 
     return PassiveMultiplier::GetValue(action);
