@@ -328,9 +328,6 @@ void RpgAction::trade(ObjectGuid guid)
 
     if (oldSelection)
         bot->SetSelectionGuid(oldSelection);
-
-    if (!ai->HasRealPlayerMaster())
-        ai->SetNextCheckDelay(sPlayerbotAIConfig.rpgDelay);
 }
 
 void RpgAction::repair(ObjectGuid guid)
@@ -363,9 +360,6 @@ void RpgAction::train(ObjectGuid guid)
 
     if (oldSelection)
         bot->SetSelectionGuid(oldSelection);
-
-    if (!ai->HasRealPlayerMaster())
-        ai->SetNextCheckDelay(sPlayerbotAIConfig.rpgDelay);
 }
 
 void RpgAction::heal(ObjectGuid guid)
@@ -402,9 +396,6 @@ void RpgAction::heal(ObjectGuid guid)
 
     if (oldSelection)
         bot->SetSelectionGuid(oldSelection);
-
-    if (!ai->HasRealPlayerMaster())
-        ai->SetNextCheckDelay(sPlayerbotAIConfig.rpgDelay);
 }
 
 void RpgAction::use(ObjectGuid guid)
@@ -419,9 +410,6 @@ void RpgAction::use(ObjectGuid guid)
 
     if (oldSelection)
         bot->SetSelectionGuid(oldSelection);
-
-    if (!ai->HasRealPlayerMaster())
-        ai->SetNextCheckDelay(sPlayerbotAIConfig.rpgDelay);
 }
 
 void RpgAction::spell(ObjectGuid guid)
@@ -440,9 +428,6 @@ void RpgAction::spell(ObjectGuid guid)
 
     if (oldSelection)
         bot->SetSelectionGuid(oldSelection);
-
-    if (!ai->HasRealPlayerMaster())
-        ai->SetNextCheckDelay(sPlayerbotAIConfig.rpgDelay);
 }
 
 void RpgAction::craft(ObjectGuid guid)
@@ -464,9 +449,6 @@ void RpgAction::craft(ObjectGuid guid)
 
     if (crafted)
         RemIgnore(guid);
-
-    if (!ai->HasRealPlayerMaster())
-        ai->SetNextCheckDelay(sPlayerbotAIConfig.rpgDelay);
 }
 
 void RpgAction::homebind(ObjectGuid guid)
@@ -483,9 +465,6 @@ void RpgAction::homebind(ObjectGuid guid)
 
     if (oldSelection)
         bot->SetSelectionGuid(oldSelection);
-
-    if (!ai->HasRealPlayerMaster())
-        ai->SetNextCheckDelay(sPlayerbotAIConfig.rpgDelay);
 }
 
 void RpgAction::queuebg(ObjectGuid guid)
@@ -505,9 +484,6 @@ void RpgAction::queuebg(ObjectGuid guid)
 
     if (oldSelection)
         bot->SetSelectionGuid(oldSelection);
-
-    if (!ai->HasRealPlayerMaster())
-        ai->SetNextCheckDelay(sPlayerbotAIConfig.rpgDelay);
 }
 
 bool RpgAction::isUseful()
