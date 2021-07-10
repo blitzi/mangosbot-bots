@@ -7,7 +7,7 @@ namespace ai
     BUFF_TRIGGER(RighteousFuryTrigger, "righteous fury");
 
     BUFF_TRIGGER(RetributionAuraTrigger, "retribution aura");
-    BUFF_TRIGGER(SanctityAuraTrigger, "sanctity aura", "sanctity aura")
+    BUFF_TRIGGER(SanctityAuraTrigger, "sanctity aura");
 
 	class CrusaderAuraTrigger : public BuffTrigger
 	{
@@ -30,9 +30,9 @@ namespace ai
         virtual bool IsActive();
     };
 
-    DEBUFF_TRIGGER(JudgementOfLightTrigger, "judgement of light")
-    DEBUFF_TRIGGER(JudgementOfWisdomTrigger, "judgement of wisdom")
-    DEBUFF_TRIGGER(JudgementTrigger, "judgement", "judgement")
+    DEBUFF_TRIGGER(JudgementOfLightTrigger, "judgement of light");
+    DEBUFF_TRIGGER(JudgementOfWisdomTrigger, "judgement of wisdom");
+    DEBUFF_TRIGGER(JudgementTrigger, "judgement");
 
     class BlessingOfSalvationOnPartyTrigger : public BuffOnPartyTrigger
     {

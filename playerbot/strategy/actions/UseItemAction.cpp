@@ -439,9 +439,6 @@ bool UseHearthStone::Execute(Event event)
     }
     bool used = UseItemAction::Execute(event);
 
-    if (used)
-        ai->SetNextCheckDelay(10 * IN_MILLISECONDS);
-
     return used;
 }
 
@@ -472,9 +469,6 @@ bool UseRandomRecipe::Execute(Event event)
         return false;
 
     bool used = UseItemAction::Execute(Event(name,recipeName));
-
-    if (used)
-        ai->SetNextCheckDelay(3.0 * IN_MILLISECONDS);
 
     return used;
 }
