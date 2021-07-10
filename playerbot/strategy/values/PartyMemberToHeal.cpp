@@ -32,6 +32,7 @@ Unit* PartyMemberToHeal::Calculate()
     IsTargetOfHealingSpell predicate;
 
     vector<Unit*> needHeals;
+    vector<Unit*> tankTargets;
 
     if (bot->GetSelectionGuid())
     {
@@ -69,10 +70,16 @@ Unit* PartyMemberToHeal::Calculate()
                 if (health < sPlayerbotAIConfig.almostFullHealth || !IsTargetOfSpellCast(player, predicate))
                     needHeals.push_back(pet);
             }
+
+            if (ai->IsTank(player) && bot->IsInGroup(player, true))
+                tankTargets.push_back(player);
         }
     }
-    if (needHeals.empty())
+    if (needHeals.empty() && tankTargets.empty())
         return NULL;
+
+    if (needHeals.empty() && !tankTargets.empty())
+        needHeals = tankTargets;
 
     sort(needHeals.begin(), needHeals.end(), compareByHealth);
 
@@ -107,5 +114,56 @@ bool PartyMemberToHeal::CanHealPet(Pet* pet)
 bool PartyMemberToHeal::Check(Unit* player)
 {
     return player && player != bot && player->GetMapId() == bot->GetMapId() &&
-        sServerFacade.GetDistance2d(bot, player) < sPlayerbotAIConfig.spellDistance;
+        sServerFacade.GetDistance2d(bot, player) < (player->IsPlayer() && ai->IsTank((Player*)player)) ? 50.0f : sPlayerbotAIConfig.spellDistance;
+}
+
+Unit* PartyMemberToProtect::Calculate()
+{
+    Group* group = bot->GetGroup();
+    if (!group)
+        return NULL;
+
+    vector<Unit*> needProtect;
+
+    list<ObjectGuid> attackers = ai->GetAiObjectContext()->GetValue<list<ObjectGuid> >("attackers")->Get();
+    for (list<ObjectGuid>::iterator i = attackers.begin(); i != attackers.end(); ++i)
+    {
+        Unit* unit = ai->GetUnit(*i);
+        if (!unit)
+            continue;
+
+        bool isRanged = false;
+
+        if (unit->AI())
+        {
+            if (unit->AI()->IsRangedUnit())
+                isRanged = true;
+        }
+
+        Unit* pVictim = unit->GetVictim();
+        if (!pVictim || !pVictim->IsPlayer())
+            continue;
+
+        if (pVictim == bot)
+            continue;
+
+        float attackDistance = isRanged ? 30.0f : 10.0f;
+        if (sServerFacade.GetDistance2d(pVictim, unit) > attackDistance)
+            continue;
+
+        if (ai->IsTank((Player*)pVictim) && pVictim->GetHealthPercent() > 10)
+            continue;
+        else if (pVictim->GetHealthPercent() > 30)
+            continue;
+
+        if (find(needProtect.begin(), needProtect.end(), pVictim) == needProtect.end())
+        needProtect.push_back(pVictim);
+    }
+
+    if (needProtect.empty())
+        return NULL;
+
+    sort(needProtect.begin(), needProtect.end(), compareByHealth);
+
+    return needProtect[0];
 }

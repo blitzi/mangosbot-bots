@@ -2,27 +2,6 @@
 #include "../Trigger.h"
 #include "../../PlayerbotAIConfig.h"
 
-#define BUFF_TRIGGER(clazz, spell, action) \
-    class clazz : public BuffTrigger \
-    { \
-    public: \
-        clazz(PlayerbotAI* ai) : BuffTrigger(ai, spell) {} \
-    };
-
-#define BUFF_ON_PARTY_TRIGGER(clazz, spell, action) \
-    class clazz : public BuffOnPartyTrigger \
-    { \
-    public: \
-        clazz(PlayerbotAI* ai) : BuffOnPartyTrigger(ai, spell) {}  \
-    };
-
-#define DEBUFF_TRIGGER(clazz, spell, action) \
-    class clazz : public DebuffTrigger \
-    { \
-    public: \
-        clazz(PlayerbotAI* ai) : DebuffTrigger(ai, spell) {} \
-    };
-
 namespace ai
 {
 	class StatAvailable : public Trigger
@@ -142,6 +121,13 @@ namespace ai
 	{
     public:
         InterruptSpellTrigger(PlayerbotAI* ai, string spell) : SpellTrigger(ai, spell) {}
+        virtual bool IsActive();
+    };
+
+    class DeflectSpellTrigger : public SpellTrigger
+    {
+    public:
+        DeflectSpellTrigger(PlayerbotAI* ai, string spell) : SpellTrigger(ai, spell) {}
         virtual bool IsActive();
     };
 
@@ -273,6 +259,17 @@ namespace ai
         virtual string getName() { return spell + " on tank"; }
     };
 
+
+    class ProtectPartyMemberTrigger : public Trigger
+    {
+    public:ProtectPartyMemberTrigger(PlayerbotAI* ai) : Trigger(ai, "protect party member") {}
+    public:
+        virtual string GetTargetName() { return "party member to protect"; }
+        virtual bool IsActive()
+        {
+            return AI_VALUE(Unit*, "party member to protect");
+        }
+    };
 
     class NoAttackersTrigger : public Trigger
     {
@@ -478,10 +475,10 @@ namespace ai
         time_t lastCheck;
     };
 
-	class TankAoeTrigger : public NoAttackersTrigger
+	class TankAssistTrigger : public NoAttackersTrigger
 	{
 	public:
-		TankAoeTrigger(PlayerbotAI* ai) : NoAttackersTrigger(ai) {}
+        TankAssistTrigger(PlayerbotAI* ai) : NoAttackersTrigger(ai) {}
 
 	public:
 		virtual bool IsActive();

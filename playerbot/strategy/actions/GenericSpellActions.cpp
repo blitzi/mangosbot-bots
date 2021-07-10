@@ -73,7 +73,7 @@ bool CastSpellAction::isUseful()
         return false;
     }
 
-    return GetTarget() && AI_VALUE2(bool, "spell cast useful", spell) && AI_VALUE2(float, "distance", GetTargetName()) <= range;
+    return GetTarget() && AI_VALUE2(bool, "spell cast useful", spell) && sServerFacade.GetDistance2d(bot, GetTarget()) <= range;
 }
 
 bool CastAuraSpellAction::isUseful()
@@ -99,7 +99,6 @@ bool CastAoeHealSpellAction::isUseful()
 {
     return CastSpellAction::isUseful();
 }
-
 
 Value<Unit*>* CurePartyMemberAction::GetTargetValue()
 {

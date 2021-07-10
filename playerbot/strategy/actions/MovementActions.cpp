@@ -507,7 +507,7 @@ bool MovementAction::IsMovingAllowed(Unit* target)
     if (bot->GetMapId() != target->GetMapId())
         return false;
 
-    float distance = bot->GetDistance(target);
+    float distance = sServerFacade.GetDistance2d(bot, target);
     if (!bot->InBattleGround() && distance > sPlayerbotAIConfig.reactDistance)
         return false;
 
@@ -690,7 +690,7 @@ void MovementAction::WaitForReach(float distance)
     ai->GetMoveTimer()->Reset(delay);
 }
 
-bool MovementAction::ChaseTo(WorldObject* obj)
+bool MovementAction::ChaseTo(WorldObject* obj, float distance, float angle)
 {
     if (bot->IsSitState())
         bot->SetStandState(UNIT_STAND_STATE_STAND);
@@ -701,10 +701,9 @@ bool MovementAction::ChaseTo(WorldObject* obj)
         ai->InterruptSpell();
     }
 
-    MotionMaster &mm = *bot->GetMotionMaster();
-    mm.Clear();
+    bot->GetMotionMaster()->Clear();
+    bot->GetMotionMaster()->MoveChase((Unit*)obj, distance, angle);
 
-    mm.MoveChase((Unit*)obj, ai->IsRanged(bot) ? 25.0f : 1.5f);
     return true;
 }
 
@@ -919,7 +918,6 @@ bool SetFacingTargetAction::isPossible()
     if (sServerFacade.IsFrozen(bot) || bot->IsPolymorphed() ||
         (sServerFacade.UnitIsDead(bot) && !bot->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST)) ||
         bot->IsBeingTeleported() ||
-        bot->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION) ||
         bot->HasAuraType(SPELL_AURA_MOD_CONFUSE) || sServerFacade.IsCharmed(bot) ||
         bot->HasAuraType(SPELL_AURA_MOD_STUN) || bot->IsFlying() ||
         bot->hasUnitState(UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL))

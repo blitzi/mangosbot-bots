@@ -16,14 +16,27 @@ namespace ai
         }
         virtual bool Execute(Event event)
 		{
-            return MoveTo(AI_VALUE(Unit*, GetTargetName()), distance);
+            Unit* target = AI_VALUE(Unit*, GetTargetName());
+            if (!target)
+                return false;
+
+            if (distance < max(5.0f, bot->GetCombinedCombatReach(target, true)))
+            {
+                return ChaseTo(target, 0.0f, GetFollowAngle());
+            }
+            else
+            {
+                bool inLos = bot->IsWithinLOSInMap(target);
+                return ChaseTo(target, inLos ? distance - sPlayerbotAIConfig.contactDistance : distance / 2, bot->GetAngle(target));
+            }
         }
         virtual bool isUseful()
 		{
-            float dist1 = AI_VALUE2(float, "distance", GetTargetName());
-            float dist2 = (distance + sPlayerbotAIConfig.contactDistance);
+            // do not move while casting
+            if (bot->IsNonMeleeSpellCasted(true))
+                return false;
 
-            return sServerFacade.IsDistanceGreaterThan(dist1, dist2);
+            return true;
         }
         virtual string GetTargetName() { return "current target"; }
 

@@ -3,45 +3,6 @@
 #include "../Action.h"
 #include "../../PlayerbotAIConfig.h"
 
-#define BEGIN_SPELL_ACTION(clazz, name) \
-class clazz : public CastSpellAction \
-        { \
-        public: \
-        clazz(PlayerbotAI* ai) : CastSpellAction(ai, name) {} \
-
-
-#define END_SPELL_ACTION() \
-    };
-
-#define BEGIN_DEBUFF_ACTION(clazz, name) \
-class clazz : public CastDebuffSpellAction \
-        { \
-        public: \
-        clazz(PlayerbotAI* ai) : CastDebuffSpellAction(ai, name) {} \
-
-#define BEGIN_RANGED_SPELL_ACTION(clazz, name) \
-class clazz : public CastSpellAction \
-        { \
-        public: \
-        clazz(PlayerbotAI* ai) : CastSpellAction(ai, name) {} \
-
-#define BEGIN_MELEE_SPELL_ACTION(clazz, name) \
-class clazz : public CastMeleeSpellAction \
-        { \
-        public: \
-        clazz(PlayerbotAI* ai) : CastMeleeSpellAction(ai, name) {} \
-
-
-#define END_RANGED_SPELL_ACTION() \
-    };
-
-
-#define BEGIN_BUFF_ON_PARTY_ACTION(clazz, name) \
-class clazz : public BuffOnPartyAction \
-        { \
-        public: \
-        clazz(PlayerbotAI* ai) : BuffOnPartyAction(ai, name) {}
-
 namespace ai
 {
     class CastSpellAction : public Action
@@ -91,6 +52,12 @@ namespace ai
     public:
         CastMeleeSpellAction(PlayerbotAI* ai, string spell) : CastSpellAction(ai, spell) {
 			range = ATTACK_DISTANCE;
+
+            Unit* target = AI_VALUE(Unit*, "current target");
+            if (target)
+                range = max(5.0f, bot->GetCombinedCombatReach(target, true));
+
+                //range = target->GetCombinedCombatReach();
 		}
     };
 
@@ -238,7 +205,27 @@ namespace ai
     class CastShootAction : public CastSpellAction
     {
     public:
-        CastShootAction(PlayerbotAI* ai) : CastSpellAction(ai, "shoot") {}
+        CastShootAction(PlayerbotAI* ai) : CastSpellAction(ai, "shoot")
+        {
+            Item* const pItem = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_RANGED);
+            if (pItem)
+            {
+                spell = "shoot";
+
+                switch (pItem->GetProto()->SubClass)
+                {
+                case ITEM_SUBCLASS_WEAPON_GUN:
+                    spell += " gun";
+                    break;
+                case ITEM_SUBCLASS_WEAPON_BOW:
+                    spell += " bow";
+                    break;
+                case ITEM_SUBCLASS_WEAPON_CROSSBOW:
+                    spell += " crossbow";
+                    break;
+                }
+            }
+        }
         virtual ActionThreatType getThreatType() { return ACTION_THREAT_NONE; }
     };
 
@@ -292,5 +279,16 @@ namespace ai
             return context->GetValue<Unit*>("snare target", spell);
         }
         virtual string getName() { return spell + " on snare target"; }
+    };
+
+    class CastProtectSpellAction : public CastSpellAction
+    {
+    public:
+        CastProtectSpellAction(PlayerbotAI* ai, string spell) : CastSpellAction(ai, spell) {}
+        virtual string GetTargetName() { return "party member to protect"; }
+        virtual bool isUseful()
+        {
+            return GetTarget() && !ai->HasAura(spell, GetTarget());
+        }
     };
 }

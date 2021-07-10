@@ -27,7 +27,6 @@
 #include "ServerFacade.h"
 #include "TravelMgr.h"
 #include "ChatHelper.h"
-#include "strategy/actions/LootAction.cpp"
 
 using namespace ai;
 using namespace std;

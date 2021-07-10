@@ -45,6 +45,8 @@ namespace ai
 
             creators["party member has aggro"] = &TriggerContext::PartyMemberHasAggro;
 
+            creators["protect party member"] = &TriggerContext::protect_party_member;
+
             creators["light rage available"] = &TriggerContext::LightRageAvailable;
             creators["medium rage available"] = &TriggerContext::MediumRageAvailable;
             creators["high rage available"] = &TriggerContext::HighRageAvailable;
@@ -62,7 +64,7 @@ namespace ai
             creators["has nearest adds"] = &TriggerContext::has_nearest_adds;
             creators["enemy player near"] = &TriggerContext::enemy_player_near;
 
-            creators["tank aoe"] = &TriggerContext::TankAoe;
+            creators["tank assist"] = &TriggerContext::TankAssist;
             creators["lose aggro"] = &TriggerContext::LoseAggro;
             creators["has aggro"] = &TriggerContext::HasAggro;
 
@@ -218,7 +220,7 @@ namespace ai
         static Trigger* HighEnergyAvailable(PlayerbotAI* ai) { return new HighEnergyAvailableTrigger(ai); }
         static Trigger* LootAvailable(PlayerbotAI* ai) { return new LootAvailableTrigger(ai); }
         static Trigger* NoAttackers(PlayerbotAI* ai) { return new NoAttackersTrigger(ai); }
-        static Trigger* TankAoe(PlayerbotAI* ai) { return new TankAoeTrigger(ai); }
+        static Trigger* TankAssist(PlayerbotAI* ai) { return new TankAssistTrigger(ai); }
         static Trigger* Timer(PlayerbotAI* ai) { return new TimerTrigger(ai); }
         static Trigger* NoTarget(PlayerbotAI* ai) { return new NoTargetTrigger(ai); }
         static Trigger* TargetInSight(PlayerbotAI* ai) { return new TargetInSightTrigger(ai); }
@@ -246,6 +248,7 @@ namespace ai
         static Trigger* PartyMemberAlmostFullHealth(PlayerbotAI* ai) { return new PartyMemberAlmostFullHealthTrigger(ai); }
         static Trigger* PartyMemberCriticalHealth(PlayerbotAI* ai) { return new PartyMemberCriticalHealthTrigger(ai); }
         static Trigger* PartyMemberHasAggro(PlayerbotAI* ai) { return new PartyMemberHasAggroTrigger(ai); }
+        static Trigger* protect_party_member(PlayerbotAI* ai) { return new ProtectPartyMemberTrigger(ai); }
         static Trigger* no_pet(PlayerbotAI* ai) { return new NoPetTrigger(ai); }
         static Trigger* has_attackers(PlayerbotAI* ai) { return new HasAttackersTrigger(ai); }
         static Trigger* random_bot_update_trigger(PlayerbotAI* ai) { return new RandomBotUpdateTrigger(ai); }
