@@ -83,7 +83,7 @@ void AttackersValue::AddAttackersOf(Player* player, set<Unit*>& targets)
 		{
 			Unit* unit = *i;
 #ifdef CMANGOS
-			if (!unit->getThreatManager().getThreat(player))
+			if (!unit->getThreatManager().getThreat(player) && (!unit->getThreatManager().getCurrentVictim() || unit->getThreatManager().getCurrentVictim()->getTarget() == player))
 #endif
 #ifdef MANGOS
 			if (!unit->GetThreatManager().getThreat(player))
@@ -264,8 +264,24 @@ bool AttackersValue::IsPossibleTarget(Unit *attacker, Player *bot)
         (!c ||
             (
                 !c->GetCombatManager().IsInEvadeMode() &&            
+#ifdef CMANGOS
                 (ai->HasStrategy("attack tagged", BOT_STATE_NON_COMBAT) || (!attacker->HasFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_TAPPED) || c->IsTappedBy(bot))) &&
 			    (!groupHasTank || ((groupHasTank && !waitForTankAggro) || iAmTank || targetIsNonElite || targetIsAlmostDead))
+                (!isMemberBotGroup && ai->HasStrategy("attack tagged", BOT_STATE_NON_COMBAT)) || leaderHasThreat ||
+                (!c->HasLootRecipient() &&
+                    (!c->GetVictim() ||
+                    c->GetVictim() &&
+                    ((bot->IsInGroup(c->GetVictim())) ||
+                        (ai->GetMaster() &&
+                            c->GetVictim() == ai->GetMaster())))) ||
+                c->IsTappedBy(bot)
+#endif
+#ifndef MANGOSBOT_TWO
+#ifdef MANGOS
+                !attacker->HasFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_TAPPED) || bot->IsTappedByMeOrMyGroup(c)
+#endif
+#endif
+                )
             )
         );
 }
