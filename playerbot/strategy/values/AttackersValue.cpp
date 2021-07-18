@@ -261,29 +261,23 @@ bool AttackersValue::IsPossibleTarget(Unit *attacker, Player *bot)
         bot->IsWithinDistInMap(attacker, sPlayerbotAIConfig.sightDistance) &&
         !(attacker->GetCreatureType() == CREATURE_TYPE_CRITTER) &&
         !(sPlayerbotAIConfig.IsInPvpProhibitedZone(attacker->GetAreaId()) && (attacker->GetObjectGuid().IsPlayer() || attacker->GetObjectGuid().IsPet())) &&
+        (!groupHasTank || ((groupHasTank && !waitForTankAggro) || iAmTank || targetIsNonElite || targetIsAlmostDead)) &&
         (!c ||
             (
                 !c->GetCombatManager().IsInEvadeMode() &&            
-#ifdef CMANGOS
-                (ai->HasStrategy("attack tagged", BOT_STATE_NON_COMBAT) || (!attacker->HasFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_TAPPED) || c->IsTappedBy(bot))) &&
-			    (!groupHasTank || ((groupHasTank && !waitForTankAggro) || iAmTank || targetIsNonElite || targetIsAlmostDead))
+#ifdef CMANGOS          
                 (!isMemberBotGroup && ai->HasStrategy("attack tagged", BOT_STATE_NON_COMBAT)) || leaderHasThreat ||
-                (!c->HasLootRecipient() &&
-                    (!c->GetVictim() ||
-                    c->GetVictim() &&
-                    ((bot->IsInGroup(c->GetVictim())) ||
-                        (ai->GetMaster() &&
-                            c->GetVictim() == ai->GetMaster())))) ||
-                c->IsTappedBy(bot)
+                
+                (c->IsTappedBy(bot) || (!c->HasLootRecipient() && (!c->GetVictim() || c->GetVictim() && ((bot->IsInGroup(c->GetVictim())) || (ai->GetMaster() &&
+                c->GetVictim() == ai->GetMaster())))))
 #endif
 #ifndef MANGOSBOT_TWO
 #ifdef MANGOS
                 !attacker->HasFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_TAPPED) || bot->IsTappedByMeOrMyGroup(c)
 #endif
 #endif
-                )
-            )
-        );
+                 )            
+            );
 }
 
 bool AttackersValue::IsValidTarget(Unit *attacker, Player *bot)

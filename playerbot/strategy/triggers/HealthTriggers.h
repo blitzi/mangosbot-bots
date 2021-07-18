@@ -38,7 +38,7 @@ namespace ai
 
 			//ignore healing if the group has a healer and I am not a healer -
 			//except the critical flag is set
-			if (critical == false && group && ai->GroupHasHealer())
+			if (critical == false && group && ai->GroupHasWorkingHealer())
 			{
 				if (ai->IsHeal(ai->GetBot()) == false)
 					return false;

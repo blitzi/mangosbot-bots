@@ -53,7 +53,7 @@ float ForceFollowMultiplier::GetValue(Action* action)
 
 NextAction** ForceFollowStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("follow", 100.0f), NULL);
+    return NextAction::array(0, new NextAction("follow", 250.0f), NULL);
 }
 
 void ForceFollowStrategy::InitTriggers(std::list<TriggerNode*> &triggers)

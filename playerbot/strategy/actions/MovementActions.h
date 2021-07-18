@@ -12,7 +12,7 @@ namespace ai
             bot = ai->GetBot();
         }
 
-        virtual bool isPossible() { return ai->GetMoveTimer()->Passed();  /*&& ai->IsCasting() == false;*/ }
+        virtual bool isPossible() { return ai->GetMoveTimer()->Passed() && Action::isPossible(); }
 
     protected:
         bool ChaseTo(WorldObject *obj, float distance = 0.0f, float angle = 0.0f);
