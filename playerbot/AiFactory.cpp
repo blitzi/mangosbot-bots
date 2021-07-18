@@ -194,13 +194,13 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
         case CLASS_PRIEST:
             if (tab == 2)
             {
-                engine->addStrategies("dps", "threat", NULL);
+                engine->addStrategies("dps", "threat", "ranged", NULL);
                 if (player->getLevel() >= 4)
                     engine->addStrategy("dps debuff");
             }
             else if (tab == 0)
             {
-                engine->addStrategies("holy", NULL);
+                engine->addStrategies("holy", "ranged", NULL);
                     //if (player->getLevel() >= 4)
                        //engine->addStrategy("dps debuff");
             }
@@ -217,7 +217,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             else
                 engine->addStrategies("frost", "frost aoe", "threat", "dps aoe", NULL);
 
-            engine->addStrategies("dps", "dps assist", "flee", "cure", "cc", NULL);
+            engine->addStrategies("dps", "dps assist", "flee", "cure", "cc", "ranged", NULL);
             break;
         case CLASS_WARRIOR:
             if (tab == 2)
@@ -229,9 +229,9 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             break;
         case CLASS_SHAMAN:
             if (tab == 0)
-                engine->addStrategies("caster", "caster aoe", "bmana", "threat", "flee", NULL);
+                engine->addStrategies("caster", "caster aoe", "bmana", "threat", "flee", "ranged", NULL);
             else if (tab == 2)
-                engine->addStrategies("heal", "bmana", "flee", NULL);
+                engine->addStrategies("heal", "bmana", "flee", "ranged", NULL);
             else
                 engine->addStrategies("dps", "melee aoe", "bdps", "threat", "close", NULL);
 
@@ -262,7 +262,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
                     engine->addStrategy("caster debuff");
             }
             else if (tab == 2)
-                engine->addStrategies("heal", "cure", "flee", "dps assist", "cc", NULL);
+                engine->addStrategies("heal", "cure", "flee", "dps assist", "cc", "ranged", NULL);
             else
             {
                 engine->removeStrategy("ranged");
@@ -286,7 +286,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             if (player->getLevel() > 19)
                 engine->addStrategy("dps debuff");
 
-            engine->addStrategies("dps assist", "flee", "cc", "pet", NULL);
+            engine->addStrategies("dps assist", "flee", "cc", "pet", "ranged", NULL);
             break;
 #ifdef MANGOSBOT_TWO
         case CLASS_DEATH_KNIGHT:
