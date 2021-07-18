@@ -243,7 +243,6 @@ public:
 	PlayerbotAI(Player* bot);
 	virtual ~PlayerbotAI();
 
-    virtual void UpdateAI(uint32 elapsed);
 public:
 	virtual void UpdateAIInternal(uint32 elapsed);
 	string HandleRemoteCommand(string command);
@@ -361,7 +360,7 @@ public:
     //Returns a semi-random (cycling) number that is fixed for each bot.
     uint32 GetFixedBotNumer(BotTypeNumber typeNumber, uint32 maxNum = 100, float cyclePerMin = 1); 
 
-	bool GroupHasHealer();
+	bool GroupHasWorkingHealer();
     GrouperType GetGrouperType();
     bool HasPlayerNearby(WorldPosition* pos, float range = sPlayerbotAIConfig.reactDistance);
     bool HasPlayerNearby(float range = sPlayerbotAIConfig.reactDistance) { WorldPosition botPos(bot);  return HasPlayerNearby(&botPos, range); };

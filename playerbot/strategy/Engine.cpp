@@ -152,7 +152,7 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
             if (minimal && (relevance < 100))
                 continue;
 
-            if (lastCastRelevance > 0 && wasCasting && relevance - 30 < lastCastRelevance)
+            if (lastCastRelevance > 0 && wasCasting && relevance - 100 < lastCastRelevance)
                 continue;
 
             // NOTE: queue.Pop() deletes basket
@@ -182,7 +182,7 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
   
                 if (relevance && action->isPossible())
                 {
-                    if (lastCastRelevance > wasCasting)
+                    if (wasCasting)
                     {
                         ai->GetBot()->CastStop();
                         ai->GetBot()->StopMoving();

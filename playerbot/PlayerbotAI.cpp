@@ -166,41 +166,6 @@ PlayerbotAI::~PlayerbotAI()
         delete aiObjectContext;
 }
 
-<<<<<<< HEAD
-int counter = 0;
-=======
-void PlayerbotAI::UpdateAI(uint32 elapsed)
-{
-    if (nextAICheckDelay > elapsed)
-        nextAICheckDelay -= elapsed;
-    else
-        nextAICheckDelay = 0;
-
-    // wake up if in combat
-    if (sServerFacade.IsInCombat(bot) && !AllowActivity())
-    {
-        if (AllowActivity(ALL_ACTIVITY, true))
-            nextAICheckDelay = 0;
-    }
-
-    if (!CanUpdateAI())
-        return;
-
-    Spell* currentSpell = bot->GetCurrentSpell(CURRENT_GENERIC_SPELL);
-
-    if (currentSpell && currentSpell->getState() == SPELL_STATE_CASTING && currentSpell->GetCastedTime())
-    {
-        nextAICheckDelay = currentSpell->GetCastedTime() + sPlayerbotAIConfig.reactDelay;       
-
-        if (!CanUpdateAI())
-            return;
-    }
-
-    UpdateAIInternal(elapsed);
-    YieldThread();
-}
->>>>>>> 57562bf737bf191bcf39aea4cdb66b65d382395f
-
 void PlayerbotAI::UpdateAIInternal(uint32 elapsed)
 {
     if (bot->IsBeingTeleported() || !bot->IsInWorld())
@@ -594,28 +559,19 @@ void PlayerbotAI::DoNextAction()
         aiObjectContext->GetValue<Unit*>("current target")->Set(NULL);
     }
 
-<<<<<<< HEAD
     if (bot->IsBeingTeleported() || (GetMaster() && GetMaster()->IsBeingTeleported()))
         return;
-=======
+
     bool minimal = !AllowActivity(ALL_ACTIVITY);
->>>>>>> 57562bf737bf191bcf39aea4cdb66b65d382395f
 
     if (bot->IsTaxiFlying() || bot->IsFlying())
         return;
 
-<<<<<<< HEAD
     if (IsEating() || IsDrinking())
-=======
-    if (minimal)
-    {
-        SetNextCheckDelay(sPlayerbotAIConfig.passiveDelay);
->>>>>>> 57562bf737bf191bcf39aea4cdb66b65d382395f
         return;
 
-    bool minimal = !AllowActive(ALL_ACTIVITY);
-
     Group *group = bot->GetGroup();
+
     // test BG master set
     if ((!master || (master->GetPlayerbotAI() && !master->GetPlayerbotAI()->IsRealPlayer())) && group && !bot->InBattleGround())
     {
@@ -1863,7 +1819,7 @@ GrouperType PlayerbotAI::GetGrouperType()
    return LEADER_5;
 }
 
-bool PlayerbotAI::GroupHasHealer()
+bool PlayerbotAI::GroupHasWorkingHealer()
 {
 	Group* group = bot->GetGroup();
 
@@ -1872,8 +1828,15 @@ bool PlayerbotAI::GroupHasHealer()
 		uint32 bcount = 0;
 		for (GroupReference *gref = group->GetFirstMember(); gref; gref = gref->next())
 		{
-			if(IsHeal(gref->getSource()))
-				return true;
+            Player* player = gref->getSource();
+            PlayerbotAI* ai = player->GetPlayerbotAI();
+
+            if(IsHeal(player) &&
+               ai->GetManaPercent() > 15 &&
+               !player->IsStunned() &&
+               !player->isFeared() &&
+               !player->IsPolymorphed())                
+		    	return true;
 		}
 	}
 
@@ -2892,7 +2855,7 @@ bool PlayerbotAI::IsDrinking()
 
 bool PlayerbotAI::IsCasting()
 {
-    for (auto e : GetBot()->m_events.GetEvents())
+    /*for (auto e : GetBot()->m_events.GetEvents())
     {
         SpellEvent* spellEvent = dynamic_cast<SpellEvent*>(e.second);
 
@@ -2915,5 +2878,9 @@ bool PlayerbotAI::IsCasting()
     if (spell && spell->getState() != SPELL_STATE_FINISHED  && !spell->IsAutoRepeat())
         return true;
 
-    return false;
+    return false;*/
+
+    Spell* currentSpell = bot->GetCurrentSpell(CURRENT_GENERIC_SPELL);
+
+    return currentSpell && currentSpell->getState() != SPELL_STATE_FINISHED && currentSpell->GetCastedTime();
 }

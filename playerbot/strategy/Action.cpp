@@ -6,6 +6,11 @@
 
 using namespace ai;
 
+bool Action::CheckForCast()
+{
+    return IgnoresCasting() ? true : !ai->IsCasting();
+}
+
 int NextAction::size(NextAction** actions)
 {
     if (!actions)

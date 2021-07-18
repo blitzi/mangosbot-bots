@@ -54,7 +54,7 @@ namespace ai
 
     public:
         virtual bool Execute(Event event) { return true; }
-        virtual bool isPossible() { return true; }
+        virtual bool isPossible() { return CheckForCast(); }
         virtual bool isUseful() { return true; }
         virtual NextAction** getPrerequisites() { return NULL; }
         virtual NextAction** getAlternatives() { return NULL; }
@@ -62,14 +62,16 @@ namespace ai
         virtual ActionThreatType getThreatType() { return ACTION_THREAT_NONE; }
         void Update() {}
         void Reset() {}
+
         virtual Unit* GetTarget();
         virtual Value<Unit*>* GetTargetValue();
         virtual string GetTargetName() { return "self target"; }
         void MakeVerbose() { verbose = true; }
-
+        virtual bool IgnoresCasting() { return false; }
         void setRelevance(uint32 relevance1) { relevance = relevance1; };
         virtual float getRelevance() { return relevance; }
     protected:
+        bool CheckForCast();
         bool verbose;
         float relevance = 0;
 	};
