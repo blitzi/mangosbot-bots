@@ -105,7 +105,7 @@ void GenericShamanStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 
 	triggers.push_back(new TriggerNode(
         "purge",
-		NextAction::array(0, new NextAction("purge", ACTION_EMERGENCY), NULL)));
+		NextAction::array(0, new NextAction("purge", ACTION_DISPEL), NULL)));
 
     triggers.push_back(new TriggerNode(
         "low health",
