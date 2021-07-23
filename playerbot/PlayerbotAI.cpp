@@ -1832,7 +1832,7 @@ bool PlayerbotAI::GroupHasWorkingHealer()
             PlayerbotAI* ai = player->GetPlayerbotAI();
 
             if(IsHeal(player) &&
-               ai->GetManaPercent() > 15 &&
+               (!ai || ai->GetManaPercent() > 15) &&
                !player->IsStunned() &&
                !player->isFeared() &&
                !player->IsPolymorphed())                
