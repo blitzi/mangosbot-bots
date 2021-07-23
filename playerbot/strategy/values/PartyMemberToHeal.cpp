@@ -60,14 +60,14 @@ Unit* PartyMemberToHeal::Calculate()
                 continue;
 
             uint8 health = player->GetHealthPercent();
-            if (health < sPlayerbotAIConfig.almostFullHealth || !IsTargetOfSpellCast(player, predicate))
+            if (health < sPlayerbotAIConfig.almostFullHealth && !IsTargetOfSpellCast(player, predicate))
                 needHeals.push_back(player);
 
             Pet* pet = player->GetPet();
             if (pet && CanHealPet(pet))
             {
                 health = pet->GetHealthPercent();
-                if (health < sPlayerbotAIConfig.almostFullHealth || !IsTargetOfSpellCast(player, predicate))
+                if (health < sPlayerbotAIConfig.almostFullHealth && !IsTargetOfSpellCast(player, predicate))
                     needHeals.push_back(pet);
             }
 
@@ -81,29 +81,9 @@ Unit* PartyMemberToHeal::Calculate()
     if (needHeals.empty() && !tankTargets.empty())
         needHeals = tankTargets;
 
-    sort(needHeals.begin(), needHeals.end(), compareByHealth);
+    sort(needHeals.begin(), needHeals.end(), compareByHealth);    
 
-    int healerIndex = 0;
-    if (group)
-    {
-        for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
-        {
-            Player* player = gref->getSource();
-            if (!player) continue;
-            if (player == bot) break;
-            if (ai->IsHeal(player))
-            {
-                float percent = (float)player->GetPower(POWER_MANA) / (float)player->GetMaxPower(POWER_MANA) * 100.0;
-                if (percent > sPlayerbotAIConfig.lowMana)
-                    healerIndex++;
-            }
-        }
-    }
-    else
-        healerIndex = 1;
-
-    healerIndex = healerIndex % needHeals.size();
-    return needHeals[healerIndex];
+    return needHeals[0];
 }
 
 bool PartyMemberToHeal::CanHealPet(Pet* pet)
