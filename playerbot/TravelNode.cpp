@@ -828,13 +828,13 @@ TravelPath TravelNodeRoute::buildPath(vector<WorldPosition> pathToStart, vector<
 
             vector<WorldPosition> path = nodePath->getPath();
 
-            if (node != nodes.back()) //Remove the last point since that will also be the start of the next path.
+            if (path.size() > 0 && node != nodes.back()) //Remove the last point since that will also be the start of the next path.
                 path.pop_back();
 
-            if (prevNode->isPortal() && !nodePath->getPortal()) //Do not move to the area trigger if we don't plan to take the portal.
+            if (path.size() > 0 && prevNode->isPortal() && !nodePath->getPortal()) //Do not move to the area trigger if we don't plan to take the portal.
                 path.erase(path.begin());
 
-            if (prevNode->isTransport() && !nodePath->getTransport()) //Do not move to the transport if we aren't going to take it.
+            if (path.size() > 0 && prevNode->isTransport() && !nodePath->getTransport()) //Do not move to the transport if we aren't going to take it.
                 path.erase(path.begin());
 
             if (nodePath->getPortal()) //Teleport to next node.
