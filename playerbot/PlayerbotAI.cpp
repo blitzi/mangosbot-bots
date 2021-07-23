@@ -256,7 +256,7 @@ void PlayerbotAI::HandleTeleportAck()
 
 void PlayerbotAI::Reset()
 {
-    if (bot->IsTaxiFlying() || bot->IsFlying())
+    if (bot->IsTaxiFlying())
         return;
 
     currentEngine = engines[BOT_STATE_NON_COMBAT];
@@ -636,6 +636,18 @@ void PlayerbotAI::DoNextAction()
         else if (bot->m_movementInfo.HasMovementFlag(MOVEFLAG_WALK_MODE)) bot->m_movementInfo.RemoveMovementFlag(MOVEFLAG_WALK_MODE);
         else if (bot->IsSitState()) bot->SetStandState(UNIT_STAND_STATE_STAND);
     }
+
+#ifndef MANGOSBOT_ZERO
+    if (bot->IsFlying() && !bot->IsFreeFlying())
+    {
+        if (bot->m_movementInfo.HasMovementFlag(MOVEFLAG_FLYING))
+            bot->m_movementInfo.RemoveMovementFlag(MOVEFLAG_FLYING);
+        if (bot->m_movementInfo.HasMovementFlag(MOVEFLAG_CAN_FLY))
+            bot->m_movementInfo.RemoveMovementFlag(MOVEFLAG_CAN_FLY);
+        if (bot->m_movementInfo.HasMovementFlag(MOVEFLAG_LEVITATING))
+            bot->m_movementInfo.RemoveMovementFlag(MOVEFLAG_LEVITATING);
+    }
+#endif
 
     /*if (!bot->m_movementInfo.HasMovementFlag(MOVEFLAG_FALLING) && !sServerFacade.IsInCombat(bot))
     {

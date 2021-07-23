@@ -57,6 +57,10 @@ void ArmsWarriorStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
         "target critical health",
         NextAction::array(0, new NextAction("execute", ACTION_HIGH + 4), NULL)));
 
+    triggers.push_back(new TriggerNode(
+        "sudden death",
+        NextAction::array(0, new NextAction("execute", ACTION_HIGH + 4), NULL)));
+
 	triggers.push_back(new TriggerNode(
 		"hamstring",
 		NextAction::array(0, new NextAction("piercing howl", ACTION_HIGH), NULL)));
@@ -65,9 +69,13 @@ void ArmsWarriorStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
         "overpower",
         NextAction::array(0, new NextAction("overpower", ACTION_HIGH + 3), NULL)));
 
+    triggers.push_back(new TriggerNode(
+        "taste for blood",
+        NextAction::array(0, new NextAction("overpower", ACTION_HIGH + 3), NULL)));
+
 	triggers.push_back(new TriggerNode(
 		"victory rush",
-		NextAction::array(0, new NextAction("victory rush", ACTION_HIGH + 3), NULL)));
+		NextAction::array(0, new NextAction("victory rush", ACTION_INTERRUPT), NULL)));
 
     triggers.push_back(new TriggerNode(
         "high rage available",
@@ -76,6 +84,10 @@ void ArmsWarriorStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
     triggers.push_back(new TriggerNode(
         "bloodrage",
         NextAction::array(0, new NextAction("bloodrage", ACTION_HIGH + 2), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "death wish",
+        NextAction::array(0, new NextAction("death wish", ACTION_HIGH + 2), NULL)));
 
     triggers.push_back(new TriggerNode(
         "boost",
@@ -89,7 +101,6 @@ void ArmsWarriorStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
         "critical health",
         NextAction::array(0, new NextAction("intimidating shout", ACTION_EMERGENCY), NULL)));
 }
-
 
 void ArmsWarrirorAoeStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
@@ -112,4 +123,8 @@ void ArmsWarrirorAoeStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
     triggers.push_back(new TriggerNode(
         "light aoe",
         NextAction::array(0, new NextAction("sweeping strikes", ACTION_HIGH + 3), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "light aoe",
+        NextAction::array(0, new NextAction("bladestorm", ACTION_HIGH + 3), NULL)));
 }

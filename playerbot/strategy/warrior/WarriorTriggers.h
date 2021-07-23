@@ -19,14 +19,17 @@ namespace ai
     CAN_CAST_TRIGGER(OverpowerAvailableTrigger, "overpower");
     CAN_CAST_TRIGGER(RampageAvailableTrigger, "rampage");
     BUFF_TRIGGER_A(BloodrageBuffTrigger, "bloodrage");
-    HAS_AURA_TRIGGER(VictoryRushTrigger, "victory rush");
+    CAN_CAST_TRIGGER(VictoryRushTrigger, "victory rush");
     HAS_AURA_TRIGGER(SwordAndBoardTrigger, "sword and board");
     SNARE_TRIGGER(ConcussionBlowTrigger, "concussion blow");
     SNARE_TRIGGER(HamstringTrigger, "hamstring");
     SNARE_TRIGGER(MockingBlowTrigger, "mocking blow");
     SNARE_TRIGGER(ThunderClapSnareTrigger, "thunder clap");
+    DEBUFF_TRIGGER(ThunderClapTrigger, "thunder clap");
     SNARE_TRIGGER(TauntSnareTrigger, "taunt");
     SNARE_TRIGGER(InterceptSnareTrigger, "intercept");
+    SNARE_TRIGGER(ShockwaveSnareTrigger, "shockwave");
+    DEBUFF_TRIGGER(ShockwaveTrigger, "shockwave");
     BOOST_TRIGGER(DeathWishTrigger, "death wish");
     BUFF_TRIGGER(BloodthirstBuffTrigger, "bloodthirst");
     BUFF_TRIGGER(BerserkerRageBuffTrigger, "berserker rage");
@@ -36,4 +39,8 @@ namespace ai
     INTERRUPT_TRIGGER(PummelInterruptSpellTrigger, "pummel");
     INTERRUPT_HEALER_TRIGGER(InterceptInterruptEnemyHealerSpellTrigger, "intercept");
     INTERRUPT_TRIGGER(InterceptInterruptSpellTrigger, "intercept");
+    DEFLECT_TRIGGER(SpellReflectionTrigger, "spell reflection");
+    HAS_AURA_TRIGGER(SuddenDeathTrigger, "sudden death");
+    HAS_AURA_TRIGGER(SlamInstantTrigger, "slam!");
+    HAS_AURA_TRIGGER(TasteForBloodTrigger, "taste for blood");
 }

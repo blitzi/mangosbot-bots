@@ -697,7 +697,7 @@ namespace ai
     public:
         virtual bool IsActive()
         {
-            return AI_VALUE2(Unit*, "party member without item", item) && AI_VALUE2(uint8, "item count", item);
+            return AI_VALUE2(Unit*, "party member without item", item) && AI_VALUE2(uint32, "item count", item);
         }
 
     protected:
@@ -712,7 +712,7 @@ namespace ai
     public:
         virtual bool IsActive()
         {
-            return AI_VALUE(Unit*, "party member without food") && AI_VALUE2(uint8, "item count", item);
+            return AI_VALUE(Unit*, "party member without food") && AI_VALUE2(uint32, "item count", item);
         }
     };
 
@@ -723,7 +723,7 @@ namespace ai
     public:
         virtual bool IsActive()
         {
-            return AI_VALUE(Unit*, "party member without water") && AI_VALUE2(uint8, "item count", item);
+            return AI_VALUE(Unit*, "party member without water") && AI_VALUE2(uint32, "item count", item);
         }
     };
 
