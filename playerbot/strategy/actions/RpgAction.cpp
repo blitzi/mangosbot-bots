@@ -6,6 +6,7 @@
 #include "../values/PossibleRpgTargetsValue.h"
 #include "EmoteAction.h"
 #include "GossipDef.h"
+#include "playerbot.h"
 
 
 using namespace ai;
@@ -71,9 +72,9 @@ bool RpgAction::Execute(Event event)
 
     uint32 dStatus = bot->GetSession()->getDialogStatus(bot, wo, DIALOG_STATUS_NONE);
 
-#ifdef MANGOSBOT_ZERO  
+#if defined(MANGOSBOT_ZERO)
     if (dStatus == DIALOG_STATUS_REWARD2 || dStatus == DIALOG_STATUS_REWARD_REP || dStatus == DIALOG_STATUS_AVAILABLE || (AI_VALUE(uint8, "durability") <= 20 || dStatus == DIALOG_STATUS_CHAT))
-#elif MANGOSBOT_ONE
+#elif defined(MANGOSBOT_ONE)
     if (dStatus == DIALOG_STATUS_REWARD2 || dStatus == DIALOG_STATUS_REWARD || dStatus == DIALOG_STATUS_REWARD_REP || dStatus == DIALOG_STATUS_AVAILABLE || (AI_VALUE(uint8, "durability") <= 20 || dStatus == DIALOG_STATUS_CHAT))
 #else
     if (dStatus == DIALOG_STATUS_REWARD2 || dStatus == DIALOG_STATUS_REWARD || dStatus == DIALOG_STATUS_REWARD_REP || dStatus == DIALOG_STATUS_AVAILABLE || (AI_VALUE(uint8, "durability") <= 20 || dStatus == DIALOG_STATUS_LOW_LEVEL_AVAILABLE))
