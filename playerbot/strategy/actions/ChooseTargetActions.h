@@ -143,9 +143,11 @@ namespace ai
             if (pullTarget && find(possible.begin(), possible.end(), pullTarget) == possible.end())
             {
                 context->GetValue<ObjectGuid>("pull target")->Set(ObjectGuid());
+
             }
             context->GetValue<Unit*>("current target")->Set(NULL);
             bot->SetSelectionGuid(ObjectGuid());
+            bot->GetMotionMaster()->Clear();
             ai->ChangeEngine(BOT_STATE_NON_COMBAT);
             ai->InterruptSpell();
             bot->AttackStop();
