@@ -383,30 +383,34 @@ bool StoreLootAction::Execute(Event event)
         if (!proto)
             continue;
 
-        if (AI_VALUE(uint8, "bag space") > 80)
-        {
-            uint32 maxStack = proto->GetMaxStackSize();
-            if (maxStack == 1)
-                continue;
-
-            list<Item*> found = parseItems(chat->formatItem(proto));
-
-            bool hasFreeStack = false;
-
-            for (auto stack : found)
-            {
-                if (stack->GetCount() + itemcount < maxStack)
-                {
-                    hasFreeStack = true;
-                    break;
-                }
-            }
-
-            if (!hasFreeStack)
-                continue;
-        }
-
         Player* master = ai->GetMaster();
+
+        if (sRandomPlayerbotMgr.IsRandomBot(bot) && !master)
+        {
+            if (AI_VALUE(uint8, "bag space") > 80)
+            {
+                uint32 maxStack = proto->GetMaxStackSize();
+                if (maxStack == 1)
+                    continue;
+
+                list<Item*> found = parseItems(chat->formatItem(proto));
+
+                bool hasFreeStack = false;
+
+                for (auto stack : found)
+                {
+                    if (stack->GetCount() + itemcount < maxStack)
+                    {
+                        hasFreeStack = true;
+                        break;
+                    }
+                }
+
+                if (!hasFreeStack)
+                    continue;
+            }
+        }        
+
         if (sRandomPlayerbotMgr.IsRandomBot(bot) && master)
         {
             uint32 price = itemcount * auctionbot.GetBuyPrice(proto) * sRandomPlayerbotMgr.GetBuyMultiplier(bot) + gold;
@@ -498,9 +502,6 @@ bool StoreLootAction::IsLootAllowed(uint32 itemid, PlayerbotAI *ai)
     }
 
     bool canLoot = lootStrategy->CanLoot(proto, context);
-
-    if (canLoot && proto->Bonding == BIND_WHEN_PICKED_UP)
-        canLoot = sPlayerbotAIConfig.IsInRandomAccountList(sObjectMgr.GetPlayerAccountIdByGUID(ai->GetBot()->GetObjectGuid()));
 
     return canLoot;
 }
