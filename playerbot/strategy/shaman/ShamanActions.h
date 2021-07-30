@@ -95,6 +95,15 @@ namespace ai
     public:
         CastTotemAction(PlayerbotAI* ai, string spell) : CastBuffSpellAction(ai, spell) {}
         virtual bool isUseful() { return CastBuffSpellAction::isUseful() && !AI_VALUE2(bool, "has totem", name); }
+
+        bool HasFireDPSTotem()
+        {
+            return AI_VALUE2(bool, "has totem", "fire elemental totem") ||
+                AI_VALUE2(bool, "has totem", "fire nova totem") ||
+                AI_VALUE2(bool, "has totem", "searing totem") ||
+                AI_VALUE2(bool, "has totem", "magma totem");
+        }
+
     };
 
     class CastStoneskinTotemAction : public CastTotemAction
@@ -151,7 +160,7 @@ namespace ai
     {
     public:
         CastFlametongueTotemAction(PlayerbotAI* ai) : CastTotemAction(ai, "flametongue totem") {}
-        virtual bool isUseful() { return CastTotemAction::isUseful() && !AI_VALUE2(bool, "has totem", "magma totem"); }
+        virtual bool isUseful() { return CastTotemAction::isUseful() && !CastTotemAction::HasFireDPSTotem(); }
     };
 
     class CastWindfuryTotemAction : public CastTotemAction
@@ -164,6 +173,7 @@ namespace ai
     {
     public:
         CastWrathTotemAction(PlayerbotAI* ai) : CastTotemAction(ai, "totem of wrath") {}
+        virtual bool isUseful() { return CastTotemAction::isUseful() && !CastTotemAction::HasFireDPSTotem(); }
     };
 
     class CastWrathOfAirTotemAction : public CastTotemAction
@@ -183,7 +193,7 @@ namespace ai
     public:
         CastSearingTotemAction(PlayerbotAI* ai) : CastTotemAction(ai, "searing totem") {}
         virtual string GetTargetName() { return "self target"; }
-        virtual bool isUseful() { return CastTotemAction::isUseful() && !AI_VALUE2(bool, "has totem", "flametongue totem"); }
+        virtual bool isUseful() { return CastTotemAction::isUseful() && !CastTotemAction::HasFireDPSTotem(); }
     };
 
     class CastMagmaTotemAction : public CastMeleeSpellAction
@@ -194,9 +204,9 @@ namespace ai
         virtual bool isUseful() { return CastMeleeSpellAction::isUseful() && !AI_VALUE2(bool, "has totem", name); }
     };
 
-    class CastFireNovaAction : public CastSpellAction {
+    class CastFireNovaTotemAction : public CastSpellAction {
     public:
-        CastFireNovaAction(PlayerbotAI* ai) : CastSpellAction(ai, "fire nova") {}
+        CastFireNovaTotemAction(PlayerbotAI* ai) : CastSpellAction(ai, "fire nova totem") {}
     };
 
     class CastWindShearAction : public CastSpellAction {

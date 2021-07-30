@@ -265,7 +265,7 @@ namespace ai
             static Action* flametongue_totem(PlayerbotAI* ai) { return new CastFlametongueTotemAction(ai); }
             static Action* magma_totem(PlayerbotAI* ai) { return new CastMagmaTotemAction(ai); }
             static Action* searing_totem(PlayerbotAI* ai) { return new CastSearingTotemAction(ai); }
-            static Action* fire_nova(PlayerbotAI* ai) { return new CastFireNovaAction(ai); }
+            static Action* fire_nova(PlayerbotAI* ai) { return new CastFireNovaTotemAction(ai); }
             static Action* windfury_totem(PlayerbotAI* ai) { return new CastWindfuryTotemAction(ai); }
             static Action* wrath_totem(PlayerbotAI* ai) { return new CastWrathTotemAction(ai); }
             static Action* wrath_of_air_totem(PlayerbotAI* ai) { return new CastWrathOfAirTotemAction(ai); }
