@@ -400,7 +400,7 @@ protected:
     ShortTimeTracker spellUpdateTimer;
     map<ActivityType, bool> allowActive;
     map<ActivityType, time_t> allowActiveCheckTimer;
-
+    bool inCombat = false;;
 };
 
 
