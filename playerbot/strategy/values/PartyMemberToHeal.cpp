@@ -137,7 +137,7 @@ Unit* PartyMemberToProtect::Calculate()
             continue;
 
         if (find(needProtect.begin(), needProtect.end(), pVictim) == needProtect.end())
-        needProtect.push_back(pVictim);
+            needProtect.push_back(pVictim);
     }
 
     if (needProtect.empty())

@@ -242,14 +242,6 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
     }
     while (basket && ++iterations <= iterationsPerTick);
   
-
-    if (HasStrategy("debug update"))
-    {
-        milliseconds ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
-        ostringstream o; o << engineState << ", iterations: " << iterations << " depth " << depth << " time " << (ms - currentMs).count();
-        ai->TellMaster(o.str());
-    }
-
     if (!basket)
     {
         PushDefaultActions();

@@ -564,7 +564,7 @@ void PlayerbotAI::DoNextAction()
 
     bool minimal = !AllowActivity(ALL_ACTIVITY);
 
-    if (bot->IsTaxiFlying() || bot->IsFlying())
+    if (bot->IsTaxiFlying())
         return;
 
     if (IsEating() || IsDrinking())
