@@ -47,7 +47,7 @@ namespace ai
         {
             return new ActionNode("blessing of salvation on party",
                 /*P*/ NULL,
-                /*A*/ NextAction::array(0, new NextAction("blessing of kings on party"), NULL),
+                /*A*/ NULL,
                 /*C*/ NULL);
         }
 
@@ -89,9 +89,9 @@ namespace ai
         }
         static ActionNode* retribution_aura(PlayerbotAI* ai)
         {
-            return new ActionNode ("retribution aura",
+            return new ActionNode ("devotion aura",
                 /*P*/ NULL,
-                /*A*/ NextAction::array(0, new NextAction("devotion aura"), NULL),
+                /*A*/ NextAction::array(0, new NextAction("concentration aura"), NULL),
                 /*C*/ NULL);
         }
 		

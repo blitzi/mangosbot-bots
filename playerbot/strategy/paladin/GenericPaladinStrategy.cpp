@@ -45,7 +45,7 @@ void GenericPaladinStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 
     triggers.push_back(new TriggerNode(
         "party member critical health",
-        NextAction::array(0, new NextAction("lay on hands on party", ACTION_EMERGENCY), new NextAction("blessing of protection on party", ACTION_EMERGENCY), NULL)));
+        NextAction::array(0, new NextAction("lay on hands on party", ACTION_EMERGENCY), NULL)));
 
 	triggers.push_back(new TriggerNode(
 		"target critical health",
