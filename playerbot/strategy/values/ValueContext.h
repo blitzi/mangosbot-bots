@@ -317,7 +317,7 @@ namespace ai
         static UntypedValue* all_targets(PlayerbotAI* ai) { return new AllTargetsValue(ai); }
         static UntypedValue* nearest_adds(PlayerbotAI* ai) { return new NearestAddsValue(ai); }
         static UntypedValue* party_member_without_aura(PlayerbotAI* ai) { return new PartyMemberWithoutAuraValue(ai); }
-        static UntypedValue* tank_without_aura(PlayerbotAI* ai) { return new TankWithoutAuraValue(ai); }
+        static UntypedValue* tank_without_aura(PlayerbotAI* ai) { return new TankWithoutAuraValue(ai, true); }
         static UntypedValue* player_with_aggro(PlayerbotAI* ai) { return new PartyMemberWithAggroValue(ai); }
         static UntypedValue* attacker_without_aura(PlayerbotAI* ai) { return new AttackerWithoutAuraTargetValue(ai); }
         static UntypedValue* party_member_to_heal(PlayerbotAI* ai) { return new PartyMemberToHeal(ai); }

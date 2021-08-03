@@ -27,6 +27,10 @@ list<ObjectGuid> AttackersValue::Calculate()
 
     RemoveNonThreating(targets);
 
+    //tanks split over all targets
+    if (ai->IsTank(ai->GetBot()) && targets.size() > 1)
+        RemoveAlreadyTankedTargets(targets, bot);
+
     //if there is an elite mob between all the other mobs, tanks should focus them
     if (ai->IsTank(ai->GetBot()) && ListContainsElite(targets))
         RemoveNonEliteTargets(targets);
@@ -131,6 +135,29 @@ void AttackersValue::RemoveNonEliteTargets(set<Unit*>& targets)
     }
 }
 
+
+void AttackersValue::RemoveAlreadyTankedTargets(set<Unit*>& targets, Player* bot)
+{
+    PlayerbotAI* ai = bot->GetPlayerbotAI();
+    Group* group = bot->GetGroup();
+
+    for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+    {
+        Player* p = ref->getSource();
+
+        if (p == bot)
+            continue;
+        
+        if (ai->IsTank(p) && p->IsAlive())        
+        {
+            Unit* target = p->GetTarget();
+
+            if (target)
+                targets.erase(target);
+        }
+    }
+}
+
 void AttackersValue::RemoveNonTotemTargets(set<Unit*>& targets)
 {
     for (set<Unit*>::iterator tIter = targets.begin(); tIter != targets.end();)
@@ -186,15 +213,15 @@ bool AttackersValue::IsPossibleTarget(Unit *attacker, Player *bot)
 
     PlayerbotAI* ai = bot->GetPlayerbotAI();
     	
-	bool groupHasTank = false;
+    bool isRaid = sMapStore.LookupEntry(bot->GetMapId())->IsRaid();
 	bool tankHasAggro = false;
-	bool targetIsNonElite = !c || !c->IsElite();
+	bool targetIsNonElite = isRaid ? false : (!c || !c->IsElite());//normal mobs in raids count as "elites"
     bool targetIsAlmostDead = false;//!c || c->GetHealthPercent() < 50;
 	float highestThreat = 0;
 	float myThreat = 0;  
 	float tankThreat = 0;
-	bool waitForTankAggro = true;
-	bool iAmTank = ai->IsTank(bot);
+	bool waitForTankAggro = true;    
+	bool iAmTank = ai->IsTank(ai->GetBot());
 
 	if (attacker)
 	{
@@ -205,7 +232,7 @@ bool AttackersValue::IsPossibleTarget(Unit *attacker, Player *bot)
 
 		for (int i = 0; i < MAX_SPELL_SCHOOL; ++i)
 		{
-			uint32 spellDmg = bot->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + i);
+			uint32 spellDmg = bot->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + i) * 1.5f;
 
 			if (spellDmg > maxSpellDmg)
 				maxSpellDmg = spellDmg;
@@ -222,6 +249,8 @@ bool AttackersValue::IsPossibleTarget(Unit *attacker, Player *bot)
 
 	Group* group = bot->GetGroup();
 
+    int tanks = 0;
+
 	if (group)
 	{
 
@@ -229,13 +258,14 @@ bool AttackersValue::IsPossibleTarget(Unit *attacker, Player *bot)
 		{
 			Player* p = ref->getSource();
 
-			if (ai->IsTank(p) && p->IsAlive())
+ 			if (ai->IsTank(p) && p->IsAlive())
 			{
-				groupHasTank = true;
+                tanks++;
 			}
 		}
 	}
 
+    bool groupHasTank = tanks > 0;
 
     bool leaderHasThreat = false;
     if (attacker && bot->GetGroup() && ai->GetMaster())

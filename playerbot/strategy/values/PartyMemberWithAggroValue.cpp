@@ -38,7 +38,7 @@ public:
         {
             Unit* unit = *i;
 
-            if (unit->getThreatManager().getThreat(player) >= unit->getThreatManager().GetHighestThreat())
+            if (unit->getThreatManager().getThreat(player) > 0 && unit->getThreatManager().getThreat(player) >= unit->getThreatManager().GetHighestThreat())
             {
                 return true;               
             }            

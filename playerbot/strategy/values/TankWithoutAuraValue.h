@@ -8,10 +8,12 @@ namespace ai
     class TankWithoutAuraValue : public PartyMemberWithoutAuraValue
 	{
 	public:
-        TankWithoutAuraValue(PlayerbotAI* ai, float range = sPlayerbotAIConfig.sightDistance) :
-            PartyMemberWithoutAuraValue(ai) {}
+        TankWithoutAuraValue(PlayerbotAI* ai, bool onlyMainTank, float range = sPlayerbotAIConfig.sightDistance) :
+            PartyMemberWithoutAuraValue(ai), onlyMainTank(onlyMainTank) {}
 
     protected:
         virtual Unit* Calculate();
+
+        bool onlyMainTank = false;
 	};
 }

@@ -17,6 +17,7 @@ namespace ai
 		void RemoveNonThreating(set<Unit*>& targets);
 		void RemoveNonEliteTargets(set<Unit*>& targets);
 		void RemoveNonTotemTargets(set<Unit*>& targets);
+        void RemoveAlreadyTankedTargets(set<Unit*>& targets, Player* bot);
         bool ListContainsElite(set<Unit*>& targets) const;
         bool ListContainsTotem(set<Unit*>& targets) const;
 

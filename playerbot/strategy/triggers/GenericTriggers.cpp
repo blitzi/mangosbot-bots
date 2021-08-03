@@ -100,7 +100,7 @@ bool PartyMemberHasAggroTrigger::IsActive()
 {
     Unit* target = GetTarget();
 
-    return target;
+    return target && !ai->IsTank((Player*)target);
 }
 
 Value<Unit*>* BuffOnPartyTrigger::GetTargetValue()
