@@ -141,19 +141,22 @@ void AttackersValue::RemoveAlreadyTankedTargets(set<Unit*>& targets, Player* bot
     PlayerbotAI* ai = bot->GetPlayerbotAI();
     Group* group = bot->GetGroup();
 
-    for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
+    if (group)
     {
-        Player* p = ref->getSource();
-
-        if (p == bot)
-            continue;
-        
-        if (ai->IsTank(p) && p->IsAlive())        
+        for (GroupReference* ref = group->GetFirstMember(); ref; ref = ref->next())
         {
-            Unit* target = p->GetTarget();
+            Player* p = ref->getSource();
 
-            if (target)
-                targets.erase(target);
+            if (p == bot)
+                continue;
+        
+            if (ai->IsTank(p) && p->IsAlive())        
+            {
+                Unit* target = p->GetTarget();
+
+                if (target)
+                    targets.erase(target);
+            }
         }
     }
 }
