@@ -28,7 +28,6 @@ private:
             /*A*/ NextAction::array(0, new NextAction("mana potion"), NULL),
             /*C*/ NULL);
     }
-
 };
 
 HealShamanStrategy::HealShamanStrategy(PlayerbotAI* ai) : GenericShamanStrategy(ai)
@@ -40,9 +39,9 @@ void HealShamanStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
     GenericShamanStrategy::InitTriggers(triggers);
 
-    triggers.push_back(new TriggerNode(
+    /*triggers.push_back(new TriggerNode(
         "earth shield on tank",
-        NextAction::array(0, new NextAction("earth shield on party", ACTION_HIGH), NULL)));
+        NextAction::array(0, new NextAction("earth shield on party", ACTION_HIGH), NULL)));*/
 
     triggers.push_back(new TriggerNode(
         "shock",
@@ -61,16 +60,8 @@ void HealShamanStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
         NextAction::array(0, new NextAction("mana tide totem", ACTION_EMERGENCY + 5), NULL)));
 
     triggers.push_back(new TriggerNode(
-        "medium aoe",
-        NextAction::array(0, new NextAction("healing stream totem", ACTION_LIGHT_HEAL), NULL)));
-
-    triggers.push_back(new TriggerNode(
         "party member to heal out of spell range",
         NextAction::array(0, new NextAction("reach party member to heal", ACTION_CRITICAL_HEAL + 1), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "mana spring totem",
-        NextAction::array(0, new NextAction("mana spring totem", 19.0f), NULL)));
 
     triggers.push_back(new TriggerNode(
         "wrath of air totem",

@@ -20,6 +20,10 @@ public:
         creators["chain heal on party"] = &chain_heal_on_party;
         creators["riptide on party"] = &riptide_on_party;
         creators["earth shock"] = &earth_shock;
+        creators["earth shock"] = &earth_shock;
+        creators["mana spring totem"] = &mana_spring_totem;
+        creators["healing stream totem"] = &healing_stream_totem;
+
     }
 private:
     static ActionNode* earth_shock(PlayerbotAI* ai)
@@ -92,6 +96,22 @@ private:
             /*A*/ NextAction::array(0, new NextAction("healing wave on party"), NULL),
             /*C*/ NULL);
     }
+
+    static ActionNode* healing_stream_totem(PlayerbotAI* ai)
+    {
+        return new ActionNode("healing stream totem",
+            /*P*/ NULL,
+            /*A*/ NextAction::array(0, new NextAction("poison cleansing totem"), NULL),
+            /*C*/ NULL);
+    }
+    static ActionNode* mana_spring_totem(PlayerbotAI* ai)
+    {
+        return new ActionNode("mana spring totem",
+            /*P*/ NULL,
+            /*A*/ NextAction::array(0, new NextAction("disease cleansing totem"), NULL),
+            /*C*/ NULL);
+    }
+
 };
 
 GenericShamanStrategy::GenericShamanStrategy(PlayerbotAI* ai) : CombatStrategy(ai)
@@ -150,6 +170,14 @@ void GenericShamanStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
     triggers.push_back(new TriggerNode(
         "party member cure disease",
         NextAction::array(0, new NextAction("cure disease on party", 30.0f), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "medium aoe",
+        NextAction::array(0, new NextAction("healing stream totem", ACTION_LIGHT_HEAL), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "mana spring totem",
+        NextAction::array(0, new NextAction("mana spring totem", 19.0f), NULL)));
 }
 
 void ShamanBuffDpsStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
