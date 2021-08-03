@@ -279,7 +279,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             break;
         case CLASS_WARLOCK:
             if (tab == 1)
-                engine->addStrategies("tank", "threat", NULL);
+                engine->addStrategies("threat", NULL);
             else
                 engine->addStrategies("dps", "threat", NULL);
 
