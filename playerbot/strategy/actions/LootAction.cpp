@@ -383,7 +383,7 @@ bool StoreLootAction::Execute(Event event)
         if (!proto)
             continue;
 
-        if (!ai->HasActivePlayerMaster() && AI_VALUE(uint8, "bag space") > 80)
+        if (!ai->HasActivePlayerMaster())
         {
             if (AI_VALUE(uint8, "bag space") > 80)
             {
@@ -409,11 +409,11 @@ bool StoreLootAction::Execute(Event event)
             }
         }        
 
-        if (sRandomPlayerbotMgr.IsRandomBot(bot) && master)
+        if (sRandomPlayerbotMgr.IsRandomBot(bot) && ai->GetMaster())
         {
             uint32 price = itemcount * auctionbot.GetBuyPrice(proto) * sRandomPlayerbotMgr.GetBuyMultiplier(bot) + gold;
             if (price)
-                sRandomPlayerbotMgr.AddTradeDiscount(bot, master, price);
+                sRandomPlayerbotMgr.AddTradeDiscount(bot, ai->GetMaster(), price);
 
             Group* group = bot->GetGroup();
             if (group)

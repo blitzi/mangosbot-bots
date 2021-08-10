@@ -223,9 +223,6 @@ void RpgAction::discover(ObjectGuid guid)
     bot->GetSession()->SendLearnNewTaxiNode(unit);
 
     unit->SetFacingTo(unit->GetAngle(bot));
-
-    if (!ai->HasRealPlayerMaster())
-        ai->SetNextCheckDelay(sPlayerbotAIConfig.rpgDelay);
 }
 
 void RpgAction::taxi(ObjectGuid guid)

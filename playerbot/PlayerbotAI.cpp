@@ -77,9 +77,7 @@ PlayerbotAI::PlayerbotAI() : PlayerbotAIBase(), bot(NULL), aiObjectContext(NULL)
 PlayerbotAI::PlayerbotAI(Player* bot) :
     PlayerbotAIBase(), chatHelper(this), chatFilter(this), security(bot), master(NULL), moveUpdateTimer(0), spellUpdateTimer(0)
 {
-	this->bot = bot;    
-    if (!bot->isTaxiCheater() && sPlayerbotAIConfig.hasCheat("taxi"))
-        bot->SetTaxiCheater(true);
+	this->bot = bot;
 
 	accountId = sObjectMgr.GetPlayerAccountIdByGUID(bot->GetObjectGuid());
 
@@ -267,7 +265,6 @@ void PlayerbotAI::Reset()
     aiObjectContext->GetValue<Unit*>("old target")->Set(NULL);
     aiObjectContext->GetValue<Unit*>("current target")->Set(NULL);
     aiObjectContext->GetValue<ObjectGuid>("pull target")->Set(ObjectGuid());
-    aiObjectContext->GetValue<ObjectGuid>("rpg target")->Set(ObjectGuid());
     aiObjectContext->GetValue<LootObject>("loot target")->Set(LootObject());
     aiObjectContext->GetValue<uint32>("lfg proposal")->Set(0);
 
@@ -613,21 +610,20 @@ void PlayerbotAI::DoNextAction()
             master = newMaster;
             ai->SetMaster(newMaster);
             ai->ResetStrategies();
-            ai->ChangeStrategy("+follow", BOT_STATE_NON_COMBAT);
+            ai->ChangeStrategy("-rpg,-grind,-travel", BOT_STATE_NON_COMBAT);
+            if (sServerFacade.GetDistance2d(bot, newMaster) < 50.0f && newMaster->IsInGroup(bot, true))
+                ai->ChangeStrategy("+follow", BOT_STATE_NON_COMBAT);
 
             ai->TellMaster("Hello, I follow you!");
         }
     }
 
-    if (master)
-	{
-        if (!group && sRandomPlayerbotMgr.IsRandomBot(bot))
+    if (currentEngine->DoNextAction(NULL, 0, minimal) == false)
+    {
+        if (master)
         {
-            bot->GetPlayerbotAI()->SetMaster(nullptr);
-        }
-        
-		if (master->m_movementInfo.HasMovementFlag(MOVEFLAG_WALK_MODE) && sServerFacade.GetDistance2d(bot, master) < 20.0f) bot->m_movementInfo.AddMovementFlag(MOVEFLAG_WALK_MODE);
-		else bot->m_movementInfo.RemoveMovementFlag(MOVEFLAG_WALK_MODE);
+            if (master->m_movementInfo.HasMovementFlag(MOVEFLAG_WALK_MODE) && sServerFacade.GetDistance2d(bot, master) < 20.0f) bot->m_movementInfo.AddMovementFlag(MOVEFLAG_WALK_MODE);
+            else bot->m_movementInfo.RemoveMovementFlag(MOVEFLAG_WALK_MODE);
 
             if (master->IsSitState())
             {

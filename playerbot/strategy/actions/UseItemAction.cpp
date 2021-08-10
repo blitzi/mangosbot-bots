@@ -463,9 +463,6 @@ bool UseRandomRecipe::Execute(Event event)
 
     bool used = UseItemAction::Execute(Event(name,recipeName));
 
-    if (used)
-        ai->SetNextCheckDelay(3.0 * IN_MILLISECONDS);
-
     return used;
 }
 
@@ -501,9 +498,6 @@ bool UseRandomQuestItem::Execute(Event event)
         return false;
 
     bool used = UseItemAction::Execute(Event(name, questItemName));
-
-    if (used)
-        ai->SetNextCheckDelay(delay);
 
     return used;
 }
