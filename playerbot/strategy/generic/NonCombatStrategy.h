@@ -36,4 +36,12 @@ namespace ai
         virtual int GetType() { return STRATEGY_TYPE_NONCOMBAT; }
         virtual string getName() { return "attack tagged"; }
     };
+
+    class DontMoveStrategy: public Strategy
+    {
+    public:
+        DontMoveStrategy(PlayerbotAI* ai) : Strategy(ai) {}
+        virtual int GetType() { return STRATEGY_TYPE_NONCOMBAT; }
+        virtual string getName() { return "dont move"; }
+    };
 }

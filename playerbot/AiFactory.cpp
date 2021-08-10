@@ -207,7 +207,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             else
                 engine->addStrategies("heal", "ranged");
 
-            engine->addStrategies("dps assist", "flee", "cure", "cc", NULL);
+            engine->addStrategies("dps assist", "flee", "cure", NULL);
             break;
         case CLASS_MAGE:
             if (tab == 0)
@@ -239,11 +239,11 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             break;
         case CLASS_PALADIN:
             if (tab == 1)
-                engine->addStrategies("tank", "tank assist", "bthreat", "cure", "barmor", "close", "cc", NULL);
+                engine->addStrategies("tank", "tank assist", "bthreat", "cure", "barmor", "close", NULL);
 			else if(tab == 0)
                 engine->addStrategies("heal", "bmana", "cure", "flee", "barmor", NULL);
             else
-                engine->addStrategies("dps", "bdps", "dps assist", "cure", "baoe", "close", "cc", NULL);
+                engine->addStrategies("dps", "bdps", "dps assist", "cure", "baoe", "close", NULL);
 
             if (player->getLevel() < 14)
             {

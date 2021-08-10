@@ -95,7 +95,9 @@ namespace ai
             creators["debug rpg"] = &StrategyContext::debug_rpg;
             creators["debug spell"] = &StrategyContext::debug_spell;
             creators["debug update"] = &StrategyContext::debug_update;
-            creators["rtsc"] = &StrategyContext::rtsc;            
+            creators["rtsc"] = &StrategyContext::rtsc;       
+            creators["dont move"] = &StrategyContext::dont_move;
+            creators["careful tanking"] = &StrategyContext::careful_tanking;
         }
 
     private:
@@ -148,6 +150,8 @@ namespace ai
         static Strategy* debug_spell(PlayerbotAI* ai) { return new DebugSpellStrategy(ai); }
         static Strategy* debug_update(PlayerbotAI* ai) { return new DebugUpdateStrategy(ai); }
         static Strategy* rtsc(PlayerbotAI* ai) { return new RTSCStrategy(ai); }
+        static Strategy* dont_move(PlayerbotAI* ai) { return new DontMoveStrategy(ai); }
+        static Strategy* careful_tanking(PlayerbotAI* ai) { return new CarefulTankingStrategy(ai); }
         
     };
 

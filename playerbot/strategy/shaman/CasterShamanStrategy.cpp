@@ -41,7 +41,7 @@ void CasterShamanStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 
     triggers.push_back(new TriggerNode(
         "shock",
-        NextAction::array(0, new NextAction("earth shock", 29), NULL)));
+        NextAction::array(0, new NextAction("earth shock", 200), NULL)));
 
 	triggers.push_back(new TriggerNode(
 		"medium aoe",

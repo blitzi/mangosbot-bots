@@ -225,28 +225,33 @@ bool AttackersValue::IsPossibleTarget(Unit *attacker, Player *bot)
 	float tankThreat = 0;
 	bool waitForTankAggro = true;    
 	bool iAmTank = ai->IsTank(ai->GetBot());
+    bool carefulTanking = ai->HasStrategy("careful tanking", BOT_STATE_COMBAT);
 
 	if (attacker)
 	{
 		highestThreat = attacker->getThreatManager().GetHighestThreat();
 		myThreat = attacker->getThreatManager().getThreat(bot);
-		float myMaxDamage = bot->GetFloatValue(UNIT_FIELD_MAXDAMAGE);
+		float myMaxDamage = bot->GetFloatValue(UNIT_FIELD_MAXDAMAGE) * (carefulTanking ? 3.0f : 1.5f);
 		uint32 maxSpellDmg = 0;
 
 		for (int i = 0; i < MAX_SPELL_SCHOOL; ++i)
 		{
-			uint32 spellDmg = bot->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + i) * 1.5f;
+			uint32 spellDmg = bot->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + i) * (carefulTanking ? 3.0f : 1.5f);
 
 			if (spellDmg > maxSpellDmg)
 				maxSpellDmg = spellDmg;
 		}
 
 		myMaxDamage += maxSpellDmg;//fantasy aggro value for testing
-
+        
 		if (highestThreat > 0)
 		{			
 			float myAggroInPct = ((100.0f / highestThreat) * (myThreat + myMaxDamage));			
-			waitForTankAggro = c->GetHealthPercent() > 90 && myAggroInPct > 90;
+
+            if(carefulTanking)
+			    waitForTankAggro = myAggroInPct > 90;
+            else
+			    waitForTankAggro = c->GetHealthPercent() > 90 && myAggroInPct > 90; 
 		}
 	}
 
@@ -261,7 +266,8 @@ bool AttackersValue::IsPossibleTarget(Unit *attacker, Player *bot)
 		{
 			Player* p = ref->getSource();
 
- 			if (ai->IsTank(p) && p->IsAlive())
+ 			if (ai->GetBot()->IsPlayer() && ai->IsTank(p) && p->IsAlive() && 
+                !(ai->GetBot()->IsStunned() || ai->GetBot()->isFeared() || ai->GetBot()->IsPolymorphed()))
 			{
                 tanks++;
 			}

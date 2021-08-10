@@ -28,8 +28,10 @@ namespace ai
             {
                 bool inLos = bot->IsWithinLOSInMap(target);
                 bool isFriend = sServerFacade.IsFriendlyTo(bot, target);
-                float chaseDist = inLos ? distance - sPlayerbotAIConfig.contactDistance : isFriend ? distance / 2 : distance - sPlayerbotAIConfig.contactDistance;
-                return ChaseTo(target, chaseDist, bot->GetAngle(target));
+                float meleeDist = inLos ? distance - sPlayerbotAIConfig.contactDistance : isFriend ? distance / 2 : distance - sPlayerbotAIConfig.contactDistance;
+                float distance = ai->IsRanged(bot) ? sPlayerbotAIConfig.spellDistance : meleeDist;
+
+                return ChaseTo(target, distance, bot->GetAngle(target));
             }
         }
         virtual bool isUseful()

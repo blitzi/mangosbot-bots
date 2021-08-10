@@ -663,7 +663,9 @@ bool MovementAction::IsMovingAllowed()
             bot->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION) ||
             bot->HasAuraType(SPELL_AURA_MOD_CONFUSE) || sServerFacade.IsCharmed(bot) ||
             bot->HasAuraType(SPELL_AURA_MOD_STUN) || bot->IsTaxiFlying() ||
-            bot->hasUnitState(UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL))
+            bot->hasUnitState(UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL) ||
+            ai->HasStrategy("dont move", BOT_STATE_NON_COMBAT)
+        )
         return false;
 
     MotionMaster &mm = *bot->GetMotionMaster();
@@ -850,7 +852,11 @@ bool MovementAction::ChaseTo(WorldObject* obj, float distance, float angle)
     }
 
     bot->GetMotionMaster()->Clear();
-    bot->GetMotionMaster()->MoveChase((Unit*)obj, distance, angle);
+
+    if (!ai->HasStrategy("dont move", BOT_STATE_NON_COMBAT))
+    {
+        bot->GetMotionMaster()->MoveChase((Unit*)obj, distance, angle);
+    }
 
     return true;
 }
