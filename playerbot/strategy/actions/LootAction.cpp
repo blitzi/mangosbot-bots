@@ -383,9 +383,7 @@ bool StoreLootAction::Execute(Event event)
         if (!proto)
             continue;
 
-        Player* master = ai->GetMaster();
-
-        if (sRandomPlayerbotMgr.IsRandomBot(bot) && !master)
+        if (!ai->HasActivePlayerMaster() && AI_VALUE(uint8, "bag space") > 80)
         {
             if (AI_VALUE(uint8, "bag space") > 80)
             {
