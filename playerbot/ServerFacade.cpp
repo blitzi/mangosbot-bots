@@ -15,6 +15,9 @@ ServerFacade::~ServerFacade() {}
 
 float ServerFacade::GetDistance2d(Unit *unit, WorldObject* wo)
 {
+    if (!wo)
+        return 0.0f;
+
     float dist =
 #ifdef MANGOS
     unit->GetDistance2d(wo);
