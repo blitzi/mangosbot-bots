@@ -252,6 +252,8 @@ void PlayerbotAI::HandleTeleportAck()
 	{
         bot->GetSession()->HandleMoveWorldportAckOpcode();
 	}
+
+    Reset();
 }
 
 void PlayerbotAI::Reset()
