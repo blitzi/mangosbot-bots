@@ -109,6 +109,7 @@ namespace ai
             creators["party member with aggro"] = &ValueContext::player_with_aggro;
             creators["attacker without aura"] = &ValueContext::attacker_without_aura;
             creators["party member to heal"] = &ValueContext::party_member_to_heal;
+            creators["party member to cancel heal"] = &ValueContext::party_member_to_cancel_heal;
             creators["party member to resurrect"] = &ValueContext::party_member_to_resurrect;
             creators["current target"] = &ValueContext::current_target;
             creators["self target"] = &ValueContext::self_target;
@@ -321,6 +322,7 @@ namespace ai
         static UntypedValue* player_with_aggro(PlayerbotAI* ai) { return new PartyMemberWithAggroValue(ai); }
         static UntypedValue* attacker_without_aura(PlayerbotAI* ai) { return new AttackerWithoutAuraTargetValue(ai); }
         static UntypedValue* party_member_to_heal(PlayerbotAI* ai) { return new PartyMemberToHeal(ai); }
+        static UntypedValue* party_member_to_cancel_heal(PlayerbotAI* ai) { return new PartyMemberToCancelHeal(ai); }
         static UntypedValue* party_member_to_resurrect(PlayerbotAI* ai) { return new PartyMemberToResurrect(ai); }
         static UntypedValue* party_member_to_dispel(PlayerbotAI* ai) { return new PartyMemberToDispel(ai); }
         static UntypedValue* party_member_to_protect(PlayerbotAI* ai) { return new PartyMemberToProtect(ai); }

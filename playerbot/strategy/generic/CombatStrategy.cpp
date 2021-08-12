@@ -21,4 +21,8 @@ void CombatStrategy::InitTriggers(list<TriggerNode*> &triggers)
     triggers.push_back(new TriggerNode(
         "out of react range",
         NextAction::array(0, new NextAction("flee to master", 55), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "party member to cancel health",
+        NextAction::array(0, new NextAction("cancel heal", 200.0f), NULL)));
 }

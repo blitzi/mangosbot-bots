@@ -60,7 +60,8 @@ Unit* PartyMemberToHeal::Calculate()
                 continue;
 
             uint8 health = player->GetHealthPercent();
-            if (health < sPlayerbotAIConfig.almostFullHealth && !IsTargetOfSpellCast(player, predicate))
+            if ((health < sPlayerbotAIConfig.almostFullHealth && !IsTargetOfSpellCast(player, predicate)) ||
+                (health < sPlayerbotAIConfig.criticalHealth))
                 needHeals.push_back(player);
 
             Pet* pet = player->GetPet();
@@ -71,18 +72,21 @@ Unit* PartyMemberToHeal::Calculate()
                     needHeals.push_back(pet);
             }
 
-            if (ai->IsTank(player) && bot->IsInGroup(player, true))
+            if (health < sPlayerbotAIConfig.almostFullHealth && ai->IsTank(player) && bot->IsInGroup(player, false))
                 tankTargets.push_back(player);
         }
     }
+
     if (needHeals.empty() && tankTargets.empty())
         return NULL;
 
-    if (needHeals.empty() && !tankTargets.empty())
-        needHeals = tankTargets;
+    if (!tankTargets.empty())
+    {
+        sort(tankTargets.begin(), tankTargets.end(), compareByHealth);
+        return tankTargets[0];
+    }
 
-    sort(needHeals.begin(), needHeals.end(), compareByHealth);    
-
+    sort(needHeals.begin(), needHeals.end(), compareByHealth);   
     return needHeals[0];
 }
 
@@ -94,7 +98,7 @@ bool PartyMemberToHeal::CanHealPet(Pet* pet)
 bool PartyMemberToHeal::Check(Unit* player)
 {
     return player && player != bot && player->GetMapId() == bot->GetMapId() &&
-        sServerFacade.GetDistance2d(bot, player) < (player->IsPlayer() && ai->IsTank((Player*)player)) ? 50.0f : sPlayerbotAIConfig.spellDistance;
+        sServerFacade.GetDistance2d(bot, player) < (player->IsPlayer() && ai->IsTank((Player*)player)) ? 50.0f : sPlayerbotAIConfig.healDistance;
 }
 
 Unit* PartyMemberToProtect::Calculate()
@@ -146,4 +150,33 @@ Unit* PartyMemberToProtect::Calculate()
     sort(needProtect.begin(), needProtect.end(), compareByHealth);
 
     return needProtect[0];
+}
+
+
+
+Unit* PartyMemberToCancelHeal::Calculate()
+{
+    IsTargetOfHealingSpell predicate;
+    vector<Unit*> needToCancelHeals;    
+
+    Group* group = bot->GetGroup();
+    if (!group)
+        return NULL;
+
+    if (group)
+    {
+        for (GroupReference* gref = group->GetFirstMember(); gref; gref = gref->next())
+        {
+            Player* player = gref->getSource();
+
+            if (!sServerFacade.IsAlive(player))
+                continue;
+
+            uint8 health = player->GetHealthPercent();
+            if (health > sPlayerbotAIConfig.almostFullHealth && IsTargetOfMySpellCast(player, predicate))
+                return player;
+        }
+    }
+
+    return NULL;
 }

@@ -2891,32 +2891,5 @@ bool PlayerbotAI::IsDrinking()
 
 bool PlayerbotAI::IsCasting()
 {
-    /*for (auto e : GetBot()->m_events.GetEvents())
-    {
-        SpellEvent* spellEvent = dynamic_cast<SpellEvent*>(e.second);
-
-        if (spellEvent)
-        {
-            Spell* spell = spellEvent->GetSpell();
-
-            if (spell && spell->m_spellInfo->Id &&
-                !spell->IsAutoRepeat() &&
-                spell->GetCastTime())
-            {
-                return true;
-            }
-        }        
-    }
-
-    LastSpellCast& lastSpell = aiObjectContext->GetValue<LastSpellCast& >("last spell cast")->Get();
-
-    Spell* spell = bot->FindCurrentSpellBySpellId(lastSpell.id);
-    if (spell && spell->getState() != SPELL_STATE_FINISHED  && !spell->IsAutoRepeat())
-        return true;
-
-    return false;*/
-
-    Spell* currentSpell = bot->GetCurrentSpell(CURRENT_GENERIC_SPELL);
-
-    return currentSpell && currentSpell->getState() != SPELL_STATE_FINISHED && currentSpell->GetCastedTime();
+    return bot->IsNonMeleeSpellCasted(false, false, true);
 }

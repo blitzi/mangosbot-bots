@@ -185,8 +185,8 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
                     if (wasCasting)
                     {
                         ai->GetBot()->CastStop();
-                        ai->GetBot()->StopMoving();
-                        ai->GetBot()->GetMotionMaster()->Clear();
+                        //ai->GetBot()->StopMoving();
+                        //ai->GetBot()->GetMotionMaster()->Clear();
                     }
 
                     if (!skipPrerequisites)

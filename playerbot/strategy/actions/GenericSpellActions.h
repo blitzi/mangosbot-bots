@@ -129,6 +129,34 @@ namespace ai
         virtual bool isUseful();
     };
 
+    class CancelHealAction : public Action
+    {
+    public:
+        CancelHealAction(PlayerbotAI* ai) : Action(ai) {}
+        virtual string GetTargetName() { return "party member to cancel heal"; }
+        virtual bool IgnoresCasting() { return true; }
+        virtual bool Execute(Event event)
+        {
+            Unit* target = GetTargetValue()->Get();
+
+            if (target)
+            {
+                ostringstream o; o << "cancel heal on " << target->GetName();
+                ai->TellMaster(o.str());
+
+                ai->GetBot()->CastStop();
+            }
+
+            return true; 
+        }
+
+        virtual bool isUseful()
+        {
+            Unit* target = GetTargetValue()->Get();            
+            return target != NULL;
+        }
+    };
+
 	class CastCureSpellAction : public CastSpellAction
 	{
 	public:

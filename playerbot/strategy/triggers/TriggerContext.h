@@ -42,6 +42,7 @@ namespace ai
             creators["party member low health"] = &TriggerContext::PartyMemberLowHealth;
             creators["party member medium health"] = &TriggerContext::PartyMemberMediumHealth;
             creators["party member almost full health"] = &TriggerContext::PartyMemberAlmostFullHealth;
+            creators["party member to cancel health"] = &TriggerContext::PartyMemberToCancelHealth;
 
             creators["party member has aggro"] = &TriggerContext::PartyMemberHasAggro;
 
@@ -246,6 +247,7 @@ namespace ai
         static Trigger* PartyMemberLowHealth(PlayerbotAI* ai) { return new PartyMemberLowHealthTrigger(ai); }
         static Trigger* PartyMemberMediumHealth(PlayerbotAI* ai) { return new PartyMemberMediumHealthTrigger(ai); }
         static Trigger* PartyMemberAlmostFullHealth(PlayerbotAI* ai) { return new PartyMemberAlmostFullHealthTrigger(ai); }
+        static Trigger* PartyMemberToCancelHealth(PlayerbotAI* ai) { return new PartyMemberToCancelHealthTrigger(ai); }
         static Trigger* PartyMemberCriticalHealth(PlayerbotAI* ai) { return new PartyMemberCriticalHealthTrigger(ai); }
         static Trigger* PartyMemberHasAggro(PlayerbotAI* ai) { return new PartyMemberHasAggroTrigger(ai); }
         static Trigger* protect_party_member(PlayerbotAI* ai) { return new ProtectPartyMemberTrigger(ai); }

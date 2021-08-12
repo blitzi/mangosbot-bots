@@ -111,6 +111,15 @@ namespace ai
             PartyMemberLowHealthTrigger(ai, "party member almost full health", sPlayerbotAIConfig.almostFullHealth,sPlayerbotAIConfig.mediumHealth) {}
     };
 
+    class PartyMemberToCancelHealthTrigger : public PartyMemberLowHealthTrigger
+    {
+    public:
+        PartyMemberToCancelHealthTrigger(PlayerbotAI* ai) :
+            PartyMemberLowHealthTrigger(ai, "party member to cancel health", 100, sPlayerbotAIConfig.almostFullHealth) {}
+
+        virtual string GetTargetName() { return "party member to cancel heal"; }
+    };
+
     class TargetLowHealthTrigger : public HealthInRangeTrigger {
     public:
         TargetLowHealthTrigger(PlayerbotAI* ai, float value, float minValue = 0) :

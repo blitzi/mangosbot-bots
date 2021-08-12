@@ -149,6 +149,7 @@ namespace ai
             creators["use random recipe"] = &ActionContext::use_random_recipe;
             creators["use random quest item"] = &ActionContext::use_random_quest_item;
             creators["craft random item"] = &ActionContext::craft_random_item;
+            creators["cancel heal"] = &ActionContext::cancel_heal;
 
             // BG Tactics
             creators["bg tactics"] = &ActionContext::bg_tactics;
@@ -260,6 +261,7 @@ namespace ai
         static Action* use_random_recipe(PlayerbotAI* ai) { return new UseRandomRecipe(ai); }
         static Action* use_random_quest_item(PlayerbotAI* ai) { return new UseRandomQuestItem(ai); }
         static Action* craft_random_item(PlayerbotAI* ai) { return new CraftRandomItemAction(ai); }
+        static Action* cancel_heal(PlayerbotAI* ai) { return new CancelHealAction(ai); }
 
         // BG Tactics
         static Action* bg_tactics(PlayerbotAI* ai) { return new BGTactics(ai); }

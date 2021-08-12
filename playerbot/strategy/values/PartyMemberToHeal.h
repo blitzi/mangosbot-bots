@@ -16,6 +16,16 @@ namespace ai
         virtual bool Check(Unit* player);
 	};
 
+    class PartyMemberToCancelHeal : public PartyMemberValue
+    {
+    public:
+        PartyMemberToCancelHeal(PlayerbotAI* ai) :
+            PartyMemberValue(ai) {}
+
+    protected:
+        virtual Unit* Calculate();
+    };
+
     class PartyMemberToProtect : public PartyMemberValue
     {
     public:
