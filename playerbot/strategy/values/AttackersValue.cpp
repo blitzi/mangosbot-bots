@@ -291,6 +291,7 @@ bool AttackersValue::IsPossibleTarget(Unit *attacker, Player *bot)
         !attacker->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE) &&
         !attacker->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE) &&        
         attacker->IsVisibleForOrDetect(bot, attacker, false) &&
+        !(attacker->IsStunned() && ai->HasAura("shackle undead", attacker)) &&
         !((attacker->IsPolymorphed() ||
         bot->GetPlayerbotAI()->HasAura("sap", attacker) ||
         sServerFacade.IsCharmed(attacker) ||
