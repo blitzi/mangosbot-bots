@@ -37,7 +37,7 @@ bool SpellCastUsefulValue::Calculate()
         if (spellid == lastSpellId)
         {
             Spell* const pSpell = bot->FindCurrentSpellBySpellId(lastSpellId);
-            if (pSpell)
+            if (pSpell && ai->IsCasting())
                 return false;
         }
 	}

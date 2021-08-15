@@ -440,7 +440,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
     if (bot->IsSitState())
         bot->SetStandState(UNIT_STAND_STATE_STAND);
 
-    if (bot->IsNonMeleeSpellCasted(true))
+    if (bot->IsNonMeleeSpellCasted(false))
     {
         bot->CastStop();
         ai->InterruptSpell();
@@ -799,7 +799,7 @@ bool MovementAction::Follow(Unit* target, float distance, float angle)
     if (bot->IsSitState())
         bot->SetStandState(UNIT_STAND_STATE_STAND);
 
-    if (bot->IsNonMeleeSpellCasted(true))
+    if (bot->IsNonMeleeSpellCasted(false))
     {
         bot->CastStop();
         ai->InterruptSpell();
@@ -851,7 +851,7 @@ bool MovementAction::ChaseTo(WorldObject* obj, float distance, float angle)
     if (bot->IsSitState())
         bot->SetStandState(UNIT_STAND_STATE_STAND);
 
-    if (bot->IsNonMeleeSpellCasted(true))
+    if (bot->IsNonMeleeSpellCasted(false))
     {
         bot->CastStop();
         ai->InterruptSpell();

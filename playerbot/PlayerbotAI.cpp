@@ -2870,7 +2870,6 @@ uint32 PlayerbotAI::GetBuffedCount(Player* player, string spellname)
     }
     return bcount;
 }
-}
 
 bool PlayerbotAI::IsEating()
 {

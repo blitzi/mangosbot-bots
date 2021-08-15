@@ -11,8 +11,6 @@ bool StayActionBase::Stay()
 {
     AI_VALUE(LastMovement&, "last movement").Set(NULL);
 
-    //if (!urand(0, 10)) ai->PlaySound(TEXTEMOTE_YAWN);
-
     MotionMaster &mm = *bot->GetMotionMaster();
 #ifdef CMANGOS
 	if (mm.GetCurrentMovementGeneratorType() == TAXI_MOTION_TYPE || bot->IsFlying())

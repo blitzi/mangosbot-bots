@@ -13,6 +13,7 @@ namespace ai
         }
 
         virtual bool isPossible() { return ai->GetMoveTimer()->Passed() && Action::isPossible();  }
+        virtual bool IgnoresCasting() { return false; }
 
     protected:
         bool ChaseTo(WorldObject *obj, float distance = 0.0f, float angle = 0.0f);
@@ -88,6 +89,7 @@ namespace ai
         virtual bool Execute(Event event);
         virtual bool isUseful();
         virtual bool isPossible();
+        virtual bool IgnoresCasting() { return true; }
     };
 
     class SetBehindTargetAction : public MovementAction

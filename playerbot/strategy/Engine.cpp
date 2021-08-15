@@ -7,7 +7,6 @@
 #include "../PerformanceMonitor.h"
 #include <playerbot/strategy/values/LastSpellCastValue.h>
 #include <playerbot/ServerFacade.h>
-#include <chrono>
 
 
 using namespace ai;
@@ -130,16 +129,17 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
     bool actionExecuted = false;
     ActionBasket* basket = NULL;
 
-    milliseconds currentMs = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
-
     time_t currentTime = time(0);
-    aiObjectContext->Update();
-    ProcessTriggers();
-
     bool wasCasting = ai->IsCasting();
 
     if (lastCastRelevance > 0 && wasCasting == false)
         lastCastRelevance = 0.0f;
+
+    aiObjectContext->Update();
+    ProcessTriggers();
+
+    bool replaceCastWithBetterOption = false;
+
 
     int iterations = 0;
     int iterationsPerTick = queue.Size() * (minimal ? 1 : sPlayerbotAIConfig.iterationsPerTick);
@@ -152,12 +152,17 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
             if (minimal && (relevance < 100))
                 continue;
 
-            if (lastCastRelevance > 0 && wasCasting && relevance - 100 < lastCastRelevance)
-                continue;
-
             // NOTE: queue.Pop() deletes basket
             ActionNode* actionNode = queue.Pop();
             Action* action = InitializeAction(actionNode);
+
+            if (action && action->IsCast() && lastCastRelevance)
+            {
+                replaceCastWithBetterOption = lastCastRelevance + 100 < relevance;
+
+                if (!action->IgnoresCasting() &&  !replaceCastWithBetterOption)
+                    continue;    
+            }
 
             if (action)            
                 action->setRelevance(relevance);            
@@ -182,12 +187,8 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
   
                 if (relevance && action->isPossible())
                 {
-                    if (wasCasting)
-                    {
+                    if (replaceCastWithBetterOption && action->IsCast())
                         ai->GetBot()->CastStop();
-                        //ai->GetBot()->StopMoving();
-                        //ai->GetBot()->GetMotionMaster()->Clear();
-                    }
 
                     if (!skipPrerequisites)
                     {
@@ -205,15 +206,9 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
 
                     if (actionExecuted)
                     {                 
-                        if (ai->IsCasting())
+                        if (action->IsCast())
                         {
-                            lastCastRelevance = relevance;
-                        }
-
-                        if (HasStrategy("debug update"))
-                        {        
-                            ostringstream o; o << "execute Action " << action->getName();
-                            ai->TellMaster(o.str());                            
+                            lastCastRelevance = relevance;                         
                         }
 
                         LogAction("A:%s - OK", action->getName().c_str());

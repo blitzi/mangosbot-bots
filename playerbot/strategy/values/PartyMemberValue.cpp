@@ -109,7 +109,7 @@ bool PartyMemberValue::IsTargetOfSpellCast(Player* target, SpellEntryPredicate &
         if (!player || player == bot)
             continue;
 
-        if (player->IsNonMeleeSpellCasted(true))
+        if (player->IsNonMeleeSpellCasted(false))
         {
             for (int type = CURRENT_GENERIC_SPELL; type < CURRENT_MAX_SPELL; type++) {
                 Spell* spell = player->GetCurrentSpell((CurrentSpellTypes)type);
@@ -137,7 +137,7 @@ bool PartyMemberValue::IsTargetOfMySpellCast(Player* target, SpellEntryPredicate
     ObjectGuid targetGuid = target->GetObjectGuid();
     ObjectGuid corpseGuid = target->GetCorpse() ? target->GetCorpse()->GetObjectGuid() : ObjectGuid();
 
-    if (bot->IsNonMeleeSpellCasted(true))
+    if (bot->IsNonMeleeSpellCasted(false))
     {
         if (targetGuid == bot->GetObjectGuid())
             return IsTargetOfSpellCast(bot, predicate);

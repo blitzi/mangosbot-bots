@@ -37,7 +37,7 @@ namespace ai
         virtual bool isUseful()
 		{
             // do not move while casting
-            if (bot->IsNonMeleeSpellCasted(true))
+            if (bot->IsNonMeleeSpellCasted(false))
                 return false;
 
             Unit* target = AI_VALUE(Unit*, GetTargetName());

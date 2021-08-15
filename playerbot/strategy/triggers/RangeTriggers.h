@@ -103,7 +103,7 @@ namespace ai
         virtual bool IsActive()
         {
             Unit* target = AI_VALUE(Unit*, GetTargetName());
-            return target && (sServerFacade.GetDistance2d(bot, target) > distance || !bot->IsWithinLOSInMap(target));
+            return target && (sServerFacade.GetDistance2d(bot, target) > ai->GetRange("spell") || !bot->IsWithinLOSInMap(target));
         }
     };
 
@@ -115,7 +115,7 @@ namespace ai
         virtual bool IsActive()
         {
             Unit* target = AI_VALUE(Unit*, GetTargetName());
-            return target && (sServerFacade.GetDistance2d(bot, target) > distance || !bot->IsWithinLOSInMap(target));
+            return target && (sServerFacade.GetDistance2d(bot, target) > ai->GetRange("heal") || !bot->IsWithinLOSInMap(target));
         }
     };
 

@@ -56,6 +56,7 @@ namespace ai
         virtual bool Execute(Event event) { return true; }
         virtual bool isPossible() { return CheckForCast(); }
         virtual bool isUseful() { return true; }
+        virtual bool IsCast() { return false; }
         virtual NextAction** getPrerequisites() { return NULL; }
         virtual NextAction** getAlternatives() { return NULL; }
         virtual NextAction** getContinuers() { return NULL; }

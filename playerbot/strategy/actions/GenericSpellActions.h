@@ -18,6 +18,7 @@ namespace ai
         virtual bool Execute(Event event);
         virtual bool isPossible();
 		virtual bool isUseful();
+        virtual bool IsCast() { return true; }
         virtual ActionThreatType getThreatType() { return ACTION_THREAT_SINGLE; }
 
 		virtual NextAction** getPrerequisites()
@@ -56,8 +57,6 @@ namespace ai
             Unit* target = AI_VALUE(Unit*, "current target");
             if (target)
                 range = max(5.0f, bot->GetCombinedCombatReach(target, true));
-
-                //range = target->GetCombinedCombatReach();
 		}
     };
 

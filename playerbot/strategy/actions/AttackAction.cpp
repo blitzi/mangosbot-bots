@@ -131,7 +131,7 @@ bool AttackAction::Attack(Unit* target)
     {
         ai->ChangeEngine(BOT_STATE_COMBAT);
 
-        float distance = ai->IsRanged(bot) ? sPlayerbotAIConfig.spellDistance : 0;
+        float distance = ai->IsRanged(bot) ? ai->GetRange("spell") : 0;
 
         return ChaseTo(target, distance);
     }
