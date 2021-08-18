@@ -124,6 +124,11 @@ bool CheckMountStateAction::isUseful()
 
     bool isOutdoor = bot->GetMap()->GetTerrain()->IsOutdoors(bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ());
     if (!isOutdoor)
+        return false;    
+
+    list<Item*> items = AI_VALUE2(list<Item*>, "inventory items", "mount");
+
+    if (items.size() == 0)
         return false;
 
     if (bot->IsTaxiFlying())
@@ -163,6 +168,11 @@ bool CheckMountStateAction::isUseful()
     }
 
     return true;
+}
+
+bool CompareItemSkill(const Item* a, const Item* b)
+{
+    return a->GetProto()->RequiredSkillRank > b->GetProto()->RequiredSkillRank;
 }
 
 bool CheckMountStateAction::Mount()
@@ -266,7 +276,20 @@ bool CheckMountStateAction::Mount()
     }
 
     list<Item*> items = AI_VALUE2(list<Item*>, "inventory items", "mount");
-    if (!items.empty()) return UseItemAuto(*items.begin());
+
+    items.sort(CompareItemSkill);
+
+    for (Item* item : items)
+    {
+        ItemPrototype const* proto = item->GetProto();
+
+        UseItemAuto(item);
+
+        if(ai->GetBot()->IsNonMeleeSpellCasted(false))
+        {
+            return true;
+        }
+    }
 
     return false;
 }

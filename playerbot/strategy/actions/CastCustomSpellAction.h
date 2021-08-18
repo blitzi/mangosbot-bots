@@ -12,6 +12,7 @@ namespace ai
         CastCustomSpellAction(PlayerbotAI* ai, string name = "cast custom spell") : InventoryAction(ai, name) {}
         virtual bool Execute(Event event);
         virtual string castString(WorldObject* target) { return "cast"; }
+        virtual bool isCast() { return true; }
     protected:
         bool ncCast = false;
     };
