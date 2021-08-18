@@ -116,6 +116,38 @@ namespace ai
         }
     };
 
+    class CircleStance : public MoveStance
+    {
+    public:
+        CircleStance(PlayerbotAI* ai) : MoveStance(ai, "circle") {}
+
+        virtual WorldLocation GetLocation()
+        {
+            float range = ai->IsRanged(bot) ? ai->GetRange("spell") : sPlayerbotAIConfig.followDistance;
+
+            Unit* target = GetTarget();    
+
+            if (!target)
+                return Formation::NullLocation;
+
+            float angle = GetFollowAngle();
+            float x = target->GetPositionX() + cos(angle) * range;
+            float y = target->GetPositionY() + sin(angle) * range;
+            float z = target->GetPositionZ();
+#ifdef MANGOSBOT_TWO
+            float ground = target->GetMap()->GetHeight(target->GetPhaseMask(), x, y, z);
+#else
+            float ground = target->GetMap()->GetHeight(x, y, z);
+#endif
+            if (ground <= INVALID_HEIGHT)
+                return Formation::NullLocation;
+
+            z += CONTACT_DISTANCE;
+            bot->UpdateAllowedPositionZ(x, y, z);
+            return WorldLocation(bot->GetMapId(), x, y, z);
+        }
+    };
+
     class TurnBackStance : public MoveStance
     {
     public:
@@ -204,6 +236,11 @@ bool StanceValue::Load(string name)
     {
         if (value) delete value;
         value = new TurnBackStance(ai);
+    }
+    else if (name == "circle")
+    {
+        if (value) delete value;
+        value = new CircleStance(ai);
     }
     else return false;
 

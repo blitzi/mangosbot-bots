@@ -70,7 +70,7 @@ namespace ai
                 Stance* stance = AI_VALUE(Stance*, "stance");
                 WorldLocation loc = stance->GetLocation();
                 return sServerFacade.GetDistance2d(ai->GetBot(), loc.coord_x, loc.coord_y);
-            }
+            } 
             else
             {
                 target = AI_VALUE(Unit*, qualifier);

@@ -4,6 +4,7 @@
 #include "MovementActions.h"
 #include "../../PlayerbotAIConfig.h"
 #include "../../ServerFacade.h"
+#include <playerbot/strategy/values/Stances.h>
 
 namespace ai
 {
@@ -20,19 +21,27 @@ namespace ai
             if (!target)
                 return false;
 
-            if (distance < max(5.0f, bot->GetCombinedCombatReach(target, true)))
-            {
-                return ChaseTo(target, 0.0f, GetFollowAngle());
-            }
+            float distance = ai->IsRanged(bot) ? ai->GetRange("spell") : 0;
+            Stance* stance = context->GetValue<Stance*>("stance")->Get();
+
+            if (stance && stance->getName() != "near")
+                return MoveTo(target);
             else
             {
-                bool inLos = bot->IsWithinLOSInMap(target);
-                bool isFriend = sServerFacade.IsFriendlyTo(bot, target);
-                float meleeDist = inLos ? distance - sPlayerbotAIConfig.contactDistance : isFriend ? distance / 2 : distance - sPlayerbotAIConfig.contactDistance;
-                float distance = ai->IsRanged(bot) ? sPlayerbotAIConfig.spellDistance : meleeDist;
+                if (distance < max(5.0f, bot->GetCombinedCombatReach(target, true)))
+                {
+                    return ChaseTo(target, 0.0f, GetFollowAngle());
+                }
+                else
+                {
+                    bool inLos = bot->IsWithinLOSInMap(target);
+                    bool isFriend = sServerFacade.IsFriendlyTo(bot, target);
+                    float meleeDist = inLos ? distance - sPlayerbotAIConfig.contactDistance : isFriend ? distance / 2 : distance - sPlayerbotAIConfig.contactDistance;
+                    float distance = ai->IsRanged(bot) ? sPlayerbotAIConfig.spellDistance : meleeDist;
 
-                return ChaseTo(target, distance, bot->GetAngle(target));
-            }
+                    return ChaseTo(target, distance, bot->GetAngle(target));
+                }
+            }                  
         }
         virtual bool isUseful()
 		{

@@ -5,6 +5,7 @@
 #include "CreatureAI.h"
 #include "../../LootObjectStack.h"
 #include "../../ServerFacade.h"
+#include <playerbot/strategy/values/Stances.h>
 
 using namespace ai;
 
@@ -131,9 +132,13 @@ bool AttackAction::Attack(Unit* target)
     {
         ai->ChangeEngine(BOT_STATE_COMBAT);
 
-        float distance = ai->IsRanged(bot) ? ai->GetRange("spell") : 0;
+        float distance = ai->IsRanged(bot) ? ai->GetRange("spell") : 0;        
+        Stance* stance = context->GetValue<Stance*>("stance")->Get();
 
-        return ChaseTo(target, distance);
+        if (stance && stance->getName() != "near")
+            return MoveTo(target);
+        else
+            return ChaseTo(target, distance);
     }
     else
         context->GetValue<Unit*>("current target")->Set(NULL);

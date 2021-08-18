@@ -15,10 +15,15 @@ public:
     virtual bool Check(Unit* unit)
     {
         Pet* pet = dynamic_cast<Pet*>(unit);
-        if (pet && (pet->getPetType() == MINI_PET || pet->getPetType() == SUMMON_PET))
+        if (pet && (pet->getPetType() == MINI_PET || pet->getPetType() == SUMMON_PET))                    
             return false;
 
+        if (ai->HasStrategy("dont move", BOT_STATE_NON_COMBAT) &&
+            sServerFacade.GetDistance2d(ai->GetBot(), unit) > ai->GetRange("heal"))     
+                return false;        
+
         return sServerFacade.IsAlive(unit) && ai->HasAuraToDispel(unit, dispelType);
+
     }
 
 private:
