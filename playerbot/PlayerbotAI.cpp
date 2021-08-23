@@ -624,7 +624,7 @@ void PlayerbotAI::DoNextAction()
 
     if (currentEngine->DoNextAction(NULL, 0, minimal) == false)
     {
-        if (master)
+        if (master && master->IsInWorld())
         {
             if (master->m_movementInfo.HasMovementFlag(MOVEFLAG_WALK_MODE) && sServerFacade.GetDistance2d(bot, master) < 20.0f) bot->m_movementInfo.AddMovementFlag(MOVEFLAG_WALK_MODE);
             else bot->m_movementInfo.RemoveMovementFlag(MOVEFLAG_WALK_MODE);
