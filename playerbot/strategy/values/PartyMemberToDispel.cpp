@@ -3,6 +3,7 @@
 #include "PartyMemberToDispel.h"
 
 #include "../../ServerFacade.h"
+#include <playerbot/strategy/values/Stances.h>
 using namespace ai;
 
 class PartyMemberToDispelPredicate : public FindPlayerPredicate, public PlayerbotAIAware
@@ -18,8 +19,10 @@ public:
         if (pet && (pet->getPetType() == MINI_PET || pet->getPetType() == SUMMON_PET))                    
             return false;
 
-        if (ai->HasStrategy("dont move", BOT_STATE_NON_COMBAT) &&
-            sServerFacade.GetDistance2d(ai->GetBot(), unit) > ai->GetRange("heal"))     
+        Stance* stance = ai->GetAiObjectContext()->GetValue<Stance*>("stance")->Get();        
+
+        if (stance && stance->getName() != "near" &&
+            sServerFacade.GetDistance2d(ai->GetBot(), unit) > ai->GetRange("spell"))     
                 return false;        
 
         return sServerFacade.IsAlive(unit) && ai->HasAuraToDispel(unit, dispelType);

@@ -2377,6 +2377,7 @@ float PlayerbotAI::GetRange(string type)
     if (type == "shoot") return sPlayerbotAIConfig.shootDistance;
     if (type == "flee") return sPlayerbotAIConfig.fleeDistance;
     if (type == "heal") return sPlayerbotAIConfig.healDistance;
+    if (type == "stance") return sPlayerbotAIConfig.stanceDistance;
     return 0;
 }
 

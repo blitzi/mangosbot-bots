@@ -45,11 +45,10 @@ namespace ai
         }
         virtual bool isUseful()
 		{
-            // do not move while casting
-            if (bot->IsNonMeleeSpellCasted(false))
-                return false;
-
             Unit* target = AI_VALUE(Unit*, GetTargetName());
+
+            float distance = ai->IsRanged(bot) ? ai->GetRange("spell") : 0;
+
             return target && (!bot->IsWithinDistInMap(target, distance) || (bot->IsWithinDistInMap(target, distance) && !bot->IsWithinLOSInMap(target)));
         }
         virtual string GetTargetName() { return "current target"; }
@@ -89,7 +88,7 @@ namespace ai
     class ReachPartyMemberToHealAction : public ReachTargetAction
     {
     public:
-        ReachPartyMemberToHealAction(PlayerbotAI* ai) : ReachTargetAction(ai, "reach party member to heal", ai->GetRange("heal")) {}
+        ReachPartyMemberToHealAction(PlayerbotAI* ai) : ReachTargetAction(ai, "reach party member to heal", ai->GetRange("spell")) {}
         virtual string GetTargetName() { return "party member to heal"; }
     };
 }

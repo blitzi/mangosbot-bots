@@ -14,6 +14,7 @@ bool RangeAction::Execute(Event event)
         PrintRange("heal");
         PrintRange("shoot");
         PrintRange("flee");
+        PrintRange("stance");
     }
     int pos = param.find(" ");
     if (pos == string::npos) return false;

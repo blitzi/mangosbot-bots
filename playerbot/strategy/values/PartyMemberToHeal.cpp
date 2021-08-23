@@ -3,6 +3,7 @@
 #include "PartyMemberToHeal.h"
 #include "../../PlayerbotAIConfig.h"
 #include "../../ServerFacade.h"
+#include <playerbot/strategy/values/Stances.h>
 
 using namespace ai;
 
@@ -106,9 +107,11 @@ bool PartyMemberToHeal::Check(Unit* player)
     if (player->GetMapId() != bot->GetMapId())
         return false;
 
-    if (ai->HasStrategy("dont move", BOT_STATE_NON_COMBAT))
+    Stance* stance = ai->GetAiObjectContext()->GetValue<Stance*>("stance")->Get();
+
+    if(stance && stance->getName() != "near")
     {
-        return sServerFacade.GetDistance2d(bot, player) <= ai->GetRange("heal");
+        return sServerFacade.GetDistance2d(bot, player) <= ai->GetRange("spell");
     }
     else
     {

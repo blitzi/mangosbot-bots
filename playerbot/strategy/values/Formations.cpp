@@ -216,7 +216,7 @@ namespace ai
             if (!group)
                 return Formation::NullLocation;
 
-            float range = 2.0f;
+            float range = ai->GetRange("stance");
 
             Player* master = ai->GetGroupMaster();
             if (!master)
@@ -373,7 +373,7 @@ namespace ai
     };
 };
 
-float Formation::GetFollowAngle()
+float Formation::GetFollowAngle(bool onlyRanged)
 {
     Player* master = ai->GetGroupMaster();
     Group* group = bot->GetGroup();
@@ -384,7 +384,9 @@ float Formation::GetFollowAngle()
         for (PlayerBotMap::const_iterator i = master->GetPlayerbotMgr()->GetPlayerBotsBegin(); i != master->GetPlayerbotMgr()->GetPlayerBotsEnd(); ++i)
         {
             if (i->second == bot) index = total;
-            total++;
+
+            if(!onlyRanged || ai->IsRanged(i->second))
+                total++;
         }
     }
     else if (group)
@@ -393,6 +395,10 @@ float Formation::GetFollowAngle()
         for (GroupReference *ref = group->GetFirstMember(); ref; ref = ref->next())
         {
             Player* member = ref->getSource();
+
+            if (onlyRanged && !ai->IsRanged(member))
+                continue;
+
             if (member && member != master && !ai->IsTank(member) && !ai->IsHeal(member))
             {
                 roster.insert(roster.begin() + roster.size() / 2, member);
@@ -401,6 +407,10 @@ float Formation::GetFollowAngle()
         for (GroupReference *ref = group->GetFirstMember(); ref; ref = ref->next())
         {
             Player* member = ref->getSource();
+
+            if (onlyRanged && !ai->IsRanged(member))
+                continue;
+
             if (member && member != master && ai->IsHeal(member))
             {
                 roster.insert(roster.begin() + roster.size() / 2, member);
@@ -410,6 +420,10 @@ float Formation::GetFollowAngle()
         for (GroupReference *ref = group->GetFirstMember(); ref; ref = ref->next())
         {
             Player* member = ref->getSource();
+
+            if (onlyRanged && !ai->IsRanged(member))
+                continue;
+
             if (member && member != master && ai->IsTank(member))
             {
                 if (left) roster.push_back(member); else roster.insert(roster.begin(), member);
@@ -419,6 +433,9 @@ float Formation::GetFollowAngle()
 
         for (vector<Player*>::iterator i = roster.begin(); i != roster.end(); ++i)
         {
+            if (onlyRanged && !ai->IsRanged(*i))
+                continue;
+
             if (*i == bot) break;
             index++;
         }

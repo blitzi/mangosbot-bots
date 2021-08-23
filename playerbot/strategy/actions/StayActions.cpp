@@ -22,13 +22,12 @@ bool StayActionBase::Stay()
 		if (verbose) ai->TellError("I can not stay, I'm flying!");
 		return false;
 	} 
-
-    uint32 sitDelay = sPlayerbotAIConfig.sitDelay / 1000;
+    
     time_t stayTime = AI_VALUE(time_t, "stay time");
     time_t now = time(0);
     if (!stayTime)
     {
-        stayTime = now - urand(0, sitDelay / 2);
+        stayTime = now - 1;
         context->GetValue<time_t>("stay time")->Set(stayTime);
     }
 

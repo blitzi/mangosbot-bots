@@ -110,12 +110,22 @@ namespace ai
     class PartyMemberToHealOutOfSpellRangeTrigger : public OutOfRangeTrigger
 	{
     public:
-        PartyMemberToHealOutOfSpellRangeTrigger(PlayerbotAI* ai) : OutOfRangeTrigger(ai, "party member to heal out of spell range", ai->GetRange("heal")) {}
+        PartyMemberToHealOutOfSpellRangeTrigger(PlayerbotAI* ai) : OutOfRangeTrigger(ai, "party member to heal out of spell range", ai->GetRange("spell")) {}
         virtual string GetTargetName() { return "party member to heal"; }
         virtual bool IsActive()
         {
             Unit* target = AI_VALUE(Unit*, GetTargetName());
-            return target && (sServerFacade.GetDistance2d(bot, target) > ai->GetRange("heal") || !bot->IsWithinLOSInMap(target));
+
+            if (target)
+            {
+                float range = ai->GetRange("spell");
+                float distance = (sServerFacade.GetDistance2d(bot, target));
+                bool los = bot->IsWithinLOSInMap(target);
+
+                return distance > range || !los;
+            }
+
+            return false;
         }
     };
 

@@ -123,14 +123,14 @@ namespace ai
 
         virtual WorldLocation GetLocation()
         {
-            float range = ai->IsRanged(bot) ? ai->GetRange("spell") : sPlayerbotAIConfig.followDistance;
+            float range = ai->IsRanged(bot) ? ai->GetRange("stance") : sPlayerbotAIConfig.followDistance;
 
             Unit* target = GetTarget();    
 
             if (!target)
                 return Formation::NullLocation;
 
-            float angle = GetFollowAngle();
+            float angle = GetFollowAngle(true);
             float x = target->GetPositionX() + cos(angle) * range;
             float y = target->GetPositionY() + sin(angle) * range;
             float z = target->GetPositionZ();

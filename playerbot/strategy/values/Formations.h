@@ -17,7 +17,7 @@ namespace ai
 		static bool IsNullLocation(WorldLocation const& loc);
 
     protected:
-        float GetFollowAngle();
+        float GetFollowAngle(bool onlyRanged = false);
     };
 
     class FollowFormation : public Formation
