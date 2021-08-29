@@ -36,8 +36,8 @@ list<ObjectGuid> AttackersValue::Calculate()
         RemoveNonEliteTargets(targets);
 
     //if there are totems between all the other targets, the group should focus them
-    if (!ai->IsTank(ai->GetBot()) && ListContainsTotem(targets))
-        RemoveNonTotemTargets(targets);
+    /*if (!ai->IsTank(ai->GetBot()) && ListContainsTotem(targets))
+        RemoveNonTotemTargets(targets);*/
     
 	for (set<Unit*>::iterator i = targets.begin(); i != targets.end(); i++)
 		result.push_back((*i)->GetObjectGuid());

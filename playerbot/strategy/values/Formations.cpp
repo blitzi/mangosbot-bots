@@ -9,9 +9,9 @@ using namespace ai;
 
 WorldLocation Formation::NullLocation = WorldLocation();
 
-bool IsSameLocation(WorldLocation const &a, WorldLocation const &b)
+bool Formation::IsSameLocation(WorldLocation const& a, WorldLocation const& b)
 {
-	return a.coord_x == b.coord_x && a.coord_y == b.coord_y && a.coord_z == b.coord_z && a.mapid == b.mapid;
+    return a.coord_x == b.coord_x && a.coord_y == b.coord_y && a.coord_z == b.coord_z && a.mapid == b.mapid;
 }
 
 bool Formation::IsNullLocation(WorldLocation const& loc)
@@ -373,7 +373,7 @@ namespace ai
     };
 };
 
-float Formation::GetFollowAngle(bool onlyRanged)
+float Formation::GetFollowAngle(bool onlyRanged, bool followMaster)
 {
     Player* master = ai->GetGroupMaster();
     Group* group = bot->GetGroup();
@@ -441,7 +441,7 @@ float Formation::GetFollowAngle(bool onlyRanged)
         }
         total = roster.size() + 1;
     }
-    float start = (master ? master->GetOrientation() : 0.0f);
+    float start = (master && followMaster ? master->GetOrientation() : 0.0f);
     return start + (0.125f + 1.75f * index / total + (total == 2 ? 0.125f : 0.0f)) * M_PI;
 }
 

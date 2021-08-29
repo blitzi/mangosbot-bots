@@ -15,9 +15,10 @@ namespace ai
         virtual float GetMaxDistance() { return sPlayerbotAIConfig.followDistance; }
         static WorldLocation NullLocation;
 		static bool IsNullLocation(WorldLocation const& loc);
+        static bool IsSameLocation(WorldLocation const& a, WorldLocation const& b);
 
     protected:
-        float GetFollowAngle(bool onlyRanged = false);
+        float GetFollowAngle(bool onlyRanged = false, bool followMaster = true);
     };
 
     class FollowFormation : public Formation

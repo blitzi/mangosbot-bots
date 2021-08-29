@@ -46,8 +46,6 @@ LootTemplateAccess const* LootMapValue::GetLootTemplate(ObjectGuid guid, LootTyp
 				lTemplate = LootTemplates_Item.GetLootFor(proto->ItemId);
 			else if (type == LootType::disenchant && proto->DisenchantID)
 				lTemplate = LootTemplates_Disenchant.GetLootFor(proto->DisenchantID);
-			if (type == LootType::milling)
-				lTemplate = LootTemplates_Milling.GetLootFor(proto->ItemId);
 			if (type == LootType::prospecting)
 				lTemplate = LootTemplates_Prospecting.GetLootFor(proto->ItemId);
 		}

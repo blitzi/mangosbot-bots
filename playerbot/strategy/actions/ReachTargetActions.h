@@ -46,12 +46,25 @@ namespace ai
         virtual bool isUseful()
 		{
             Unit* target = AI_VALUE(Unit*, GetTargetName());
+            Stance* stance = context->GetValue<Stance*>("stance")->Get();
+
+            if (target && stance && stance->getName() != "near")
+            {
+                WorldLocation location;
+                WorldLocation loc = stance->GetLocation();
+                bot->GetPosition(location);
+                return !Formation::IsSameLocation(location, loc);
+            }
 
             float distance = ai->IsRanged(bot) ? ai->GetRange("spell") : 0;
+            bool a = !bot->IsWithinDistInMap(target, distance);
+            bool b = bot->IsWithinDistInMap(target, distance);
+            bool c = !bot->IsWithinLOSInMap(target);
 
-            return target && (!bot->IsWithinDistInMap(target, distance) || (bot->IsWithinDistInMap(target, distance) && !bot->IsWithinLOSInMap(target)));
+            return target && (a || (b && c));
         }
         virtual string GetTargetName() { return "current target"; }
+        virtual bool IgnoresCasting() { return true; }
 
     protected:
         float distance;

@@ -1300,7 +1300,7 @@ bool PlayerbotAI::CanCastSpell(uint32 spellid, GameObject* goTarget, uint8 effec
     Spell* spell = new Spell(bot, spellInfo, false);
 
     spell->m_targets.setGOTarget(goTarget);
-#ifndef MANGOSBOT_ONE
+#ifdef MANGOSBOT_ONE
     spell->m_CastItem = aiObjectContext->GetValue<Item*>("item for spell", spellid)->Get();
     spell->m_targets.setItemTarget(spell->m_CastItem);
 #else
@@ -1350,7 +1350,7 @@ bool PlayerbotAI::CanCastSpell(uint32 spellid, float x, float y, float z, uint8 
 
     if (!itemTarget)
     {
-        if (sqrt(bot->GetDistance(x,y,z)) > sPlayerbotAIConfig.sightDistance)
+        if (sqrt(bot->GetDistance(x,y,z, DIST_CALC_NONE)) > sPlayerbotAIConfig.sightDistance)
             return false;
     }
 

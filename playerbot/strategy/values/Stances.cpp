@@ -130,7 +130,7 @@ namespace ai
             if (!target)
                 return Formation::NullLocation;
 
-            float angle = GetFollowAngle(true);
+            float angle = GetFollowAngle(false, false);
             float x = target->GetPositionX() + cos(angle) * range;
             float y = target->GetPositionY() + sin(angle) * range;
             float z = target->GetPositionZ();

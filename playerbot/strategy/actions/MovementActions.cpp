@@ -95,7 +95,7 @@ bool MovementAction::MoveToLOS(WorldObject* target, bool ranged)
         return false;
 
     if (!ranged)
-        return MoveTo((Unit*)target, target->GetObjectBoundingRadius());
+        return ChaseTo((Unit*)target, target->GetObjectBoundingRadius());
 
     float dist = FLT_MAX;
     PositionEntry dest;
@@ -562,7 +562,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
     return true;
 }
 
-bool MovementAction::MoveTo(Unit* target, float distance)
+bool MovementAction::MoveTo(Unit* target)
 {
     if (!target)
     {
@@ -574,49 +574,29 @@ bool MovementAction::MoveTo(Unit* target, float distance)
     float tx = target->GetPositionX(), ty = target->GetPositionY(), tz = target->GetPositionZ();
 
     Stance* stance = AI_VALUE(Stance*, "stance");
+
     WorldLocation loc = stance->GetLocation();
     if (Formation::IsNullLocation(loc) || loc.mapid == -1)
     {        
-        return true;
+        return false;
     }
 
-    if (sServerFacade.IsHostileTo(bot, target))
+    WorldLocation location;
+    bot->GetPosition(location);
+
+    if (Formation::IsSameLocation(location, loc))
+        return false;
+
+    if (!sServerFacade.IsFriendlyTo(bot, target))
     {
         tx = loc.coord_x;
         ty = loc.coord_y;
         tz = loc.coord_z;
-    }
-    else
-    {
-        return true;
+        
+        return MoveTo(target->GetMapId(), tx, ty, tz);        
     }
 
-
-    float distanceToTarget = sServerFacade.GetDistance2d(bot, tx, ty);
-    if (sServerFacade.IsDistanceGreaterThan(distanceToTarget, sPlayerbotAIConfig.targetPosRecalcDistance))
-    {
-        /*
-        float angle = bot->GetAngle(tx, ty);
-        float needToGo = distanceToTarget - distance;
-
-        float maxDistance = ai->GetRange("spell");
-        if (needToGo > 0 && needToGo > maxDistance)
-            needToGo = maxDistance;
-        else if (needToGo < 0 && needToGo < -maxDistance)
-            needToGo = -maxDistance;
-
-        float dx = cos(angle) * needToGo + bx;
-        float dy = sin(angle) * needToGo + by;
-        float dz = bz + (tz - bz) * needToGo / distanceToTarget;
-        */
-
-        float dx = tx;
-        float dy = ty;
-        float dz = tz;
-        return MoveTo(target->GetMapId(), dx, dy, dz);
-    }
-
-    return true;
+    return false;
 }
 
 float MovementAction::GetFollowAngle()
@@ -657,7 +637,7 @@ bool MovementAction::IsMovingAllowed(Unit* target)
 
 bool MovementAction::IsMovingAllowed(uint32 mapId, float x, float y, float z)
 {
-    float distance = sqrt(bot->GetDistance(x, y, z));
+    float distance = sqrt(bot->GetDistance(x, y, z, DIST_CALC_NONE));
     if (!bot->InBattleGround() && distance > sPlayerbotAIConfig.reactDistance)
         return false;
 
@@ -869,7 +849,7 @@ bool MovementAction::Follow(Unit* target, float distance, float angle)
     if (sServerFacade.IsDistanceGreaterOrEqualThan(sServerFacade.GetDistance2d(bot, target), sPlayerbotAIConfig.sightDistance))
     {
         if (!target->IsTaxiFlying())
-            return MoveTo(target, sPlayerbotAIConfig.followDistance);
+            return ChaseTo(target, sPlayerbotAIConfig.followDistance);
     }
 
     if (sServerFacade.IsDistanceLessOrEqualThan(sServerFacade.GetDistance2d(bot, target), sPlayerbotAIConfig.followDistance))
@@ -1009,7 +989,7 @@ bool MovementAction::Flee(Unit *target)
 
             if (!fleeTarget && master)
             {
-                foundFlee = MoveTo(master, sPlayerbotAIConfig.followDistance);
+                foundFlee = ChaseTo(master, sPlayerbotAIConfig.followDistance);
             }
 
             if (foundFlee)
@@ -1137,7 +1117,7 @@ bool MoveOutOfEnemyContactAction::Execute(Event event)
     if (!target)
         return false;
 
-    return MoveTo(target, sPlayerbotAIConfig.contactDistance);
+    return ChaseTo(target, sPlayerbotAIConfig.contactDistance);
 }
 
 bool MoveOutOfEnemyContactAction::isUseful()

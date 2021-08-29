@@ -215,8 +215,8 @@ namespace ai
         FrostShockSnareTrigger(PlayerbotAI* ai) : SnareTargetTrigger(ai, "frost shock") {}
     };
 
-    DEBUFF_TRIGGER(FlameshockTrigger, "flame shock", "flame shock");
-    DEBUFF_TRIGGER(EarthshockTrigger, "earth shock", "earth shock");
+    DEBUFF_TRIGGER(FlameshockTrigger, "flame shock");
+    DEBUFF_TRIGGER(EarthshockTrigger, "earth shock");
 
     class HeroismTrigger : public BoostTrigger
     {
