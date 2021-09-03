@@ -311,7 +311,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
 
                 out << to_string(bot->getRace()) << ",";
                 out << to_string(bot->getClass()) << ",";
-                out << bot->getLevel() << ",";
+                out << bot->GetLevel() << ",";
                 out << (entry ? -1 : entry);
 
                 sPlayerbotAIConfig.log("bot_movement.csv", out.str().c_str());
@@ -422,7 +422,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
         startPosition.printWKT({ startPosition, movePosition }, out, 1);
         out << to_string(bot->getRace()) << ",";
         out << to_string(bot->getClass()) << ",";
-        out << bot->getLevel();
+        out << bot->GetLevel();
         out << 0;
 
         sPlayerbotAIConfig.log("bot_movement.csv", out.str().c_str());
