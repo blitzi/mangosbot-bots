@@ -6,9 +6,13 @@
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "CellImpl.h"
+#include <algorithm>
+#include "RtiTargetValue.h"
 
 using namespace ai;
 using namespace MaNGOS;
+
+set<int> focusTargets = { 17096 /*astral-flare*/ };
 
 list<ObjectGuid> AttackersValue::Calculate()
 {
@@ -38,6 +42,12 @@ list<ObjectGuid> AttackersValue::Calculate()
     //if there are totems between all the other targets, the group should focus them
     /*if (!ai->IsTank(ai->GetBot()) && ListContainsTotem(targets))
         RemoveNonTotemTargets(targets);*/
+
+    if (!ai->IsTank(ai->GetBot()) && ListContainsFocusTarget(targets))
+        RemoveNonFocusTargets(targets);
+
+    if(ListContainsRti(targets))
+        RemoveNonRtiTargets(targets);
     
 	for (set<Unit*>::iterator i = targets.begin(); i != targets.end(); i++)
 		result.push_back((*i)->GetObjectGuid());
@@ -179,6 +189,51 @@ void AttackersValue::RemoveNonTotemTargets(set<Unit*>& targets)
 }
 
 
+void AttackersValue::RemoveNonFocusTargets(set<Unit*>& targets)
+{
+    for (set<Unit*>::iterator tIter = targets.begin(); tIter != targets.end();)
+    {
+        Unit* unit = *tIter;
+        Creature* c = dynamic_cast<Creature*>(unit);
+
+        if (c)
+        {
+            CreatureData const* data = sObjectMgr.GetCreatureData(c->GetDbGuid());
+
+            if (data && focusTargets.find(data->id) == focusTargets.end())
+            {
+                set<Unit*>::iterator tIter2 = tIter;
+                ++tIter;
+                targets.erase(tIter2);
+            }
+            else
+                ++tIter;
+        }
+        else
+        {
+            ++tIter;
+        }
+    }
+}
+
+void AttackersValue::RemoveNonRtiTargets(set<Unit*>& targets)
+{
+    for (set<Unit*>::iterator tIter = targets.begin(); tIter != targets.end();)
+    {
+        Unit* unit = *tIter;
+        if (!IsRti(unit, ai->GetBot()))
+        {
+            set<Unit*>::iterator tIter2 = tIter;
+            ++tIter;
+            targets.erase(tIter2);
+        }
+        else
+            ++tIter;
+    }
+}
+
+
+
 bool AttackersValue::ListContainsElite(set<Unit*>& targets) const
 {
     for (auto t : targets)
@@ -193,6 +248,23 @@ bool AttackersValue::ListContainsElite(set<Unit*>& targets) const
 }
 
 
+bool AttackersValue::ListContainsFocusTarget(set<Unit*>& targets) const
+{
+    for (auto t : targets)
+    {
+        Creature* c = dynamic_cast<Creature*>(t);
+
+        if (c)
+        {
+            CreatureData const* data = sObjectMgr.GetCreatureData(c->GetDbGuid());
+            if (data && focusTargets.find(data->id) != focusTargets.end())
+                return true;
+        }
+    }
+
+    return false;
+}
+
 bool AttackersValue::ListContainsTotem(set<Unit*>& targets) const
 {
     for (auto t : targets)
@@ -206,13 +278,45 @@ bool AttackersValue::ListContainsTotem(set<Unit*>& targets) const
     return false;
 }
 
+bool AttackersValue::ListContainsRti(set<Unit*>& targets) const
+{
+    for (auto t : targets)
+    {
+        if (IsRti(t, bot))
+            return true;
+    }
+
+    return false;
+}
+
 bool AttackersValue::IsPossibleTarget(Unit *attacker, Player *bot)
 {
     Creature *c = dynamic_cast<Creature*>(attacker);
 
-    bool rti = false;
-    if (attacker && bot->GetGroup())
-        rti = bot->GetGroup()->GetTargetIcon(7) == attacker->GetObjectGuid();
+    bool basicConditions = attacker &&
+        attacker->IsInWorld() &&
+        attacker->GetMapId() == bot->GetMapId() &&
+        !sServerFacade.UnitIsDead(attacker) &&
+        !attacker->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE) &&
+        !attacker->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE) &&
+        attacker->IsVisibleForOrDetect(bot, attacker, false) &&
+        !sServerFacade.IsFriendlyTo(attacker, bot) &&
+        bot->IsWithinDistInMap(attacker, sPlayerbotAIConfig.sightDistance) &&
+        !(sPlayerbotAIConfig.IsInPvpProhibitedZone(attacker->GetAreaId()) && (attacker->GetObjectGuid().IsPlayer() || attacker->GetObjectGuid().IsPet())) &&
+        (!c || !c->GetCombatManager().IsInEvadeMode());
+
+    bool rti = IsRti(attacker, bot);
+
+    if (rti)
+        return basicConditions;
+
+    if (c)
+    {
+        CreatureData const* data = sObjectMgr.GetCreatureData(c->GetDbGuid());
+        if (data && focusTargets.find(data->id) != focusTargets.end())
+            return basicConditions;
+    }
+
 
     PlayerbotAI* ai = bot->GetPlayerbotAI();
     	
@@ -284,27 +388,17 @@ bool AttackersValue::IsPossibleTarget(Unit *attacker, Player *bot)
     if (bot->GetGroup() && ai->GetMaster() && ai->GetMaster()->GetPlayerbotAI() && !ai->GetMaster()->GetPlayerbotAI()->IsRealPlayer())
         isMemberBotGroup = true;
 
-    return attacker &&
-        attacker->IsInWorld() &&
-        attacker->GetMapId() == bot->GetMapId() &&
-        !sServerFacade.UnitIsDead(attacker) &&
-        !attacker->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE) &&
-        !attacker->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE) &&        
-        attacker->IsVisibleForOrDetect(bot, attacker, false) &&
+    return basicConditions &&
         !(attacker->IsStunned() && ai->HasAura("shackle undead", attacker)) &&
         !((attacker->IsPolymorphed() ||
         bot->GetPlayerbotAI()->HasAura("sap", attacker) ||
         sServerFacade.IsCharmed(attacker) ||
         sServerFacade.IsFeared(attacker)) && !rti) &&
-        //!sServerFacade.IsInRoots(attacker) &&
-        !sServerFacade.IsFriendlyTo(attacker, bot) &&
-        bot->IsWithinDistInMap(attacker, sPlayerbotAIConfig.sightDistance) &&
-        !(attacker->GetCreatureType() == CREATURE_TYPE_CRITTER) &&
-        !(sPlayerbotAIConfig.IsInPvpProhibitedZone(attacker->GetAreaId()) && (attacker->GetObjectGuid().IsPlayer() || attacker->GetObjectGuid().IsPet())) &&
+        //!sServerFacade.IsInRoots(attacker) &&                
+        !(attacker->GetCreatureType() == CREATURE_TYPE_CRITTER) &&        
         (!groupHasTank || ((groupHasTank && !waitForTankAggro) || iAmTank || targetIsNonElite || targetIsAlmostDead)) &&
         (!c ||
             (
-                !c->GetCombatManager().IsInEvadeMode() &&            
 #ifdef CMANGOS          
                 (!isMemberBotGroup && ai->HasStrategy("attack tagged", BOT_STATE_NON_COMBAT)) || leaderHasThreat ||
                 
@@ -318,6 +412,21 @@ bool AttackersValue::IsPossibleTarget(Unit *attacker, Player *bot)
 #endif
                  )            
             );
+}
+
+bool AttackersValue::IsRti(Unit* enemy, Player* bot)
+{
+    bool isRti = false;
+
+    if (enemy && bot->GetGroup())
+    {
+        string rtiStr = bot->GetPlayerbotAI()->GetAiObjectContext()->GetValue<string>("rti")->Get();
+        int index = RtiTargetValue::GetRtiIndex(rtiStr);
+
+        isRti = bot->GetGroup()->GetTargetIcon(index) == enemy->GetObjectGuid();
+    }
+
+    return isRti;
 }
 
 bool AttackersValue::IsValidTarget(Unit *attacker, Player *bot)
