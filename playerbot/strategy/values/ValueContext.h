@@ -144,6 +144,7 @@ namespace ai
             creators["attacker count"] = &ValueContext::attacker_count;
             creators["my attacker count"] = &ValueContext::my_attacker_count;
             creators["has aggro"] = &ValueContext::has_aggro;
+            creators["has area debuff"] = &ValueContext::has_area_debuff;
             creators["mounted"] = &ValueContext::mounted;
 
             creators["can loot"] = &ValueContext::can_loot;
@@ -308,6 +309,7 @@ namespace ai
         static UntypedValue* attacker_count(PlayerbotAI* ai) { return new AttackerCountValue(ai); }
         static UntypedValue* my_attacker_count(PlayerbotAI* ai) { return new MyAttackerCountValue(ai); }
         static UntypedValue* has_aggro(PlayerbotAI* ai) { return new HasAggroValue(ai); }
+        static UntypedValue* has_area_debuff(PlayerbotAI* ai) { return new HasAreaDebuffValue(ai); }
         static UntypedValue* mounted(PlayerbotAI* ai) { return new IsMountedValue(ai); }
         static UntypedValue* health(PlayerbotAI* ai) { return new HealthValue(ai); }
         static UntypedValue* rage(PlayerbotAI* ai) { return new RageValue(ai); }

@@ -145,5 +145,5 @@ bool SetReturnPositionAction::isUseful()
 bool ReturnAction::isUseful()
 {
     ai::PositionEntry pos = context->GetValue<ai::PositionMap&>("position")->Get()[qualifier];
-    return pos.isSet() && AI_VALUE2(float, "distance", "position_random") > sPlayerbotAIConfig.followDistance;
+    return pos.isSet();
 }

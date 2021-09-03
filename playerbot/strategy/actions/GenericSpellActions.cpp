@@ -73,7 +73,9 @@ bool CastSpellAction::isUseful()
         return false;
     }
 
-    if (!GetTarget())
+    Unit* target = GetTarget();
+
+    if (!target)
         return false;
 
     float maxRange = range;
@@ -81,22 +83,19 @@ bool CastSpellAction::isUseful()
     uint32 spellid = AI_VALUE2(uint32, "spell id", spell);
     if (spellid)
     {
-        SpellEntry const* spellInfo = sServerFacade.LookupSpellInfo(spellid);
-
-        if (SpellRangeEntry const* spellRange = sSpellRangeStore.LookupEntry(spellInfo->rangeIndex))
+        if (SpellEntry const* spellInfo = sServerFacade.LookupSpellInfo(spellid))
         {
-            maxRange = spellRange->maxRange;
+            if (SpellRangeEntry const* spellRange = sSpellRangeStore.LookupEntry(spellInfo->rangeIndex))
+            {
+                maxRange = spellRange->maxRange;
 
-            if (Player* modOwner = bot->GetSpellModOwner())
-                modOwner->ApplySpellMod(spellInfo->Id, SPELLMOD_RANGE, maxRange);
+                if (Player* modOwner = bot->GetSpellModOwner())
+                    modOwner->ApplySpellMod(spellInfo->Id, SPELLMOD_RANGE, maxRange);
+            }
         }
     }
 
-    Unit* target = GetTarget();
-    bool spellUseful = AI_VALUE2(bool, "spell cast useful", spell);
-    float distance = bot->GetDistance(GetTarget(), true, DIST_CALC_COMBAT_REACH);
-
-    return target && spellUseful && distance <= maxRange;
+    return target && AI_VALUE2(bool, "spell cast useful", spell) && bot->GetDistance(target, true, DIST_CALC_COMBAT_REACH) <= maxRange;
 }
 
 bool CastAuraSpellAction::isUseful()

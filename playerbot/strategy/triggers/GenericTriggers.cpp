@@ -52,6 +52,11 @@ bool HasAggroTrigger::IsActive()
     return AI_VALUE2(bool, "has aggro", "current target");
 }
 
+bool HasAreaDebuffTrigger::IsActive()
+{
+    return AI_VALUE2(bool, "has area debuff", "self target");
+}
+
 bool PanicTrigger::IsActive()
 {
     return AI_VALUE2(uint8, "health", "self target") < sPlayerbotAIConfig.criticalHealth &&

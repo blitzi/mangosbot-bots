@@ -85,6 +85,12 @@ namespace ai
 		virtual bool IsActive();
 	};
 
+    class HasAreaDebuffTrigger : public Trigger {
+    public:
+        HasAreaDebuffTrigger(PlayerbotAI* ai) : Trigger(ai, "have area debuff") {}
+        virtual bool IsActive();
+    };
+
     class PartyMemberHasAggroTrigger : public Trigger {
     public:
         PartyMemberHasAggroTrigger(PlayerbotAI* ai) : Trigger(ai, "party member has aggro") {}

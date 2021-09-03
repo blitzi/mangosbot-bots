@@ -98,6 +98,7 @@ namespace ai
             creators["rtsc"] = &StrategyContext::rtsc;       
             creators["dont move"] = &StrategyContext::dont_move;
             creators["careful tanking"] = &StrategyContext::careful_tanking;
+            creators["run away on area debuff"] = &StrategyContext::run_away_on_area_debuff;
         }
 
     private:
@@ -152,6 +153,7 @@ namespace ai
         static Strategy* rtsc(PlayerbotAI* ai) { return new RTSCStrategy(ai); }
         static Strategy* dont_move(PlayerbotAI* ai) { return new DontMoveStrategy(ai); }
         static Strategy* careful_tanking(PlayerbotAI* ai) { return new CarefulTankingStrategy(ai); }
+        static Strategy* run_away_on_area_debuff(PlayerbotAI* ai) { return new RunAwayOnAreaDebuff(ai); }
         
     };
 

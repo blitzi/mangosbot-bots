@@ -70,6 +70,7 @@ namespace ai
             creators["tank assist"] = &TriggerContext::TankAssist;
             creators["lose aggro"] = &TriggerContext::LoseAggro;
             creators["has aggro"] = &TriggerContext::HasAggro;
+            creators["has area debuff"] = &TriggerContext::HasAreaDebuff;
 
             creators["range aoe"] = &TriggerContext::RangeAoe;
             creators["light aoe"] = &TriggerContext::LightAoe;
@@ -208,6 +209,7 @@ namespace ai
         static Trigger* Bossfight(PlayerbotAI* ai) { return new BossfightTrigger(ai); }
         static Trigger* LoseAggro(PlayerbotAI* ai) { return new LoseAggroTrigger(ai); }
         static Trigger* HasAggro(PlayerbotAI* ai) { return new HasAggroTrigger(ai); }
+        static Trigger* HasAreaDebuff(PlayerbotAI* ai) { return new HasAreaDebuffTrigger(ai); }
         static Trigger* LowHealth(PlayerbotAI* ai) { return new LowHealthTrigger(ai); }
         static Trigger* MediumHealth(PlayerbotAI* ai) { return new MediumHealthTrigger(ai); }
         static Trigger* AlmostFullHealth(PlayerbotAI* ai) { return new AlmostFullHealthTrigger(ai); }
