@@ -56,7 +56,7 @@ void XpGainAction::GiveXP(uint32 xp, Unit* victim)
         return;
     }
 
-    uint32 level = bot->GetLevel();
+    uint32 level = bot->getLevel();
 
     // Used by Eluna
 #ifdef ENABLE_ELUNA
@@ -87,7 +87,7 @@ void XpGainAction::GiveXP(uint32 xp, Unit* victim)
             bot->GiveLevel(level + 1);
         }
 
-        level = bot->GetLevel();
+        level = bot->getLevel();
         nextLvlXP = bot->GetUInt32Value(PLAYER_NEXT_LEVEL_XP);
     }
 

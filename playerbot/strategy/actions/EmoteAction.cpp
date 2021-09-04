@@ -579,7 +579,7 @@ bool EmoteAction::Execute(Event event)
 
             if (pSource && sServerFacade.GetDistance2d(bot, pSource) < sPlayerbotAIConfig.farDistance)
             {
-                sLog.outDetail("Bot #%d %s:%d <%s> received SMSG_TEXT_EMOTE %d", bot->GetGUIDLow(), bot->GetTeam() == ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName(), text_emote);
+                sLog.outDetail("Bot #%d %s:%d <%s> received SMSG_TEXT_EMOTE %d", bot->GetGUIDLow(), bot->GetTeam() == ALLIANCE ? "A" : "H", bot->getLevel(), bot->GetName(), text_emote);
                 emote = text_emote;
             }
 
@@ -599,7 +599,7 @@ bool EmoteAction::Execute(Event event)
         {
             if (pSource->GetSelectionGuid() == bot->GetObjectGuid())
             {
-                sLog.outDetail("Bot #%d %s:%d <%s> received SMSG_EMOTE %d", bot->GetGUIDLow(), bot->GetTeam() == ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName(), emoteId);
+                sLog.outDetail("Bot #%d %s:%d <%s> received SMSG_EMOTE %d", bot->GetGUIDLow(), bot->GetTeam() == ALLIANCE ? "A" : "H", bot->getLevel(), bot->GetName(), emoteId);
                 vector<uint32> types;
                 for (int32 i = sEmotesTextStore.GetNumRows(); i >= 0; --i)
                 {

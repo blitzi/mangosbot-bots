@@ -61,7 +61,7 @@ AiObjectContext* AiFactory::createAiObjectContext(Player* player, PlayerbotAI* a
 
 int AiFactory::GetPlayerSpecTab(Player* bot)
 {
-    if (bot->GetLevel() >= 10)
+    if (bot->getLevel() >= 10)
     {
         map<uint32, int32> tabs = GetPlayerSpecTabs(bot);
 
@@ -195,13 +195,13 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             if (tab == 2)
             {
                 engine->addStrategies("dps", "threat", "ranged", NULL);
-                if (player->GetLevel() >= 4)
+                if (player->getLevel() >= 4)
                     engine->addStrategy("dps debuff");
             }
             else if (tab == 0)
             {
                 engine->addStrategies("holy", "ranged", NULL);
-                    //if (player->GetLevel() >= 4)
+                    //if (player->getLevel() >= 4)
                        //engine->addStrategy("dps debuff");
             }
             else
@@ -222,7 +222,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
         case CLASS_WARRIOR:
             if (tab == 2)
                 engine->addStrategies("tank", "tank assist", "aoe", "close", NULL);
-            else if (player->GetLevel() < 30 || tab == 0)
+            else if (player->getLevel() < 30 || tab == 0)
                 engine->addStrategies("arms", "aoe", "dps assist", "threat", "close", NULL);
             else
                 engine->addStrategies("fury", "aoe", "dps assist", "threat", "close", NULL);
@@ -245,11 +245,11 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             else
                 engine->addStrategies("dps", "bdps", "dps assist", "cure", "baoe", "close", NULL);
 
-            if (player->GetLevel() < 14)
+            if (player->getLevel() < 14)
             {
                 engine->addStrategy("bdps");
             }
-            if (player->GetLevel() < 16)
+            if (player->getLevel() < 16)
             {
                 engine->addStrategy("barmor");
             }
@@ -258,7 +258,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             if (tab == 0)
             {
                 engine->addStrategies("caster", "cure", "caster aoe", "threat", "flee", "dps assist", "cc", NULL);
-                if (player->GetLevel() > 19)
+                if (player->getLevel() > 19)
                     engine->addStrategy("caster debuff");
             }
             else if (tab == 2)
@@ -271,7 +271,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             break;
         case CLASS_HUNTER:
             engine->addStrategies("dps", "bdps", "threat", "dps assist", "ranged", "pet", "cc", NULL);
-            if (player->GetLevel() > 19)
+            if (player->getLevel() > 19)
                 engine->addStrategy("dps debuff");
             break;
         case CLASS_ROGUE:
@@ -283,7 +283,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             else
                 engine->addStrategies("dps", "threat", NULL);
 
-            if (player->GetLevel() > 19)
+            if (player->getLevel() > 19)
                 engine->addStrategy("dps debuff");
 
             engine->addStrategies("dps assist", "flee", "cc", "pet", "ranged", NULL);
@@ -315,7 +315,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
                 engine->addStrategies("caster", "caster aoe", NULL);
             }
 
-            if (player->getClass() == CLASS_DRUID && tab == 1 && urand(0, 100) > 50 && player->GetLevel() > 19)
+            if (player->getClass() == CLASS_DRUID && tab == 1 && urand(0, 100) > 50 && player->getLevel() > 19)
             {
                 engine->addStrategy("dps");
             }
@@ -414,9 +414,9 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
             else
                 nonCombatEngine->addStrategies("dps assist", "baoe", "bdps", NULL);
 
-            if (player->GetLevel() < 14)
+            if (player->getLevel() < 14)
                 nonCombatEngine->addStrategies("bdps", NULL);
-            if (player->GetLevel() < 16)
+            if (player->getLevel() < 16)
                 nonCombatEngine->addStrategies("barmor", NULL);
 
             nonCombatEngine->addStrategies("cure", NULL);

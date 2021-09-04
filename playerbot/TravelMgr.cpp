@@ -729,7 +729,7 @@ string QuestTravelDestination::getTitle() {
 bool QuestRelationTravelDestination::isActive(Player* bot) {
     if (relation == 0)
     {
-        if (questTemplate->GetQuestLevel() >= (int)bot->GetLevel() + 5)
+        if (questTemplate->GetQuestLevel() >= (int)bot->getLevel() + 5)
             return false;
         //if (questTemplate->XPValue(bot) == 0)
         //    return false;
@@ -786,12 +786,12 @@ string QuestRelationTravelDestination::getTitle() {
 }
 
 bool QuestObjectiveTravelDestination::isActive(Player* bot) {
-    if (questTemplate->GetQuestLevel() > (int)bot->GetLevel() + 1)
+    if (questTemplate->GetQuestLevel() > (int)bot->getLevel() + 1)
         return false;
 
     PlayerbotAI* ai = bot->GetPlayerbotAI();
     AiObjectContext* context = ai->GetAiObjectContext();
-    if (questTemplate->GetQuestLevel() + 5 > (int)bot->GetLevel() && !AI_VALUE(bool, "can fight equal"))
+    if (questTemplate->GetQuestLevel() + 5 > (int)bot->getLevel() && !AI_VALUE(bool, "can fight equal"))
         return false;
 
     //Check mob level
@@ -799,7 +799,7 @@ bool QuestObjectiveTravelDestination::isActive(Player* bot) {
     {
         CreatureInfo const* cInfo = ObjectMgr::GetCreatureTemplate(getEntry());
 
-        if (cInfo && (int)cInfo->MaxLevel - (int)bot->GetLevel() > 4)
+        if (cInfo && (int)cInfo->MaxLevel - (int)bot->getLevel() > 4)
             return false;
     }
 
@@ -877,7 +877,7 @@ bool ExploreTravelDestination::isActive(Player* bot)
 {
     AreaTableEntry const* area = GetAreaEntryByAreaID(areaId);
 
-    if (area->area_level && (uint32)area->area_level > bot->GetLevel() && bot->GetLevel() < DEFAULT_MAX_LEVEL)
+    if (area->area_level && (uint32)area->area_level > bot->getLevel() && bot->getLevel() < DEFAULT_MAX_LEVEL)
         return false;
 
     if (area->exploreFlag == 0xffff)
@@ -908,7 +908,7 @@ bool GrindTravelDestination::isActive(Player* bot)
 
     CreatureInfo const* cInfo = this->getCreatureInfo();
 
-    int32 botLevel = bot->GetLevel();
+    int32 botLevel = bot->getLevel();
 
     uint8 botPowerLevel = AI_VALUE(uint8, "durability");
     float levelMod = botPowerLevel / 500.0f; //(0-0.2f)
@@ -956,7 +956,7 @@ bool BossTravelDestination::isActive(Player* bot)
 
     CreatureInfo const* cInfo = this->getCreatureInfo();
 
-    int32 botLevel = bot->GetLevel();
+    int32 botLevel = bot->getLevel();
 
     uint8 botPowerLevel = AI_VALUE(uint8, "durability");
     float levelMod = botPowerLevel / 500.0f; //(0-0.2f)
@@ -3141,7 +3141,7 @@ uint32 TravelMgr::getDialogStatus(Player* pPlayer, int32 questgiver, Quest const
                     {
                         dialogStatusNew = DIALOG_STATUS_REWARD_REP;
                     }
-                    else if (lowLevelDiff < 0 || pPlayer->GetLevel() <= pPlayer->GetQuestLevelForPlayer(pQuest) + uint32(lowLevelDiff))
+                    else if (lowLevelDiff < 0 || pPlayer->getLevel() <= pPlayer->GetQuestLevelForPlayer(pQuest) + uint32(lowLevelDiff))
                     {
                         dialogStatusNew = DIALOG_STATUS_AVAILABLE;
                     }

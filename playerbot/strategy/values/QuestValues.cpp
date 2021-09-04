@@ -284,7 +284,7 @@ questGiverMap QuestGiversValue::Calculate()
 
 list<GuidPosition> ActiveQuestGiversValue::Calculate()
 {
-	questGiverMap qGivers = GAI_VALUE2(questGiverMap, "quest givers", bot->GetLevel());
+	questGiverMap qGivers = GAI_VALUE2(questGiverMap, "quest givers", bot->getLevel());
 
 	list<GuidPosition> retQuestGivers;
 
@@ -562,7 +562,7 @@ uint32 DialogStatusValue::getDialogStatus(Player* bot, int32 questgiver, uint32 
 					{
 						dialogStatusNew = DIALOG_STATUS_REWARD_REP;
 					}
-					else if (lowLevelDiff < 0 || bot->GetLevel() <= bot->GetQuestLevelForPlayer(pQuest) + uint32(lowLevelDiff))
+					else if (lowLevelDiff < 0 || bot->getLevel() <= bot->GetQuestLevelForPlayer(pQuest) + uint32(lowLevelDiff))
 					{
 						dialogStatusNew = DIALOG_STATUS_AVAILABLE;
 					}

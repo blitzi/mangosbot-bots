@@ -165,7 +165,7 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemPrototype const* item)
     if (item->Class == ITEM_CLASS_WEAPON && !sRandomItemMgr.CanEquipWeapon(bot->getClass(), item))
         shouldEquip = false;
 
-    if (item->Class == ITEM_CLASS_ARMOR && !sRandomItemMgr.CanEquipArmor(bot->getClass(), bot->GetLevel(), item))
+    if (item->Class == ITEM_CLASS_ARMOR && !sRandomItemMgr.CanEquipArmor(bot->getClass(), bot->getLevel(), item))
         shouldEquip = false;
 
     Item* existingItem = bot->GetItemByPos(dest);
@@ -197,7 +197,7 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemPrototype const* item)
     if (oldItem->Class == ITEM_CLASS_WEAPON && !sRandomItemMgr.CanEquipWeapon(bot->getClass(), oldItem))
         existingShouldEquip = false;
 
-    if (oldItem->Class == ITEM_CLASS_ARMOR && !sRandomItemMgr.CanEquipArmor(bot->getClass(), bot->GetLevel(), oldItem))
+    if (oldItem->Class == ITEM_CLASS_ARMOR && !sRandomItemMgr.CanEquipArmor(bot->getClass(), bot->getLevel(), oldItem))
         existingShouldEquip = false;
 
     if (oldItem->ItemId != item->ItemId && //Item is not identical

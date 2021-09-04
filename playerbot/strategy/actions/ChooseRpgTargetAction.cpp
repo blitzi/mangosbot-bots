@@ -72,7 +72,7 @@ BattleGroundTypeId ChooseRpgTargetAction::CanQueueBg(ObjectGuid guid)
         if (!bg)
             continue;
 
-        if (bot->GetLevel() < bg->GetMinLevel())
+        if (bot->getLevel() < bg->GetMinLevel())
             continue;
 
         // check if already in queue

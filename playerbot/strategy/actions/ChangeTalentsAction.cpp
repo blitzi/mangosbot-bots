@@ -50,17 +50,17 @@ bool ChangeTalentsAction::Execute(Event event)
 
                 if (crop)
                 {
-                    newSpec.CropTalents(bot->GetLevel());
+                    newSpec.CropTalents(bot->getLevel());
                     out << "becomes: " << newSpec.GetTalentLink();
                 }
                 if (shift)
                 {
                     TalentSpec botSpec(bot);
-                    newSpec.ShiftTalents(&botSpec, bot->GetLevel());
+                    newSpec.ShiftTalents(&botSpec, bot->getLevel());
                     out << "becomes: " << newSpec.GetTalentLink();
                 }
 
-                if (newSpec.CheckTalents(bot->GetLevel(), &out))
+                if (newSpec.CheckTalents(bot->getLevel(), &out))
                 {
                     newSpec.ApplyTalents(bot, &out);
                     sRandomPlayerbotMgr.SetValue(bot->GetGUIDLow(), "specNo", 0); 
@@ -85,7 +85,7 @@ bool ChangeTalentsAction::Execute(Event event)
                             out << "Found " << paths.size() << " possible specs to choose from. ";
                         TalentPath* path = PickPremadePath(paths, sRandomPlayerbotMgr.IsRandomBot(bot));
                         TalentSpec newSpec = *GetBestPremadeSpec(path->id);
-                        newSpec.CropTalents(bot->GetLevel());
+                        newSpec.CropTalents(bot->getLevel());
                         newSpec.ApplyTalents(bot, &out);
                         if (newSpec.GetTalentPoints() > 0)
                         {
@@ -143,7 +143,7 @@ std::vector<TalentPath*> ChangeTalentsAction::getPremadePaths(TalentSpec *oldSpe
     for (auto& path : sPlayerbotAIConfig.classSpecs[bot->getClass()].talentPath)
     {
         TalentSpec newSpec = *GetBestPremadeSpec(path.id);
-        newSpec.CropTalents(bot->GetLevel());        
+        newSpec.CropTalents(bot->getLevel());        
         if (oldSpec->isEarlierVersionOf(newSpec))
         {
             ret.push_back(&path);
@@ -209,7 +209,7 @@ TalentPath* ChangeTalentsAction::PickPremadePath(std::vector<TalentPath*> paths,
 bool ChangeTalentsAction::AutoSelectTalents(ostringstream* out)
 {
     //Does the bot have talentpoints?
-    if (bot->GetLevel() < 10)
+    if (bot->getLevel() < 10)
     {
         *out << "No free talent points.";
         return false;
@@ -222,7 +222,7 @@ bool ChangeTalentsAction::AutoSelectTalents(ostringstream* out)
     if (specNo > 0)
     {
         TalentSpec newSpec = *GetBestPremadeSpec(specId);
-        newSpec.CropTalents(bot->GetLevel());
+        newSpec.CropTalents(bot->getLevel());
         newSpec.ApplyTalents(bot, out);
         if (newSpec.GetTalentPoints() > 0)
         {
@@ -258,7 +258,7 @@ bool ChangeTalentsAction::AutoSelectTalents(ostringstream* out)
         {
             specId = PickPremadePath(paths, sRandomPlayerbotMgr.IsRandomBot(bot))->id;
             TalentSpec newSpec = *GetBestPremadeSpec(specId);
-            newSpec.CropTalents(bot->GetLevel());
+            newSpec.CropTalents(bot->getLevel());
             newSpec.ApplyTalents(bot, out);
 
             if (paths.size() > 1)

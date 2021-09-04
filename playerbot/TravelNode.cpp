@@ -180,7 +180,7 @@ float TravelNodePath::getCost(Player* bot, uint32 cGold)
         if (bot->HasSpell(1066))
             swimSpeed *= 1.5;
 
-        uint32 level = bot->GetLevel();
+        uint32 level = bot->getLevel();
         bool isAlliance = PlayerbotAI::friendToAlliance(bot->GetFactionTemplateEntry());
                                   
         int factionAnnoyance = 0;

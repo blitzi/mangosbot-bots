@@ -65,7 +65,7 @@ bool PanicTrigger::IsActive()
 
 bool OutNumberedTrigger::IsActive()
 {
-    int32 botLevel = bot->GetLevel();
+    int32 botLevel = bot->getLevel();
     uint32 friendPower = 200, foePower = 0;
     for (auto &attacker : ai->GetAiObjectContext()->GetValue<list<ObjectGuid> >("attackers")->Get())
     {
@@ -74,7 +74,7 @@ bool OutNumberedTrigger::IsActive()
         if (!creature)
             continue;
 
-        int32 dLevel = creature->GetLevel() - botLevel;
+        int32 dLevel = creature->getLevel() - botLevel;
 
         if(dLevel > -10)
             foePower = std::max(100 + 10 * dLevel, dLevel * 200);
@@ -90,7 +90,7 @@ bool OutNumberedTrigger::IsActive()
         if (!player || player == bot)
             continue;
 
-        int32 dLevel = player->GetLevel() - botLevel;
+        int32 dLevel = player->getLevel() - botLevel;
 
         if (dLevel > -10 && bot->GetDistance(player) < 10.0f)
             friendPower += std::max(200 + 20 * dLevel, dLevel * 200);

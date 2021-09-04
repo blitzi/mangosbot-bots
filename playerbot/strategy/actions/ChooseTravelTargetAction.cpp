@@ -671,7 +671,7 @@ bool ChooseTravelTargetAction::needForQuest(Unit* target)
         {
             QuestStatusData questStatus = quest.second;
 
-            if (questTemplate->GetQuestLevel() > (int)bot->GetLevel())
+            if (questTemplate->GetQuestLevel() > (int)bot->getLevel())
                 continue;
 
             for (int j = 0; j < QUEST_OBJECTIVES_COUNT; j++)

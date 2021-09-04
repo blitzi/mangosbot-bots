@@ -9,7 +9,7 @@ uint32 MoneyNeededValue::Calculate()
 	PlayerbotAI* ai = bot->GetPlayerbotAI();
 	AiObjectContext* context = ai->GetAiObjectContext();
 
-	uint32 level = bot->GetLevel();
+	uint32 level = bot->getLevel();
 
 	uint32 moneyWanted = 1000; //We want atleast 10 silver.
 
