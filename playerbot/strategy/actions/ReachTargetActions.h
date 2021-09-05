@@ -56,12 +56,17 @@ namespace ai
                 return !Formation::IsSameLocation(location, loc);
             }
 
-            float distance = ai->IsRanged(bot) ? ai->GetRange("spell") : 0;
-            bool a = !bot->IsWithinDistInMap(target, distance);
-            bool b = bot->IsWithinDistInMap(target, distance);
-            bool c = !bot->IsWithinLOSInMap(target);
+            if (target)
+            {
+                float distance = ai->IsRanged(bot) ? ai->GetRange("spell") : 0;
+                bool a = !bot->IsWithinDistInMap(target, distance);
+                bool b = bot->IsWithinDistInMap(target, distance);
+                bool c = !bot->IsWithinLOSInMap(target);
+                
+                return (a || (b && c));
+            }
 
-            return target && (a || (b && c));
+            return false;
         }
         virtual string GetTargetName() { return "current target"; }
         virtual bool IgnoresCasting() { return true; }

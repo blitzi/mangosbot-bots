@@ -66,7 +66,7 @@ namespace ai
         if (ai->GetGrouperType() == SOLO)
             return true;
 
-        if (abs(int32(master->getLevel() - bot->getLevel())) > 4)
+        if (abs(int32(master->GetLevel() - bot->GetLevel())) > 4)
             return true;
 
         return false;

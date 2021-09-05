@@ -51,7 +51,7 @@ namespace ai
                     continue;
             }
 
-            if (abs(int32(player->getLevel() - bot->getLevel())) > 2)
+            if (abs(int32(player->GetLevel() - bot->GetLevel())) > 2)
                 continue;
 
             if (sServerFacade.GetDistance2d(bot, player) > sPlayerbotAIConfig.sightDistance)

@@ -187,7 +187,9 @@ bool RandomPlayerbotFactory::CreateRandomBot(uint8 cls)
 #ifndef MANGOSBOT_ZERO
 		2,
 #endif
-        0, LOCALE_enUS);
+        0, LOCALE_enUS, "", 0, 0, false);
+
+    session->SetNoAnticheat();
 
     Player *player = new Player(session);
 	if (!player->Create(sObjectMgr.GeneratePlayerLowGuid(), name, race, cls, gender,
@@ -624,7 +626,7 @@ void RandomPlayerbotFactory::CreateRandomArenaTeams()
         {
             Player* player = sObjectMgr.GetPlayer(captain);
 
-            if (!arenateam && player && player->getLevel() >= 70)
+            if (!arenateam && player && player->GetLevel() >= 70)
                 availableCaptains.push_back(captain);
         }
     }
@@ -650,7 +652,7 @@ void RandomPlayerbotFactory::CreateRandomArenaTeams()
             continue;
         }
 
-        if (player->getLevel() < 70)
+        if (player->GetLevel() < 70)
         {
             sLog.outError("Bot %d must be level 70 to create an arena team", captain);
             continue;
