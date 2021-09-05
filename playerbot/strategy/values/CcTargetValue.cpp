@@ -21,7 +21,7 @@ public:
     {
         Player* bot = ai->GetBot();
 
-        if (!ai->CanCastSpell(spell, creature, true))
+        if (!ai->CanCastSpell(spell, creature))
             return;
 
         if (*ai->GetAiObjectContext()->GetValue<Unit*>("rti cc target") == creature)

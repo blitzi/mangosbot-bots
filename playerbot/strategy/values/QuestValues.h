@@ -135,7 +135,12 @@ namespace ai
 
         static uint32 getDialogStatus(Player* bot, int32 questgiver, uint32 questId = 0);
 
-        virtual uint32 Calculate() { return getDialogStatus(bot, stoi(getQualifier())); }
+        virtual uint32 Calculate() {            
+            string qualifier = getQualifier();
+            long long ll = stoll(qualifier);
+
+            return getDialogStatus(bot, ll);         
+        }
     };
 
     //Dialog status npc quest

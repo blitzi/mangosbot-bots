@@ -1493,11 +1493,6 @@ bool RandomPlayerbotMgr::ProcessBot(Player* player)
         }
     }*/
 
-	if (urand(0, 100) > 20) // move optimisation to the next step
-	{
-		return true;
-	}
-
 	player->GetPlayerbotAI()->GetAiObjectContext()->GetValue<bool>("random bot update")->Set(false);
 
     bool randomiser = true;

@@ -509,7 +509,7 @@ bool UseRandomQuestItem::Execute(Event event)
         {
             SpellEntry const* spellInfo = sServerFacade.LookupSpellInfo(spellId);
 
-            if (ai->CanCastSpell(spellId, bot, 0, false))
+            if (ai->CanCastSpell(spellId, bot, false))
             {
 
                 item = questItem;
@@ -523,7 +523,7 @@ bool UseRandomQuestItem::Execute(Event event)
             for (auto& npc : npcs)
             {
                 Unit* unit = ai->GetUnit(npc);
-                if (questItem->IsTargetValidForItemUse(unit) || ai->CanCastSpell(spellId, unit, 0, false))
+                if (questItem->IsTargetValidForItemUse(unit) || ai->CanCastSpell(spellId, unit, false))
                 {
                     item = questItem;
                     unitTarget = unit;
@@ -535,7 +535,7 @@ bool UseRandomQuestItem::Execute(Event event)
             for (auto& go : gos)
             {
                 GameObject* gameObject = ai->GetGameObject(go);
-                if (ai->CanCastSpell(spellId, gameObject, 0, false))
+                if (ai->CanCastSpell(spellId, gameObject, false))
                 {
                     item = questItem;
                     goTarget = go;

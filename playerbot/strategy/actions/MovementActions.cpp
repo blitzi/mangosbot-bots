@@ -344,12 +344,25 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
 
             TaxiPathEntry const* tEntry = sTaxiPathStore.LookupEntry(entry);
 
-            if (entry)
+            if (tEntry)
             {
-                uint32 money = bot->GetMoney();
-                //bot->SetMoney(money + 100000);
-                bool goTaxi = bot->ActivateTaxiPathTo({ tEntry->from, tEntry->to }, nullptr, 1);
-                //bot->SetMoney(money);
+                Creature* unit = nullptr;
+
+                if (!bot->m_taxi.IsTaximaskNodeKnown(tEntry->from))
+                {
+                    list<ObjectGuid> npcs = AI_VALUE(list<ObjectGuid>, "nearest npcs");
+                    for (list<ObjectGuid>::iterator i = npcs.begin(); i != npcs.end(); i++)
+                    {
+                        Creature* unit = bot->GetNPCIfCanInteractWith(*i, UNIT_NPC_FLAG_FLIGHTMASTER);
+                        if (!unit)
+                            continue;
+
+                        bot->GetSession()->SendLearnNewTaxiNode(unit);
+
+                        unit->SetFacingTo(unit->GetAngle(bot));
+                    }
+                }
+                bool goTaxi = bot->ActivateTaxiPathTo({ tEntry->from, tEntry->to }, unit, 1);
 
                 return goTaxi;
             }

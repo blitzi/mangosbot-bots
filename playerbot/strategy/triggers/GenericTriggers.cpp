@@ -171,7 +171,7 @@ bool SpellTrigger::IsActive()
 bool SpellCanBeCastTrigger::IsActive()
 {
 	Unit* target = GetTarget();
-	return target && ai->CanCastSpell(spell, target, true);
+	return target && ai->CanCastSpell(spell, target);
 }
 
 bool RandomTrigger::IsActive()
