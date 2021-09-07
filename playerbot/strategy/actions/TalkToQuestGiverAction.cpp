@@ -140,7 +140,7 @@ void TalkToQuestGiverAction::RewardMultipleItem(Quest const* quest, WorldObject*
     Item* newItem;
 
     ostringstream outid;
-    if (sPlayerbotAIConfig.autoPickReward == "no")
+    if (sPlayerbotAIConfig.autoPickReward == "no" || !sRandomPlayerbotMgr.IsRandomBot(ai->GetBot()))
     {   //Old functionality, list rewards.
         AskToSelectReward(quest, out, false);       
     }
