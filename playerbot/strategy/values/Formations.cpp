@@ -85,7 +85,7 @@ namespace ai
         virtual WorldLocation GetLocationInternal()
         {
             Player* master = ai->GetGroupMaster();
-            if (!master)
+            if (!master || master->GetMap() == NULL)
                 return WorldLocation();
 
             float range = sPlayerbotAIConfig.followDistance;
@@ -117,7 +117,7 @@ namespace ai
         virtual WorldLocation GetLocationInternal()
         {
             Player* master = ai->GetGroupMaster();
-            if (!master)
+            if (!master || master->GetMap() == NULL)
                 return WorldLocation();
 
             float range = sPlayerbotAIConfig.followDistance;
@@ -167,7 +167,7 @@ namespace ai
             if (!target && target != bot)
                 target = master;
 
-            if (!target)
+            if (!target || target->GetMap() == NULL)
 				return Formation::NullLocation;
 
             switch (bot->getClass())
@@ -319,7 +319,7 @@ namespace ai
             float followRange = sPlayerbotAIConfig.followDistance;
 
             Player* master = ai->GetGroupMaster();
-            if (!master || master == bot)
+            if (!master || master == bot || (master && master->GetMap() == NULL))
                 return Formation::NullLocation;
 
             if (sServerFacade.GetDistance2d(bot, master) <= range)
