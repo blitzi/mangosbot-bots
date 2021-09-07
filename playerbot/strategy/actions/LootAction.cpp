@@ -455,7 +455,9 @@ bool StoreLootAction::IsLootAllowed(uint32 itemid, PlayerbotAI *ai)
     AiObjectContext *context = ai->GetAiObjectContext();
     LootStrategy* lootStrategy = AI_VALUE(LootStrategy*, "loot strategy");
 
-    set<uint32>& lootItems = AI_VALUE(set<uint32>&, "always loot list");
+    return true;
+
+    /*set<uint32>& lootItems = AI_VALUE(set<uint32>&, "always loot list");
     if (lootItems.find(itemid) != lootItems.end()) 
         return true;    
 
@@ -501,7 +503,7 @@ bool StoreLootAction::IsLootAllowed(uint32 itemid, PlayerbotAI *ai)
 
     bool canLoot = lootStrategy->CanLoot(proto, context);
 
-    return canLoot;
+    return canLoot;*/
 }
 
 bool ReleaseLootAction::Execute(Event event)
