@@ -36,10 +36,6 @@ void GenericPriestStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
         NextAction::array(0, new NextAction("fade", 55.0f), NULL)));
 
     triggers.push_back(new TriggerNode(
-        "enemy is close",
-        NextAction::array(0, new NextAction("psychic scream", 50.0f), NULL)));
-
-    triggers.push_back(new TriggerNode(
         "low mana",
         NextAction::array(0, new NextAction("inner focus", 42.0f), NULL)));
 
