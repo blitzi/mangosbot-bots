@@ -23,6 +23,9 @@ void HealPriestStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
     triggers.push_back(new TriggerNode(
         "almost full health",
         NextAction::array(0, new NextAction("renew", 43.0f), NULL)));
+
+
+    triggers.push_back(new TriggerNode(
         "prayer of mending on tank",
         NextAction::array(0, new NextAction("prayer of mending on tank", ACTION_HIGH), NULL)));
 

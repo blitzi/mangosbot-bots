@@ -88,7 +88,7 @@ bool ChangeTalentsAction::Execute(Event event)
                         TalentPath* path = PickPremadePath(paths, sRandomPlayerbotMgr.IsRandomBot(bot));
                         TalentSpec newSpec = *GetBestPremadeSpec(path->id);
                         string specLink = newSpec.GetTalentLink();
-                        newSpec.CropTalents(bot->getLevel());
+                        newSpec.CropTalents(bot->GetLevel());
                         newSpec.ApplyTalents(bot, &out);
                         if (newSpec.GetTalentPoints() > 0)
                         {
@@ -237,7 +237,7 @@ bool ChangeTalentsAction::AutoSelectTalents(ostringstream* out)
     else if (!specLink.empty())
     {
         TalentSpec newSpec(bot, specLink);
-        newSpec.CropTalents(bot->getLevel());
+        newSpec.CropTalents(bot->GetLevel());
         newSpec.ApplyTalents(bot, out);
         if (newSpec.GetTalentPoints() > 0)
         {
@@ -275,7 +275,7 @@ bool ChangeTalentsAction::AutoSelectTalents(ostringstream* out)
             specId = PickPremadePath(paths, sRandomPlayerbotMgr.IsRandomBot(bot))->id;
             TalentSpec newSpec = *GetBestPremadeSpec(specId);
             specLink = newSpec.GetTalentLink();
-            newSpec.CropTalents(bot->getLevel());
+            newSpec.CropTalents(bot->GetLevel());
             newSpec.ApplyTalents(bot, out);
 
             if (paths.size() > 1)

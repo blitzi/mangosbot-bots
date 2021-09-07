@@ -59,9 +59,7 @@ bool MoveToTravelTargetAction::Execute(Event event)
                 ai->TellMasterNoFacing(out);
             }
 
-            target->setExpireIn(target->getTimeLeft() + sPlayerbotAIConfig.maxWaitForMove);
-
-            ai->SetNextCheckDelay(sPlayerbotAIConfig.maxWaitForMove);
+            target->setExpireIn(target->getTimeLeft() + sPlayerbotAIConfig.maxWaitForMove);           
 
             return true;
         }

@@ -137,7 +137,6 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
         time_t now = time(0);
         if (AI_VALUE(LastMovement&, "last movement").nextTeleport > now) //We can not teleport yet. Wait.
         {
-            ai->SetNextCheckDelay((AI_VALUE(LastMovement&, "last movement").nextTeleport - now) * 1000);
             return true;
         }
     }
@@ -913,7 +912,7 @@ bool MovementAction::Follow(Unit* target, float distance, float angle)
         }
 
         if (!target->IsTaxiFlying())
-           return MoveTo(target, sPlayerbotAIConfig.followDistance);
+           return MoveTo(target);
     }
 
     if (sServerFacade.IsDistanceLessOrEqualThan(sServerFacade.GetDistance2d(bot, target), sPlayerbotAIConfig.followDistance))

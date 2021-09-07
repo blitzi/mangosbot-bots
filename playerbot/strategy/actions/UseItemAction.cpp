@@ -360,7 +360,6 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Uni
    if (!spellId)
        return false;
 
-   ai->SetNextCheckDelay(sPlayerbotAIConfig.globalCoolDown);
    ai->TellMasterNoFacing(out.str());
 
    bot->GetSession()->HandleUseItemOpcode(packet);
@@ -582,9 +581,6 @@ bool UseRandomQuestItem::Execute(Event event)
         return false;
 
     bool used = UseItem(item, goTarget, nullptr, unitTarget);
-
-    if (used)
-        ai->SetNextCheckDelay(delay);
 
     return used;
 }

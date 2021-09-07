@@ -970,7 +970,7 @@ bool BossTravelDestination::isActive(Player* bot)
 
     CreatureInfo const* cInfo = this->getCreatureInfo();
 
-    int32 botLevel = bot->getLevel();
+    int32 botLevel = bot->GetLevel();
 
     uint8 botPowerLevel = AI_VALUE(uint8, "durability");
     float levelMod = botPowerLevel / 500.0f; //(0-0.2f)

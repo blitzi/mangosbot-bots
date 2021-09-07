@@ -318,7 +318,7 @@ namespace ai
             return context->GetValue<Unit*>("cc target", getName());
         }
         virtual bool Execute(Event event) { return ai->CastSpell(getName(), GetTarget()); }
-        virtual bool isPossible() { return ai->CanCastSpell(getName(), GetTarget(), true); }
+        virtual bool isPossible() { return ai->CanCastSpell(getName(), GetTarget()); }
         virtual bool isUseful() { return true; }
         virtual ActionThreatType getThreatType() { return ACTION_THREAT_NONE; }
     };
