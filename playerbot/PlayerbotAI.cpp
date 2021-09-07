@@ -260,8 +260,6 @@ void PlayerbotAI::HandleTeleportAck()
 	}
 
     Reset();
-
-    Reset();
 }
 
 void PlayerbotAI::Reset(bool full)
