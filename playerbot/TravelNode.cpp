@@ -9,6 +9,7 @@
 #include "MoveMapSharedDefines.h"
 #include "MotionGenerators/PathFinder.h"
 #include "Entities/Transports.h"
+#include "strategy/values/BudgetValues.h"
 
 using namespace ai;
 using namespace MaNGOS;
@@ -169,8 +170,9 @@ float TravelNodePath::getCost(Player* bot, uint32 cGold)
                 return -1;
 
             TaxiNodesEntry const* startTaxiNode = sTaxiNodesStore.LookupEntry(taxiPath->from);
+            TaxiNodesEntry const* endTaxiNode = sTaxiNodesStore.LookupEntry(taxiPath->to);
 
-            if (!startTaxiNode || !startTaxiNode->MountCreatureID[bot->GetTeam() == ALLIANCE ? 1 : 0])
+            if (!startTaxiNode  || !endTaxiNode || !startTaxiNode->MountCreatureID[bot->GetTeam() == ALLIANCE ? 1 : 0] || !endTaxiNode->MountCreatureID[bot->GetTeam() == ALLIANCE ? 1 : 0])
                 return -1;            
         }
 
@@ -230,10 +232,10 @@ TravelNodePath* TravelNode::buildPath(TravelNode* endNode, Unit* bot, bool postP
         returnNodePath = setPathTo(endNode, TravelNodePath(), false);
     else
         returnNodePath = getPathTo(endNode);                //Get the exsisting path.
-
+    
     if (returnNodePath->getComplete())                      //Path is already complete. Return it.
         return returnNodePath;
-
+    
     vector<WorldPosition> path = returnNodePath->getPath();
 
     if (path.empty())
@@ -244,6 +246,36 @@ TravelNodePath* TravelNode::buildPath(TravelNode* endNode, Unit* bot, bool postP
     path = endPos->getPathFromPath(path, bot);          //Pathfind from the existing path to the end Node.
 
     bool canPath = endPos->isPathTo(path);              //Check if we reached our destination.
+
+    if (!canPath && endNode->hasLinkTo(this)) //Unable to find a path? See if the reverse is possible.
+    {
+        TravelNodePath backNodePath = *endNode->getPathTo(this);
+
+        if (!backNodePath.getTransport() && !backNodePath.getPortal() && !backNodePath.getFlightPath())
+        {
+            vector<WorldPosition> bPath = backNodePath.getPath();
+
+            if (!backNodePath.getComplete()) //Build it if it's not already complete.
+            {
+                if (bPath.empty())
+                    bPath = { *endNode->getPosition() };            //Start the path from the end Node.
+
+                WorldPosition* thisPos = getPosition();             //Build the path to this Node.
+
+                bPath = thisPos->getPathFromPath(bPath, bot);         //Pathfind from the existing path to the this Node.
+
+                canPath = thisPos->isPathTo(bPath);              //Check if we reached our destination.
+            }
+            else
+                canPath = true;
+
+            if (canPath)
+            {
+                std::reverse(bPath.begin(), bPath.end());
+                path = bPath;
+            }
+        }
+    }
 
     //Transports are (probably?) not solid at this moment. We need to walk over them so we need extra code for this.
     //Some portals are 'too' solid so we can't properly walk in them. Again we need to bypass this.
@@ -352,6 +384,9 @@ vector<TravelNode*> TravelNode::getNodeMap(bool importantOnly, vector<TravelNode
 
 bool TravelNode::isUselessLink(TravelNode* farNode)
 {
+    if (getPathTo(farNode)->getPortal() || getPathTo(farNode)->getTransport() || getPathTo(farNode)->getFlightPath())
+        return false;
+
     float farLength;
     if (hasLinkTo(farNode))
         farLength = getPathTo(farNode)->getDistance();
@@ -601,6 +636,8 @@ void TravelNode::print(bool printFailed)
                 pathType = 4;
             else if (path->getFlightPath())
                 pathType = 5;
+            else if (!path->getComplete())
+                pathType = 6;
 
             out << pathType << ",";
             out << std::fixed << std::setprecision(2);
@@ -608,6 +645,7 @@ void TravelNode::print(bool printFailed)
             out << path->getPortalId() << ",";
             out << path->getDistance() << ",";
             out << path->getCost();
+            out << path->getComplete() ? 0 : 1;
 
             sPlayerbotAIConfig.log("travelPaths.csv", out.str().c_str());
         }
@@ -625,7 +663,7 @@ bool TravelPath::makeShortCut(WorldPosition startPos, float maxDist)
     vector<PathNodePoint> newPath;
     WorldPosition firstNode;
 
-    for (auto & p : fullPath) //cycle over the full path
+    for (auto& p : fullPath) //cycle over the full path
     {
         //if (p.point.getMapId() != startPos.getMapId())
         //    continue;
@@ -657,10 +695,11 @@ bool TravelPath::makeShortCut(WorldPosition startPos, float maxDist)
                 }
             }
         }
+
         newPath.push_back(p);
     }
 
-    if (newPath.empty() || minDist > maxDistSq)
+    if (newPath.empty() || minDist > maxDistSq || newPath.front().point.getMapId() != startPos.getMapId())
     {
         clear();
         return false;
@@ -1104,11 +1143,29 @@ TravelNodeRoute TravelNodeMap::getRoute(TravelNode* start, TravelNode* goal, Pla
     if(start == goal)
         return TravelNodeRoute();
 
+    if(!start->hasRouteTo(goal))
+        return TravelNodeRoute();
+
     //Basic A* algoritm
     std::unordered_map<TravelNode*, TravelNodeStub> m_stubs;
 
     TravelNodeStub* startStub = &m_stubs.insert(make_pair(start, TravelNodeStub(start))).first->second;
-    startStub->currentGold = bot->GetMoney();
+
+    if (bot)
+    {
+        PlayerbotAI* ai = bot->GetPlayerbotAI();
+        if (ai)
+        {
+            if (ai->HasCheat(BotCheatMask::gold))
+                startStub->currentGold = 10000000;
+            else {
+                AiObjectContext* context = ai->GetAiObjectContext();
+                startStub->currentGold = AI_VALUE2(uint32, "free money for", (uint32)NeedMoneyFor::travel);
+            }
+        }
+        else
+            startStub->currentGold = bot->GetMoney();
+    }
 
     TravelNodeStub* currentNode, * childNode;
     float f, g, h;
@@ -1174,7 +1231,7 @@ TravelNodeRoute TravelNodeMap::getRoute(TravelNode* start, TravelNode* goal, Pla
             childNode->m_h = h;
             childNode->parent = currentNode;
 
-            if(!bot->isTaxiCheater())
+            if(bot && !bot->isTaxiCheater())
                 childNode->currentGold = currentNode->currentGold - link.second->getPrice();
 
             if (childNode->close)

@@ -71,26 +71,41 @@ bool FollowAction::isUseful()
 
 bool FollowAction::CanDeadFollow(Unit* target)
 {
-    //Follow ghost when dead
-    if (!sServerFacade.IsAlive(bot) && !sServerFacade.IsAlive(target) && target->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
-        return true;
-
-    //Follow when both alive or guard corpse of master
-    if (sServerFacade.IsAlive(bot) && (sServerFacade.IsAlive(target) || !target->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST)))
-        return true;
-
-    return false;
+    //Move to corpse when dead and player is alive or not a ghost.
+    if (!sServerFacade.IsAlive(bot) && (sServerFacade.IsAlive(target) || !target->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST)))
+        return false;
+    
+    return true;
 }
 
 bool FleeToMasterAction::Execute(Event event)
 {
-    bool canFollow = Follow(AI_VALUE(Unit*, "master target"));
+    Unit* fTarget = AI_VALUE(Unit*, "master target");
+    bool canFollow = Follow(fTarget);
     if (!canFollow)
     {
         //ai->SetNextCheckDelay(5000);
         return false;
     }
-    ai->TellMaster("Wait for me!");
+
+    WorldPosition targetPos(fTarget);
+    WorldPosition bosPos(bot);
+    float distance = bosPos.fDist(targetPos);
+
+    if (distance < sPlayerbotAIConfig.reactDistance * 3)
+    {
+        if (!urand(0, 3))
+            ai->TellMaster("I am close, wait for me!");
+    }
+    else if (distance < 1000)
+    {
+        if (!urand(0, 10))
+            ai->TellMaster("I heading to your position.");
+    }
+    else
+        if (!urand(0,20))
+            ai->TellMaster("I am traveling to your position.");
+           
     return true;
 }
 

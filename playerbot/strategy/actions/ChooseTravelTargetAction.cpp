@@ -61,6 +61,11 @@ void ChooseTravelTargetAction::ReportTravelTarget(TravelTarget* newTarget, Trave
 
     TravelDestination* oldDestination = oldTarget->getDestination();
 
+    ostringstream out;
+
+    if (newTarget->isForced())
+        out << "(Forced) ";
+
     if (destination->getName() == "QuestRelationTravelDestination" || destination->getName() == "QuestObjectiveTravelDestination")
     {
         QuestTravelDestination* QuestDestination = (QuestTravelDestination*)destination;
@@ -75,8 +80,6 @@ void ChooseTravelTargetAction::ReportTravelTarget(TravelTarget* newTarget, Trave
             gInfo = ObjectMgr::GetGameObjectInfo(destination->getEntry() * -1);
 
         string Sub;
-
-        ostringstream out;
 
         if (newTarget->isGroupCopy())
             out << "Following group ";
@@ -99,8 +102,6 @@ void ChooseTravelTargetAction::ReportTravelTarget(TravelTarget* newTarget, Trave
 
         WorldPosition botLocation(bot);
 
-        ostringstream out;
-
         if (newTarget->isGroupCopy())
             out << "Following group ";
         else if (oldDestination && oldDestination == destination)
@@ -110,7 +111,14 @@ void ChooseTravelTargetAction::ReportTravelTarget(TravelTarget* newTarget, Trave
 
         out << round(newTarget->getDestination()->distanceTo(&botLocation)) << "y";
 
-        out << " for rpg ";
+        out << " for ";
+
+        if (AI_VALUE2(bool, "group or", "should sell,can sell"))
+            out << "selling items";
+        else if (AI_VALUE2(bool, "group or", "should repair,can repair"))
+            out << "repairing";
+        else
+            out << "rpg";
 
         out << " to " << RpgDestination->getTitle();
 
@@ -121,8 +129,6 @@ void ChooseTravelTargetAction::ReportTravelTarget(TravelTarget* newTarget, Trave
         ExploreTravelDestination* ExploreDestination = (ExploreTravelDestination*)destination;
 
         WorldPosition botLocation(bot);
-
-        ostringstream out;
 
         if (newTarget->isGroupCopy())
             out << "Following group ";
@@ -145,8 +151,6 @@ void ChooseTravelTargetAction::ReportTravelTarget(TravelTarget* newTarget, Trave
 
         WorldPosition botLocation(bot);
 
-        ostringstream out;
-
         if (newTarget->isGroupCopy())
             out << "Following group ";
         else if (oldDestination && oldDestination == destination)
@@ -167,8 +171,6 @@ void ChooseTravelTargetAction::ReportTravelTarget(TravelTarget* newTarget, Trave
         BossTravelDestination* BossDestination = (BossTravelDestination*)destination;
 
         WorldPosition botLocation(bot);
-
-        ostringstream out;
 
         if (newTarget->isGroupCopy())
             out << "Following group ";
@@ -207,12 +209,12 @@ bool ChooseTravelTargetAction::SetTarget(TravelTarget* target, TravelTarget* old
 
     //Enpty bags/repair
     if (!foundTarget && urand(1, 100) > 10)                               //90% chance
-        if ((AI_VALUE(bool, "should sell") && AI_VALUE(bool, "can sell")) || (AI_VALUE(bool, "should repair") && AI_VALUE(bool, "can repair")))
+        if (AI_VALUE2(bool, "group or", "should sell,can sell,following party") || AI_VALUE2(bool, "group or", "should repair,can repair,following party"))
             foundTarget = SetRpgTarget(target);                           //Go to town to sell items or repair
 
     //Rpg in city
     if (!foundTarget && urand(1, 100) > 90)                               //10% chance
-        foundTarget = SetBankTarget(target);                              //Head to the bank
+        foundTarget = SetCapitalTarget(target);                           //Head to a city
     
     //Grind for money
     if (!foundTarget && AI_VALUE(bool, "should get money"))
@@ -580,7 +582,7 @@ bool ChooseTravelTargetAction::SetExploreTarget(TravelTarget* target)
     return target->isActive();
 }
 
-bool ChooseTravelTargetAction::SetBankTarget(TravelTarget* target)
+bool ChooseTravelTargetAction::SetCapitalTarget(TravelTarget* target)
 {
     WorldPosition* botPos = &WorldPosition(bot);
 
@@ -596,7 +598,7 @@ bool ChooseTravelTargetAction::SetBankTarget(TravelTarget* target)
         if (!cInfo)
             continue;
 
-        if ((cInfo->NpcFlags & UNIT_NPC_FLAG_BANKER) == 0)
+        if ((cInfo->NpcFlags & UNIT_NPC_FLAG_BANKER) == 0 && (cInfo->NpcFlags & UNIT_NPC_FLAG_BATTLEMASTER) == 0 && (cInfo->NpcFlags & UNIT_NPC_FLAG_AUCTIONEER) == 0)
             continue;
 
         FactionTemplateEntry const* factionEntry = sFactionTemplateStore.LookupEntry(cInfo->Faction);
@@ -605,7 +607,7 @@ bool ChooseTravelTargetAction::SetBankTarget(TravelTarget* target)
         if (reaction  <= REP_NEUTRAL)
             continue;
 
-
+        dests.push_back(d);
     }
 
     if (!dests.empty())
@@ -632,6 +634,55 @@ bool ChooseTravelTargetAction::SetNullTarget(TravelTarget* target)
     
     return true;
 }
+
+vector<string> split(const string& s, char delim);
+char* strstri(const char* haystack, const char* needle);
+
+TravelDestination* ChooseTravelTargetAction::FindDestination(Player* bot, string name)
+{
+    PlayerbotAI* ai = bot->GetPlayerbotAI();
+
+    AiObjectContext* context = ai->GetAiObjectContext();
+
+    vector<TravelDestination*> dests;
+
+    //Zones
+    for (auto& d : sTravelMgr.getExploreTravelDestinations(bot, true, true))
+    {
+        if (strstri(d->getTitle().c_str(), name.c_str()))
+            dests.push_back(d);
+    }
+
+    //Npcs
+    for (auto& d : sTravelMgr.getRpgTravelDestinations(bot, true, true))
+    {
+        if (strstri(d->getTitle().c_str(), name.c_str()))
+            dests.push_back(d);
+    }
+
+    //Mobs
+    for (auto& d : sTravelMgr.getGrindTravelDestinations(bot, true, true))
+    {
+        if (strstri(d->getTitle().c_str(), name.c_str()))
+            dests.push_back(d);
+    }
+
+    //Bosses
+    for (auto& d : sTravelMgr.getBossTravelDestinations(bot, true, true))
+    {
+        if (strstri(d->getTitle().c_str(), name.c_str()))
+            dests.push_back(d);
+    }
+
+    WorldPosition* botPos = &WorldPosition(bot);
+
+    if (dests.empty())
+        return nullptr;
+
+    TravelDestination* dest = *std::min_element(dests.begin(), dests.end(), [botPos](TravelDestination* i, TravelDestination* j) {return i->distanceTo(botPos) < j->distanceTo(botPos); });
+
+    return dest;
+};
 
 bool ChooseTravelTargetAction::isUseful()
 {

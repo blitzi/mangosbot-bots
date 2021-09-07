@@ -28,8 +28,12 @@ namespace ai
         bool SetGrindTarget(TravelTarget* target);
         bool SetBossTarget(TravelTarget* target);
         bool SetExploreTarget(TravelTarget* target);
-        bool SetBankTarget(TravelTarget* target);
+        bool SetCapitalTarget(TravelTarget* target);
         bool SetNullTarget(TravelTarget* target);
+
+    public:
+        static TravelDestination* FindDestination(Player* bot, string name);
+    private:
 
         void ReportTravelTarget(TravelTarget* newTarget, TravelTarget* oldTarget);
 

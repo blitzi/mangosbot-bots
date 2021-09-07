@@ -55,6 +55,7 @@ bool RpgAction::Execute(Event event)
 
         if (!ai->HasStrategy("follow", BOT_STATE_NON_COMBAT))
         {
+            ai->SetNextCheckDelay(sPlayerbotAIConfig.globalCoolDown);
             return true;
         }
     }
@@ -171,6 +172,10 @@ bool RpgAction::HasIgnore(ObjectGuid guid)
 
 void RpgAction::setDelay()
 {
+    if (!ai->HasRealPlayerMaster())
+        ai->SetNextCheckDelay(sPlayerbotAIConfig.rpgDelay);
+    else
+        ai->SetNextCheckDelay(sPlayerbotAIConfig.rpgDelay/5);
 }
 
 void RpgAction::stay(ObjectGuid guid)

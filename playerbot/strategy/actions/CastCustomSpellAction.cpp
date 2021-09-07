@@ -146,9 +146,9 @@ bool CastCustomSpellAction::Execute(Event event)
 
 bool CastRandomSpellAction::Execute(Event event)
 {
-    PlayerSpellMap const& spellMap = bot->GetSpellMap();
+    list<pair<uint32, string>> spellMap = GetSpellList();
     Player* master = GetMaster();
-
+    
     Unit* target = nullptr;
     GameObject* got = nullptr;
 
@@ -186,20 +186,11 @@ bool CastRandomSpellAction::Execute(Event event)
     {
         uint32 spellId = spell.first;
 
-        if (spell.second.state == PLAYERSPELL_REMOVED || spell.second.disabled || IsPassiveSpell(spellId))
-            continue;
-
         const SpellEntry* pSpellInfo = sServerFacade.LookupSpellInfo(spellId);
         if (!pSpellInfo)
             continue;
 
         if (!AcceptSpell(pSpellInfo))
-            continue;
-
-        if (pSpellInfo->Effect[0] == SPELL_EFFECT_LEARN_SPELL)
-            continue;
-
-        if (pSpellInfo->Effect[0] == SPELL_EFFECT_TRADE_SKILL)
             continue;
 
         if (bot->HasSpell(spellId))

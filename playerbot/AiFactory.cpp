@@ -186,7 +186,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
 
     if (!player->InBattleGround())
     {
-        engine->addStrategies("racials", "chat", "default", "aoe", "potions", "conserve mana", "duel", NULL);
+        engine->addStrategies("racials", "chat", "default", "potions", "cast time", "conserve mana", "duel", NULL);
     }
 
     switch (player->getClass())
@@ -194,18 +194,16 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
         case CLASS_PRIEST:
             if (tab == 2)
             {
-                engine->addStrategies("dps", "threat", "ranged", NULL);
-                if (player->GetLevel() >= 4)
-                    engine->addStrategy("dps debuff");
+                engine->addStrategies("dps", "shadow debuff", "shadow aoe", "threat", NULL);
             }
             else if (tab == 0)
             {
-                engine->addStrategies("holy", "ranged", NULL);
-                    //if (player->GetLevel() >= 4)
+                engine->addStrategies("holy", "shadow debuff", "shadow aoe", "threat", NULL);
+                    //if (player->getLevel() >= 4)
                        //engine->addStrategy("dps debuff");
             }
             else
-                engine->addStrategies("heal", "ranged");
+                engine->addStrategies("heal", "threat", NULL);
 
             engine->addStrategies("dps assist", "flee", "cure", NULL);
             break;
@@ -221,7 +219,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             break;
         case CLASS_WARRIOR:
             if (tab == 2)
-                engine->addStrategies("tank", "tank assist", "aoe", "close", NULL);
+                engine->addStrategies("tank", "tank assist", "aoe", "close", "mark rti", NULL);
             else if (player->GetLevel() < 30 || tab == 0)
                 engine->addStrategies("arms", "aoe", "dps assist", "threat", "close", NULL);
             else
@@ -323,7 +321,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             if (player->getClass() == CLASS_PRIEST && tab == 1)
             {
                 engine->removeStrategy("heal");
-                engine->addStrategies("shadow aoe", "holy", NULL);
+                engine->addStrategies("holy", "shadow debuff", "shadow aoe", "threat", NULL);
             }
 
             if (player->getClass() == CLASS_SHAMAN && tab == 2)
@@ -338,9 +336,6 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
 
             if (player->getClass() == CLASS_ROGUE)
                 engine->addStrategies("stealth", NULL);
-
-            if (player->getClass() != CLASS_HUNTER)
-                engine->removeStrategy("ranged");
         }
 
         if (player->getClass() == CLASS_ROGUE)
@@ -386,9 +381,6 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
         
         if (player->getClass() == CLASS_ROGUE)
             engine->addStrategies("behind", "stealth", NULL);
-
-        //if (player->getClass() != CLASS_HUNTER)
-        //    engine->removeStrategy("ranged");
     }
 }
 
@@ -485,11 +477,12 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
             nonCombatEngine->addStrategy("pvp");
             nonCombatEngine->addStrategy("collision");
             nonCombatEngine->addStrategy("grind");
+            nonCombatEngine->addStrategy("maintenance");
 
             if (sPlayerbotAIConfig.autoDoQuests)
             {
                 nonCombatEngine->addStrategy("travel");
-                nonCombatEngine->addStrategy("rpg");
+                nonCombatEngine->addStrategy("rpg");                
             }
             if (sPlayerbotAIConfig.randomBotJoinLfg)
                 nonCombatEngine->addStrategy("lfg");
@@ -506,11 +499,12 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
                 Player* master = botAi->GetMaster();
                 if (master)
                 {
-                    if (master->GetPlayerbotAI())
+                    if (master->GetPlayerbotAI() || sRandomPlayerbotMgr.IsRandomBot(player))
                     {
                         nonCombatEngine->addStrategy("pvp");
                         nonCombatEngine->addStrategy("collision");
                         nonCombatEngine->addStrategy("grind");
+                        nonCombatEngine->addStrategy("maintenance");
 
                         if (sPlayerbotAIConfig.autoDoQuests)
                         {

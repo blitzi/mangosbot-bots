@@ -8,7 +8,7 @@ using namespace ai;
 
 bool ReviveFromCorpseAction::Execute(Event event)
 {
-    Player* master = GetMaster();
+    Player* master = ai->GetGroupMaster();
     Corpse* corpse = bot->GetCorpse();
 
     // follow master when master revives
@@ -39,7 +39,17 @@ bool ReviveFromCorpseAction::Execute(Event event)
             return false;
     }
 
-    sLog.outDetail("Bot #%d %s:%d <%s> revives at body", bot->GetGUIDLow(), bot->GetTeam() == ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName());
+    if (!ai->HasRealPlayerMaster())
+    {
+        uint32 dCount = AI_VALUE(uint32, "death count");
+
+        if (dCount >= 5)
+        {
+            return ai->DoSpecificAction("spirit healer");
+        }
+    }
+
+    sLog.outDetail("Bot #%d %s:%d <%s> revives at body", bot->GetGUIDLow(), bot->GetTeam() == ALLIANCE ? "A" : "H", bot->getLevel(), bot->GetName());
     
     WorldPacket packet(CMSG_RECLAIM_CORPSE);
     packet << bot->GetObjectGuid();
@@ -60,7 +70,7 @@ bool FindCorpseAction::Execute(Event event)
     //if (corpse->GetMapId() != bot->GetMapId())
     //    return false;
 
-    Player* master = GetMaster();
+    Player* master = ai->GetGroupMaster();
     if (master)
     {
         if (!master->GetPlayerbotAI() &&
@@ -116,7 +126,7 @@ bool FindCorpseAction::Execute(Event event)
 
             bool moved = false;
 
-            if (deadTime < 30 * MINUTE && dCount < 5 && corpse->GetMapId() == bot->GetMapId()) //Look for corpse up to 30 minutes.
+            if (deadTime < 10 * MINUTE && dCount < 5 && corpse->GetMapId() == bot->GetMapId()) //Look for corpse up to 30 minutes.
             {
                 if (bot->IsWithinLOS(x, y, z))
                     moved = MoveNear(bot->GetMapId(), x, y, z, 0);
@@ -206,8 +216,9 @@ bool SpiritHealerAction::Execute(Event event)
     }
 
     uint32 dCount = AI_VALUE(uint32, "death count");
+    int64 deadTime = time(nullptr) - corpse->GetGhostTime();
 
-    WorldSafeLocsEntry const* ClosestGrave = GetGrave(dCount > 10);
+    WorldSafeLocsEntry const* ClosestGrave = GetGrave(dCount > 10 || deadTime > 15 * MINUTE);
 
     if (bot->GetDistance2d(ClosestGrave->x, ClosestGrave->y) < sPlayerbotAIConfig.sightDistance)
     {
@@ -251,7 +262,8 @@ bool SpiritHealerAction::Execute(Event event)
 
     if (!ai->HasActivePlayerMaster())
     {
-        bot->TeleportTo(ClosestGrave->map_id, ClosestGrave->x, ClosestGrave->y, ClosestGrave->z, ClosestGrave->o);
+        context->GetValue<uint32>("death count")->Set(dCount + 1);
+        return bot->TeleportTo(ClosestGrave->map_id, ClosestGrave->x, ClosestGrave->y, ClosestGrave->z, ClosestGrave->o);
     }
 
     sLog.outBasic("Bot #%d %s:%d <%s> can't find a spirit healer", bot->GetGUIDLow(), bot->GetTeam() == ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName());

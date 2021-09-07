@@ -39,6 +39,7 @@
 #include "generic/DebugStrategy.h"
 #include "generic/BattlegroundStrategy.h"
 #include "generic/LfgStrategy.h"
+#include "generic/MaintenanceStrategy.h"
 
 namespace ai
 {
@@ -99,6 +100,7 @@ namespace ai
             creators["dont move"] = &StrategyContext::dont_move;
             creators["careful tanking"] = &StrategyContext::careful_tanking;
             creators["run away on area debuff"] = &StrategyContext::run_away_on_area_debuff;
+            creators["maintenance"] = &StrategyContext::maintenance;
         }
 
     private:
@@ -151,6 +153,7 @@ namespace ai
         static Strategy* debug_spell(PlayerbotAI* ai) { return new DebugSpellStrategy(ai); }
         static Strategy* debug_update(PlayerbotAI* ai) { return new DebugUpdateStrategy(ai); }
         static Strategy* rtsc(PlayerbotAI* ai) { return new RTSCStrategy(ai); }
+        static Strategy* maintenance(PlayerbotAI* ai) { return new MaintenanceStrategy(ai); }
         static Strategy* dont_move(PlayerbotAI* ai) { return new DontMoveStrategy(ai); }
         static Strategy* careful_tanking(PlayerbotAI* ai) { return new CarefulTankingStrategy(ai); }
         static Strategy* run_away_on_area_debuff(PlayerbotAI* ai) { return new RunAwayOnAreaDebuff(ai); }

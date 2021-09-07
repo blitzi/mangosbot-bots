@@ -357,7 +357,12 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Uni
       return true;
    }
 
+   if (!spellId)
+       return false;
+
+   ai->SetNextCheckDelay(sPlayerbotAIConfig.globalCoolDown);
    ai->TellMasterNoFacing(out.str());
+
    bot->GetSession()->HandleUseItemOpcode(packet);
    return true;
 }
@@ -479,12 +484,12 @@ bool UseRandomRecipe::Execute(Event event)
 
 bool UseRandomQuestItem::isUseful()
 {
-    return !ai->HasActivePlayerMaster() && !bot->InBattleGround();
+    return !ai->HasActivePlayerMaster() && !bot->InBattleGround() && !bot->IsTaxiFlying();
 }
 
 bool UseRandomQuestItem::Execute(Event event)
 {
-    Unit* unitTarget = bot;
+    Unit* unitTarget = nullptr;
     ObjectGuid goTarget = ObjectGuid();
 
     list<Item*> questItems = AI_VALUE2(list<Item*>, "inventory items", "quest");
@@ -504,26 +509,26 @@ bool UseRandomQuestItem::Execute(Event event)
 
         ItemPrototype const* proto = questItem->GetProto();
 
+        if (proto->StartQuest)
+        {
+            Quest const* qInfo = sObjectMgr.GetQuestTemplate(proto->StartQuest);
+            if (bot->CanTakeQuest(qInfo, false))
+            {
+                item = questItem;
+                break;
+            }
+        }
+
         uint32 spellId = proto->Spells[0].SpellId;
         if (spellId)
         {
             SpellEntry const* spellInfo = sServerFacade.LookupSpellInfo(spellId);
 
-            if (ai->CanCastSpell(spellId, bot, false))
-            {
-
-                item = questItem;
-
-                if (spellInfo)
-                    delay = (!IsChanneledSpell(spellInfo) ? GetSpellCastTime(spellInfo, bot) : GetSpellDuration(spellInfo)) + sPlayerbotAIConfig.globalCoolDown;
-                break;
-            }
-
             list<ObjectGuid> npcs = AI_VALUE(list<ObjectGuid>, ("nearest npcs"));
             for (auto& npc : npcs)
             {
                 Unit* unit = ai->GetUnit(npc);
-                if (questItem->IsTargetValidForItemUse(unit) || ai->CanCastSpell(spellId, unit, false))
+                if (questItem->IsTargetValidForItemUse(unit) || ai->CanCastSpell(spellId, unit, 0, false))
                 {
                     item = questItem;
                     unitTarget = unit;
@@ -535,13 +540,27 @@ bool UseRandomQuestItem::Execute(Event event)
             for (auto& go : gos)
             {
                 GameObject* gameObject = ai->GetGameObject(go);
-                if (ai->CanCastSpell(spellId, gameObject, false))
+                GameObjectInfo const* goInfo = gameObject->GetGOInfo();
+                if (!goInfo->GetLockId())
+                    continue;
+
+                LockEntry const* lock = sLockStore.LookupEntry(goInfo->GetLockId());
+
+                for (uint8 i = 0; i < MAX_LOCK_CASE; ++i)
                 {
-                    item = questItem;
-                    goTarget = go;
-                    unitTarget = nullptr;
-                    break;
-                }
+                    if (!lock->Type[i])
+                        continue;
+                    if (lock->Type[i] != LOCK_KEY_ITEM)
+                        continue;
+
+                    if (lock->Index[i] == proto->ItemId)
+                    {
+                        item = questItem;
+                        goTarget = go;
+                        unitTarget = nullptr;
+                        break;
+                    }
+                }               
             }
         }
 
@@ -559,7 +578,13 @@ bool UseRandomQuestItem::Execute(Event event)
     if (!item)
         return false;
 
+    if (!goTarget && !unitTarget)
+        return false;
+
     bool used = UseItem(item, goTarget, nullptr, unitTarget);
+
+    if (used)
+        ai->SetNextCheckDelay(delay);
 
     return used;
 }

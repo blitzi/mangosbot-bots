@@ -10,6 +10,21 @@ float ThreatMultiplier::GetValue(Action* action)
 {
     //TODO move some of the AttackersValue Threat code here
 
+    if (!AI_VALUE(bool, "group"))
+        return 1.0f;
+
+    if (action->getThreatType() == ACTION_THREAT_AOE)
+    {
+        uint8 threat = AI_VALUE2(uint8, "threat", "aoe");
+        if (threat >= 50)
+            return 0.0f;
+    }
+
+    uint8 threat = AI_VALUE2(uint8, "threat", "current target");
+
+    if (threat >= 80)
+        return 0.0f;
+
     return 1.0f;
 }
 

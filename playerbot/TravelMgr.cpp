@@ -806,7 +806,24 @@ bool QuestObjectiveTravelDestination::isActive(Player* bot) {
     if (questTemplate->GetType() == QUEST_TYPE_ELITE && !AI_VALUE(bool, "can fight boss"))
         return false;
 
-    return sTravelMgr.getObjectiveStatus(bot, questTemplate, objective);
+    if (!sTravelMgr.getObjectiveStatus(bot, questTemplate, objective))
+        return false;
+
+    WorldPosition botPos(bot);
+
+    if (getEntry() > 0 && !isOut(&botPos))
+    {
+        list<ObjectGuid> targets = AI_VALUE(list<ObjectGuid>, "possible targets");
+
+        for (auto& target : targets)
+            if (target.GetEntry() == getEntry() && target.IsCreature() && ai->GetCreature(target) && ai->GetCreature(target)->IsAlive())
+                return true;
+        
+        setCooldownDelay(1000);
+        return false;
+    }
+
+    return true;
 }
 
 string QuestObjectiveTravelDestination::getTitle() {
@@ -836,11 +853,11 @@ bool RpgTravelDestination::isActive(Player* bot)
     bool isUsefull = false;
 
     if (cInfo->NpcFlags & UNIT_NPC_FLAG_VENDOR)
-        if (AI_VALUE(bool, "should sell") && AI_VALUE(bool, "can sell"))
+        if (AI_VALUE2(bool, "group or", "should sell,can sell,following party"))
             isUsefull = true;
 
     if (cInfo->NpcFlags & UNIT_NPC_FLAG_REPAIR)
-        if (AI_VALUE(bool, "should repair") && AI_VALUE(bool, "can repair"))
+        if (AI_VALUE2(bool, "group or", "should repair,can repair,following party"))
             isUsefull = true;
 
     if (!isUsefull)
@@ -951,12 +968,9 @@ bool BossTravelDestination::isActive(Player* bot)
     if (!AI_VALUE(bool, "can fight boss"))
         return false;
 
-    if (AI_VALUE(bool, "should sell"))
-        return false;
-
     CreatureInfo const* cInfo = this->getCreatureInfo();
 
-    int32 botLevel = bot->GetLevel();
+    int32 botLevel = bot->getLevel();
 
     uint8 botPowerLevel = AI_VALUE(uint8, "durability");
     float levelMod = botPowerLevel / 500.0f; //(0-0.2f)
@@ -975,7 +989,24 @@ bool BossTravelDestination::isActive(Player* bot)
     FactionTemplateEntry const* factionEntry = sFactionTemplateStore.LookupEntry(cInfo->Faction);
     ReputationRank reaction = ai->getReaction(factionEntry);
 
-    return reaction < REP_NEUTRAL;
+    if (reaction >= REP_NEUTRAL)
+        return false;
+
+    WorldPosition botPos(bot);
+
+    if (!isOut(&botPos))
+    {
+        list<ObjectGuid> targets = AI_VALUE(list<ObjectGuid>, "possible targets");
+
+        for (auto& target : targets)
+            if (target.GetEntry() == getEntry() && target.IsCreature() && ai->GetCreature(target) && ai->GetCreature(target)->IsAlive())
+                return true;
+
+        setCooldownDelay(1000);
+        return false;
+    }
+
+    return true;
 }
 
 string BossTravelDestination::getTitle() {
@@ -1554,7 +1585,7 @@ void TravelMgr::LoadQuestTravelTable()
                     }
                     else
                     {
-                        uint32 objective = 0;
+                        uint32 objective;
                         if (flag & (uint32)QuestRelationFlag::objective1)
                             objective = 0;
                         else if (flag & (uint32)QuestRelationFlag::objective2)
@@ -2550,6 +2581,40 @@ void TravelMgr::LoadQuestTravelTable()
         }
 
         sLog.outString(">> Calculated pathcost for " SIZEFMTD " nodes.", sTravelNodeMap.getNodes().size());
+    }
+
+    bool mirrorMissingPaths = true || fullNavPointReload || storeNavPointReload;
+
+    if (mirrorMissingPaths)
+    {
+        BarGoLink bar(sTravelNodeMap.getNodes().size());
+
+        for (auto& startNode : sTravelNodeMap.getNodes())
+        {
+            for (auto& path : *startNode->getLinks())
+            {
+                TravelNode* endNode = path.first;
+
+                if (endNode->hasLinkTo(startNode))
+                    continue;
+
+                if (path.second->getTransport() || path.second->getPortal() || path.second->getFlightPath())
+                    continue;
+
+                TravelNodePath nodePath = *path.second;
+
+                vector<WorldPosition> pPath = nodePath.getPath();
+                std::reverse(pPath.begin(), pPath.end());
+
+                nodePath.setPath(pPath);
+
+                endNode->setPathTo(startNode, nodePath, true);
+            }
+
+            bar.step();
+        }
+
+        sLog.outString(">> Reversed missing paths for " SIZEFMTD " nodes.", sTravelNodeMap.getNodes().size());
     }
 
     sTravelNodeMap.printMap();

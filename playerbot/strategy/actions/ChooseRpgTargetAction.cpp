@@ -5,6 +5,8 @@
 #include "../values/PossibleRpgTargetsValue.h"
 #include "../../Travelmgr.h"
 #include "../values/Formations.h"
+#include "../values/BudgetValues.h"
+#include "../values/Formations.h"
 
 using namespace ai;
 
@@ -28,11 +30,13 @@ bool ChooseRpgTargetAction::CanTrain(ObjectGuid guid)
 
     float fDiscountMod = bot->GetReputationPriceDiscount(creature);
 
-    TrainerSpellData const* trainer_spells = cSpells;
-    if (!trainer_spells)
-        trainer_spells = tSpells;
+    TrainerSpellMap trainer_spells;      
+    if(cSpells)
+        trainer_spells.insert(cSpells->spellList.begin(), cSpells->spellList.end());
+    if(tSpells)
+        trainer_spells.insert(tSpells->spellList.begin(), tSpells->spellList.end());
 
-    for (TrainerSpellMap::const_iterator itr = trainer_spells->spellList.begin(); itr != trainer_spells->spellList.end(); ++itr)
+    for (TrainerSpellMap::const_iterator itr = trainer_spells.begin(); itr != trainer_spells.end(); ++itr)
     {
         TrainerSpell const* tSpell = &itr->second;
 
@@ -52,7 +56,7 @@ bool ChooseRpgTargetAction::CanTrain(ObjectGuid guid)
             continue;
 
         uint32 cost = uint32(floor(tSpell->spellCost * fDiscountMod));
-        if (cost > bot->GetMoney())
+        if (cost > AI_VALUE2(uint32, "free money for", (uint32)NeedMoneyFor::spells))
             continue;
 
         return true;

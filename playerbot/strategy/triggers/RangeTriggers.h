@@ -13,7 +13,7 @@ namespace ai
 			Unit* target = AI_VALUE(Unit*, "current target");
             if (target)
             {
-                if (target->GetTarget() == bot && !bot->GetGroup() && !target->IsRooted() && target->GetSpeedInMotion() > bot->GetSpeedInMotion() * 0.9)
+                if (target->GetTarget() == bot && !bot->GetGroup() && !target->IsRooted() && target->GetSpeedInMotion() > bot->GetSpeedInMotion() * 0.65)
                     return false;
 
                 float targetDistance = sServerFacade.GetDistance2d(bot, target);
@@ -32,7 +32,7 @@ namespace ai
             if (!target)
                 return false;
 
-            if (target->GetTarget() == bot && !bot->GetGroup() && !target->IsRooted() && target->GetSpeedInMotion() > bot->GetSpeedInMotion() * 0.9)
+            if (target->GetTarget() == bot && !bot->GetGroup() && !target->IsRooted() && target->GetSpeedInMotion() > bot->GetSpeedInMotion() * 0.65)
                 return false;
 
             return sServerFacade.IsDistanceLessOrEqualThan(AI_VALUE2(float, "distance", "current target"), (ai->GetRange("shoot") / 2));
@@ -92,7 +92,7 @@ namespace ai
                 return false;
 
             float targetDistance = sServerFacade.GetDistance2d(bot, target);
-            return target && (targetDistance > max(5.0f, bot->GetCombinedCombatReach(target, true)) || (!bot->IsWithinLOSInMap(target) && targetDistance > 5.0f));
+            return target && (targetDistance > max(5.0f, bot->GetCombinedCombatReach(target, true)) || (!bot->IsWithinLOSInMap(target, true) && targetDistance > 5.0f));
         }
     };
 
@@ -103,7 +103,7 @@ namespace ai
         virtual bool IsActive()
         {
             Unit* target = AI_VALUE(Unit*, GetTargetName());
-            return target && (sServerFacade.GetDistance2d(bot, target) > ai->GetRange("spell") || !bot->IsWithinLOSInMap(target));
+            return target && (sServerFacade.GetDistance2d(bot, target) > ai->GetRange("spell") || !bot->IsWithinLOSInMap(target, true));
         }
     };
 

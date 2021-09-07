@@ -3,6 +3,7 @@
 #include "DebugAction.h"
 #include "../../PlayerbotAIConfig.h"
 #include <playerbot/TravelNode.h>
+#include "ChooseTravelTargetAction.h"
 
 using namespace ai;
 
@@ -48,6 +49,142 @@ bool DebugAction::Execute(Event event)
             i = zoneId;
         }
         return i == 0;        
+    }
+    else if (text.find("printmap") != std::string::npos)
+    {
+        sTravelNodeMap.printMap();
+        return true;
+    }
+    else if (text.find("travel ") != std::string::npos)
+    {
+        WorldPosition* botPos = &WorldPosition(bot);
+
+        string destination = text.substr(7);
+
+        TravelDestination* dest = ChooseTravelTargetAction::FindDestination(bot, destination);
+        if (dest)
+        {
+            vector <WorldPosition*> points = dest->nextPoint(botPos, true);
+
+            if (points.empty())
+                return false;
+
+            vector<WorldPosition> beginPath, endPath;
+            TravelNodeRoute route = sTravelNodeMap.getRoute(botPos, points.front(), beginPath, bot);
+
+            ostringstream out; out << "Traveling to " << dest->getTitle() << ": ";
+
+            for (auto node : route.getNodes())
+            {
+                out << node->getName() << ", ";
+            }
+
+            ai->TellMasterNoFacing(out.str());
+
+            return true;
+        }
+        else
+        {
+            ai->TellMasterNoFacing("Destination " + destination + " not found.");            
+            return true;
+        }
+    }
+    else if (text.find("quest ") != std::string::npos)
+    {
+        uint32 questId = stoi(text.substr(6));
+
+        Quest const* quest = sObjectMgr.GetQuestTemplate(questId);
+
+        if (!quest)
+        {
+            ai->TellMasterNoFacing("Quest " + text.substr(6) + " not found.");
+            return false;
+        }
+
+        ostringstream out;
+
+        out << quest->GetTitle() << ": ";
+
+        QuestContainer* cont = sTravelMgr.quests[questId];
+
+        for (auto g : cont->questGivers)
+        {
+            out << g->getTitle() << " +" << cont->questGivers.size() << " ";
+            break;
+        }
+
+        for (auto g : cont->questTakers)
+        {
+            out << g->getTitle() << " +" << cont->questTakers.size() - 1;
+            break;
+        }
+
+        for (auto g : cont->questObjectives)
+        {
+            out << g->getTitle() << " +" << cont->questObjectives.size() - 1;
+            break;
+        }
+
+        ai->TellMasterNoFacing(out);
+
+        return true;
+    }
+    else if (text.find("quest") != std::string::npos)
+    {
+        ostringstream out;
+        out << sTravelMgr.quests.size() << " quests ";
+
+        uint32 noT = 0, noG = 0, noO = 0;
+
+        for (auto q : sTravelMgr.quests)
+        {
+            if (q.second->questGivers.empty())
+                noG++;
+
+            if (q.second->questTakers.empty())
+                noT++;
+
+            if (q.second->questObjectives.empty())
+                noO++;
+        }
+
+        out << noG << "|" << noT << "|" << noO << " bad.";
+
+        ai->TellMasterNoFacing(out);
+
+        return true;
+    }
+    else if (text.find("bquest") != std::string::npos)
+    {
+        ostringstream out;
+        out << "bad quests:";
+
+        uint32 noT = 0, noG = 0, noO = 0;
+
+        for (auto q : sTravelMgr.quests)
+        {
+            Quest const* quest = sObjectMgr.GetQuestTemplate(q.first);
+
+            if (!quest)
+            {
+                out << " " << q.first << " does not exists";
+                continue;
+            }
+
+            if (q.second->questGivers.empty() || q.second->questTakers.empty() || q.second->questObjectives.empty())
+                out << quest->GetTitle() << " ";
+
+            if (q.second->questGivers.empty())
+                out << " no G";
+
+            if (q.second->questTakers.empty())
+                out << " no T";
+
+            if (q.second->questObjectives.empty())
+                out << " no O";
+        }
+        ai->TellMasterNoFacing(out);
+
     }
     else if (text.find("node") != std::string::npos)
     {

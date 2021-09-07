@@ -45,6 +45,8 @@
 #include "WorldBuffAction.h"
 #include "CastCustomSpellAction.h"
 #include "BattleGroundJoinAction.h"
+#include "DestroyItemAction.h"
+#include "ResetInstancesAction.h"
 
 namespace ai
 {
@@ -149,6 +151,8 @@ namespace ai
             creators["use random recipe"] = &ActionContext::use_random_recipe;
             creators["use random quest item"] = &ActionContext::use_random_quest_item;
             creators["craft random item"] = &ActionContext::craft_random_item;
+            creators["smart destroy item"] = &ActionContext::smart_destroy_item;
+            creators["reset instances"] = &ActionContext::reset_instances;
             creators["cancel heal"] = &ActionContext::cancel_heal;
 
             // BG Tactics
@@ -261,6 +265,9 @@ namespace ai
         static Action* use_random_recipe(PlayerbotAI* ai) { return new UseRandomRecipe(ai); }
         static Action* use_random_quest_item(PlayerbotAI* ai) { return new UseRandomQuestItem(ai); }
         static Action* craft_random_item(PlayerbotAI* ai) { return new CraftRandomItemAction(ai); }
+        static Action* smart_destroy_item(PlayerbotAI* ai) { return new SmartDestroyItemAction(ai); }
+        static Action* reset_instances(PlayerbotAI* ai) { return new ResetInstancesAction(ai); }
+        
         static Action* cancel_heal(PlayerbotAI* ai) { return new CancelHealAction(ai); }
 
         // BG Tactics

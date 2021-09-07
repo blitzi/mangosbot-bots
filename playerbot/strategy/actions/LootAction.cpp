@@ -503,7 +503,10 @@ bool StoreLootAction::IsLootAllowed(uint32 itemid, PlayerbotAI *ai)
 
     bool canLoot = lootStrategy->CanLoot(proto, context);
 
-    return canLoot;*/
+    if (canLoot && proto->Bonding == BIND_WHEN_PICKED_UP && ai->HasActivePlayerMaster())
+        canLoot = sPlayerbotAIConfig.IsInRandomAccountList(sObjectMgr.GetPlayerAccountIdByGUID(ai->GetBot()->GetObjectGuid()));
+
+    return canLoot;
 }
 
 bool ReleaseLootAction::Execute(Event event)
