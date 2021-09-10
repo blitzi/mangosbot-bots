@@ -76,6 +76,9 @@ bool SummonAction::Execute(Event event)
     if (!master)
         return false;
 
+    if (master->IsDead() || master->IsInCombat())
+        return false;
+
     if (master->GetSession()->GetSecurity() >= SEC_PLAYER)
         return Teleport(master, bot);
 
