@@ -267,7 +267,7 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Uni
       if (!spellId)
          continue;
 
-      if (!ai->CanCastSpell(spellId, bot, false))
+      if (!ai->CanCastSpell(spellId, bot, 0, false))
          continue;
 
       const SpellEntry* const pSpellInfo = sServerFacade.LookupSpellInfo(spellId);
