@@ -729,7 +729,7 @@ string QuestTravelDestination::getTitle() {
 bool QuestRelationTravelDestination::isActive(Player* bot) {
     if (relation == 0)
     {
-        if (questTemplate->GetQuestLevel() >= bot->getLevel() + (uint32)5)
+        if (questTemplate->GetQuestLevel() >= bot->GetLevel() + (uint32)5)
             return false;
         //if (questTemplate->XPValue(bot) == 0)
         //    return false;
@@ -786,7 +786,7 @@ string QuestRelationTravelDestination::getTitle() {
 }
 
 bool QuestObjectiveTravelDestination::isActive(Player* bot) {
-    if (questTemplate->GetQuestLevel() > bot->getLevel() + (uint32)1)
+    if (questTemplate->GetQuestLevel() > bot->GetLevel() + (uint32)1)
         return false;
 
     PlayerbotAI* ai = bot->GetPlayerbotAI();
