@@ -128,4 +128,6 @@ bool GossipHelloAction::ProcessGossip(int menuToSelect)
     bot->GetSession()->HandleGossipSelectOptionOpcode(p);
 
     TellGossipMenus();
+
+    return true;
 }

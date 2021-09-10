@@ -12,9 +12,6 @@ namespace ai
 
     private:
         bool BuyItem(VendorItemData const* tItems, ObjectGuid vendorguid, const ItemPrototype* proto);
-        bool TradeItem(FindItemVisitor *visitor, int8 slot);
-        bool TradeItem(const Item& item, int8 slot);
-
     };
 
 }

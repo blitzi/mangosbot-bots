@@ -678,9 +678,9 @@ void PlayerbotAI::DoNextAction()
         {
             bot->GetPlayerbotAI()->SetMaster(nullptr);
         }
+	    else if (bot->m_movementInfo.HasMovementFlag(MOVEFLAG_WALK_MODE)) bot->m_movementInfo.RemoveMovementFlag(MOVEFLAG_WALK_MODE);
+        else if (bot->IsSitState()) bot->SetStandState(UNIT_STAND_STATE_STAND);
 	}
-	else if (bot->m_movementInfo.HasMovementFlag(MOVEFLAG_WALK_MODE)) bot->m_movementInfo.RemoveMovementFlag(MOVEFLAG_WALK_MODE);
-    else if (bot->IsSitState()) bot->SetStandState(UNIT_STAND_STATE_STAND);
 
 #ifndef MANGOSBOT_ZERO
     if (bot->IsFlying() && !bot->IsFreeFlying())

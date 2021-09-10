@@ -42,7 +42,7 @@ Unit* EnemyPlayerValue::Calculate()
 bool NearestEnemyPlayersValue::AcceptUnit(Unit* unit)
 {
     Player* enemy = dynamic_cast<Player*>(unit);
-    if (enemy &&
+    return (enemy &&
         ai->IsOpposing(enemy) &&
         enemy->IsPvP() &&
         !sPlayerbotAIConfig.IsInPvpProhibitedZone(enemy->GetAreaId()) &&
@@ -50,9 +50,7 @@ bool NearestEnemyPlayersValue::AcceptUnit(Unit* unit)
         //!enemy->HasStealthAura() &&
         //!enemy->HasInvisibilityAura() &&
         enemy->IsVisibleForOrDetect(bot, enemy, false) &&
-        !(enemy->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION))
-        )
-        return true;
+        !(enemy->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION)));
 }
 
 Unit* EnemyPlayerValue::Calculate()

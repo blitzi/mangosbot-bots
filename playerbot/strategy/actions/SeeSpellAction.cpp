@@ -125,7 +125,7 @@ bool SeeSpellAction::Execute(Event event)
 
         out << (end - aend).length();
 
-        Creature* lastWp;
+        Creature* lastWp = NULL;
 
         for (auto i : points)
         {
