@@ -2446,7 +2446,7 @@ bool BGTactics::selectObjective(bool reset)
                             //bot->Say(out.str(), LANG_UNIVERSAL);
                         }
                         pAttackObjectiveObject = pGalvangar;
-                        attackObjectiveDistance = sqrt(bot->GetDistance(pGalvangar));
+                        attackObjectiveDistance = bot->GetDistance(pGalvangar);
                     }
                 }
 
@@ -2456,7 +2456,7 @@ bool BGTactics::selectObjective(bool reset)
                     {
                         if (GameObject* pGO = bot->GetMap()->GetGameObject(bg->GetSingleGameObjectGuid(objective.first, objective.second)))
                         {
-                            float const distance = sqrt(bot->GetDistance(pGO));
+                            float const distance = bot->GetDistance(pGO);
                             if (attackObjectiveDistance > distance)
                             {
                                 pAttackObjectiveObject = pGO;
@@ -2637,7 +2637,7 @@ bool BGTactics::selectObjective(bool reset)
                         {
                             if (GameObject* pGO = bot->GetMap()->GetGameObject(bg->GetSingleGameObjectGuid(objective.first, BG_AB_NODE_STATUS_NEUTRAL)))
                             {
-                                float const distance = sqrt(bot->GetDistance(pGO));
+                                float const distance = bot->GetDistance(pGO);
                                 if (attackObjectiveDistance > distance)
                                 {
                                     // do not pick if already in list
@@ -2679,7 +2679,7 @@ bool BGTactics::selectObjective(bool reset)
                     {
                         if (GameObject* pGO = bot->GetMap()->GetGameObject(bg->GetSingleGameObjectGuid(objective.first, BG_AB_NODE_STATUS_NEUTRAL)))
                         {
-                            float const distance = sqrt(bot->GetDistance(pGO));
+                            float const distance = bot->GetDistance(pGO);
                             if (attackObjectiveDistance > distance)
                             {
                                 // do not pick if already in list
@@ -2960,7 +2960,7 @@ bool BGTactics::startNewPathBegin(std::vector<BattleBotPath*> const& vPaths)
             continue;
 
         BattleBotWaypoint* pStart = &((*pPath)[0]);
-        if (sqrt(bot->GetDistance(pStart->x, pStart->y, pStart->z, DIST_CALC_NONE) < INTERACTION_DISTANCE))
+        if (sqrt(bot->GetDistance(pStart->x, pStart->y, pStart->z, DIST_CALC_NONE)) < INTERACTION_DISTANCE)
             availablePaths.emplace_back(AvailablePath(pPath, false));
 
         // Some paths are not allowed backwards.
@@ -2968,7 +2968,7 @@ bool BGTactics::startNewPathBegin(std::vector<BattleBotPath*> const& vPaths)
             continue;
 
         BattleBotWaypoint* pEnd = &((*pPath)[(*pPath).size() - 1]);
-        if (sqrt(bot->GetDistance(pEnd->x, pEnd->y, pEnd->z, DIST_CALC_NONE) < INTERACTION_DISTANCE))
+        if (sqrt(bot->GetDistance(pEnd->x, pEnd->y, pEnd->z, DIST_CALC_NONE)) < INTERACTION_DISTANCE)
             availablePaths.emplace_back(AvailablePath(pPath, true));
     }
 
