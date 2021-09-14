@@ -82,6 +82,14 @@ void PriestNonCombatStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
     triggers.push_back(new TriggerNode(
        "often",
        NextAction::array(0, new NextAction("apply oil", 1.0f), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "low health",
+        NextAction::array(0, new NextAction("greater heal", 51.0f), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "party member low health",
+        NextAction::array(0, new NextAction("greater heal on party", 50.0f), NULL)));
 }
 
 void PriestBuffStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
