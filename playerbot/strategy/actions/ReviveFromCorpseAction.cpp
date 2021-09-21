@@ -198,7 +198,7 @@ WorldSafeLocsEntry const* SpiritHealerAction::GetGrave(bool startZone)
 
         if (master && master != bot)
         {
-            ClosestGrave = sObjectMgr.GetClosestGraveYard(master->GetPositionX(), master->GetPositionY(), master->GetPositionZ(), master->GetMapId(), bot->GetTeam());
+            ClosestGrave = bot->GetMap()->GetGraveyardManager().GetClosestGraveYard(master->GetPositionX(), master->GetPositionY(), master->GetPositionZ(), master->GetMapId(), bot->GetTeam());
 
             if (ClosestGrave)
                 return ClosestGrave;

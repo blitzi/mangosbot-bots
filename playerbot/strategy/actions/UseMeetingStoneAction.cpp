@@ -169,7 +169,7 @@ bool SummonAction::Teleport(Player *summoner, Player *player)
     Player* master = GetMaster();
     if (!summoner->IsBeingTeleported() && !player->IsBeingTeleported())
     {
-        float followAngle = GetFollowAngle();
+        float followAngle = 0;
         for (float angle = followAngle - M_PI; angle <= followAngle + M_PI; angle += M_PI / 4)
         {
             uint32 mapId = summoner->GetMapId();
@@ -186,6 +186,8 @@ bool SummonAction::Teleport(Player *summoner, Player *player)
 
                 player->GetMotionMaster()->Clear();
                 player->TeleportTo(mapId, x, y, z, 0);
+                ResetReturnPosition();
+
                 return true;
             }
         }

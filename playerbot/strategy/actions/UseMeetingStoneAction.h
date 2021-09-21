@@ -2,13 +2,14 @@
 
 #include "../Action.h"
 #include "MovementActions.h"
+#include "ChatShortcutActions.h"
 
 namespace ai
 {
-    class SummonAction : public MovementAction
+    class SummonAction : public ReturnPositionResetAction
     {
     public:
-        SummonAction(PlayerbotAI* ai, string name = "summon") : MovementAction(ai, name) {}
+        SummonAction(PlayerbotAI* ai, string name = "summon") : ReturnPositionResetAction(ai, name) {}
 
         virtual bool Execute(Event event);
 
