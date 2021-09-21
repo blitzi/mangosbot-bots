@@ -929,7 +929,7 @@ bool MovementAction::Follow(Unit* target, float distance, float angle)
         }
 
         if (!target->IsTaxiFlying())
-           return MoveTo(target);
+           return ChaseTo(target, sPlayerbotAIConfig.followDistance);
     }
 
     if (sServerFacade.IsDistanceLessOrEqualThan(sServerFacade.GetDistance2d(bot, target), sPlayerbotAIConfig.followDistance))

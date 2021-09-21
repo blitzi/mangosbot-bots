@@ -37,7 +37,7 @@ namespace ai
                     bool inLos = bot->IsWithinLOSInMap(target);
                     bool isFriend = sServerFacade.IsFriendlyTo(bot, target);
                     float meleeDist = inLos ? distance - sPlayerbotAIConfig.contactDistance : isFriend ? distance / 2 : distance - sPlayerbotAIConfig.contactDistance;
-                    float distance = ai->IsRanged(bot) ? sPlayerbotAIConfig.spellDistance : meleeDist;
+                    float distance = ai->IsRanged(bot) ? ai->GetRange("spell") : meleeDist;
 
                     return ChaseTo(target, distance, bot->GetAngle(target));
                 }
