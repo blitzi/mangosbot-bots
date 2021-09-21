@@ -2,6 +2,7 @@
 #include "../../playerbot.h"
 #include "../values/PositionValue.h"
 #include "PositionAction.h"
+#include <playerbot/ServerFacade.h>
 
 using namespace ai;
 
@@ -144,6 +145,8 @@ bool SetReturnPositionAction::isUseful()
 
 bool ReturnAction::isUseful()
 {
+    if (sServerFacade.isMoving(bot)) return false;
+
     ai::PositionEntry pos = context->GetValue<ai::PositionMap&>("position")->Get()[qualifier];
     return pos.isSet();
 }
