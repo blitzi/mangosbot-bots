@@ -491,33 +491,10 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
                 nonCombatEngine->addStrategy("bg");
 
             nonCombatEngine->ChangeStrategy(sPlayerbotAIConfig.randomBotNonCombatStrategies);
-        }
-        else {
-            PlayerbotAI* botAi = player->GetPlayerbotAI();
-            if (botAi)
-            {
-                Player* master = botAi->GetMaster();
-                if (master)
-                {
-                    if (master->GetPlayerbotAI() || sRandomPlayerbotMgr.IsRandomBot(player))
-                    {
-                        nonCombatEngine->addStrategy("pvp");
-                        nonCombatEngine->addStrategy("collision");
-                        nonCombatEngine->addStrategy("grind");
-                        nonCombatEngine->addStrategy("maintenance");
-
-                        if (sPlayerbotAIConfig.autoDoQuests)
-                        {
-                            nonCombatEngine->addStrategy("travel");
-                            nonCombatEngine->addStrategy("rpg");
-                        }
-                        nonCombatEngine->ChangeStrategy(sPlayerbotAIConfig.randomBotNonCombatStrategies);
-                    }
-                    else
-                        nonCombatEngine->ChangeStrategy(sPlayerbotAIConfig.nonCombatStrategies);
-
-                }
-            }
+        }    
+        else
+        {
+            nonCombatEngine->ChangeStrategy(sPlayerbotAIConfig.nonCombatStrategies);
         }
     }
     else
