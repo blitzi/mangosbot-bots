@@ -41,7 +41,7 @@ bool RpgAction::Execute(Event event)
         entry = -((int32)wo->GetEntry());
 
     if (sServerFacade.isMoving(bot))
-        return true;
+        return false;
 
     if (bot->GetMapId() != wo->GetMapId())
     {
