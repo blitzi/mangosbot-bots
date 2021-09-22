@@ -20,7 +20,7 @@ namespace ai
         virtual bool RemIgnore(ObjectGuid guid);
         virtual bool HasIgnore(ObjectGuid guid);
 
-        void setDelay() {};
+        void setDelay(bool important = false);
 
         void stay(ObjectGuid guid);
         void cancel(ObjectGuid guid);
@@ -38,6 +38,7 @@ namespace ai
         void craft(ObjectGuid guid);
         void homebind(ObjectGuid guid);
         void queuebg(ObjectGuid guid);
+        void buyPetition(ObjectGuid guid);
     };
 
     class CRpgAction : public RpgAction {

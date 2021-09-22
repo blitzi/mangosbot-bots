@@ -9,7 +9,10 @@ using namespace ai;
 
 namespace ai
 {
-	bool LeaveGroupAction::Leave() {
+	bool LeaveGroupAction::Leave(Player* player) {
+
+        if (player && !player->GetPlayerbotAI() && !ai->GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_INVITE, false, player))
+            return false;
 
         bool aiMaster = (ai->GetMaster() && ai->GetMaster()->GetPlayerbotAI());
 
@@ -63,10 +66,27 @@ namespace ai
         if (ai->IsAlt() && (!master->GetPlayerbotAI() || master->GetPlayerbotAI()->IsRealPlayer())) //Don't leave group when alt grouped with player master.
             return false;
 
-        if (ai->GetGrouperType() == SOLO)
+        if (ai->GetGrouperType() == GrouperType::SOLO)
             return true;
 
-        if (abs(int32(master->GetLevel() - bot->GetLevel())) > 4)
+        uint32 dCount = AI_VALUE(uint32, "death count");
+
+        if (dCount > 9)
+            return true;
+
+        if (dCount > 4 && !ai->HasRealPlayerMaster())
+            return true;
+
+        if (bot->GetGuildId() == master->GetGuildId())
+        {
+            if (bot->getLevel() > master->getLevel() + 5)
+            {
+                if(AI_VALUE(bool, "should get money"))
+                    return false;
+            }
+        }
+
+        if (abs(int32(master->getLevel() - bot->getLevel())) > 4)
             return true;
 
         return false;

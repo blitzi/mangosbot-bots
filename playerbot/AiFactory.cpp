@@ -478,6 +478,8 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
             nonCombatEngine->addStrategy("collision");
             nonCombatEngine->addStrategy("grind");
             nonCombatEngine->addStrategy("maintenance");
+            nonCombatEngine->addStrategy("group");
+            nonCombatEngine->addStrategy("guild");
 
             if (sPlayerbotAIConfig.autoDoQuests)
             {

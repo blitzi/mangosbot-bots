@@ -40,6 +40,8 @@
 #include "generic/BattlegroundStrategy.h"
 #include "generic/LfgStrategy.h"
 #include "generic/MaintenanceStrategy.h"
+#include "generic/GroupStrategy.h"
+#include "generic/GuildStrategy.h"
 
 namespace ai
 {
@@ -101,6 +103,8 @@ namespace ai
             creators["careful tanking"] = &StrategyContext::careful_tanking;
             creators["run away on area debuff"] = &StrategyContext::run_away_on_area_debuff;
             creators["maintenance"] = &StrategyContext::maintenance;
+            creators["group"] = &StrategyContext::group;
+            creators["guild"] = &StrategyContext::guild;
         }
 
     private:
@@ -154,6 +158,8 @@ namespace ai
         static Strategy* debug_update(PlayerbotAI* ai) { return new DebugUpdateStrategy(ai); }
         static Strategy* rtsc(PlayerbotAI* ai) { return new RTSCStrategy(ai); }
         static Strategy* maintenance(PlayerbotAI* ai) { return new MaintenanceStrategy(ai); }
+        static Strategy* group(PlayerbotAI* ai) { return new GroupStrategy(ai); }
+        static Strategy* guild (PlayerbotAI* ai) { return new GuildStrategy(ai); }
         static Strategy* dont_move(PlayerbotAI* ai) { return new DontMoveStrategy(ai); }
         static Strategy* careful_tanking(PlayerbotAI* ai) { return new CarefulTankingStrategy(ai); }
         static Strategy* run_away_on_area_debuff(PlayerbotAI* ai) { return new RunAwayOnAreaDebuff(ai); }

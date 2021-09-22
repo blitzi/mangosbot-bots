@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../Action.h"
-#include "InventoryAction.h"
 
 namespace ai
 {
@@ -9,5 +8,5 @@ namespace ai
     public:
         PetitionSignAction(PlayerbotAI* ai) : Action(ai, "petition sign") {}
         virtual bool Execute(Event event);
-    };
+    };    
 }

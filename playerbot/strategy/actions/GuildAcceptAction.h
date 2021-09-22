@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../Action.h"
-#include "InventoryAction.h"
 
 namespace ai
 {
@@ -10,5 +9,4 @@ namespace ai
         GuildAcceptAction(PlayerbotAI* ai) : Action(ai, "guild accept") {}
         virtual bool Execute(Event event);
     };
-
 }

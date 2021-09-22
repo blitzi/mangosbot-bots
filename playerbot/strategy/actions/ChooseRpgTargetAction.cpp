@@ -6,7 +6,7 @@
 #include "../../Travelmgr.h"
 #include "../values/Formations.h"
 #include "../values/BudgetValues.h"
-#include "../values/Formations.h"
+#include "GuildCreateActions.h"
 
 using namespace ai;
 
@@ -76,7 +76,7 @@ BattleGroundTypeId ChooseRpgTargetAction::CanQueueBg(ObjectGuid guid)
         if (!bg)
             continue;
 
-        if (bot->GetLevel() < bg->GetMinLevel())
+        if (bot->getLevel() < bg->GetMinLevel())
             continue;
 
         // check if already in queue
@@ -210,9 +210,9 @@ bool ChooseRpgTargetAction::Execute(Event event)
             }
 
             if (unit->isVendor() && AI_VALUE2(bool, "group or", "should sell,can sell,following party,near leader"))
-                    priority = 100;
+                priority = 100;
             else if (unit->isArmorer() && AI_VALUE2(bool, "group or", "should repair,can repair,following party,near leader"))
-                    priority = 95;
+                priority = 95;
             else if (AI_VALUE2(bool, "can turn in quest npc", unit->GetEntry()))
                 priority = 90;
             else if (CanTrain(guid) || AI_VALUE2(bool, "can accept quest npc", unit->GetEntry()) || (!AI_VALUE(bool, "can fight equal") && AI_VALUE2(bool, "can accept quest low level npc", unit->GetEntry())))
@@ -223,6 +223,8 @@ bool ChooseRpgTargetAction::Execute(Event event)
                 priority = 60;
             else if (unit->isBattleMaster() && CanQueueBg(guid) != BATTLEGROUND_TYPE_NONE)
                 priority = 50;
+            else if (unit->isGuildMaster() && BuyPetitionAction::canBuyPetition(bot))
+                priority = 40;
         }
         else
         {
@@ -242,7 +244,7 @@ bool ChooseRpgTargetAction::Execute(Event event)
                 priority = 70;     
         }
 
-        if (ai->HasStrategy("debug rpg", BOT_STATE_NON_COMBAT))
+        if (ai->HasStrategy("debug rpg", BOT_STATE_NON_COMBAT) && priority > 1)
         {
             ostringstream out;
             out << "rpg option: ";
