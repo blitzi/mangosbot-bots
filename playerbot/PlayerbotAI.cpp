@@ -1349,19 +1349,19 @@ bool PlayerbotAI::CanCastSpell(uint32 spellid, GameObject* goTarget, bool checkH
 
     if (CastingTime && bot->IsMoving())
         return false;
-
    
-        bool damage = false;
-        for (int32 i = EFFECT_INDEX_0; i <= EFFECT_INDEX_2; i++)
+    bool damage = false;
+    for (int32 i = EFFECT_INDEX_0; i <= EFFECT_INDEX_2; i++)
+    {
+        if (spellInfo->Effect[(SpellEffectIndex)i] == SPELL_EFFECT_SCHOOL_DAMAGE)
         {
-            if (spellInfo->Effect[(SpellEffectIndex)i] == SPELL_EFFECT_SCHOOL_DAMAGE)
-            {
-                damage = true;
-                break;
-            }
+            damage = true;
+            break;
         }
-        if (bot->GetDistance(goTarget) > sPlayerbotAIConfig.sightDistance)
-            return false;
+    }
+
+    if (bot->GetDistance(goTarget) > sPlayerbotAIConfig.sightDistance)
+        return false;
 
     ObjectGuid oldSel = bot->GetSelectionGuid();
     bot->SetSelectionGuid(goTarget->GetObjectGuid());
