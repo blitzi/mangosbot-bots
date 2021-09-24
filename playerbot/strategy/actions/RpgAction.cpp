@@ -55,8 +55,7 @@ bool RpgAction::Execute(Event event)
         sServerFacade.SetFacingTo(bot, wo, true);
 
         if (!ai->HasStrategy("follow", BOT_STATE_NON_COMBAT))
-        {
-            ai->SetNextCheckDelay(sPlayerbotAIConfig.globalCoolDown);
+        {            
             return true;
         }
     }
@@ -175,10 +174,6 @@ bool RpgAction::HasIgnore(ObjectGuid guid)
 
 void RpgAction::setDelay(bool important)
 {
-    if (!ai->HasRealPlayerMaster() || (important && ai->GetGroupMaster() == bot && bot->GetGroup()))
-        ai->SetNextCheckDelay(sPlayerbotAIConfig.rpgDelay);
-    else
-        ai->SetNextCheckDelay(sPlayerbotAIConfig.rpgDelay/5);
 }
 
 void RpgAction::stay(ObjectGuid guid)
