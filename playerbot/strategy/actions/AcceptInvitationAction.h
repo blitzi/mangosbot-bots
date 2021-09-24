@@ -39,7 +39,7 @@ namespace ai
             //else
             //    sPlayerbotDbStore.Save(ai);
             
-            ai->ResetStrategies();
+            ai->ResetStrategies(false);
             ai->ChangeStrategy("+follow,-lfg,-bg", BOT_STATE_NON_COMBAT);
             ai->Reset();
 

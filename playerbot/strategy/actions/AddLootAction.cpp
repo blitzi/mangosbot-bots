@@ -87,4 +87,23 @@ bool AddGatheringLootAction::AddLoot(ObjectGuid guid)
     }
 
     return AddAllLootAction::AddLoot(guid);
+
+    /*if (AI_VALUE(uint8, "bag space") < 90)
+    {
+        return AddAllLootAction::AddLoot(guid);
+    }
+    else
+    {
+        ostringstream out;
+        out << "I would loot " << wo->GetName() << " but my inventory is full";
+
+        if (ai->GetMaster())
+            ai->TellError(out.str());
+        else
+            ai->GetBot()->Say(out.str(), LANG_UNIVERSAL);
+
+        ai->TellError(out.str());
+
+        return false;
+    }*/
 }

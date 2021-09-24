@@ -195,6 +195,9 @@ string QueryItemUsageAction::QueryQuestItem(uint32 itemId)
             string usage = QueryQuestItem(itemId, questTemplate, &questStatus);
             if (!usage.empty()) return usage;
         }
+
+        if (bot->CanCompleteQuest(questId))
+            bot->CompleteQuest(questId);
     }
 
     return "";

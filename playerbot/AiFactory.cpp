@@ -229,7 +229,10 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             if (tab == 0)
                 engine->addStrategies("caster", "caster aoe", "bmana", "threat", "flee", "ranged", NULL);
             else if (tab == 2)
+            {
                 engine->addStrategies("heal", "bmana", "flee", "ranged", NULL);
+                engine->removeStrategy("dps assist");
+            }
             else
                 engine->addStrategies("dps", "melee aoe", "bdps", "threat", "close", NULL);
 
@@ -264,7 +267,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             else
             {
                 engine->removeStrategy("ranged");
-                engine->addStrategies("bear", "tank assist", "flee", "close", NULL);
+                engine->addStrategies("bear", "tank aoe", "flee", "close", NULL);
             }
             break;
         case CLASS_HUNTER:
@@ -306,11 +309,22 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
         {
             engine->addStrategy("flee");
             engine->addStrategy("boost");
+            engine->addStrategy("flee");
 
-            
+            if (player->getClass() == CLASS_MAGE)
+            {
+                engine->removeStrategy("ranged");
+            }
+
+            if (player->getClass() == CLASS_WARLOCK)
+            {
+                engine->removeStrategy("ranged");
+            }
+
             if (player->getClass() == CLASS_DRUID && tab == 2)
             {
                 engine->addStrategies("caster", "caster aoe", NULL);
+                engine->removeStrategy("ranged");
             }
 
             if (player->getClass() == CLASS_DRUID && tab == 1 && urand(0, 100) > 50 && player->GetLevel() > 19)
@@ -322,15 +336,18 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             {
                 engine->removeStrategy("heal");
                 engine->addStrategies("holy", "shadow debuff", "shadow aoe", "threat", NULL);
+                engine->removeStrategy("ranged");
             }
 
             if (player->getClass() == CLASS_SHAMAN && tab == 2)
             {
                 engine->addStrategies("caster", "caster aoe", NULL);
+                engine->removeStrategy("ranged");
             }
 
             if (player->getClass() == CLASS_PALADIN && tab == 0)
             {
+                engine->removeStrategy("ranged");
                 engine->addStrategies("dps", "close", NULL);
             }
 
@@ -459,6 +476,8 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
             nonCombatEngine->addStrategy("dps assist");
             break;
     }
+    nonCombatEngine->addStrategies("nc", "food", "stay", "sit", "chat", "follow",
+            "default", "quest", "loot", "gather", "duel", "emote", "conserve mana", "buff", "reveal", NULL);
 
     if (!player->InBattleGround())
     {
@@ -470,28 +489,7 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
     {   
         if (!player->GetGroup() || player->GetGroup()->GetLeaderGuid() == player->GetObjectGuid())
         {
-            // let 50% of random not grouped (or grp leader) bots help other players
-            if (!urand(0, 4))
-                nonCombatEngine->addStrategy("attack tagged");
-
-            nonCombatEngine->addStrategy("pvp");
             nonCombatEngine->addStrategy("collision");
-            nonCombatEngine->addStrategy("grind");
-            nonCombatEngine->addStrategy("maintenance");
-            nonCombatEngine->addStrategy("group");
-            nonCombatEngine->addStrategy("guild");
-
-            if (sPlayerbotAIConfig.autoDoQuests)
-            {
-                nonCombatEngine->addStrategy("travel");
-                nonCombatEngine->addStrategy("rpg");                
-            }
-            if (sPlayerbotAIConfig.randomBotJoinLfg)
-                nonCombatEngine->addStrategy("lfg");
-
-            if (sPlayerbotAIConfig.randomBotJoinBG)
-                nonCombatEngine->addStrategy("bg");
-
             nonCombatEngine->ChangeStrategy(sPlayerbotAIConfig.randomBotNonCombatStrategies);
         }    
         else

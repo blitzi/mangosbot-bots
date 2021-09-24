@@ -54,6 +54,7 @@ LootObject::LootObject(Player* bot, ObjectGuid guid)
 
 void LootObject::Refresh(Player* bot, ObjectGuid guid)
 {
+    isQuestGO = false;
     skillId = SKILL_NONE;
     reqSkillValue = 0;
     reqItem = 0;
@@ -117,6 +118,37 @@ void LootObject::Refresh(Player* bot, ObjectGuid guid)
     }
 }
 
+bool LootObject::IsNeededForQuest(Player* bot, uint32 itemId)
+{
+    for (int qs = 0; qs < MAX_QUEST_LOG_SIZE; ++qs)
+    {
+        uint32 questId = bot->GetQuestSlotQuestId(qs);
+        if (questId == 0)
+            continue;
+
+        QuestStatusData& qData = bot->getQuestStatusMap()[questId];
+        if (qData.m_status != QUEST_STATUS_INCOMPLETE)
+            continue;
+
+        Quest const* qInfo = sObjectMgr.GetQuestTemplate(questId);
+        if (!qInfo)
+            continue;
+
+        for (int i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; ++i)
+        {
+            if (!qInfo->ReqItemCount[i] || (qInfo->ReqItemCount[i] - qData.m_itemcount[i]) <= 0)
+                continue;
+
+            if (qInfo->ReqItemId[i] != itemId)
+                continue;
+
+            return true;
+        }
+    }
+
+    return false;
+}
+
 WorldObject* LootObject::GetWorldObject(Player* bot)
 {
     Refresh(bot, guid);
@@ -150,7 +182,19 @@ bool LootObject::IsLootPossible(Player* bot)
     PlayerbotAI* ai = bot->GetPlayerbotAI();
 
     if (reqItem && !bot->HasItemCount(reqItem, 1))
+    {
+        /*if (ai->GetMaster())
+        {
+            ItemPrototype const *proto = sObjectMgr.GetItemPrototype(reqItem);
+            ostringstream out;
+            ChatHelper* chat;
+            out << " I need ";
+            out << chat->formatItem(proto, 1);
+            out << " to open it!";
+            ai->TellMaster(out.str());
+        }*/
         return false;
+    }
 
     if (abs(GetWorldObject(bot)->GetPositionZ() - bot->GetPositionZ()) > INTERACTION_DISTANCE)
         return false;

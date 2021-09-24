@@ -43,6 +43,7 @@ bool ImbueWithPoisonAction::Execute(Event event)
          if (poison)
          {
             ai->ImbueItem(poison, EQUIPMENT_SLOT_MAINHAND);
+            ai->SetNextCheckDelay(5);
          }
       }
       //... and offhand
@@ -57,10 +58,10 @@ bool ImbueWithPoisonAction::Execute(Event event)
          if (poison)
          {
             ai->ImbueItem(poison, EQUIPMENT_SLOT_OFFHAND);
+            ai->SetNextCheckDelay(5);
          }
       }
 
-      return true;
    }
 
 // Search and apply stone to weapons
@@ -97,6 +98,7 @@ bool ImbueWithStoneAction::Execute(Event event)
       if (stone)
       {
          ai->ImbueItem(stone, EQUIPMENT_SLOT_MAINHAND);
+         ai->SetNextCheckDelay(5);
       }
    }
    //... and offhand
@@ -107,10 +109,10 @@ bool ImbueWithStoneAction::Execute(Event event)
       if (stone)
       {
          ai->ImbueItem(stone, EQUIPMENT_SLOT_OFFHAND);
+         ai->SetNextCheckDelay(5);
       }
    }
 
-   return true;
 }
 
 // Search and apply oil to weapons
@@ -127,7 +129,6 @@ bool ImbueWithOilAction::Execute(Event event)
    if (bot->IsInCombat())
 #endif
       return false;
-
    // remove stealth
    if (bot->HasAura(SPELL_AURA_MOD_STEALTH))
       bot->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
@@ -147,13 +148,12 @@ bool ImbueWithOilAction::Execute(Event event)
       if (oil)
       {
          ai->ImbueItem(oil, EQUIPMENT_SLOT_MAINHAND);
+         ai->SetNextCheckDelay(5);
       }
    }
-
-   return true;
 }
 
-TryEmergencyAction::TryEmergencyAction(PlayerbotAI* ai) : Action(ai, "try emergency")
+TryEmergencyAction::TryEmergencyAction(PlayerbotAI* ai) : Action(ai, "try emegency")
 {
 }
 
@@ -169,6 +169,7 @@ bool TryEmergencyAction::Execute(Event event)
       Item* bandage = ai->FindBandage();
       if (bandage)
       {
+         ai->SetNextCheckDelay(8);
          ai->ImbueItem(bandage, bot);
       }
    }
@@ -183,6 +184,4 @@ bool TryEmergencyAction::Execute(Event event)
          ai->ImbueItem(healthItem);
       }
    }
-
-   return true;
 }

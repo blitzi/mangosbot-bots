@@ -403,11 +403,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
 
     if (!movePosition || movePosition.getMapId() != bot->GetMapId())
     {
-        movePath.clear();
-        AI_VALUE(LastMovement&, "last movement").setPath(movePath);
-
-        if (ai->HasStrategy("debug move", BOT_STATE_NON_COMBAT))
-            ai->TellMasterNoFacing("No point. Rebuilding.");
+        //ai->TellError("Seems I am stuck");
         return false;
     }
 

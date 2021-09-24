@@ -198,12 +198,8 @@ bool QuestAction::AcceptQuest(Quest const* quest, uint64 questGiver)
         p.rpos(0);
         bot->GetSession()->HandleQuestgiverAcceptQuestOpcode(p);
 
-        if (bot->GetQuestStatus(questId) == QUEST_STATUS_NONE && sPlayerbotAIConfig.syncQuestWithPlayer)
-        {
-            Object* pObject = bot->GetObjectByTypeMask((ObjectGuid)questGiver, TYPEMASK_CREATURE_GAMEOBJECT_PLAYER_OR_ITEM);
-            bot->AddQuest(quest, pObject);
-
-        }
+        if (bot->CanCompleteQuest(questId))
+            bot->CompleteQuest(questId);
 
         if (bot->GetQuestStatus(questId) != QUEST_STATUS_NONE && bot->GetQuestStatus(questId) != QUEST_STATUS_AVAILABLE)
         {

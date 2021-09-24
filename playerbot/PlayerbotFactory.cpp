@@ -332,7 +332,7 @@ void PlayerbotFactory::AddConsumables()
              StoreItem(CONSUM_ID_WIZARD_OIL, 5);
          }
 #ifdef MANGOSBOT_ZERO
-         if (level >= 45) {
+         if (level >= 45 ) {
              StoreItem(CONSUM_ID_BRILLIANT_MANA_OIL, 5);
              StoreItem(CONSUM_ID_BRILLIANT_WIZARD_OIL, 5);
          }
@@ -348,7 +348,8 @@ void PlayerbotFactory::AddConsumables()
          if (level >= 58) {
            StoreItem(CONSUM_ID_SUPERIOR_MANA_OIL, 5);
            StoreItem(CONSUM_ID_SUPERIOR_WIZARD_OIL, 5);
-      }
+         }
+#endif
 #endif
    }
       break;
@@ -617,9 +618,9 @@ void PlayerbotFactory::InitTalentsTree(bool incremental)
 {
     uint32 specNo = sRandomPlayerbotMgr.GetValue(bot->GetGUIDLow(), "specNo");
     if (incremental && specNo)
-	{
-        specNo -= 1;
-	}
+    {
+        specNo -=  1;
+    }
     else
     {
         uint32 point = urand(0, 100);
@@ -987,8 +988,11 @@ bool PlayerbotFactory::CanEquipItem(ItemPrototype const* proto, uint32 desiredQu
 
 void PlayerbotFactory::InitEquipment(bool incremental)
 {
+	//if (bot->getLevel() >= 10)
+	//{
         DestroyItemsVisitor visitor(bot);
         IterateItems(&visitor, ITERATE_ALL_ITEMS);
+	//}
 
     for(uint8 slot = 0; slot < EQUIPMENT_SLOT_END; ++slot)
     {

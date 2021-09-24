@@ -1521,10 +1521,7 @@ bool RandomPlayerbotMgr::ProcessBot(Player* player)
 				sGuildTaskMgr.Update(*i, player);
 		}
 
-        uint32 accountId = sObjectMgr.GetPlayerAccountIdByGUID(guild->GetLeaderGuid());
-
-        if (!sPlayerbotAIConfig.IsInRandomAccountList(accountId))
-        {
+        if (!IsRandomBot(guild->GetLeaderGuid())) {
             int32 rank = guild->GetRank(player->GetObjectGuid());
             randomiser = rank < 4 ? false : true;
         }
@@ -1537,18 +1534,21 @@ bool RandomPlayerbotMgr::ProcessBot(Player* player)
         {
             Randomize(player);
         }
-
-        if (randomiser)
-        {
-            sLog.outBasic("Bot #%d <%s>: randomized", bot, player->GetName());
-        }
         else
         {
-            sLog.outBasic("Bot #%d %s <%s>: consumables refreshed", bot, player->GetName(), sGuildMgr.GetGuildById(player->GetGuildId())->GetName());
+            RandomTeleportForRpg(player);
         }
 
-        // disable until needed
-        // ChangeStrategy(player);
+		SetEventValue(bot, "teleport", 1, sPlayerbotAIConfig.maxRandomBotInWorldTime);
+		uint32 randomChange = urand(sPlayerbotAIConfig.randomBotUpdateInterval * 5, sPlayerbotAIConfig.randomBotUpdateInterval * 15);
+		ScheduleChangeStrategy(bot, randomChange);
+
+        if (randomiser) {
+            sLog.outString("Bot %d is randomized and sent to city for %d minutes", bot, int(randomChange / 60));
+        }
+        else {
+            sLog.outString("Bot %d from <%s> is refreshed and sent to city for %d minutes", bot, sGuildMgr.GetGuildById(player->GetGuildId())->GetName(), int(randomChange / 60));
+        }
 
         uint32 randomTime = urand(sPlayerbotAIConfig.minRandomBotRandomizeTime, sPlayerbotAIConfig.maxRandomBotRandomizeTime);
         ScheduleRandomize(bot, randomTime);
@@ -2042,7 +2042,7 @@ void RandomPlayerbotMgr::Refresh(Player* bot)
         bot->SetPower(POWER_ENERGY, bot->GetMaxPower(POWER_ENERGY));
 
     uint32 money = bot->GetMoney();
-    bot->SetMoney(money + 500 * sqrt(urand(1, bot->getLevel() * 5)));
+    bot->SetMoney(money + 1000 * sqrt(urand(1, bot->getLevel() * 5)));
 
     if (pmo) pmo->finish();
 }
