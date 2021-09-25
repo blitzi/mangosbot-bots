@@ -96,11 +96,12 @@ bool CastSpellAction::isUseful()
     }
 
     return target && AI_VALUE2(bool, "spell cast useful", spell) && bot->GetDistance(target, true, DIST_CALC_COMBAT_REACH) <= maxRange;
+    return GetTarget() && (GetTarget() != nullptr) && (GetTarget() != NULL) && AI_VALUE2(bool, "spell cast useful", spell) && sServerFacade.GetDistance2d(bot, GetTarget()) <= range;
 }
 
 bool CastAuraSpellAction::isUseful()
 {
-    return CastSpellAction::isUseful() && !ai->HasAura(spell, GetTarget(), true);
+    return GetTarget() && (GetTarget() != nullptr) && (GetTarget() != NULL) && CastSpellAction::isUseful() && !ai->HasAura(spell, GetTarget(), true);
 }
 
 bool CastEnchantItemAction::isPossible()

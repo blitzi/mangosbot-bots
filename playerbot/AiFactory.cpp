@@ -61,7 +61,7 @@ AiObjectContext* AiFactory::createAiObjectContext(Player* player, PlayerbotAI* a
 
 int AiFactory::GetPlayerSpecTab(Player* bot)
 {
-    if (bot->GetLevel() >= 10)
+    if (bot->getLevel() >= 10)
     {
         map<uint32, int32> tabs = GetPlayerSpecTabs(bot);
 
@@ -205,7 +205,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             else
                 engine->addStrategies("heal", "threat", NULL);
 
-            engine->addStrategies("dps assist", "flee", "cure", "ranged", NULL);
+            engine->addStrategies("dps assist", "flee", "cure", "ranged", "cc", NULL);
             break;
         case CLASS_MAGE:
             if (tab == 0)
@@ -215,12 +215,12 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             else
                 engine->addStrategies("frost", "frost aoe", "threat", "dps aoe", NULL);
 
-            engine->addStrategies("dps", "dps assist", "flee", "cure", "cc", "ranged", NULL);
+            engine->addStrategies("dps", "dps assist", "flee", "cure", "ranged", "cc", NULL);
             break;
         case CLASS_WARRIOR:
             if (tab == 2)
                 engine->addStrategies("tank", "tank assist", "aoe", "close", "mark rti", NULL);
-            else if (player->GetLevel() < 30 || tab == 0)
+            else if (player->getLevel() < 30 || tab == 0)
                 engine->addStrategies("arms", "aoe", "dps assist", "threat", "close", NULL);
             else
                 engine->addStrategies("fury", "aoe", "dps assist", "threat", "close", NULL);
@@ -229,10 +229,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             if (tab == 0)
                 engine->addStrategies("caster", "caster aoe", "bmana", "threat", "flee", "ranged", NULL);
             else if (tab == 2)
-            {
                 engine->addStrategies("heal", "bmana", "flee", "ranged", NULL);
-                engine->removeStrategy("dps assist");
-            }
             else
                 engine->addStrategies("dps", "melee aoe", "bdps", "threat", "close", NULL);
 
@@ -240,17 +237,17 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             break;
         case CLASS_PALADIN:
             if (tab == 1)
-                engine->addStrategies("tank", "tank assist", "bthreat", "cure", "barmor", "close", NULL);
+                engine->addStrategies("tank", "tank assist", "bthreat", "cure", "barmor", "bstats", "close", "cc", NULL);
 			else if(tab == 0)
-                engine->addStrategies("heal", "bmana", "cure", "flee", "barmor", NULL);
+                engine->addStrategies("heal", "bmana", "dps assist", "cure", "flee", "barmor", "ranged", NULL);
             else
-                engine->addStrategies("dps", "bdps", "dps assist", "cure", "baoe", "close", NULL);
+                engine->addStrategies("dps", "bdps", "dps assist", "cure", "baoe", "close", "cc", NULL);
 
-            if (player->GetLevel() < 14)
+            if (player->getLevel() < 14)
             {
                 engine->addStrategy("bdps");
             }
-            if (player->GetLevel() < 16)
+            if (player->getLevel() < 16)
             {
                 engine->addStrategy("barmor");
             }
@@ -258,21 +255,21 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
         case CLASS_DRUID:
             if (tab == 0)
             {
-                engine->addStrategies("caster", "cure", "caster aoe", "threat", "flee", "dps assist", "cc", NULL);
-                if (player->GetLevel() > 19)
+                engine->addStrategies("caster", "cure", "caster aoe", "threat", "flee", "dps assist", "ranged", "cc", NULL);
+                if (player->getLevel() > 19)
                     engine->addStrategy("caster debuff");
             }
             else if (tab == 2)
-                engine->addStrategies("heal", "cure", "flee", "dps assist", "cc", "ranged", NULL);
+                engine->addStrategies("heal", "cure", "flee", "dps assist", "ranged", "cc", NULL);
             else
             {
                 engine->removeStrategy("ranged");
-                engine->addStrategies("bear", "tank aoe", "flee", "close", NULL);
+                engine->addStrategies("bear", "tank assist", "flee", "close", NULL);
             }
             break;
         case CLASS_HUNTER:
             engine->addStrategies("dps", "bdps", "threat", "dps assist", "ranged", "pet", "cc", NULL);
-            if (player->GetLevel() > 19)
+            if (player->getLevel() > 19)
                 engine->addStrategy("dps debuff");
             break;
         case CLASS_ROGUE:
@@ -280,14 +277,14 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             break;
         case CLASS_WARLOCK:
             if (tab == 1)
-                engine->addStrategies("threat", NULL);
+                engine->addStrategies("tank", "threat", NULL);
             else
                 engine->addStrategies("dps", "threat", NULL);
 
-            if (player->GetLevel() > 19)
+            if (player->getLevel() > 19)
                 engine->addStrategy("dps debuff");
 
-            engine->addStrategies("dps assist", "dps", "flee", "cc", "pet", "ranged", NULL);
+            engine->addStrategies("dps assist", "flee", "ranged", "cc", "pet", NULL);
             break;
 #ifdef MANGOSBOT_TWO
         case CLASS_DEATH_KNIGHT:
@@ -309,25 +306,14 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
         {
             engine->addStrategy("flee");
             engine->addStrategy("boost");
-            engine->addStrategy("flee");
 
-            if (player->getClass() == CLASS_MAGE)
-            {
-                engine->removeStrategy("ranged");
-            }
-
-            if (player->getClass() == CLASS_WARLOCK)
-            {
-                engine->removeStrategy("ranged");
-            }
-
+            
             if (player->getClass() == CLASS_DRUID && tab == 2)
             {
                 engine->addStrategies("caster", "caster aoe", NULL);
-                engine->removeStrategy("ranged");
             }
 
-            if (player->getClass() == CLASS_DRUID && tab == 1 && urand(0, 100) > 50 && player->GetLevel() > 19)
+            if (player->getClass() == CLASS_DRUID && tab == 1 && urand(0, 100) > 50 && player->getLevel() > 19)
             {
                 engine->addStrategy("dps");
             }
@@ -336,18 +322,15 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             {
                 engine->removeStrategy("heal");
                 engine->addStrategies("holy", "shadow debuff", "shadow aoe", "threat", NULL);
-                engine->removeStrategy("ranged");
             }
 
             if (player->getClass() == CLASS_SHAMAN && tab == 2)
             {
                 engine->addStrategies("caster", "caster aoe", NULL);
-                engine->removeStrategy("ranged");
             }
 
             if (player->getClass() == CLASS_PALADIN && tab == 0)
             {
-                engine->removeStrategy("ranged");
                 engine->addStrategies("dps", "close", NULL);
             }
 
@@ -402,7 +385,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
 }
 
 Engine* AiFactory::createCombatEngine(Player* player, PlayerbotAI* const facade, AiObjectContext* AiObjectContext) {
-	Engine* engine = new Engine(facade, AiObjectContext, BotState::BOT_STATE_COMBAT);
+	Engine* engine = new Engine(facade, AiObjectContext);
     AddDefaultCombatStrategies(player, facade, engine);
     return engine;
 }
@@ -411,70 +394,70 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
 {
     int tab = GetPlayerSpecTab(player);
 
-    switch (player->getClass()) {
-    case CLASS_PRIEST:
-        nonCombatEngine->addStrategies("dps assist", "cure", NULL);
-        break;
-    case CLASS_PALADIN:
-        if (tab == 1)
-            nonCombatEngine->addStrategies("bthreat", "tank assist", "barmor", "bstats", NULL);
-        else if (tab == 0)
-            nonCombatEngine->addStrategies("dps assist", "barmor", "bmana", NULL);
-        else
-            nonCombatEngine->addStrategies("dps assist", "baoe", "bdps", NULL);
-
-        if (player->GetLevel() < 14)
-            nonCombatEngine->addStrategies("bdps", NULL);
-        if (player->GetLevel() < 16)
-            nonCombatEngine->addStrategies("barmor", NULL);
-
-        nonCombatEngine->addStrategies("cure", NULL);
-        break;
-    case CLASS_HUNTER:
-        nonCombatEngine->addStrategies("bdps", "dps assist", NULL);
-        break;
-    case CLASS_SHAMAN:
-        if (tab == 0 || tab == 2)
-            nonCombatEngine->addStrategy("bmana");
-        else
-            nonCombatEngine->addStrategy("bdps");
-
-        nonCombatEngine->addStrategies("dps assist", "cure", NULL);
-        break;
-    case CLASS_MAGE:
-        if (tab == 1)
-            nonCombatEngine->addStrategy("bdps");
-        else
-            nonCombatEngine->addStrategy("bmana");
-
-        nonCombatEngine->addStrategies("dps assist", "cure", NULL);
-        break;
-    case CLASS_DRUID:
-        if (tab == 1)
-            nonCombatEngine->addStrategy("tank assist");
-        else
+    switch (player->getClass()){
+        case CLASS_PRIEST:
             nonCombatEngine->addStrategies("dps assist", "cure", NULL);
-        break;
-    case CLASS_WARRIOR:
-        if (tab == 2)
-            nonCombatEngine->addStrategy("tank assist");
-        else
-            nonCombatEngine->addStrategy("dps assist");
-        break;
-    case CLASS_WARLOCK:
-        nonCombatEngine->addStrategies("pet", "dps assist", NULL);
-        break;
+            break;
+        case CLASS_PALADIN:
+            if (tab == 1)
+                nonCombatEngine->addStrategies("bthreat", "tank assist", "barmor", "bstats", NULL);
+            else if (tab == 0)
+                nonCombatEngine->addStrategies("dps assist", "barmor", "bmana", NULL);
+            else
+                nonCombatEngine->addStrategies("dps assist", "baoe", "bdps", NULL);
+
+            if (player->getLevel() < 14)
+                nonCombatEngine->addStrategies("bdps", NULL);
+            if (player->getLevel() < 16)
+                nonCombatEngine->addStrategies("barmor", NULL);
+
+            nonCombatEngine->addStrategies("cure", NULL);
+            break;
+        case CLASS_HUNTER:
+            nonCombatEngine->addStrategies("bdps", "dps assist", NULL);
+            break;
+        case CLASS_SHAMAN:
+            if (tab == 0 || tab == 2)
+                nonCombatEngine->addStrategy("bmana");
+            else
+                nonCombatEngine->addStrategy("bdps");
+
+            nonCombatEngine->addStrategies("dps assist", "cure", NULL);
+            break;
+        case CLASS_MAGE:
+            if (tab == 1)
+                nonCombatEngine->addStrategy("bdps");
+            else
+                nonCombatEngine->addStrategy("bmana");
+
+            nonCombatEngine->addStrategies("dps assist", "cure", NULL);
+            break;
+        case CLASS_DRUID:
+            if (tab == 1)
+                nonCombatEngine->addStrategy("tank assist");
+            else
+                nonCombatEngine->addStrategies("dps assist", "cure", NULL);
+            break;
+        case CLASS_WARRIOR:
+            if (tab == 2)
+                nonCombatEngine->addStrategy("tank assist");
+            else
+                nonCombatEngine->addStrategy("dps assist");
+            break;
+        case CLASS_WARLOCK:
+            nonCombatEngine->addStrategies("pet", "dps assist", NULL);
+            break;
 #ifdef MANGOSBOT_TWO
-    case CLASS_DEATH_KNIGHT:
-        if (tab == 0)
-            nonCombatEngine->addStrategy("tank assist");
-        else
-            nonCombatEngine->addStrategy("dps assist");
-        break;
+        case CLASS_DEATH_KNIGHT:
+            if (tab == 0)
+                nonCombatEngine->addStrategy("tank assist");
+            else
+                nonCombatEngine->addStrategy("dps assist");
+            break;
 #endif
-    default:
-        nonCombatEngine->addStrategy("dps assist");
-        break;
+        default:
+            nonCombatEngine->addStrategy("dps assist");
+            break;
     }
 
     if (!player->InBattleGround())
@@ -484,7 +467,7 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
     }
 
     if ((facade->IsRealPlayer() || sRandomPlayerbotMgr.IsRandomBot(player)) && !player->InBattleGround())
-    {
+    {   
         if (!player->GetGroup() || player->GetGroup()->GetLeaderGuid() == player->GetObjectGuid())
         {
             // let 50% of random not grouped (or grp leader) bots help other players
@@ -501,7 +484,7 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
             if (sPlayerbotAIConfig.autoDoQuests)
             {
                 nonCombatEngine->addStrategy("travel");
-                nonCombatEngine->addStrategy("rpg");
+                nonCombatEngine->addStrategy("rpg");                
             }
             if (sPlayerbotAIConfig.randomBotJoinLfg)
                 nonCombatEngine->addStrategy("lfg");
@@ -531,16 +514,16 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
                         {
                             nonCombatEngine->addStrategy("travel");
                             nonCombatEngine->addStrategy("rpg");
-                    }
+                        }
                         nonCombatEngine->ChangeStrategy(sPlayerbotAIConfig.randomBotNonCombatStrategies);
-                }
+                    }
                     else
                         nonCombatEngine->ChangeStrategy(sPlayerbotAIConfig.nonCombatStrategies);
 
+                }
             }
         }
     }
-}
     else
     {
         nonCombatEngine->ChangeStrategy(sPlayerbotAIConfig.nonCombatStrategies);
@@ -590,7 +573,7 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
 }
 
 Engine* AiFactory::createNonCombatEngine(Player* player, PlayerbotAI* const facade, AiObjectContext* AiObjectContext) {
-    Engine* nonCombatEngine = new Engine(facade, AiObjectContext, BotState::BOT_STATE_NON_COMBAT);
+	Engine* nonCombatEngine = new Engine(facade, AiObjectContext);
 
     AddDefaultNonCombatStrategies(player, facade, nonCombatEngine);
 	return nonCombatEngine;
@@ -606,7 +589,7 @@ void AiFactory::AddDefaultDeadStrategies(Player* player, PlayerbotAI* const faca
 }
 
 Engine* AiFactory::createDeadEngine(Player* player, PlayerbotAI* const facade, AiObjectContext* AiObjectContext) {
-    Engine* deadEngine = new Engine(facade, AiObjectContext, BotState::BOT_STATE_DEAD);
+    Engine* deadEngine = new Engine(facade, AiObjectContext);
     AddDefaultDeadStrategies(player, facade, deadEngine);
     return deadEngine;
 }

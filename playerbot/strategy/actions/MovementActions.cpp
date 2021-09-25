@@ -193,7 +193,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
 
         if (startPosition.getMapId() != endPosition.getMapId() || totalDistance > maxDist)
         {
-            if (!sTravelNodeMap.getNodes().empty())
+            if (!sTravelNodeMap.getNodes().empty() && !bot->InBattleGround())
             {
                 //[[Node pathfinding system]]
                 //We try to find nodes near the bot and near the end position that have a route between them.
@@ -202,7 +202,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
 
                 //Find the route of nodes starting at a node closest to the start position and ending at a node closest to the endposition.
                 //Also returns longPath: The path from the start position to the first node in the route.
-                TravelNodeRoute route = sTravelNodeMap.getRoute(&startPosition, &endPosition, beginPath, bot);
+                TravelNodeRoute route = sTravelNodeMap.getRoute(startPosition, endPosition, beginPath, bot);
 
                 if (sPlayerbotAIConfig.hasLog("bot_pathfinding.csv"))
                 {
@@ -233,7 +233,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
                 }
                 else
                 {
-                    endPath = route.getNodes().back()->getPosition()->getPathTo(endPosition, NULL);
+                    endPath = route.getNodes().back()->getPosition()->getPathTo(endPosition, nullptr);
                     movePath = route.buildPath(beginPath, endPath);
 
                     if (sPlayerbotAIConfig.hasLog("bot_pathfinding.csv"))
