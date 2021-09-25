@@ -105,10 +105,12 @@ bool TrainerAction::Execute(Event event)
 
     Player* master = GetMaster();
 
-    Creature *creature = ai->GetCreature(master->GetSelectionGuid());
-    if (!creature || !creature->IsTrainer())
+    if (!master)
         return false;
 
+    Creature *creature = ai->GetCreature(master->GetSelectionGuid());
+    if (!creature || !creature->isTrainer())
+        return false;
             
     if (!creature->IsTrainerOf(bot, false))
     {

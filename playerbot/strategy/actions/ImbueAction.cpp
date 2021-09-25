@@ -42,8 +42,7 @@ bool ImbueWithPoisonAction::Execute(Event event)
             poison = ai->FindConsumable(WOUND_POISON_DISPLAYID);
          if (poison)
          {
-            ai->ImbueItem(poison, EQUIPMENT_SLOT_MAINHAND);
-            ai->SetNextCheckDelay(5);
+            ai->ImbueItem(poison, EQUIPMENT_SLOT_MAINHAND);            
          }
       }
       //... and offhand
@@ -57,8 +56,7 @@ bool ImbueWithPoisonAction::Execute(Event event)
             poison = ai->FindConsumable(INSTANT_POISON_DISPLAYID);
          if (poison)
          {
-            ai->ImbueItem(poison, EQUIPMENT_SLOT_OFFHAND);
-            ai->SetNextCheckDelay(5);
+            ai->ImbueItem(poison, EQUIPMENT_SLOT_OFFHAND);           
          }
       }
 
@@ -97,8 +95,7 @@ bool ImbueWithStoneAction::Execute(Event event)
       stone = ai->FindStoneFor(weapon);
       if (stone)
       {
-         ai->ImbueItem(stone, EQUIPMENT_SLOT_MAINHAND);
-         ai->SetNextCheckDelay(5);
+         ai->ImbueItem(stone, EQUIPMENT_SLOT_MAINHAND);         
       }
    }
    //... and offhand
@@ -108,8 +105,7 @@ bool ImbueWithStoneAction::Execute(Event event)
       stone = ai->FindStoneFor(weapon);
       if (stone)
       {
-         ai->ImbueItem(stone, EQUIPMENT_SLOT_OFFHAND);
-         ai->SetNextCheckDelay(5);
+         ai->ImbueItem(stone, EQUIPMENT_SLOT_OFFHAND);         
       }
    }
 
@@ -147,8 +143,7 @@ bool ImbueWithOilAction::Execute(Event event)
       oil = ai->FindOilFor(weapon);
       if (oil)
       {
-         ai->ImbueItem(oil, EQUIPMENT_SLOT_MAINHAND);
-         ai->SetNextCheckDelay(5);
+         ai->ImbueItem(oil, EQUIPMENT_SLOT_MAINHAND);         
       }
    }
 }
@@ -168,8 +163,7 @@ bool TryEmergencyAction::Execute(Event event)
    {
       Item* bandage = ai->FindBandage();
       if (bandage)
-      {
-         ai->SetNextCheckDelay(8);
+      {         
          ai->ImbueItem(bandage, bot);
       }
    }

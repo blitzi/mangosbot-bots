@@ -106,6 +106,7 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Uni
    uint8 slot = item->GetSlot();
    uint8 spell_index = 0;
    uint8 cast_count = 1;
+   uint32 spellId = 0;
 #ifdef MANGOSBOT_TWO
    ObjectGuid item_guid = item->GetObjectGuid();
 #else

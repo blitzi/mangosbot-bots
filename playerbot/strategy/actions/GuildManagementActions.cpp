@@ -159,7 +159,7 @@ bool GuildManageNearbyAction::isUseful()
     Guild* guild = sGuildMgr.GetGuildById(bot->GetGuildId());
     MemberSlot* botMember = guild->GetMemberSlot(bot->GetObjectGuid());
 
-    return  guild->GetRankRights(botMember->RankId) & (GR_RIGHT_DEMOTE | GR_RIGHT_PROMOTE | GR_RIGHT_INVITE);
+    return botMember && guild->GetRankRights(botMember->RankId) & (GR_RIGHT_DEMOTE | GR_RIGHT_PROMOTE | GR_RIGHT_INVITE);
 }
 
 bool GuildLeaveAction::Execute(Event event)
