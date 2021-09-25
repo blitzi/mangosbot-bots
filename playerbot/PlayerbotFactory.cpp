@@ -350,7 +350,6 @@ void PlayerbotFactory::AddConsumables()
            StoreItem(CONSUM_ID_SUPERIOR_WIZARD_OIL, 5);
          }
 #endif
-#endif
    }
       break;
       case CLASS_PALADIN:
@@ -1562,12 +1561,9 @@ void PlayerbotFactory::SetRandomSkill(uint16 id)
 	}
 #endif
 
-    uint32 value = urand(maxValue - level, maxValue);
     uint32 curValue = bot->GetSkillValue(id);
-    if (!bot->HasSkill(id) || value > curValue)
-        bot->SetSkill(id, value, maxValue);
-
-
+    if (!bot->HasSkill(id) || maxValue > curValue)
+        bot->SetSkill(id, maxValue, maxValue);
 }
 
 void PlayerbotFactory::InitAvailableSpells()
