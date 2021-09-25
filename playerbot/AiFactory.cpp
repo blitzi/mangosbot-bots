@@ -411,73 +411,71 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
 {
     int tab = GetPlayerSpecTab(player);
 
-    switch (player->getClass()){
-        case CLASS_PRIEST:
+    switch (player->getClass()) {
+    case CLASS_PRIEST:
+        nonCombatEngine->addStrategies("dps assist", "cure", NULL);
+        break;
+    case CLASS_PALADIN:
+        if (tab == 1)
+            nonCombatEngine->addStrategies("bthreat", "tank assist", "barmor", "bstats", NULL);
+        else if (tab == 0)
+            nonCombatEngine->addStrategies("dps assist", "barmor", "bmana", NULL);
+        else
+            nonCombatEngine->addStrategies("dps assist", "baoe", "bdps", NULL);
+
+        if (player->GetLevel() < 14)
+            nonCombatEngine->addStrategies("bdps", NULL);
+        if (player->GetLevel() < 16)
+            nonCombatEngine->addStrategies("barmor", NULL);
+
+        nonCombatEngine->addStrategies("cure", NULL);
+        break;
+    case CLASS_HUNTER:
+        nonCombatEngine->addStrategies("bdps", "dps assist", NULL);
+        break;
+    case CLASS_SHAMAN:
+        if (tab == 0 || tab == 2)
+            nonCombatEngine->addStrategy("bmana");
+        else
+            nonCombatEngine->addStrategy("bdps");
+
+        nonCombatEngine->addStrategies("dps assist", "cure", NULL);
+        break;
+    case CLASS_MAGE:
+        if (tab == 1)
+            nonCombatEngine->addStrategy("bdps");
+        else
+            nonCombatEngine->addStrategy("bmana");
+
+        nonCombatEngine->addStrategies("dps assist", "cure", NULL);
+        break;
+    case CLASS_DRUID:
+        if (tab == 1)
+            nonCombatEngine->addStrategy("tank assist");
+        else
             nonCombatEngine->addStrategies("dps assist", "cure", NULL);
-            break;
-        case CLASS_PALADIN:
-            if (tab == 1)
-                nonCombatEngine->addStrategies("bthreat", "tank assist", "barmor", NULL);
-            else if (tab == 0)
-                nonCombatEngine->addStrategies("dps assist", "barmor", "bmana", NULL);
-            else
-                nonCombatEngine->addStrategies("dps assist", "baoe", "bdps", NULL);
-
-            if (player->GetLevel() < 14)
-                nonCombatEngine->addStrategies("bdps", NULL);
-            if (player->GetLevel() < 16)
-                nonCombatEngine->addStrategies("barmor", NULL);
-
-            nonCombatEngine->addStrategies("cure", NULL);
-            break;
-        case CLASS_HUNTER:
-            nonCombatEngine->addStrategies("bdps", "dps assist", NULL);
-            break;
-        case CLASS_SHAMAN:
-            if (tab == 0 || tab == 2)
-                nonCombatEngine->addStrategy("bmana");
-            else
-                nonCombatEngine->addStrategy("bdps");
-
-            nonCombatEngine->addStrategies("dps assist", "cure", NULL);
-            break;
-        case CLASS_MAGE:
-            if (tab == 1)
-                nonCombatEngine->addStrategy("bdps");
-            else
-                nonCombatEngine->addStrategy("bmana");
-
-            nonCombatEngine->addStrategies("dps assist", "cure", NULL);
-            break;
-        case CLASS_DRUID:
-            if (tab == 1)
-                nonCombatEngine->addStrategy("tank assist");
-            else
-                nonCombatEngine->addStrategies("dps assist", "cure", NULL);
-            break;
-        case CLASS_WARRIOR:
-            if (tab == 2)
-                nonCombatEngine->addStrategy("tank assist");
-            else
-                nonCombatEngine->addStrategy("dps assist");
-            break;
-        case CLASS_WARLOCK:
-            nonCombatEngine->addStrategies("pet", "dps assist", NULL);
-            break;
-#ifdef MANGOSBOT_TWO
-        case CLASS_DEATH_KNIGHT:
-            if (tab == 0)
-                nonCombatEngine->addStrategy("tank assist");
-            else
-                nonCombatEngine->addStrategy("dps assist");
-            break;
-#endif
-        default:
+        break;
+    case CLASS_WARRIOR:
+        if (tab == 2)
+            nonCombatEngine->addStrategy("tank assist");
+        else
             nonCombatEngine->addStrategy("dps assist");
-            break;
+        break;
+    case CLASS_WARLOCK:
+        nonCombatEngine->addStrategies("pet", "dps assist", NULL);
+        break;
+#ifdef MANGOSBOT_TWO
+    case CLASS_DEATH_KNIGHT:
+        if (tab == 0)
+            nonCombatEngine->addStrategy("tank assist");
+        else
+            nonCombatEngine->addStrategy("dps assist");
+        break;
+#endif
+    default:
+        nonCombatEngine->addStrategy("dps assist");
+        break;
     }
-    nonCombatEngine->addStrategies("nc", "food", "stay", "sit", "chat", "follow",
-            "default", "quest", "loot", "gather", "duel", "emote", "conserve mana", "buff", "reveal", NULL);
 
     if (!player->InBattleGround())
     {
@@ -486,17 +484,63 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
     }
 
     if ((facade->IsRealPlayer() || sRandomPlayerbotMgr.IsRandomBot(player)) && !player->InBattleGround())
-    {   
+    {
         if (!player->GetGroup() || player->GetGroup()->GetLeaderGuid() == player->GetObjectGuid())
         {
+            // let 50% of random not grouped (or grp leader) bots help other players
+            if (!urand(0, 4))
+                nonCombatEngine->addStrategy("attack tagged");
+
+            nonCombatEngine->addStrategy("pvp");
             nonCombatEngine->addStrategy("collision");
+            nonCombatEngine->addStrategy("grind");
+            nonCombatEngine->addStrategy("maintenance");
+            nonCombatEngine->addStrategy("group");
+            nonCombatEngine->addStrategy("guild");
+
+            if (sPlayerbotAIConfig.autoDoQuests)
+            {
+                nonCombatEngine->addStrategy("travel");
+                nonCombatEngine->addStrategy("rpg");
+            }
+            if (sPlayerbotAIConfig.randomBotJoinLfg)
+                nonCombatEngine->addStrategy("lfg");
+
+            if (sPlayerbotAIConfig.randomBotJoinBG)
+                nonCombatEngine->addStrategy("bg");
+
             nonCombatEngine->ChangeStrategy(sPlayerbotAIConfig.randomBotNonCombatStrategies);
-        }    
-        else
-        {
-            nonCombatEngine->ChangeStrategy(sPlayerbotAIConfig.nonCombatStrategies);
+        }
+        else {
+            PlayerbotAI* botAi = player->GetPlayerbotAI();
+            if (botAi)
+            {
+                Player* master = botAi->GetMaster();
+                if (master)
+                {
+                    if (master->GetPlayerbotAI() || sRandomPlayerbotMgr.IsRandomBot(player))
+                    {
+                        nonCombatEngine->addStrategy("pvp");
+                        nonCombatEngine->addStrategy("collision");
+                        nonCombatEngine->addStrategy("grind");
+                        nonCombatEngine->addStrategy("maintenance");
+                        nonCombatEngine->addStrategy("group");
+                        nonCombatEngine->addStrategy("guild");
+
+                        if (sPlayerbotAIConfig.autoDoQuests)
+                        {
+                            nonCombatEngine->addStrategy("travel");
+                            nonCombatEngine->addStrategy("rpg");
+                    }
+                        nonCombatEngine->ChangeStrategy(sPlayerbotAIConfig.randomBotNonCombatStrategies);
+                }
+                    else
+                        nonCombatEngine->ChangeStrategy(sPlayerbotAIConfig.nonCombatStrategies);
+
+            }
         }
     }
+}
     else
     {
         nonCombatEngine->ChangeStrategy(sPlayerbotAIConfig.nonCombatStrategies);
