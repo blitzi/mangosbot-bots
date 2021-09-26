@@ -68,7 +68,7 @@ namespace ai
     class Engine : public PlayerbotAIAware
     {
     public:
-        Engine(PlayerbotAI* ai, AiObjectContext *factory, BotState botState);
+        Engine(PlayerbotAI* ai, AiObjectContext *factory);
 
 	    void Init();
         void addStrategy(string name);
@@ -121,7 +121,6 @@ namespace ai
         AiObjectContext* aiObjectContext;
         std::map<string, Strategy*> strategies;
         string lastAction;
-        BotState engineState;
 
     public:
 		bool testMode;

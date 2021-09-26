@@ -13,7 +13,7 @@ using namespace ai;
 using namespace std;
 using namespace chrono;
 
-Engine::Engine(PlayerbotAI* ai, AiObjectContext *factory, BotState botState) : PlayerbotAIAware(ai), aiObjectContext(factory), engineState(botState), lastCastRelevance(0.0f)
+Engine::Engine(PlayerbotAI* ai, AiObjectContext *factory) : PlayerbotAIAware(ai), aiObjectContext(factory), lastCastRelevance(0.0f)
 {
     testMode = false;
 }

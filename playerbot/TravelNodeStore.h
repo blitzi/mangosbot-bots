@@ -35533,7 +35533,7 @@ namespace ai
 
             for (auto node : addNodes)
             {
-                nodes[node.node] = sTravelNodeMap.addNode(&node.point, node.name, true, true, node.isTransport, node.transportId);
+                nodes[node.node] = sTravelNodeMap.addNode(node.point, node.name, true, true, node.isTransport, node.transportId);
             }
 
             for (auto lnode : linkNodes)
