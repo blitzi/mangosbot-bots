@@ -217,8 +217,8 @@ void PlayerbotFactory::Randomize(bool incremental)
     if (pmo) pmo->finish();
 
     pmo = sPerformanceMonitor.start(PERF_MON_RNDBOT, "PlayerbotFactory_Equip");
-    sLog.outDetail("Initializing equipmemt...");
-    InitEquipment(incremental);
+    //sLog.outDetail("Initializing equipmemt...");
+    //InitEquipment(incremental);
 	
 	if (bot->GetLevel() >= sPlayerbotAIConfig.minEnchantingBotLevel)
 	{
@@ -309,7 +309,6 @@ void PlayerbotFactory::Refresh()
     InitPotions();
     InitReagents();
     bot->SaveToDB();
-    //bot->SaveToDB();
 }
 
 void PlayerbotFactory::AddConsumables()
@@ -1398,7 +1397,7 @@ void PlayerbotFactory::UpdateTradeSkills()
 void PlayerbotFactory::InitSkills()
 {
     uint32 maxValue = level * 5;
-    SetRandomSkill(SKILL_DEFENSE);
+    bot->UpdateSkillsForLevel(true);
 
 // Riding skills requirements are different
 #ifdef MANGOSBOT_ZERO
@@ -2178,7 +2177,7 @@ void PlayerbotFactory::CancelAuras()
 void PlayerbotFactory::InitInventory()
 {
     InitInventoryTrade();
-    InitInventoryEquip();
+    //InitInventoryEquip();
     InitInventorySkill();
 }
 
