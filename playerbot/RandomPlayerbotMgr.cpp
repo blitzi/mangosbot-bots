@@ -293,7 +293,7 @@ uint32 RandomPlayerbotMgr::AddRandomBots()
 {
     set<uint32> bots;
 
-    QueryResult* results = PlayerbotDatabase.PQuery(
+   /* QueryResult* results = PlayerbotDatabase.PQuery(
         "select `bot` from ai_playerbot_random_bots where event = 'add'");
 
     if (results)
@@ -305,7 +305,7 @@ uint32 RandomPlayerbotMgr::AddRandomBots()
             bots.insert(bot);
         } while (results->NextRow());
         delete results;
-    }
+    }*/
 
     vector<uint32> guids;
     int maxAllowedBotCount = GetEventValue(0, "bot_count");
@@ -2058,7 +2058,7 @@ list<uint32> RandomPlayerbotMgr::GetBots()
 {
     if (!currentBots.empty()) return currentBots;
 
-    QueryResult* results = PlayerbotDatabase.Query(
+   /* QueryResult* results = PlayerbotDatabase.Query(
             "select bot from ai_playerbot_random_bots where owner = 0 and event = 'add'");
 
     if (results)
@@ -2070,7 +2070,7 @@ list<uint32> RandomPlayerbotMgr::GetBots()
             currentBots.push_back(bot);
         } while (results->NextRow());
 		delete results;
-    }
+    }*/
 
     return currentBots;
 }
