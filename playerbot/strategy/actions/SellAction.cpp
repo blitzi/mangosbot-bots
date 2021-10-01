@@ -38,6 +38,35 @@ public:
     }
 };
 
+class SellWhiteItemsVisitor : public SellItemsVisitor
+{
+public:
+    SellWhiteItemsVisitor(SellAction* action) : SellItemsVisitor(action) {}
+
+    virtual bool Visit(Item* item)
+    {
+        if (item->GetProto()->Quality != ITEM_QUALITY_NORMAL)
+            return true;
+
+        return SellItemsVisitor::Visit(item);
+    }
+};
+
+class SellGreenItemsVisitor : public SellItemsVisitor
+{
+public:
+    SellGreenItemsVisitor(SellAction* action) : SellItemsVisitor(action) {}
+
+    virtual bool Visit(Item* item)
+    {
+        if (item->GetProto()->Quality != ITEM_QUALITY_UNCOMMON)
+            return true;
+
+        return SellItemsVisitor::Visit(item);
+    }
+};
+
+
 class SellVendorItemsVisitor : public SellItemsVisitor
 {
 public:
@@ -61,27 +90,30 @@ bool SellAction::Execute(Event event)
 {
     string text = event.getParam();
 
-    if (text == "gray" || text == "*")
+    if (text == "grey" || text == "*")
     {
         SellGrayItemsVisitor visitor(this);
         IterateItems(&visitor);
         return true;
     }
 
-    if (text == "vendor")
+    if (text == "white")
     {
-        SellVendorItemsVisitor visitor(this, context);
+        SellWhiteItemsVisitor visitor(this);
         IterateItems(&visitor);
         return true;
     }
 
-    list<Item*> items = parseItems(text, ITERATE_ITEMS_IN_BAGS);
-    for (list<Item*>::iterator i = items.begin(); i != items.end(); ++i)
+    if (text == "green")
     {
-        Sell(*i);
+        SellGreenItemsVisitor visitor(this);
+        IterateItems(&visitor);
+        return true;
     }
+    
+    ai->TellMaster("s grey|white|green|");
 
-    return true;
+    return false;
 }
 
 
