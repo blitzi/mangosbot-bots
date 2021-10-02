@@ -93,7 +93,7 @@ namespace ai
 
             uint32 memberCount = group->GetMembersCount();
 
-            if (memberCount >= uint8(grouperType))
+            if (memberCount > 1 || memberCount >= uint8(grouperType))
                 return false;
         }
 
