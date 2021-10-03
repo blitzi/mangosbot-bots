@@ -16,4 +16,8 @@ void GenericWarriorNonCombatStrategy::InitTriggers(std::list<TriggerNode*> &trig
    triggers.push_back(new TriggerNode(
        "battle stance",
        NextAction::array(0, new NextAction("battle stance", 1.0f), NULL)));
+
+   triggers.push_back(new TriggerNode(
+       "enemy out of melee",
+       NextAction::array(0, new NextAction("charge", ACTION_MOVE + 9), NULL)));
 }
