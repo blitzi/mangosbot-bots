@@ -113,7 +113,7 @@ bool MoveToTravelTargetAction::Execute(Event event)
 
 bool MoveToTravelTargetAction::isUseful()
 {
-    if (!context->GetValue<TravelTarget*>("travel target")->Get()->isTraveling())
+    if (!context->GetValue<TravelTarget*>("travel target")->Get()->isActive())
         return false;
 
     if (bot->IsTaxiFlying())

@@ -117,7 +117,7 @@ void WorldPacketHandlerStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 
     triggers.push_back(new TriggerNode(
         "levelup",
-        NextAction::array(0, new NextAction("auto talents", relevance), new NextAction("auto learn spell", relevance), NULL)));
+        NextAction::array(0, new NextAction("increase level", relevance), new NextAction("auto talents", relevance), new NextAction("auto learn spell", relevance), NULL)));
 
     triggers.push_back(new TriggerNode(
         "see spell",
@@ -146,7 +146,6 @@ WorldPacketHandlerStrategy::WorldPacketHandlerStrategy(PlayerbotAI* ai) : PassTr
     supported.push_back("uninvite");
     supported.push_back("lfg role check");
     supported.push_back("lfg teleport");
-    supported.push_back("random bot update");
     supported.push_back("inventory change failure");
     supported.push_back("bg status");
 }

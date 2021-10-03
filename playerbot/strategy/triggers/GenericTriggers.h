@@ -562,6 +562,15 @@ namespace ai
         virtual bool IsActive();
     };
 
+   class NoPossibleGrindTargetTrigger : public Trigger
+    {
+    public:
+        NoPossibleGrindTargetTrigger(PlayerbotAI* ai) : Trigger(ai, "no possible grind target") {}
+
+    public:
+        virtual bool IsActive();
+    };
+
     class NotDpsTargetActiveTrigger : public Trigger
     {
     public:
@@ -633,18 +642,6 @@ namespace ai
         virtual Value<Unit*>* GetTargetValue();
         virtual string getName() { return spell + " on enemy healer"; }
         virtual bool IsActive();
-    };
-
-    class RandomBotUpdateTrigger : public RandomTrigger
-    {
-    public:
-        RandomBotUpdateTrigger(PlayerbotAI* ai) : RandomTrigger(ai, "random bot update", 30) {}
-
-    public:
-        virtual bool IsActive()
-        {
-            return RandomTrigger::IsActive() && AI_VALUE(bool, "random bot update");
-        }
     };
 
     class NoNonBotPlayersAroundTrigger : public Trigger

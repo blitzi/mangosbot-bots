@@ -209,7 +209,6 @@ namespace ai
             creators["aoe position"] = &ValueContext::aoe_position;
             creators["outfit list"] = &ValueContext::outfit_list_value;
 
-            creators["random bot update"] = &ValueContext::random_bot_update_value;
             creators["nearest non bot players"] = &ValueContext::nearest_non_bot_players;
             creators["new player nearby"] = &ValueContext::new_player_nearby;
             creators["already seen players"] = &ValueContext::already_seen_players;

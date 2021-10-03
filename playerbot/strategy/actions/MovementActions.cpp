@@ -599,7 +599,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
     return true;
 }
 
-bool MovementAction::MoveTo(Unit* target)
+bool MovementAction::MoveToStance(Unit* target)
 {
     if (!target)
     {

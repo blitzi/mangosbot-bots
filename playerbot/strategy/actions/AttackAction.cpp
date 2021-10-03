@@ -134,7 +134,7 @@ bool AttackAction::Attack(Unit* target)
         Stance* stance = context->GetValue<Stance*>("stance")->Get();
 
         if (stance && stance->getName() != "near")
-            return MoveTo(target);
+            return MoveToStance(target);
         else
             return ChaseTo(target, distance);
     }

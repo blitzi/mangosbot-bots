@@ -190,11 +190,10 @@ bool ChooseRpgTargetAction::Execute(Event event)
             entry = -((int32)go->GetEntry());
 
         if (!ignoreList.empty()
-            && ignoreList.find(guid) != ignoreList.end()
-            && urand(0, 100) < 10) //10% chance to retry ignored.            
+            && ignoreList.find(guid) != ignoreList.end())    
             continue;
 
-        int priority = 1;
+        int priority = 0;
 
         if (unit)
         {
@@ -212,19 +211,11 @@ bool ChooseRpgTargetAction::Execute(Event event)
             if (unit->isVendor() && AI_VALUE2(bool, "group or", "should sell,can sell,following party,near leader"))
                 priority = 100;
             else if (unit->isArmorer() && AI_VALUE2(bool, "group or", "should repair,can repair,following party,near leader"))
-                priority = 95;
-            else if (AI_VALUE2(bool, "can turn in quest npc", unit->GetEntry()))
-                priority = 90;
-            else if (CanTrain(guid) || AI_VALUE2(bool, "can accept quest npc", unit->GetEntry()) || (!AI_VALUE(bool, "can fight equal") && AI_VALUE2(bool, "can accept quest low level npc", unit->GetEntry())))
-                priority = 80;
-            else if (travelTarget->getDestination() && travelTarget->getDestination()->getEntry() == unit->GetEntry())
-                priority = 70;
+                priority = 95;     
             else if (unit->isInnkeeper() && AI_VALUE(bool, "should home bind"))
                 priority = 60;
             else if (unit->isBattleMaster() && CanQueueBg(guid) != BATTLEGROUND_TYPE_NONE)
                 priority = 50;
-            else if (unit->isGuildMaster() && BuyPetitionAction::canBuyPetition(bot))
-                priority = 40;
         }
         else
         {
@@ -234,14 +225,7 @@ bool ChooseRpgTargetAction::Execute(Event event)
                 continue;
 
             if (!isFollowValid(bot, go))
-                continue;
-
-            if(AI_VALUE2(bool, "can turn in quest npc", entry))
-                priority = 90;
-            else if (AI_VALUE2(bool, "can accept quest npc", entry))
-                priority = 80;
-            else if (travelTarget->getDestination() && travelTarget->getDestination()->getEntry() == entry)
-                priority = 70;     
+                continue; 
         }
 
         if (ai->HasStrategy("debug rpg", BOT_STATE_NON_COMBAT) && priority > 1)
@@ -259,9 +243,6 @@ bool ChooseRpgTargetAction::Execute(Event event)
         }
 
         if (priority < maxPriority)
-            continue;
-
-        if (HasSameTarget(guid) > urand(5, 15))
             continue;
 
         if (priority > maxPriority)

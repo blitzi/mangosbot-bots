@@ -65,7 +65,6 @@ private:
     void InitSpells();
     void ClearSpells();
     void ClearSkills();
-    bool InitLevelOne();
     void InitAvailableSpells();
     void InitSpecialSpells();
     void InitTalentsTree(bool incremental);

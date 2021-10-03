@@ -27,7 +27,6 @@ namespace ai
         if (randomBot)
         {
             bot->GetPlayerbotAI()->SetMaster(NULL);
-            sRandomPlayerbotMgr.ScheduleTeleport(bot->GetObjectGuid());
         }        
 
         if(!aiMaster)

@@ -321,6 +321,12 @@ bool NoPossibleTargetsTrigger::IsActive()
     return !targets.size();
 }
 
+bool NoPossibleGrindTargetTrigger::IsActive()
+{
+    Unit* grindTarget = AI_VALUE(Unit*, "grind target");
+    return grindTarget == NULL || grindTarget->IsDead();
+}
+
 bool PossibleAddsTrigger::IsActive()
 {
     return AI_VALUE(bool, "possible adds") && !AI_VALUE(ObjectGuid, "pull target");

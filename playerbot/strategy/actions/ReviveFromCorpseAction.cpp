@@ -112,7 +112,7 @@ bool FindCorpseAction::Execute(Event event)
         {
             list<ObjectGuid> units = AI_VALUE(list<ObjectGuid>, "possible targets no los");
             
-            if (botPos.getUnitsAggro(units, bot) == 0) //There are no mobs near.
+            if (botPos.getUnitsAggro(units, bot) <= 1) //There are almost no mobs near.
                 return false;
         }
     }
@@ -257,7 +257,7 @@ bool SpiritHealerAction::Execute(Event event)
     uint32 dCount = AI_VALUE(uint32, "death count");
     int64 deadTime = time(nullptr) - corpse->GetGhostTime();
 
-    WorldSafeLocsEntry const* ClosestGrave = GetGrave(dCount > 10 || deadTime > 15 * MINUTE);
+    WorldSafeLocsEntry const* ClosestGrave = GetGrave(dCount > 10 || deadTime > 15 * MINUTE || AI_VALUE(uint8, "durability") < 10);
 
     if (bot->GetDistance2d(ClosestGrave->x, ClosestGrave->y) < sPlayerbotAIConfig.sightDistance)
     {

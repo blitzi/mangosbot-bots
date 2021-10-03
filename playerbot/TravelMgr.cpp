@@ -1608,7 +1608,7 @@ void TravelMgr::LoadQuestTravelTable()
 
     sLog.outErrorDb("Loading quest data.");
 
-    bool loadQuestData = true;
+    bool loadQuestData = false;
 
     if (loadQuestData)
     {
@@ -3616,10 +3616,18 @@ vector<TravelDestination*> TravelMgr::getGrindTravelDestinations(Player* bot, bo
         if (dest->isFull(ignoreFull))
             continue;
 
-        if (maxDistance > 0 && dest->distanceTo(&botLocation) > maxDistance)
-            continue;
+        int level = bot->GetLevel();        
+        CreatureInfo const* cInfo = ObjectMgr::GetCreatureTemplate(dest->getEntry());      
 
-        retTravelLocations.push_back(dest);
+        if (level >= cInfo->MinLevel && level <= cInfo->MaxLevel)
+        {
+            float dist = dest->distanceTo(&botLocation);
+
+            if (maxDistance > 0 && dist > maxDistance)
+                continue;
+
+            retTravelLocations.push_back(dest);
+        }
     }
 
     return retTravelLocations;

@@ -463,7 +463,7 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
     if (!player->InBattleGround())
     {
         nonCombatEngine->addStrategies("nc", "food", "chat", "follow",
-            "default", "quest", "loot", "gather", "duel", "emote", "conserve mana", "buff", "mount", NULL);
+            "default", "quest", "loot", "gather", "duel", "conserve mana", "buff", "mount", NULL);
     }
 
     if ((facade->IsRealPlayer() || sRandomPlayerbotMgr.IsRandomBot(player)) && !player->InBattleGround())
@@ -480,12 +480,8 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
             nonCombatEngine->addStrategy("maintenance");
             nonCombatEngine->addStrategy("group");
             nonCombatEngine->addStrategy("guild");
+            //nonCombatEngine->addStrategy("rpg");
 
-            if (sPlayerbotAIConfig.autoDoQuests)
-            {
-                nonCombatEngine->addStrategy("travel");
-                nonCombatEngine->addStrategy("rpg");                
-            }
             if (sPlayerbotAIConfig.randomBotJoinLfg)
                 nonCombatEngine->addStrategy("lfg");
 
@@ -509,12 +505,8 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
                         nonCombatEngine->addStrategy("maintenance");
                         nonCombatEngine->addStrategy("group");
                         nonCombatEngine->addStrategy("guild");
+                        //nonCombatEngine->addStrategy("rpg");
 
-                        if (sPlayerbotAIConfig.autoDoQuests)
-                        {
-                            nonCombatEngine->addStrategy("travel");
-                            nonCombatEngine->addStrategy("rpg");
-                        }
                         nonCombatEngine->ChangeStrategy(sPlayerbotAIConfig.randomBotNonCombatStrategies);
                     }
                     else

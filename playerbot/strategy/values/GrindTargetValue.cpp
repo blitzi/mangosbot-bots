@@ -60,18 +60,13 @@ Unit* GrindTargetValue::FindTargetForGrinding(int assistCount)
         if (!bot->InBattleGround() && GetTargetingPlayerCount(unit) > assistCount)
             continue;
 
-        //if (master && master->GetDistance(unit) >= sPlayerbotAIConfig.grindDistance && !sRandomPlayerbotMgr.IsRandomBot(bot))
-        //    continue;
+        if (!bot->InBattleGround() && !unit->GetObjectGuid().IsPlayer())
+        {
+            int gap = (int)unit->GetLevel() - (int)bot->GetLevel();
 
-        if (!bot->InBattleGround() && (int)unit->GetLevel() - (int)bot->GetLevel() > 4 && !unit->GetObjectGuid().IsPlayer())
-            continue;
-
-        if (!needForQuest(unit))
-            if (urand(0, 100) < 75 || (context->GetValue<TravelTarget*>("travel target")->Get()->isWorking() && context->GetValue<TravelTarget*>("travel target")->Get()->getDestination()->getName() != "GrindTravelDestination"))
+            if(gap > 2 || gap < -3)
                 continue;
-
-        //if (bot->InBattleGround() && bot->GetDistance(unit) > 40.0f)
-            //continue;
+        }
 
         Creature* creature = dynamic_cast<Creature*>(unit);
         if (creature && creature->GetCreatureInfo() && creature->GetCreatureInfo()->Rank > CREATURE_ELITE_NORMAL && !AI_VALUE(bool, "can fight boss"))
@@ -97,7 +92,7 @@ Unit* GrindTargetValue::FindTargetForGrinding(int assistCount)
         else
         {
             float newdistance = bot->GetDistance(unit);
-            if (!result || (newdistance < distance && urand(0, abs(distance - newdistance)) > sPlayerbotAIConfig.sightDistance * 0.1))
+            if (!result || (newdistance < distance))
             {
                 distance = newdistance;
                 result = unit;

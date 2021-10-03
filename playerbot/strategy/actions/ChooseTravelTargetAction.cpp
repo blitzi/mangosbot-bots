@@ -36,52 +36,24 @@ void ChooseTravelTargetAction::getNewTarget(TravelTarget* newTarget, TravelTarge
     foundTarget = SetGroupTarget(newTarget);                                 //Join groups members
 
     //Enpty bags/repair
-    if (!foundTarget && urand(1, 100) > 10)                               //90% chance
+    if (!foundTarget)                               //90% chance
         if (AI_VALUE2(bool, "group or", "should sell,can sell,following party,near leader") || AI_VALUE2(bool, "group or", "should repair,can repair,following party,near leader"))
             foundTarget = SetRpgTarget(newTarget);                           //Go to town to sell items or repair
 
     //Rpg in city
-    if (!foundTarget && urand(1, 100) > 90)                               //10% chance
+    if (!foundTarget && urand(1, 100) > 99)                               //1% chance
         foundTarget = SetNpcFlagTarget(newTarget, { UNIT_NPC_FLAG_BANKER,UNIT_NPC_FLAG_BATTLEMASTER,UNIT_NPC_FLAG_AUCTIONEER });
 
     //Grind for money
-    if (!foundTarget && AI_VALUE(bool, "should get money"))
-        if (urand(1, 100) > 66)
-        {
-            foundTarget = SetQuestTarget(newTarget, true);                    //Turn in quests for money.
-
-            if (!foundTarget)
-                foundTarget = SetQuestTarget(newTarget);                     //Do low level quests
-        }
-        else if (urand(1, 100) > 50)
-            foundTarget = SetGrindTarget(newTarget);                         //Go grind mobs for money
-        else
-            foundTarget = SetNewQuestTarget(newTarget);                      //Find a low level quest to do
-
-
-    //Continue
-    if (!foundTarget && urand(1, 100) > 10)                               //90% chance 
-        foundTarget = SetCurrentTarget(newTarget, oldTarget);                //Extend current target.
-
-    //Dungeon in group
-    if (!foundTarget && urand(1, 100) > 50)                               //50% chance
-        if (AI_VALUE(bool, "can fight boss"))
-            foundTarget = SetBossTarget(newTarget);                         //Go fight a (dungeon boss)
-
-    if (!foundTarget && urand(1, 100) > 5)                                //95% chance
-        foundTarget = SetQuestTarget(newTarget);                             //Do a target of an active quest.
-
-    if (!foundTarget && urand(1, 100) > 5)
-        foundTarget = SetNewQuestTarget(newTarget);                          //Find a new quest to do.
-
-    if (!foundTarget && ai->HasStrategy("explore", BOT_STATE_NON_COMBAT)) //Explore a unexplored sub-zone.
+    foundTarget = SetGrindTarget(newTarget);                         //Go grind mobs for money
+             
+     if (!foundTarget && ai->HasStrategy("explore", BOT_STATE_NON_COMBAT)) //Explore a unexplored sub-zone.
         foundTarget = SetExploreTarget(newTarget);
 
-    // if (!foundTarget)
-    //foundTarget = SetRpgTarget(target);
-
     if (!foundTarget)
-        SetNullTarget(newTarget);                                    //Idle a bit.
+        SetNullTarget(newTarget);                 
+    
+    foundTarget = SetCurrentTarget(newTarget, oldTarget);  
 }
 
 void ChooseTravelTargetAction::setNewTarget(TravelTarget* newTarget, TravelTarget* oldTarget)
@@ -594,8 +566,10 @@ bool ChooseTravelTargetAction::SetNpcFlagTarget(TravelTarget* target, vector<NPC
     WorldPosition* botPos = &WorldPosition(bot);
 
     vector<TravelDestination*> dests;
+    vector<TravelDestination*> possibleDest = sTravelMgr.getRpgTravelDestinations(bot, true, true);
 
-    for (auto& d : sTravelMgr.getRpgTravelDestinations(bot, true, true))
+
+    for (auto& d : possibleDest)
     {
         if (!d->getEntry())
             continue;

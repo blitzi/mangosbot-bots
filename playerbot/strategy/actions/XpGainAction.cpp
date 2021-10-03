@@ -34,12 +34,13 @@ bool XpGainAction::Execute(Event event)
         p >> groupBonus;   // 8 group bonus
     }
 
-    Unit* victim;
+    Unit* victim = NULL;
     if (guid)
         victim = ai->GetUnit(guid);
     xpgain = xpgain * (sPlayerbotAIConfig.playerbotsXPrate - 1);
-    GiveXP(xpgain, victim);
 
+    if(victim)
+        GiveXP(xpgain, victim);
 
     return true;
 }

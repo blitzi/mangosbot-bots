@@ -24,10 +24,10 @@ void TrainerAction::Learn(uint32 cost, TrainerSpell const* tSpell, ostringstream
         return;
 
 #ifdef CMANGOS
-    if (tSpell->learnedSpell)
-        bot->learnSpell(tSpell->learnedSpell, false);
-    else
+    if (tSpell->IsCastable())
         ai->CastSpell(tSpell->spell, bot);
+    else
+        bot->learnSpell(tSpell->learnedSpell, false);
 #endif
 
 #ifdef MANGOS

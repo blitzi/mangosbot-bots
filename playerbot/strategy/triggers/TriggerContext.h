@@ -98,6 +98,7 @@ namespace ai
             creators["no pet"] = &TriggerContext::no_pet;
             creators["has attackers"] = &TriggerContext::has_attackers;
             creators["no possible targets"] = &TriggerContext::no_possible_targets;
+            creators["no possible grind target"] = &TriggerContext::no_possible_grind_target;
             creators["possible adds"] = &TriggerContext::possible_adds;
 
             creators["no drink"] = &TriggerContext::no_drink;
@@ -123,7 +124,6 @@ namespace ai
 
             creators["unknown dungeon"] = &TriggerContext::unknown_dungeon;
 
-            creators["random bot update"] = &TriggerContext::random_bot_update_trigger;
             creators["no non bot players around"] = &TriggerContext::no_non_bot_players_around;
             creators["new player nearby"] = &TriggerContext::new_player_nearby;
             creators["no rpg target"] = &TriggerContext::no_rpg_target;
@@ -200,6 +200,7 @@ namespace ai
         static Trigger* target_changed(PlayerbotAI* ai) { return new TargetChangedTrigger(ai); }
         static Trigger* swimming(PlayerbotAI* ai) { return new IsSwimmingTrigger(ai); }
         static Trigger* no_possible_targets(PlayerbotAI* ai) { return new NoPossibleTargetsTrigger(ai); }
+        static Trigger* no_possible_grind_target(PlayerbotAI* ai) { return new NoPossibleGrindTargetTrigger(ai); }
         static Trigger* possible_adds(PlayerbotAI* ai) { return new PossibleAddsTrigger(ai); }
         static Trigger* can_loot(PlayerbotAI* ai) { return new CanLootTrigger(ai); }
         static Trigger* far_from_loot_target(PlayerbotAI* ai) { return new FarFromCurrentLootTrigger(ai); }
@@ -268,7 +269,6 @@ namespace ai
         static Trigger* protect_party_member(PlayerbotAI* ai) { return new ProtectPartyMemberTrigger(ai); }
         static Trigger* no_pet(PlayerbotAI* ai) { return new NoPetTrigger(ai); }
         static Trigger* has_attackers(PlayerbotAI* ai) { return new HasAttackersTrigger(ai); }
-        static Trigger* random_bot_update_trigger(PlayerbotAI* ai) { return new RandomBotUpdateTrigger(ai); }
         static Trigger* no_non_bot_players_around(PlayerbotAI* ai) { return new NoNonBotPlayersAroundTrigger(ai); }
         static Trigger* new_player_nearby(PlayerbotAI* ai) { return new NewPlayerNearbyTrigger(ai); }
         static Trigger* need_world_buff(PlayerbotAI* ai) { return new NeedWorldBuffTrigger(ai); }

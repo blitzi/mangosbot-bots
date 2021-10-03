@@ -46,7 +46,6 @@ class RandomPlayerbotMgr : public PlayerbotHolder
         static bool HandlePlayerbotConsoleCommand(ChatHandler* handler, char const* args);
         bool IsRandomBot(Player* bot);
         bool IsRandomBot(uint32 bot);
-        void Randomize(Player* bot);
         void RandomizeFirst(Player* bot);
         void IncreaseLevel(Player* bot);
         void ScheduleTeleport(uint32 bot, uint32 time = 0);
@@ -66,11 +65,8 @@ class RandomPlayerbotMgr : public PlayerbotHolder
         void SetTradeDiscount(Player* bot, Player* master, uint32 value);
         uint32 GetTradeDiscount(Player* bot, Player* master);
         void Refresh(Player* bot);
-        void RandomTeleportForLevel(Player* bot);
         void RandomTeleportForRpg(Player* bot);
         int GetMaxAllowedBotCount();
-        bool ProcessBot(Player* player);
-        void Revive(Player* player);
         void ChangeStrategy(Player* player);
         uint32 GetValue(Player* bot, string type);
         uint32 GetValue(uint32 bot, string type);
@@ -112,7 +108,6 @@ class RandomPlayerbotMgr : public PlayerbotHolder
         time_t PlayersCheckTimer;
         uint32 AddRandomBots();
         bool ProcessBot(uint32 bot);
-        void ScheduleRandomize(uint32 bot, uint32 time);
         void RandomTeleport(Player* bot);
         void RandomTeleport(Player* bot, vector<WorldLocation> &locs, bool hearth = false);
         uint32 GetZoneLevel(uint16 mapId, float teleX, float teleY, float teleZ);

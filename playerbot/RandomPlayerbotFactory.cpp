@@ -209,6 +209,7 @@ bool RandomPlayerbotFactory::CreateRandomBot(uint8 cls)
 
     player->setCinematic(2);
     player->SetAtLoginFlag(AT_LOGIN_NONE);
+
     player->SaveToDB();
 
     sLog.outDebug( "Random bot created for account %d - name: \"%s\"; race: %u; class: %u",

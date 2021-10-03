@@ -75,23 +75,15 @@ bool RpgAction::Execute(Event event)
         elements.push_back(&RpgAction::quest);
 
     if (unit)
-    {
-        if(unit->isTaxi() && CanDiscover(guid))
-            elements.push_back(&RpgAction::discover);
-        if (unit->isVendor())
+    {       
+        if (unit->isVendor() && AI_VALUE(bool, "should sell") && AI_VALUE(bool, "can sell"))
             elements.push_back(&RpgAction::trade);
         if (unit->isArmorer() && AI_VALUE(bool, "should repair") && AI_VALUE(bool, "can repair"))
             elements.push_back(&RpgAction::repair);
-        if (CanTrain(guid))
-            elements.push_back(&RpgAction::train);
-        if (unit->GetHealthPercent() < 100 && (bot->getClass() == CLASS_PRIEST || bot->getClass() == CLASS_DRUID || bot->getClass() == CLASS_PALADIN || bot->getClass() == CLASS_SHAMAN))
-            elements.push_back(&RpgAction::heal);
         if (unit->isInnkeeper() && AI_VALUE(bool, "should home bind"))
             elements.push_back(&RpgAction::homebind);
         if (unit->isBattleMaster() && CanQueueBg(guid))
             elements.push_back(&RpgAction::queuebg);
-        else if (unit->isGuildMaster() && BuyPetitionAction::canBuyPetition(bot))
-            elements.push_back(&RpgAction::buyPetition);
     }
     else
     {
@@ -103,23 +95,6 @@ bool RpgAction::Execute(Event event)
             elements.push_back(&RpgAction::craft);
         }
     }
-
-    if (AddIgnore(guid))
-    {
-        if (elements.empty() && ChooseRpgTargetAction::isFollowValid(bot, wo))
-        {
-            elements.push_back(&RpgAction::emote);
-            elements.push_back(&RpgAction::stay);
-            elements.push_back(&RpgAction::work);
-            elements.push_back(&RpgAction::spell);
-            elements.push_back(&RpgAction::craft);
-
-            if(unit && unit->isTaxi() && !ai->HasRealPlayerMaster())
-                elements.push_back(&RpgAction::taxi);
-        }
-    }    
-    else
-        elements.push_back(&RpgAction::cancel);
 
     if (elements.empty())
         elements.push_back(&RpgAction::cancel);

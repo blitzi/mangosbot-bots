@@ -28,7 +28,6 @@
 #include "RevealGatheringItemAction.h"
 #include "SayAction.h"
 #include "OutfitAction.h"
-#include "RandomBotUpdateAction.h"
 #include "RemoveAuraAction.h"
 #include "RpgAction.h"
 #include "TravelAction.h"
@@ -128,7 +127,6 @@ namespace ai
             creators["say"] = &ActionContext::say;
             creators["reveal gathering item"] = &ActionContext::reveal_gathering_item;
             creators["outfit"] = &ActionContext::outfit;
-            creators["random bot update"] = &ActionContext::random_bot_update;
             creators["delay"] = &ActionContext::delay;
             creators["greet"] = &ActionContext::greet;
             creators["check values"] = &ActionContext::check_values;
@@ -142,6 +140,7 @@ namespace ai
             creators["mount"] = &ActionContext::mount;
             creators["war stomp"] = &ActionContext::war_stomp;
             creators["auto talents"] = &ActionContext::auto_talents;
+            creators["increase level"] = &ActionContext::increase_level;
 			creators["auto learn spell"] = &ActionContext::auto_learn_spell;
             creators["xp gain"] = &ActionContext::xp_gain;
             creators["invite nearby"] = &ActionContext::invite_nearby;
@@ -259,10 +258,10 @@ namespace ai
         static Action* say(PlayerbotAI* ai) { return new SayAction(ai); }
         static Action* reveal_gathering_item(PlayerbotAI* ai) { return new RevealGatheringItemAction(ai); }
         static Action* outfit(PlayerbotAI* ai) { return new OutfitAction(ai); }
-        static Action* random_bot_update(PlayerbotAI* ai) { return new RandomBotUpdateAction(ai); }
         static Action* delay(PlayerbotAI* ai) { return new DelayAction(ai); }
         static Action* mount(PlayerbotAI *ai) { return new CastSpellAction(ai, "mount"); }
         static Action* auto_talents(PlayerbotAI* ai) { return new AutoSetTalentsAction(ai); }
+        static Action* increase_level(PlayerbotAI* ai) { return new IncreaseLevelAction(ai); }
 		static Action* auto_learn_spell(PlayerbotAI* ai) { return new AutoLearnSpellAction(ai); }
         static Action* xp_gain(PlayerbotAI* ai) { return new XpGainAction(ai); }
         static Action* invite_nearby(PlayerbotAI* ai) { return new InviteNearbyToGroupAction(ai); }

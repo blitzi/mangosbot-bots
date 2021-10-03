@@ -30,16 +30,6 @@ bool MoveToRpgTargetAction::Execute(Event event)
         ai->TellMasterNoFacing(out);
     }
 
-    if ((unit && unit->IsMoving() && !urand(0, 20))
-        || !ChooseRpgTargetAction::isFollowValid(bot, wo)
-        || !urand(0, 50))
-    {
-        context->GetValue<set<ObjectGuid>&>("ignore rpg target")->Get().insert(AI_VALUE(ObjectGuid, "rpg target"));
-
-        context->GetValue<ObjectGuid>("rpg target")->Set(ObjectGuid());
-        return false;
-    }
-
     float x = wo->GetPositionX();
     float y = wo->GetPositionY();
     float z = wo->GetPositionZ();
@@ -65,8 +55,6 @@ bool MoveToRpgTargetAction::Execute(Event event)
     x += cos(angle) * sPlayerbotAIConfig.followDistance;
     y += sin(angle) * sPlayerbotAIConfig.followDistance;
     
-    //WaitForReach(distance);
-
     bool couldMove;
     
     if (bot->IsWithinLOS(x, y, z))

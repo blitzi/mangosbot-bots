@@ -25,7 +25,7 @@ namespace ai
             Stance* stance = context->GetValue<Stance*>("stance")->Get();
 
             if (stance && stance->getName() != "near")
-                return MoveTo(target);
+                return MoveToStance(target);
             else
             {
                 if (distance < max(5.0f, bot->GetCombinedCombatReach(target, true)))

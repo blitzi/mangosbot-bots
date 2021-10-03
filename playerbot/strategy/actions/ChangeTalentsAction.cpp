@@ -2,6 +2,7 @@
 #include "../../playerbot.h"
 #include "../../talentspec.h"
 #include "ChangeTalentsAction.h"
+#include <RandomPlayerbotMgr.cpp>
 
 using namespace ai;
 
@@ -325,5 +326,14 @@ bool AutoSetTalentsAction::Execute(Event event)
 
     return true;
 }
+
+bool IncreaseLevelAction::Execute(Event event)
+{
+    sRandomPlayerbotMgr.IncreaseLevel(ai->GetBot());
+
+    return true;
+}
+
+
 
 

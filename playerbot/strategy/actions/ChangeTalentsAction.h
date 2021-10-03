@@ -25,5 +25,11 @@ namespace ai
     public:
         AutoSetTalentsAction(PlayerbotAI* ai) : ChangeTalentsAction(ai, "auto talents") {}
         virtual bool Execute(Event event);
+    };   
+    
+    class IncreaseLevelAction : public Action {
+    public:
+        IncreaseLevelAction(PlayerbotAI* ai) : Action(ai, "increase level") {}
+        virtual bool Execute(Event event);
     };
 }

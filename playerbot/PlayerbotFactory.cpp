@@ -21,6 +21,7 @@
     #ifdef MANGOS
         #include "ArenaTeam.h"
     #endif
+#include <playerbot/strategy/actions/InventoryAction.cpp>
 #endif
 
 using namespace ai;
@@ -133,160 +134,60 @@ void PlayerbotFactory::Randomize(bool incremental)
 {
     sLog.outDetail("Preparing to %s randomize...", (incremental ? "incremental" : "full"));
     Prepare();
-
-    if (sPlayerbotAIConfig.disableRandomLevels)
-    {
-        return;
-    }
-
-    sLog.outDetail("Resetting player...");
-    PerformanceMonitorOperation* pmo = sPerformanceMonitor.start(PERF_MON_RNDBOT, "PlayerbotFactory_Reset");
-    bot->resetTalents(true);
-    ClearSkills();
-    ClearSpells();
-    ClearInventory();
-    CancelAuras();
-    bot->SaveToDB();
-    if (pmo) pmo->finish();
-
-    /*pmo = sPerformanceMonitor.start(PERF_MON_RNDBOT, "PlayerbotFactory_Immersive");
-    sLog.outDetail("Initializing immersive...");
-    InitImmersive();
-    if (pmo) pmo->finish();*/
-
-	if (sPlayerbotAIConfig.randomBotPreQuests) {
-		sLog.outDetail("Initializing quests...");
-		pmo = sPerformanceMonitor.start(PERF_MON_RNDBOT, "PlayerbotFactory_Quests");
-        InitQuests(classQuestIds);
-        InitQuests(specialQuestIds);
-		// quest rewards boost bot level, so reduce back
-		if (sPlayerbotAIConfig.disableRandomLevels)
-		{
-			if (bot->GetLevel() < sPlayerbotAIConfig.randombotStartingLevel)
-			{
-				bot->SetLevel(sPlayerbotAIConfig.randombotStartingLevel);
-			}
-		}
-		if (!sPlayerbotAIConfig.disableRandomLevels)
-		{
-			bot->SetLevel(level);
-		}
-        ClearInventory();
-        bot->SetUInt32Value(PLAYER_XP, 0);
-        CancelAuras();
-        bot->SaveToDB();
-        if (pmo) pmo->finish();
-    }
-
-    pmo = sPerformanceMonitor.start(PERF_MON_RNDBOT, "PlayerbotFactory_Spells1");
-    sLog.outDetail("Initializing spells (step 1)...");
-    InitAvailableSpells();
-    if (pmo) pmo->finish();
+    CancelAuras();  
 
     sLog.outDetail("Initializing skills (step 1)...");
-    pmo = sPerformanceMonitor.start(PERF_MON_RNDBOT, "PlayerbotFactory_Skills1");
     InitSkills();
     InitTradeSkills();
-    if (pmo) pmo->finish();
 
-    pmo = sPerformanceMonitor.start(PERF_MON_RNDBOT, "PlayerbotFactory_Talents");
-    sLog.outDetail("Initializing talents...");
-    //InitTalentsTree(incremental);    
-    sRandomPlayerbotMgr.SetValue(bot->GetGUIDLow(), "specNo", 0);
-    ai->DoSpecificAction("auto talents");
-
-    sPlayerbotDbStore.Reset(ai);
-    ai->ResetStrategies(false); // fix wrong stored strategy
-    if (pmo) pmo->finish();
-
-    pmo = sPerformanceMonitor.start(PERF_MON_RNDBOT, "PlayerbotFactory_Spells2");
-    sLog.outDetail("Initializing spells (step 2)...");
-    InitAvailableSpells();
-    InitSpecialSpells();
-    if (pmo) pmo->finish();
-
-    pmo = sPerformanceMonitor.start(PERF_MON_RNDBOT, "PlayerbotFactory_Mounts");
     sLog.outDetail("Initializing mounts...");
     InitMounts();
-    if (pmo) pmo->finish();
 
-    pmo = sPerformanceMonitor.start(PERF_MON_RNDBOT, "PlayerbotFactory_Skills2");
     sLog.outDetail("Initializing skills (step 2)...");
     UpdateTradeSkills();
-    bot->SaveToDB();
-    if (pmo) pmo->finish();
-
-    pmo = sPerformanceMonitor.start(PERF_MON_RNDBOT, "PlayerbotFactory_Equip");
-    //sLog.outDetail("Initializing equipmemt...");
-    //InitEquipment(incremental);
 	
 	if (bot->GetLevel() >= sPlayerbotAIConfig.minEnchantingBotLevel)
 	{
 		sLog.outDetail("Initializing enchant templates...");
 		LoadEnchantContainer();
-		if (pmo) pmo->finish();
 	}
 
-    pmo = sPerformanceMonitor.start(PERF_MON_RNDBOT, "PlayerbotFactory_Bags");
     sLog.outDetail("Initializing bags...");
     InitBags();
-    bot->SaveToDB();
-    if (pmo) pmo->finish();
 
-    pmo = sPerformanceMonitor.start(PERF_MON_RNDBOT, "PlayerbotFactory_Ammo");
     sLog.outDetail("Initializing ammo...");
     InitAmmo();
-    if (pmo) pmo->finish();
 
-    pmo = sPerformanceMonitor.start(PERF_MON_RNDBOT, "PlayerbotFactory_Food");
     sLog.outDetail("Initializing food...");
     InitFood();
-    if (pmo) pmo->finish();
 
-    pmo = sPerformanceMonitor.start(PERF_MON_RNDBOT, "PlayerbotFactory_Potions");
     sLog.outDetail("Initializing potions...");
     InitPotions();
-    if (pmo) pmo->finish();
 
-    pmo = sPerformanceMonitor.start(PERF_MON_RNDBOT, "PlayerbotFactory_Reagents");
     sLog.outDetail("Initializing reagents...");
     InitReagents();
-    if (pmo) pmo->finish();
 
-	pmo = sPerformanceMonitor.start(PERF_MON_RNDBOT, "PlayerbotFactory_EqSets");
-    sLog.outDetail("Initializing second equipment set...");
-    InitSecondEquipmentSet();
 	if (bot->GetLevel() >= sPlayerbotAIConfig.minEnchantingBotLevel)
 	{
 		ApplyEnchantTemplate();
 	}
-    if (pmo) pmo->finish();
 
-    pmo = sPerformanceMonitor.start(PERF_MON_RNDBOT, "PlayerbotFactory_Inventory");
     sLog.outDetail("Initializing inventory...");
     InitInventory();
     AddConsumables();
-    if (pmo) pmo->finish();
-
-    pmo = sPerformanceMonitor.start(PERF_MON_RNDBOT, "PlayerbotFactory_Guilds & ArenaTeams");
+    
     sLog.outDetail("Initializing guilds & ArenaTeams");
-    bot->SaveToDB(); //thesawolf - save save save (hopefully avoids dupes)
-    InitGuild();
+
 #ifndef MANGOSBOT_ZERO
     if (bot->GetLevel() >= 70)
         InitArenaTeam();
 #endif
-    if (pmo) pmo->finish();
 
 	if (bot->GetLevel() >= 10) {
-		pmo = sPerformanceMonitor.start(PERF_MON_RNDBOT, "PlayerbotFactory_Pet");
 		sLog.outDetail("Initializing pet...");
 		InitPet();
-		if (pmo) pmo->finish();
 	}
 
-    pmo = sPerformanceMonitor.start(PERF_MON_RNDBOT, "PlayerbotFactory_Save");
-    sLog.outDetail("Saving to DB...");
     if (incremental)
     {
         uint32 money = bot->GetMoney();
@@ -296,9 +197,10 @@ void PlayerbotFactory::Randomize(bool incremental)
     {
         bot->SetMoney(10000 * sqrt(urand(1, level * 5)));
     }
+
+    sLog.outDetail("Saving to DB...");
     bot->SaveToDB();
     sLog.outDetail("Done.");
-    if (pmo) pmo->finish();
 }
 
 void PlayerbotFactory::Refresh()
@@ -1639,10 +1541,10 @@ void PlayerbotFactory::InitAvailableSpells()
             }
 
 #ifdef CMANGOS
-            if (tSpell->learnedSpell)
-                bot->learnSpell(tSpell->learnedSpell, false);
-            else
+            if (tSpell->IsCastable())
                 ai->CastSpell(tSpell->spell, bot);
+            else
+                bot->learnSpell(tSpell->learnedSpell, false);            
 #endif
 
 #ifdef MANGOS
@@ -2177,7 +2079,6 @@ void PlayerbotFactory::CancelAuras()
 void PlayerbotFactory::InitInventory()
 {
     InitInventoryTrade();
-    //InitInventoryEquip();
     InitInventorySkill();
 }
 
