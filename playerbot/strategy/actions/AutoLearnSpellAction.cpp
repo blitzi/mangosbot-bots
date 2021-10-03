@@ -103,7 +103,7 @@ void AutoLearnSpellAction::LearnTrainerSpells(ostringstream* out)
 
             }
 
-            LearnSpell(tSpell->spell, out);
+            bot->learnSpell(tSpell->spell, false);
         }
     }
 }
@@ -127,11 +127,11 @@ void AutoLearnSpellAction::LearnQuestSpells(ostringstream* out)
 
         if (quest->GetRewSpellCast() > 0)
         {
-            LearnSpell(quest->GetRewSpellCast(), out);
+            LearnQuestRewardSpell(quest->GetRewSpellCast(), out);
         }
         else if (quest->GetRewSpell() > 0)
         {
-            LearnSpell(quest->GetRewSpell(), out);
+            LearnQuestRewardSpell(quest->GetRewSpell(), out);
         }
     }
 }
@@ -148,7 +148,7 @@ string formatSpell(SpellEntry const* sInfo)
     return out.str();
 }
 
-void AutoLearnSpellAction::LearnSpell(uint32 spellId, ostringstream* out)
+void AutoLearnSpellAction::LearnQuestRewardSpell(uint32 spellId, ostringstream* out)
 {
     SpellEntry const* proto = sServerFacade.LookupSpellInfo(spellId);
 

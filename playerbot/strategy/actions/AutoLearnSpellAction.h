@@ -17,6 +17,6 @@ namespace ai
         void LearnSpells(ostringstream* out);
         void LearnTrainerSpells(ostringstream* out);
         void LearnQuestSpells(ostringstream* out);
-        void LearnSpell(uint32 spellId, ostringstream* out);
+        void LearnQuestRewardSpell(uint32 spellId, ostringstream* out);
     };
 }
