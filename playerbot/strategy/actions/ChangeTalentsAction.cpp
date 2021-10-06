@@ -329,9 +329,14 @@ bool AutoSetTalentsAction::Execute(Event event)
 
 bool IncreaseLevelAction::Execute(Event event)
 {
-    sRandomPlayerbotMgr.IncreaseLevel(ai->GetBot());
+    if (sRandomPlayerbotMgr.IsRandomBot(bot))
+    {
+        sRandomPlayerbotMgr.IncreaseLevel(ai->GetBot());
 
-    return true;
+        return true;
+    }
+
+    return false;
 }
 
 
