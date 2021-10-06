@@ -12,7 +12,7 @@ namespace ai
 
     public:
         virtual bool Execute(Event event);
-        virtual bool IgnoresCasting() { return true; }
+        virtual bool IgnoresCasting() { return false; }
 
     protected:
         bool Attack(Unit* target);

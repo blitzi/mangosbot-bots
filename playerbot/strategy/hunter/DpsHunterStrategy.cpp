@@ -46,6 +46,7 @@ private:
             /*A*/ NextAction::array(0, new NextAction("aimed shot"), NULL),
             /*C*/ NULL);
     }
+
     static ActionNode* concussive_shot(PlayerbotAI* ai)
     {
         return new ActionNode ("concussive shot",
@@ -63,7 +64,7 @@ DpsHunterStrategy::DpsHunterStrategy(PlayerbotAI* ai) : GenericHunterStrategy(ai
 
 NextAction** DpsHunterStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("explosive shot", 11.0f), new NextAction("auto shot", 10.0f), new NextAction("auto attack", 9.0f), NULL);
+    return NextAction::array(0, new NextAction("explosive shot", 11.0f), new NextAction("auto shot", 10.0f), new NextAction("melee", 8.0f), NULL);
 }
 
 void DpsHunterStrategy::InitTriggers(std::list<TriggerNode*> &triggers)

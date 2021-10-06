@@ -84,7 +84,15 @@ namespace ai
         }
 		virtual bool isUseful()
 		{
-			return sServerFacade.IsDistanceGreaterThan(AI_VALUE2(float, "distance", "current target"), (distance + sPlayerbotAIConfig.contactDistance));
+            Unit* target = AI_VALUE(Unit*, GetTargetName());
+
+            if (target)
+            {
+                bool inLos = bot->IsWithinLOSInMap(target);
+			    return inLos && sServerFacade.IsDistanceGreaterThan(AI_VALUE2(float, "distance", "current target"), (distance + sPlayerbotAIConfig.contactDistance));
+            }
+
+            return false;
 		}
 
     protected:

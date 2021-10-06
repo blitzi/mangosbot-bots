@@ -95,7 +95,7 @@ CasterDruidStrategy::CasterDruidStrategy(PlayerbotAI* ai) : GenericDruidStrategy
 
 NextAction** CasterDruidStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("starfire", ACTION_NORMAL + 2), new NextAction("wrath", ACTION_NORMAL + 1), NULL);
+    return NextAction::array(0, new NextAction("starfire", ACTION_NORMAL + 2), new NextAction("wrath", ACTION_NORMAL + 1), new NextAction("melee", ACTION_NORMAL), NULL);
 }
 
 void CasterDruidStrategy::InitTriggers(std::list<TriggerNode*> &triggers)

@@ -13,7 +13,7 @@ ShadowPriestStrategy::ShadowPriestStrategy(PlayerbotAI* ai) : GenericPriestStrat
 
 NextAction** ShadowPriestStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("mind blast", 10.0f), new NextAction("mana burn", 9.0f), new NextAction("starshards", 8.0f), new NextAction("shoot", 7.0f), NULL);
+    return NextAction::array(0, new NextAction("mind blast", 10.0f), new NextAction("mana burn", 9.0f), new NextAction("starshards", 8.0f), new NextAction("shoot", 7.0f), new NextAction("melee", 6.0f), NULL);
 }
 
 void ShadowPriestStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
