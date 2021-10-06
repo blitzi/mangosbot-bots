@@ -117,7 +117,7 @@ void AutoLearnSpellAction::LearnQuestSpells(ostringstream* out)
         uint32 questId = i->first;
         Quest const* quest = i->second;
 
-        if (!quest->GetRequiredClasses() || quest->IsRepeatable() || quest->GetMinLevel() < 10)
+        if (!quest->GetRequiredClasses() || quest->IsRepeatable())
             continue;
 
         if (!bot->SatisfyQuestClass(quest, false) ||
