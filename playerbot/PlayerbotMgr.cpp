@@ -214,7 +214,7 @@ void PlayerbotHolder::OnBotLogin(Player * const bot)
 #endif
     }
 
-    if (sRandomPlayerbotMgr.IsRandomBot(bot))
+    if (sRandomPlayerbotMgr.IsRandomBot(bot->GetGUIDLow()))
     {
         PlayerbotFactory factory(bot, bot->GetLevel());
         factory.Randomize(false);

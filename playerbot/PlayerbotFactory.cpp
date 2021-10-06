@@ -201,6 +201,8 @@ void PlayerbotFactory::Randomize(bool incremental)
     sLog.outDetail("Saving to DB...");
     bot->SaveToDB();
     sLog.outDetail("Done.");
+
+    ai->DoSpecificAction("equip upgrades");
 }
 
 void PlayerbotFactory::Refresh()
@@ -1805,7 +1807,7 @@ void PlayerbotFactory::InitMounts()
         return;
 
     map<uint8, map<int32, vector<uint32> > > mounts;
-    initializer_list<uint32> slow, fast, fslow, ffast;
+    vector<uint32> slow, fast, fslow, ffast;
     switch (bot->getRace())
     {
     case RACE_HUMAN:
@@ -1863,10 +1865,10 @@ void PlayerbotFactory::InitMounts()
         break;
 #endif
     }
-    mounts[bot->getRace()][0].insert(mounts[bot->getRace()][0].end(), slow);
-    mounts[bot->getRace()][1].insert(mounts[bot->getRace()][1].end(), fast);
-    mounts[bot->getRace()][2].insert(mounts[bot->getRace()][2].end(), fslow);
-    mounts[bot->getRace()][3].insert(mounts[bot->getRace()][3].end(), ffast);
+    mounts[bot->getRace()][0].insert(mounts[bot->getRace()][0].end(), slow.begin(), slow.end());
+    mounts[bot->getRace()][1].insert(mounts[bot->getRace()][1].end(), fast.begin(), fast.end());
+    mounts[bot->getRace()][2].insert(mounts[bot->getRace()][2].end(), fslow.begin(), fslow.end());
+    mounts[bot->getRace()][3].insert(mounts[bot->getRace()][3].end(), ffast.begin(), ffast.end());
 
     for (uint32 type = 0; type < 4; type++)
     {
@@ -1892,6 +1894,7 @@ void PlayerbotFactory::InitMounts()
 void PlayerbotFactory::InitPotions()
 {
     uint32 effects[] = { SPELL_EFFECT_HEAL, SPELL_EFFECT_ENERGIZE };
+
     for (int i = 0; i < 2; ++i)
     {
         uint32 effect = effects[i];
@@ -1910,7 +1913,7 @@ void PlayerbotFactory::InitPotions()
         if (!proto) continue;
 
         uint32 maxCount = proto->GetMaxStackSize();
-        Item* newItem = bot->StoreNewItemInInventorySlot(itemId, urand(maxCount / 2, maxCount));
+        Item* newItem = bot->StoreNewItemInInventorySlot(itemId, maxCount);
         if (newItem)
             newItem->AddToUpdateQueueOf(bot);
     }
@@ -1919,6 +1922,7 @@ void PlayerbotFactory::InitPotions()
 void PlayerbotFactory::InitFood()
 {
     uint32 categories[] = { 11, 59 };
+
     for (int i = 0; i < 2; ++i)
     {
         uint32 category = categories[i];
@@ -1937,7 +1941,7 @@ void PlayerbotFactory::InitFood()
         if (!proto) continue;
 
         uint32 maxCount = proto->GetMaxStackSize();
-        Item* newItem = bot->StoreNewItemInInventorySlot(itemId, urand(maxCount / 2, maxCount));
+        Item* newItem = bot->StoreNewItemInInventorySlot(itemId, maxCount);
         if (newItem)
             newItem->AddToUpdateQueueOf(bot);
    }
@@ -2232,93 +2236,6 @@ void PlayerbotFactory::InitGuild()
         StoreItem(5976, 1);
 
     bot->SaveToDB();
-}
-
-void PlayerbotFactory::InitImmersive()
-{
-    uint32 owner = bot->GetObjectGuid().GetCounter();
-    map<Stats, int32> percentMap;
-
-    bool initialized = false;
-    for (int i = STAT_STRENGTH; i < MAX_STATS; ++i)
-    {
-        Stats type = (Stats)i;
-        ostringstream name; name << "immersive_stat_" << i;
-        uint32 value = sRandomPlayerbotMgr.GetValue(owner, name.str());
-        if (value) initialized = true;
-        percentMap[type] = value;
-    }
-
-    if (!initialized)
-    {
-        switch (bot->getClass())
-        {
-        case CLASS_DRUID:
-        case CLASS_SHAMAN:
-            percentMap[STAT_STRENGTH] = 15;
-            percentMap[STAT_INTELLECT] = 10;
-            percentMap[STAT_SPIRIT] = 5;
-            percentMap[STAT_AGILITY] = 35;
-            percentMap[STAT_STAMINA] = 35;
-            break;
-        case CLASS_PALADIN:
-            percentMap[STAT_STRENGTH] = 35;
-            percentMap[STAT_INTELLECT] = 10;
-            percentMap[STAT_SPIRIT] = 5;
-            percentMap[STAT_AGILITY] = 15;
-            percentMap[STAT_STAMINA] = 35;
-            break;
-        case CLASS_WARRIOR:
-            percentMap[STAT_STRENGTH] = 30;
-            percentMap[STAT_SPIRIT] = 10;
-            percentMap[STAT_AGILITY] = 20;
-            percentMap[STAT_STAMINA] = 40;
-            break;
-        case CLASS_ROGUE:
-        case CLASS_HUNTER:
-            percentMap[STAT_STRENGTH] = 15;
-            percentMap[STAT_SPIRIT] = 5;
-            percentMap[STAT_AGILITY] = 40;
-            percentMap[STAT_STAMINA] = 40;
-            break;
-        case CLASS_MAGE:
-            percentMap[STAT_INTELLECT] = 65;
-            percentMap[STAT_SPIRIT] = 5;
-            percentMap[STAT_STAMINA] = 30;
-            break;
-        case CLASS_PRIEST:
-            percentMap[STAT_INTELLECT] = 15;
-            percentMap[STAT_SPIRIT] = 55;
-            percentMap[STAT_STAMINA] = 30;
-            break;
-        case CLASS_WARLOCK:
-            percentMap[STAT_INTELLECT] = 30;
-            percentMap[STAT_SPIRIT] = 15;
-            percentMap[STAT_STAMINA] = 55;
-            break;
-        }
-
-        for (int i = 0; i < 5; i++)
-        {
-            Stats from = (Stats)urand(STAT_STRENGTH, MAX_STATS - 1);
-            Stats to = (Stats)urand(STAT_STRENGTH, MAX_STATS - 1);
-            int32 delta = urand(0, 5 + bot->GetLevel() / 3);
-            if (from != to && percentMap[to] + delta <= 100 && percentMap[from] - delta >= 0)
-            {
-                percentMap[to] += delta;
-                percentMap[from] -= delta;
-            }
-        }
-
-        for (int i = STAT_STRENGTH; i < MAX_STATS; ++i)
-        {
-            Stats type = (Stats)i;
-            ostringstream name; name << "immersive_stat_" << i;
-            sRandomPlayerbotMgr.SetValue(owner, name.str(), percentMap[type]);
-        }
-    }
-    bot->InitStatsForLevel(true);
-    bot->UpdateAllStats();
 }
 
 #ifndef MANGOSBOT_ZERO

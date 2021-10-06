@@ -795,8 +795,8 @@ uint32 RandomItemMgr::GetRandomPotion(uint32 level, uint32 effect)
 
 uint32 RandomItemMgr::GetFood(uint32 level, uint32 category)
 {
-    initializer_list<uint32> items;
-    vector<uint32> food;
+    vector<uint32> items = {};
+    vector<uint32> food = {};
     if (category == 11)
     {
         if (level < 5)
@@ -865,7 +865,7 @@ uint32 RandomItemMgr::GetFood(uint32 level, uint32 category)
 #endif
     }
 
-    food.insert(food.end(), items);
+    food.insert(food.end(), items.begin(), items.end());
     if (food.empty()) return 0;
     return food[urand(0, food.size() - 1)];
 }

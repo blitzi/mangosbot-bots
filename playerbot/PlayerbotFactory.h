@@ -93,7 +93,6 @@ private:
     Item* StoreItem(uint32 itemId, uint32 count);
     void InitGuild();
     void InitArenaTeam();
-    void InitImmersive();
     void AddConsumables();
     static void AddPrevQuests(uint32 questId, list<uint32>& questIds);
     void LoadEnchantContainer();
