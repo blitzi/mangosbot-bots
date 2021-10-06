@@ -385,7 +385,7 @@ bool StoreLootAction::Execute(Event event)
 
         if (!ai->HasActivePlayerMaster())
         {
-            if (AI_VALUE(uint8, "bag space") > 80)
+            if (AI_VALUE(uint8, "bag space") > 50)
             {
                 uint32 maxStack = proto->GetMaxStackSize();
                 if (maxStack == 1)
@@ -404,7 +404,7 @@ bool StoreLootAction::Execute(Event event)
                     }
                 }
 
-                if (!hasFreeStack)
+                if (!hasFreeStack && proto->Quality < ITEM_QUALITY_UNCOMMON)
                     continue;
             }
         }        
