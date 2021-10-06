@@ -33,27 +33,37 @@ void ChooseTravelTargetAction::getNewTarget(TravelTarget* newTarget, TravelTarge
 {
     bool foundTarget = false;
 
-    foundTarget = SetGroupTarget(newTarget);                                 //Join groups members
-
     //Enpty bags/repair
-    if (!foundTarget)                               //90% chance
-        if (AI_VALUE2(bool, "group or", "should sell,can sell,following party,near leader") || AI_VALUE2(bool, "group or", "should repair,can repair,following party,near leader"))
-            foundTarget = SetRpgTarget(newTarget);                           //Go to town to sell items or repair
+    if (!foundTarget && (AI_VALUE2(bool, "group or", "should sell,can sell")))
+    {
+        //foundTarget = SetNpcFlagTarget(newTarget, { UNIT_NPC_FLAG_VENDOR });                       
+    }
+       
+    if (!foundTarget && AI_VALUE2(bool, "group or", "should repair,can repair"))
+    {
+        //foundTarget = SetNpcFlagTarget(newTarget, { UNIT_NPC_FLAG_REPAIR });
+    }     
+
+    if (!foundTarget)
+    {
+        foundTarget = SetGroupTarget(newTarget);
+    }
 
     //Rpg in city
     if (!foundTarget && urand(1, 100) > 99)                               //1% chance
         foundTarget = SetNpcFlagTarget(newTarget, { UNIT_NPC_FLAG_BANKER,UNIT_NPC_FLAG_BATTLEMASTER,UNIT_NPC_FLAG_AUCTIONEER });
 
-    //Grind for money
-    foundTarget = SetGrindTarget(newTarget);                         //Go grind mobs for money
+    if(!foundTarget)
+        foundTarget = SetGrindTarget(newTarget);                         //Go grind mobs for money
              
      if (!foundTarget && ai->HasStrategy("explore", BOT_STATE_NON_COMBAT)) //Explore a unexplored sub-zone.
-        foundTarget = SetExploreTarget(newTarget);
+        foundTarget = SetExploreTarget(newTarget);    
+    
+    if(!foundTarget)
+        foundTarget = SetCurrentTarget(newTarget, oldTarget);  
 
     if (!foundTarget)
-        SetNullTarget(newTarget);                 
-    
-    foundTarget = SetCurrentTarget(newTarget, oldTarget);  
+        SetNullTarget(newTarget);
 }
 
 void ChooseTravelTargetAction::setNewTarget(TravelTarget* newTarget, TravelTarget* oldTarget)
@@ -246,7 +256,7 @@ bool ChooseTravelTargetAction::getBestDestination(vector<TravelDestination*>* ac
     if (availablePoints.empty()) //No points available.
         return false;
 
-    TravelDestination* targetDestination;
+    TravelDestination* targetDestination = NULL;
 
     for (auto activeTarget : *activeDestinations) //Pick the destination that has this point.
         if (activeTarget->distanceTo(availablePoints.front()) == 0)
@@ -335,9 +345,6 @@ bool ChooseTravelTargetAction::SetCurrentTarget(TravelTarget* target, TravelTarg
         return false;
 
     if (!oldDestination) //Does this target have a destination?
-        return false;
-
-    if (!oldDestination->isActive(bot)) //Is the destination still valid?
         return false;
 
     WorldPosition botLocation(bot);

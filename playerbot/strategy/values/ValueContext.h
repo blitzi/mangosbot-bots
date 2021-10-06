@@ -260,7 +260,7 @@ namespace ai
             creators["near leader"] = &ValueContext::near_leader;
 
             creators["and"] = &ValueContext::and_value;
-            creators["and"] = &ValueContext::and_value;
+            creators["or"] = &ValueContext::or_value;
             creators["group and"] = &ValueContext::group_and;
             creators["group or"] = &ValueContext::group_or;
 
@@ -434,6 +434,7 @@ namespace ai
         static UntypedValue* following_party(PlayerbotAI* ai) { return new IsFollowingPartyValue(ai); }
         static UntypedValue* near_leader(PlayerbotAI* ai) { return new IsNearLeaderValue(ai); }
         static UntypedValue* and_value(PlayerbotAI* ai) { return new BoolANDValue(ai); }
+        static UntypedValue* or_value(PlayerbotAI* ai) { return new BoolORValue(ai); }
         static UntypedValue* group_and(PlayerbotAI* ai) { return new GroupBoolANDValue(ai); }
         static UntypedValue* group_or(PlayerbotAI* ai) { return new GroupBoolORValue(ai); }
 

@@ -42,6 +42,19 @@ bool BoolANDValue::Calculate()
     return true;
 }
 
+bool BoolORValue::Calculate()
+{
+    vector<string> values = split(getQualifier(), ',');
+
+    for (auto value : values)
+    {
+        if (AI_VALUE(bool, value))
+            return true;
+    }
+
+    return false;
+}
+
 bool GroupBoolANDValue::Calculate()
 {    
     Group* group = bot->GetGroup();

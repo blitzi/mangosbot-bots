@@ -976,12 +976,6 @@ bool GrindTravelDestination::isActive(Player* bot)
     PlayerbotAI* ai = bot->GetPlayerbotAI();
     AiObjectContext* context = ai->GetAiObjectContext();
     
-    if (!AI_VALUE(bool, "should get money"))
-        return false;
-
-    if (AI_VALUE(bool, "should sell"))
-        return false;
-
     CreatureInfo const* cInfo = this->getCreatureInfo();
 
     int32 botLevel = bot->GetLevel();
@@ -1203,12 +1197,6 @@ bool TravelTarget::isTraveling() {
         return false;
     }
 
-    if (!ai->HasStrategy("travel", BOT_STATE_NON_COMBAT))
-    {
-        setTarget(sTravelMgr.nullTravelDestination, sTravelMgr.nullWorldPosition, true);
-        return false;
-    }
-
     return true;
 }
 
@@ -1233,12 +1221,6 @@ bool TravelTarget::isWorking() {
         return false;
     }
     */
-
-    if (!ai->HasStrategy("travel", BOT_STATE_NON_COMBAT))
-    {
-        setTarget(sTravelMgr.nullTravelDestination, sTravelMgr.nullWorldPosition, true);
-        return false;
-    }
 
     return true;
 }

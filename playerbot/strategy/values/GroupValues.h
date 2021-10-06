@@ -22,7 +22,15 @@ namespace ai
     class BoolANDValue : public BoolCalculatedValue, public Qualified
     {
     public:
-        BoolANDValue(PlayerbotAI* ai) : BoolCalculatedValue(ai, "bool and") {}
+        BoolANDValue(PlayerbotAI* ai) : BoolCalculatedValue(ai, "and") {}
+
+        virtual bool Calculate();
+    };
+
+    class BoolORValue : public BoolCalculatedValue, public Qualified
+    {
+    public:
+        BoolORValue(PlayerbotAI* ai) : BoolCalculatedValue(ai, "or") {}
 
         virtual bool Calculate();
     };
