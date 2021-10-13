@@ -59,11 +59,11 @@ PlayerbotSecurityLevel PlayerbotSecurity::LevelFor(Player* from, DenyReason* rea
             }
         }
 
-        if (sServerFacade.UnitIsDead(bot))
+        /*if (sServerFacade.UnitIsDead(bot))
         {
             if (reason) *reason = PLAYERBOT_DENY_DEAD;
             return PLAYERBOT_SECURITY_TALK;
-        }
+        }*/
 
         group = bot->GetGroup();
         if (!group)
@@ -94,14 +94,14 @@ PlayerbotSecurityLevel PlayerbotSecurity::LevelFor(Player* from, DenyReason* rea
             return PLAYERBOT_SECURITY_TALK;
         }
 
-        if (bot->GetPlayerbotAI()->HasStrategy("bg", BOT_STATE_NON_COMBAT))
+     /*   if (bot->GetPlayerbotAI()->HasStrategy("bg", BOT_STATE_NON_COMBAT))
         {
             if (!bot->GetGuildId() || bot->GetGuildId() != from->GetGuildId())
             {
                 if (reason) *reason = PLAYERBOT_DENY_BG;
                 return PLAYERBOT_SECURITY_TALK;
             }
-        }
+        }*/
 
         if (bot->GetPlayerbotAI()->HasStrategy("lfg", BOT_STATE_NON_COMBAT))
         {
