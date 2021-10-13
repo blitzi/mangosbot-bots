@@ -140,9 +140,6 @@ uint32 ChooseRpgTargetAction::HasSameTarget(ObjectGuid guid)
         if (!ai)
             continue;
 
-        if (!ai->AllowActivity(GRIND_ACTIVITY))
-            continue;
-
         if (ai->GetAiObjectContext()->GetValue<ObjectGuid>("rpg target")->Get() != guid)
             continue;
 
@@ -200,17 +197,9 @@ bool ChooseRpgTargetAction::Execute(Event event)
             if (!isFollowValid(bot, unit))
                 continue;
 
-            if (unit->isTaxi() && !bot->isTaxiCheater())
-            {
-                uint32 node = sObjectMgr.GetNearestTaxiNode(unit->GetPositionX(), unit->GetPositionY(), unit->GetPositionZ(), unit->GetMapId(), bot->GetTeam());
-
-                if (!bot->m_taxi.IsTaximaskNodeKnown(node))
-                    priority = 110;
-            }
-
-            if (unit->isVendor() && AI_VALUE2(bool, "group or", "should sell,can sell,following party,near leader"))
+            if (unit->isVendor() && AI_VALUE2(bool, "group or", "should sell,can sell"))
                 priority = 100;
-            else if (unit->isArmorer() && AI_VALUE2(bool, "group or", "should repair,can repair,following party,near leader"))
+            else if (unit->isArmorer() && AI_VALUE2(bool, "group or", "should repair,can repair"))
                 priority = 95;     
             else if (unit->isInnkeeper() && AI_VALUE(bool, "should home bind"))
                 priority = 60;
@@ -294,10 +283,9 @@ bool ChooseRpgTargetAction::Execute(Event event)
 
 bool ChooseRpgTargetAction::isUseful()
 {
-    return ai->AllowActivity(RPG_ACTIVITY)
-        && !bot->IsInCombat()
-        && !context->GetValue<ObjectGuid>("rpg target")->Get()
-        && (!context->GetValue<TravelTarget*>("travel target")->Get()->isTraveling() || !ChooseRpgTargetAction::isFollowValid(bot, context->GetValue<TravelTarget*>("travel target")->Get()->getLocation()))
+    return
+        !bot->IsInCombat()
+        && !context->GetValue<ObjectGuid>("rpg target")->Get()      
         && !context->GetValue <list<ObjectGuid>>("possible rpg targets")->Get().empty();
 }
 

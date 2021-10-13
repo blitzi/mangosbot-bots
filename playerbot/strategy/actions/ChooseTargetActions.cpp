@@ -17,9 +17,6 @@ bool AttackAnythingAction::isUseful() {
     if (!name.empty() && name.find("Dummy") != std::string::npos) //Target is not a targetdummy
         return false;
 
-    if (!ai->AllowActivity(GRIND_ACTIVITY))                                              //Bot not allowed to be active
-        return false;
-
     if(!ChooseRpgTargetAction::isFollowValid(bot, target))                               //Do not grind mobs far away from master.
         return false;
 
@@ -27,6 +24,12 @@ bool AttackAnythingAction::isUseful() {
         return false;
 
     if (AI_VALUE2(uint8, "mana", "self target") && AI_VALUE2(uint8, "mana", "self target") <= sPlayerbotAIConfig.mediumMana) //Bot has mana and not enough mana.
+        return false;
+
+    if (AI_VALUE2(bool, "group or", "should repair,can repair"))
+        return false;
+
+    if (AI_VALUE2(bool, "group or", "should sell,can sell"))
         return false;
 
     if(context->GetValue<TravelTarget*>("travel target")->Get()->isTraveling() && ChooseRpgTargetAction::isFollowValid(bot, context->GetValue<TravelTarget*>("travel target")->Get()->getLocation())) //Bot is traveling

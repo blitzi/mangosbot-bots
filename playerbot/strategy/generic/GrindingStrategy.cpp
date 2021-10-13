@@ -5,9 +5,27 @@
 using namespace ai;
 
 
-NextAction** GrindingStrategy::getDefaultActions()
+class GrindingStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 {
-    return NextAction::array(0, new NextAction("choose travel target", 1.0f), NULL);
+public:
+    GrindingStrategyActionNodeFactory()
+    {
+        creators["attack anything"] = &attack_anything;
+    }
+
+private:
+    static ActionNode* attack_anything(PlayerbotAI* ai)
+    {
+        return new ActionNode("attack anything",
+            /*P*/ NULL,
+            /*A*/ NextAction::array(0, new NextAction("choose travel target"), NULL),
+            /*C*/ NULL);
+    }
+};
+
+GrindingStrategy::GrindingStrategy(PlayerbotAI* ai) : NonCombatStrategy(ai)
+{
+    actionNodeFactories.Add(new GrindingStrategyActionNodeFactory());
 }
 
 void GrindingStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
@@ -18,7 +36,18 @@ void GrindingStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
         new NextAction("attack anything", 10.0f), NULL))); 
 
     triggers.push_back(new TriggerNode(
-        "no possible grind target",
-        NextAction::array(0, new NextAction("move to travel target", 1.0f), NULL)));
+        "far from travel target",
+        NextAction::array(0, new NextAction("move to travel target", 8.0f), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "no rpg target",
+        NextAction::array(0, new NextAction("choose rpg target", 5.0f), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "far from rpg target",
+        NextAction::array(0, new NextAction("rpg", 8), NULL)));
+
+
+
 }
 

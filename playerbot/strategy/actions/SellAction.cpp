@@ -110,8 +110,16 @@ bool SellAction::Execute(Event event)
         IterateItems(&visitor);
         return true;
     }
+
+    if (text == "vendor")
+    {
+        SellVendorItemsVisitor visitor(this, context);
+        IterateItems(&visitor);
+        return true;
+    }
+
     
-    ai->TellMaster("s grey|white|green|");
+    ai->TellMaster("s grey|white|green|vendor");
 
     return false;
 }

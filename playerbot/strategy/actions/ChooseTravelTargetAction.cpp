@@ -36,22 +36,18 @@ void ChooseTravelTargetAction::getNewTarget(TravelTarget* newTarget, TravelTarge
     //Enpty bags/repair
     if (!foundTarget && (AI_VALUE2(bool, "group or", "should sell,can sell")))
     {
-        //foundTarget = SetNpcFlagTarget(newTarget, { UNIT_NPC_FLAG_VENDOR });                       
+        foundTarget = SetNpcFlagTarget(newTarget, { UNIT_NPC_FLAG_VENDOR });                       
     }
        
     if (!foundTarget && AI_VALUE2(bool, "group or", "should repair,can repair"))
     {
-        //foundTarget = SetNpcFlagTarget(newTarget, { UNIT_NPC_FLAG_REPAIR });
+        foundTarget = SetNpcFlagTarget(newTarget, { UNIT_NPC_FLAG_REPAIR });
     }     
 
     if (!foundTarget)
     {
         foundTarget = SetGroupTarget(newTarget);
     }
-
-    //Rpg in city
-    if (!foundTarget && urand(1, 100) > 99)                               //1% chance
-        foundTarget = SetNpcFlagTarget(newTarget, { UNIT_NPC_FLAG_BANKER,UNIT_NPC_FLAG_BATTLEMASTER,UNIT_NPC_FLAG_AUCTIONEER });
 
     if(!foundTarget)
         foundTarget = SetGrindTarget(newTarget);                         //Go grind mobs for money
@@ -575,7 +571,6 @@ bool ChooseTravelTargetAction::SetNpcFlagTarget(TravelTarget* target, vector<NPC
     vector<TravelDestination*> dests;
     vector<TravelDestination*> possibleDest = sTravelMgr.getRpgTravelDestinations(bot, true, true);
 
-
     for (auto& d : possibleDest)
     {
         if (!d->getEntry())
@@ -639,7 +634,7 @@ bool ChooseTravelTargetAction::SetNpcFlagTarget(TravelTarget* target, vector<NPC
         FactionTemplateEntry const* factionEntry = sFactionTemplateStore.LookupEntry(cInfo->Faction);
         ReputationRank reaction = ai->getReaction(factionEntry);
 
-        if (reaction  < REP_NEUTRAL)
+        if (reaction <= REP_NEUTRAL)
             continue;
 
         dests.push_back(d);
@@ -648,6 +643,8 @@ bool ChooseTravelTargetAction::SetNpcFlagTarget(TravelTarget* target, vector<NPC
     if (!dests.empty())
     {
         TravelDestination* dest = *std::min_element(dests.begin(), dests.end(), [botPos](TravelDestination* i, TravelDestination* j) {return i->distanceTo(botPos) < j->distanceTo(botPos); });
+
+        float dist = dest->distanceTo(botPos);
 
         vector <WorldPosition*> points = dest->nextPoint(botPos, true);
 
@@ -723,8 +720,7 @@ bool ChooseTravelTargetAction::isUseful()
 {
     return !context->GetValue<TravelTarget *>("travel target")->Get()->isActive() 
         && !context->GetValue<LootObject>("loot target")->Get().IsLootPossible(bot)
-        && !bot->IsInCombat()
-        && ai->AllowActivity(TRAVEL_ACTIVITY);
+        && !bot->IsInCombat();
 }
 
 

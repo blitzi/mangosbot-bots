@@ -20,6 +20,7 @@
 #include "strategy/values/SharedValueContext.h"
 
 #include "Grids/CellImpl.h"
+#include <playerbot/ServerFacade.h>
 
 using namespace ai;
 using namespace MaNGOS;
@@ -973,37 +974,7 @@ string ExploreTravelDestination::getTitle()
 
 bool GrindTravelDestination::isActive(Player* bot)
 {
-    PlayerbotAI* ai = bot->GetPlayerbotAI();
-    AiObjectContext* context = ai->GetAiObjectContext();
-    
-    CreatureInfo const* cInfo = this->getCreatureInfo();
-
-    int32 botLevel = bot->GetLevel();
-
-    uint8 botPowerLevel = AI_VALUE(uint8, "durability");
-    float levelMod = botPowerLevel / 500.0f; //(0-0.2f)
-    float levelBoost = botPowerLevel / 50.0f; //(0-2.0f)
-
-    int32 maxLevel = std::max(botLevel * (0.5f + levelMod), botLevel - 5.0f + levelBoost);
- 
-    if ((int32)cInfo->MaxLevel > maxLevel) //@lvl5 max = 3, @lvl60 max = 57
-        return false;
-
-    int32 minLevel = std::max(botLevel * (0.4f + levelMod), botLevel - 12.0f + levelBoost);
-
-    if ((int32)cInfo->MaxLevel < minLevel) //@lvl5 min = 3, @lvl60 max = 50
-        return false;
-
-    if (cInfo->MinLootGold == 0)
-        return false;
-
-    if (cInfo->Rank > 0 && !AI_VALUE(bool, "can fight boss"))
-        return false;
-
-    FactionTemplateEntry const* factionEntry = sFactionTemplateStore.LookupEntry(cInfo->Faction);
-    ReputationRank reaction = ai->getReaction(factionEntry);
-
-    return reaction < REP_NEUTRAL;
+    return true;
 }
 
 string GrindTravelDestination::getTitle() {
@@ -1405,33 +1376,8 @@ void TravelMgr::LoadQuestTravelTable()
     // Clearing store (for reloading case)
     Clear();
 
-    /* remove this
-    questGuidMap cQuestMap = GAI_VALUE(questGuidMap,"quest objects");
-
-    for (auto cQuest : cQuestMap)
-    {
-        sLog.outErrorDb("[Quest id: %d]", cQuest.first);
-
-        for (auto cObj : cQuest.second)
-        {
-            sLog.outErrorDb(" [Objective type: %d]", cObj.first);
-
-            for (auto cCre : cObj.second)
-            {
-                sLog.outErrorDb(" %s %d", cCre.GetTypeName(), cCre.GetEntry());
-            }
-        }
-    }
-    */
-
-    struct unit { uint64 guid; uint32 type; uint32 entry; uint32 map; float  x; float  y; float  z;  float  o; uint32 c; } t_unit;
+    struct unit { uint64 guidx; uint32 guid; uint32 type; uint32 entry; uint32 map; float  x; float  y; float  z;  float  o; uint32 c; } t_unit;
     vector<unit> units;
-
-    //struct relation { uint32 type; uint32 role;  uint32 entry; uint32 questId; } t_rel;
-    //vector<relation> relations;
-
-    //struct loot { uint32 type; uint32 entry;  uint32 item; } t_loot;
-    //vector<loot> loots;
 
     ObjectMgr::QuestMap const& questMap = sObjectMgr.GetQuestTemplates();
     vector<uint32> questIds;
@@ -1447,7 +1393,8 @@ void TravelMgr::LoadQuestTravelTable()
     for (auto& creaturePair : WorldPosition().getCreaturesNear())
     {
         t_unit.type = 0;
-        t_unit.guid = ObjectGuid(HIGHGUID_UNIT, creaturePair->second.id, creaturePair->first).GetRawValue();
+        t_unit.guidx = ObjectGuid(HIGHGUID_UNIT, creaturePair->second.id, creaturePair->first).GetRawValue();
+        t_unit.guid = creaturePair->first;
         t_unit.entry = creaturePair->second.id;
         t_unit.map = creaturePair->second.mapid;
         t_unit.x = creaturePair->second.posX;
@@ -1469,7 +1416,7 @@ void TravelMgr::LoadQuestTravelTable()
     for (auto& goPair : WorldPosition().getGameObjectsNear())
     {
         t_unit.type = 1;
-        t_unit.guid = ObjectGuid(HIGHGUID_GAMEOBJECT, goPair->second.id, goPair->first).GetRawValue();
+        t_unit.guidx = ObjectGuid(HIGHGUID_GAMEOBJECT, goPair->second.id, goPair->first).GetRawValue();
         t_unit.entry = goPair->second.id;
         t_unit.map = goPair->second.mapid;
         t_unit.x = goPair->second.posX;
@@ -1479,114 +1426,7 @@ void TravelMgr::LoadQuestTravelTable()
         t_unit.c = 1;
 
         units.push_back(t_unit);
-    }
-
-    /*
-    //                     0    1  2   3          4          5          6           7     8
-    string query = "SELECT 0,guid,id,map,position_x,position_y,position_z,orientation, (select count(*) from creature k where c.id = k.id) FROM creature c UNION ALL SELECT 1,guid,id,map,position_x,position_y,position_z,orientation, (select count(*) from gameobject h where h.id = g.id)  FROM gameobject g";
-
-    QueryResult* result = WorldDatabase.PQuery(query.c_str());
-
-    if (result)
-    {
-        BarGoLink bar(result->GetRowCount());
-        do
-        {
-            Field* fields = result->Fetch();
-            bar.step();
-
-            t_unit.type = fields[0].GetUInt32();
-            t_unit.guid = fields[1].GetUInt32();
-            t_unit.entry = fields[2].GetUInt32();
-            t_unit.map = fields[3].GetUInt32();
-            t_unit.x = fields[4].GetFloat();
-            t_unit.y = fields[5].GetFloat();
-            t_unit.z = fields[6].GetFloat();
-            t_unit.o = fields[7].GetFloat();
-            t_unit.c = fields[8].GetUInt32();
-
-            units.push_back(t_unit);
-
-        } while (result->NextRow());
-
-        delete result;
-
-        sLog.outString(">> Loaded " SIZEFMTD " units locations.", units.size());
-    }
-    else
-    {
-        sLog.outString();
-        sLog.outErrorDb(">> Error loading units locations.");
-    }
-
-#ifdef MANGOS
-    query = "SELECT actor, role, entry, quest FROM quest_relations qr";
-#endif
-#ifdef CMANGOS
-    query = "SELECT 0, 0, id, quest FROM creature_questrelation UNION ALL SELECT 0, 1, id, quest FROM creature_involvedrelation UNION ALL SELECT 1, 0, id, quest FROM gameobject_questrelation UNION ALL SELECT 1, 1, id, quest FROM gameobject_involvedrelation";
-#endif
-
-    result = WorldDatabase.PQuery(query.c_str());
-
-    if (result)
-    {
-        BarGoLink bar(result->GetRowCount());
-
-        do
-        {
-            Field* fields = result->Fetch();
-            bar.step();
-
-            t_rel.type = fields[0].GetUInt32();
-            t_rel.role = fields[1].GetUInt32();
-            t_rel.entry = fields[2].GetUInt32();
-            t_rel.questId = fields[3].GetUInt32();
-
-            relations.push_back(t_rel);
-
-        } while (result->NextRow());
-
-        delete result;
-
-        sLog.outString(">> Loaded " SIZEFMTD " relations.", relations.size());
-    }
-    else
-    {
-        sLog.outString();
-        sLog.outErrorDb(">> Error loading relations.");
-    }
-
-    query = "SELECT 0, ct.entry, item FROM creature_template ct JOIN creature_loot_template clt ON (ct.lootid = clt.entry) UNION ALL SELECT 0, entry, item FROM npc_vendor UNION ALL SELECT 1, gt.entry, item FROM gameobject_template gt JOIN gameobject_loot_template glt ON (gt.TYPE = 3 AND gt.DATA1 = glt.entry)";
-
-    result = WorldDatabase.PQuery(query.c_str());
-
-    if (result)
-    {
-        BarGoLink bar(result->GetRowCount());
-
-        do
-        {
-            Field* fields = result->Fetch();
-            bar.step();
-
-            t_loot.type = fields[0].GetUInt32();
-            t_loot.entry = fields[1].GetUInt32();
-            t_loot.item = fields[2].GetUInt32();
-
-            loots.push_back(t_loot);
-
-        } while (result->NextRow());
-
-        delete result;
-
-        sLog.outString(">> Loaded " SIZEFMTD " loot lists.", loots.size());
-    }
-    else
-    {
-        sLog.outString();
-        sLog.outErrorDb(">> Error loading loot lists.");
-    }
-    */
+    }  
 
     sLog.outErrorDb("Loading quest data.");
 
@@ -1669,184 +1509,17 @@ void TravelMgr::LoadQuestTravelTable()
                     questGivers.push_back(loc);
             }
         }
-    }
-    /*
-    if (loadQuestData && false)
-    {
-        BarGoLink bar(questIds.size());
-
-        for (auto& questId : questIds)
-        {
-            bar.step();
-
-            Quest* quest = questMap.find(questId)->second;
-
-            QuestContainer* container = new QuestContainer;
-            QuestTravelDestination* loc;
-            WorldPosition point;
-
-            bool hasError = false;
-
-            //Relations
-            for (auto& r : relations)
-            {
-                if (questId != r.questId)
-                    continue;
-
-                int32 entry = r.type == 0 ? r.entry : r.entry * -1;
-
-                loc = new QuestRelationTravelDestination(r.questId, entry, r.role, sPlayerbotAIConfig.tooCloseDistance, sPlayerbotAIConfig.sightDistance);
-                loc->setExpireDelay(5 * 60 * 1000);
-                loc->setMaxVisitors(15, 0);
-
-                for (auto& u : units)
-                {
-                    if (r.type != u.type || r.entry != u.entry)
-                        continue;
-
-                    int32 guid = u.type == 0 ? u.guid : u.guid * -1;
-
-                    point = WorldPosition(u.map, u.x, u.y, u.z, u.o);
-                    pointsMap.insert(make_pair(guid, point));
-
-                    loc->addPoint(&pointsMap.find(guid)->second);
-                }
-
-                if (loc->getPoints(0).empty())
-                {
-                    logQuestError(1, quest, r.role, entry);
-                    delete loc;
-                    continue;
-                }
-
-
-                if (r.role == 0)
-                {
-                    container->questGivers.push_back(loc);
-                }
-                else
-                    container->questTakers.push_back(loc);
-
-            }
-
-            //Mobs
-            for (uint32 i = 0; i < 4; i++)
-            {
-                if (quest->ReqCreatureOrGOCount[i] == 0)
-                    continue;
-
-                uint32 reqEntry = quest->ReqCreatureOrGOId[i];
-
-                loc = new QuestObjectiveTravelDestination(questId, reqEntry, i, sPlayerbotAIConfig.tooCloseDistance, sPlayerbotAIConfig.sightDistance);
-                loc->setExpireDelay(1 * 60 * 1000);
-                loc->setMaxVisitors(100, 1);
-
-                for (auto& u : units)
-                {
-                    int32 entry = u.type == 0 ? u.entry : u.entry * -1;
-
-                    if (entry != reqEntry)
-                        continue;
-
-                    int32 guid = u.type == 0 ? u.guid : u.guid * -1;
-
-                    point = WorldPosition(u.map, u.x, u.y, u.z, u.o);
-                    pointsMap.insert(make_pair(u.guid, point));
-
-                    loc->addPoint(&pointsMap.find(u.guid)->second);
-                }
-
-                if (loc->getPoints(0).empty())
-                {
-                    logQuestError(2, quest, i, reqEntry);
-
-                    delete loc;
-                    hasError = true;
-                    continue;
-                }
-
-                container->questObjectives.push_back(loc);
-            }
-
-            //Loot
-            for (uint32 i = 0; i < 4; i++)
-            {
-                if (quest->ReqItemCount[i] == 0)
-                    continue;
-
-                ItemPrototype const* proto = sObjectMgr.GetItemPrototype(quest->ReqItemId[i]);
-
-                if (!proto)
-                {
-                    logQuestError(3, quest, i, 0, quest->ReqItemId[i]);
-                    hasError = true;
-                    continue;
-                }
-
-                uint32 foundLoot = 0;
-
-                for (auto& l : loots)
-                {
-                    if (l.item != quest->ReqItemId[i])
-                        continue;
-
-                    int32 entry = l.type == 0 ? l.entry : l.entry * -1;
-
-                    loc = new QuestObjectiveTravelDestination(questId, entry, i, sPlayerbotAIConfig.tooCloseDistance, sPlayerbotAIConfig.sightDistance, l.item);
-                    loc->setExpireDelay(1 * 60 * 1000);
-                    loc->setMaxVisitors(100, 1);
-
-                    for (auto& u : units)
-                    {
-                        if (l.type != u.type || l.entry != u.entry)
-                            continue;
-
-                        int32 guid = u.type == 0 ? u.guid : u.guid * -1;
-
-                        point = WorldPosition(u.map, u.x, u.y, u.z, u.o);
-                        pointsMap.insert(make_pair(guid, point));
-
-                        loc->addPoint(&pointsMap.find(guid)->second);
-                    }
-
-                    if (loc->getPoints(0).empty())
-                    {
-                        logQuestError(4, quest, i, entry, quest->ReqItemId[i]);
-                        delete loc;
-                        continue;
-                    }
-
-                    container->questObjectives.push_back(loc);
-
-                    foundLoot++;
-                }
-
-                if (foundLoot == 0)
-                {
-                    hasError = true;
-                    logQuestError(5, quest, i, 0, quest->ReqItemId[i]);
-                }
-            }
-
-            if (container->questTakers.empty())
-                logQuestError(7, quest);
-
-            if (!container->questGivers.empty() || !container->questTakers.empty() || hasError)
-            {
-                quests.insert(make_pair(questId, container));
-
-                for (auto loc : container->questGivers)
-                    questGivers.push_back(loc);
-            }
-        }
-
-        sLog.outString(">> Loaded " SIZEFMTD " quest details.", questIds.size());
-    }
-    */
+    }  
 
     sLog.outErrorDb("Loading Rpg, Grind and Boss locations.");
 
     WorldPosition point;
+
+    vector<uint32> allowedNpcFlags;
+
+    allowedNpcFlags.push_back(UNIT_NPC_FLAG_INNKEEPER);
+    allowedNpcFlags.push_back(UNIT_NPC_FLAG_VENDOR);
+    allowedNpcFlags.push_back(UNIT_NPC_FLAG_REPAIR);
 
     //Rpg locations
     for (auto& u : units)
@@ -1863,62 +1536,56 @@ void TravelMgr::LoadQuestTravelTable()
         if (!cInfo)
             continue;
 
-        vector<uint32> allowedNpcFlags;
+        point = WorldPosition(u.map, u.x, u.y, u.z, u.o);         
 
-        allowedNpcFlags.push_back(UNIT_NPC_FLAG_INNKEEPER);
-        allowedNpcFlags.push_back(UNIT_NPC_FLAG_GOSSIP);
-        allowedNpcFlags.push_back(UNIT_NPC_FLAG_QUESTGIVER);
-        allowedNpcFlags.push_back(UNIT_NPC_FLAG_FLIGHTMASTER);
-        allowedNpcFlags.push_back(UNIT_NPC_FLAG_BANKER);
-        allowedNpcFlags.push_back(UNIT_NPC_FLAG_AUCTIONEER);
-        allowedNpcFlags.push_back(UNIT_NPC_FLAG_STABLEMASTER);
-        allowedNpcFlags.push_back(UNIT_NPC_FLAG_PETITIONER);
-        allowedNpcFlags.push_back(UNIT_NPC_FLAG_TABARDDESIGNER);
-
-        allowedNpcFlags.push_back(UNIT_NPC_FLAG_TRAINER);
-        allowedNpcFlags.push_back(UNIT_NPC_FLAG_VENDOR);
-        allowedNpcFlags.push_back(UNIT_NPC_FLAG_REPAIR);
-
-        point = WorldPosition(u.map, u.x, u.y, u.z, u.o);
+        if (!point.getMapEntry()->IsContinent())
+            continue;
 
         for (vector<uint32>::iterator i = allowedNpcFlags.begin(); i != allowedNpcFlags.end(); ++i)
         {
             if ((cInfo->NpcFlags & *i) != 0)
             {
                 rLoc = new RpgTravelDestination(u.entry, sPlayerbotAIConfig.tooCloseDistance, sPlayerbotAIConfig.sightDistance);
-                rLoc->setExpireDelay(5 * 60 * 1000);
+                rLoc->setExpireDelay(60 * 1000);
                 rLoc->setMaxVisitors(15, 0);
+                rLoc->guid = ObjectGuid(u.guidx);
 
-
-                pointsMap.insert_or_assign(u.guid, point);
-                rLoc->addPoint(&pointsMap.find(u.guid)->second);
+                pointsMap.insert_or_assign(u.guidx, point);
+                rLoc->addPoint(&pointsMap.find(u.guidx)->second);
                 rpgNpcs.push_back(rLoc);
                 break;
             }
         }
 
-        if (cInfo->MinLootGold > 0)
-        {
-            gLoc = new GrindTravelDestination(u.entry, sPlayerbotAIConfig.tooCloseDistance, sPlayerbotAIConfig.sightDistance);
-            gLoc->setExpireDelay(5 * 60 * 1000);
-            gLoc->setMaxVisitors(100, 0);
+        gLoc = new GrindTravelDestination(u.entry, sPlayerbotAIConfig.tooCloseDistance, sPlayerbotAIConfig.sightDistance);
 
-            point = WorldPosition(u.map, u.x, u.y, u.z, u.o);
-            pointsMap.insert_or_assign(u.guid, point);
-            gLoc->addPoint(&pointsMap.find(u.guid)->second);
-            grindMobs.push_back(gLoc);
-        }
+
+
+        gLoc->setExpireDelay(60 * 1000);
+        gLoc->setMaxVisitors(100, 0);
+
+        point = WorldPosition(u.map, u.x, u.y, u.z, u.o);
+
+        if (point.isUnderWater() || point.isInWater())
+            continue;
+
+        if (point.getMapEntry()->IsDungeon())
+            continue;
+
+        pointsMap.insert_or_assign(u.guidx, point);
+        gLoc->addPoint(&pointsMap.find(u.guidx)->second);
+        grindMobs.push_back(gLoc);        
 
         if (cInfo->Rank == 3 || (cInfo->Rank == 1 && !point.isOverworld() && u.c == 1))
         {
             string nodeName = cInfo->Name;
 
             bLoc = new BossTravelDestination(u.entry, sPlayerbotAIConfig.tooCloseDistance, sPlayerbotAIConfig.sightDistance);
-            bLoc->setExpireDelay(5 * 60 * 1000);
+            bLoc->setExpireDelay(60 * 1000);
             bLoc->setMaxVisitors(0, 0);
 
-            pointsMap.insert_or_assign(u.guid, point);
-            bLoc->addPoint(&pointsMap.find(u.guid)->second);
+            pointsMap.insert_or_assign(u.guidx, point);
+            bLoc->addPoint(&pointsMap.find(u.guidx)->second);
             bossMobs.push_back(bLoc);
         }
     }
@@ -1944,7 +1611,7 @@ void TravelMgr::LoadQuestTravelTable()
 
         auto iloc = exploreLocs.find(area->ID);
 
-        int32 guid = u.type == 0 ? u.guid : u.guid * -1;
+        int32 guid = u.type == 0 ? u.guidx : u.guidx * -1;
 
         pointsMap.insert_or_assign(guid, point);
 
@@ -3551,14 +3218,19 @@ vector<TravelDestination*> TravelMgr::getRpgTravelDestinations(Player* bot, bool
     {
         if (!ignoreInactive && !dest->isActive(bot))
             continue;
-
+        
         if (dest->isFull(ignoreFull))
             continue;
 
         if (maxDistance > 0 && dest->distanceTo(&botLocation) > maxDistance)
             continue;
 
-        retTravelLocations.push_back(dest);
+        Unit* u = bot->GetPlayerbotAI()->GetUnit(dest->guid);
+
+        if (u && u->IsInWorld())
+        {
+            retTravelLocations.push_back(dest);            
+        }
     }
 
     return retTravelLocations;
@@ -3608,6 +3280,22 @@ vector<TravelDestination*> TravelMgr::getGrindTravelDestinations(Player* bot, bo
             if (maxDistance > 0 && dist > maxDistance)
                 continue;
 
+            //ignore creatures that can only swim
+            if (cInfo->InhabitType & INHABIT_GROUND == 0 && cInfo->InhabitType & INHABIT_WATER != 0)
+                continue;           
+
+            if (cInfo->ExtraFlags & CREATURE_EXTRA_FLAG_INVISIBLE != 0)
+                continue;
+
+            if (cInfo->Rank > 0 && !bot->GetPlayerbotAI()->GetAiObjectContext()->GetValue<bool>("can fight boss"))
+                continue;
+
+            FactionTemplateEntry const* factionEntry = sFactionTemplateStore.LookupEntry(cInfo->Faction);
+            ReputationRank reaction = bot->GetPlayerbotAI()->getReaction(factionEntry);
+
+            if (reaction > REP_NEUTRAL)
+                continue;            
+            
             retTravelLocations.push_back(dest);
         }
     }

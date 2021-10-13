@@ -130,13 +130,14 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
     ActionBasket* basket = NULL;
 
     time_t currentTime = time(0);
+
     bool wasCasting = ai->IsCasting();
 
     if (lastCastRelevance > 0 && wasCasting == false)
         lastCastRelevance = 0.0f;
 
     aiObjectContext->Update();
-    ProcessTriggers();
+    ProcessTriggers(minimal);
 
     bool replaceCastWithBetterOption = false;
 
@@ -231,6 +232,7 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
             else
             {               
                 LogAction("A:%s - USELESS", action->getName().c_str());
+                MultiplyAndPush(actionNode->getAlternatives(), relevance + 0.03, false, event, "alt");
             }
             delete actionNode;
         }
@@ -253,7 +255,9 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
         }
     } while (basket);*/
 
-    if (time(0) - currentTime > 1) {
+    time_t timespan = time(0) - currentTime;
+   
+    if (timespan > 1) {
         LogAction("too long execution");
     }
 
@@ -427,12 +431,12 @@ bool Engine::HasStrategy(string name)
     return strategies.find(name) != strategies.end();
 }
 
-void Engine::ProcessTriggers()
+void Engine::ProcessTriggers(bool minimal)
 {
     map<Trigger*, Event> fires;
     for (list<TriggerNode*>::iterator i = triggers.begin(); i != triggers.end(); i++)
     {
-        TriggerNode* node = *i;
+        TriggerNode* node = *i;        
         if (!node)
             continue;
 
@@ -446,7 +450,7 @@ void Engine::ProcessTriggers()
         if (!trigger)
             continue;
 
-        if (testMode || trigger->needCheck())
+        if (testMode || trigger->needCheck(minimal))
         {
             PerformanceMonitorOperation *pmo = sPerformanceMonitor.start(PERF_MON_TRIGGER, trigger->getName());
             Event event = trigger->Check();
@@ -576,6 +580,9 @@ bool Engine::ListenAndExecute(Action* action, Event event)
 
 void Engine::LogAction(const char* format, ...)
 {
+    if (!testMode)    
+        return;
+
     char buf[1024];
 
     va_list ap;

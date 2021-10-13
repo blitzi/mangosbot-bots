@@ -155,14 +155,14 @@ float TravelNodePath::getCost(Player* bot, uint32 cGold)
             int mobAnnoyance = (maxLevelCreature[0] - level) - 10; //Mobs 10 levels below do not bother us.
 
             if (isAlliance)
-                factionAnnoyance = (maxLevelCreature[2] - level) - 30;              //Opposite faction below 30 do not bother us.
+                factionAnnoyance = (maxLevelCreature[2] - level) - 10;              //Opposite faction below 30 do not bother us.
             else if (!isAlliance)
-                factionAnnoyance = (maxLevelCreature[1] - level) - 30;
+                factionAnnoyance = (maxLevelCreature[1] - level) - 10;
 
             if (mobAnnoyance > 0)
                 modifier += 0.1 * mobAnnoyance;     //For each level the whole path takes 10% longer.
             if (factionAnnoyance > 0)
-                modifier += 0.1 * factionAnnoyance; //For each level the whole path takes 10% longer.
+                modifier += 0.3 * factionAnnoyance; //For each level the whole path takes 10% longer.
         }
     }
     else if (getPathType() == TravelNodePathType::flightPath)
@@ -1206,7 +1206,7 @@ TravelNodeRoute TravelNodeMap::getRoute(TravelNode* start, TravelNode* goal, Pla
         else
             startStub->currentGold = bot->GetMoney();
 
-        if (sServerFacade.IsSpellReady(bot, 8690))
+        if (bot->IsAlive() && sServerFacade.IsSpellReady(bot, 8690) && bot->HasItemCount(6948, 1, false))
         {
             AiObjectContext* context = ai->GetAiObjectContext();
 
@@ -1354,7 +1354,7 @@ TravelNodeRoute TravelNodeMap::getRoute(WorldPosition startPos, WorldPosition en
         }
     }
 
-    if (bot && sServerFacade.IsSpellReady(bot, 8690))
+    if (bot && sServerFacade.IsSpellReady(bot, 8690) && bot->HasItemCount(6948, 1, false))
     {
         TravelNode* botNode = sTravelNodeMap.teleportNodes[bot->GetObjectGuid()][0];
         if (!botNode)

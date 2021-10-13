@@ -130,17 +130,6 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
 {
     UpdateMovementState();
 
-    bool detailedMove = ai->AllowActivity(DETAILED_MOVE_ACTIVITY);
-
-    if (!detailedMove)
-    {
-        time_t now = time(0);
-        if (AI_VALUE(LastMovement&, "last movement").nextTeleport > now) //We can not teleport yet. Wait.
-        {
-            return true;
-        }
-    }
-
     float minDist = sPlayerbotAIConfig.targetPosRecalcDistance; //Minium distance a bot should move.
     float maxDist = sPlayerbotAIConfig.reactDistance;           //Maxium distance a bot can move in one single action.
     float originalZ = z;                                        // save original destination height to check if bot needs to fly up
@@ -383,10 +372,9 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
         {
             if (entry == 8690)
             {
-                if (sServerFacade.IsSpellReady(bot, 8690))
+                if (sServerFacade.IsSpellReady(bot, 8690) && bot->HasItemCount(6948, 1, false))
                 {
                     return ai->DoSpecificAction("hearthstone", Event("move action"));
-
                 }
                 else
                 {
@@ -514,7 +502,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
         }
     }
 
-    if (totalDistance > maxDist && !detailedMove && !ai->HasPlayerNearby(&movePosition)) //Why walk if you can fly?
+    if (totalDistance > maxDist && !ai->HasPlayerNearby(&movePosition)) //Why walk if you can fly?
     {
         time_t now = time(0);
 

@@ -59,7 +59,7 @@ bool TravelAction::Execute(Event event)
 
 bool TravelAction::isUseful()
 {
-    return false && context->GetValue<TravelTarget *>("travel target")->Get()->isActive() && (!context->GetValue<ObjectGuid>("rpg target")->Get() || !context->GetValue<ObjectGuid>("pull target")->Get());
+    return context->GetValue<TravelTarget *>("travel target")->Get()->isActive() && (!context->GetValue<ObjectGuid>("rpg target")->Get() || !context->GetValue<ObjectGuid>("pull target")->Get());
 }
 
 bool MoveToDarkPortalAction::Execute(Event event)

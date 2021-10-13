@@ -79,7 +79,6 @@ bool MoveToTravelTargetAction::Execute(Event event)
         //angle = bot->GetAngle(location.coord_x, location.coord_y);
         //location = botLocation.getLocation();
     }
-
     float x = location.coord_x;
     float y = location.coord_y;
     float z = location.coord_z;
@@ -98,22 +97,29 @@ bool MoveToTravelTargetAction::Execute(Event event)
     else
         canMove = MoveTo(mapId, x, y, z, false, false);
 
-    if (!canMove && !target->isForced())
+
+    if (!canMove)
     {
         target->incRetry(true);
 
         if (target->isMaxRetry(true))
             target->setStatus(TRAVEL_STATUS_COOLDOWN);
-    }
+    }    
     else
-        target->setRetry(true);
+    {
+        //target->setRetry(true);
+    }
      
     return canMove;
 }
 
 bool MoveToTravelTargetAction::isUseful()
 {
-    if (!context->GetValue<TravelTarget*>("travel target")->Get()->isActive())
+    if (!context->GetValue<TravelTarget*>("travel target")->Get()->isTraveling())
+        return false;
+
+    TravelTarget* target = context->GetValue<TravelTarget*>("travel target")->Get();
+    if (!target || !target->getPosition())
         return false;
 
     if (bot->IsTaxiFlying())
@@ -128,14 +134,7 @@ bool MoveToTravelTargetAction::isUseful()
     if (bot->IsInCombat())
         return false;
 
-    if (AI_VALUE2(uint8, "health", "self target") <= sPlayerbotAIConfig.almostFullHealth)
-        return false;
-     
-    if (AI_VALUE2(uint8, "mana", "self target") && AI_VALUE2(uint8, "mana", "self target") <= sPlayerbotAIConfig.mediumMana) 
-        return false;
-
-    LootObject loot = AI_VALUE(LootObject, "loot target");
-    if (loot.IsLootPossible(bot))
+    if (bot->IsNonMeleeSpellCasted(false))
         return false;
 
     if (!ChooseRpgTargetAction::isFollowValid(bot, context->GetValue<TravelTarget*>("travel target")->Get()->getLocation()))

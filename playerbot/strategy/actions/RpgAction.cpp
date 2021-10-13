@@ -7,6 +7,7 @@
 #include "EmoteAction.h"
 #include "GossipDef.h"
 #include "GuildCreateActions.h"
+#include <playerbot/PlayerbotFactory.h>
 
 
 using namespace ai;
@@ -329,7 +330,15 @@ void RpgAction::trade(ObjectGuid guid)
 
     bot->SetSelectionGuid(guid);
 
+    ai->DoSpecificAction("sell", Event("rpg action", "grey"));
+    ai->DoSpecificAction("sell", Event("rpg action", "white"));
     ai->DoSpecificAction("sell", Event("rpg action", "vendor"));
+
+    if (sRandomPlayerbotMgr.IsRandomBot(bot->GetGUIDLow()))
+    {
+        PlayerbotFactory factory(bot, bot->GetLevel());
+        factory.Randomize(false);
+    }
 
     if(AI_VALUE(uint8, "durability") > 50)
         ai->DoSpecificAction("buy", Event("rpg action", "vendor"));

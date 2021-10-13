@@ -140,36 +140,21 @@ bool FindCorpseAction::Execute(Event event)
     //Actual mobing part.
     bool moved = false;
 
-    if (!ai->AllowActivity(ALL_ACTIVITY))
-    {
-        uint32 delay = sServerFacade.GetDistance2d(bot, corpse) / bot->GetSpeed(MOVE_RUN); //Time a bot would take to travel to it's corpse.
-        delay = min(delay, uint32(10 * MINUTE)); //Cap time to get to corpse at 10 minutes.
-
-        if (deadTime > delay)
-        {
-            bot->GetMotionMaster()->Clear();
-            bot->TeleportTo(moveToPos.getMapId(), moveToPos.getX(), moveToPos.getY(), moveToPos.getZ(), 0);
-        }
-
+    if (bot->IsMoving())
         moved = true;
-    }
     else
     {
-        if (bot->IsMoving())
-            moved = true;
-        else
+        if (deadTime < 10 * MINUTE && dCount < 5) //Look for corpse up to 30 minutes.
         {
-            if (deadTime < 10 * MINUTE && dCount < 5) //Look for corpse up to 30 minutes.
-            {
-                moved = MoveTo(moveToPos.getMapId(), moveToPos.getX(), moveToPos.getY(), moveToPos.getZ(), false, false);
-            }
-
-            if (!moved)
-            {
-                moved = ai->DoSpecificAction("spirit healer");
-            }
+            moved = MoveTo(moveToPos.getMapId(), moveToPos.getX(), moveToPos.getY(), moveToPos.getZ(), false, false);
         }
-    }   
+
+        if (!moved)
+        {
+            moved = ai->DoSpecificAction("spirit healer");
+        }
+    }
+      
 
     return moved;
 }
@@ -257,7 +242,7 @@ bool SpiritHealerAction::Execute(Event event)
     uint32 dCount = AI_VALUE(uint32, "death count");
     int64 deadTime = time(nullptr) - corpse->GetGhostTime();
 
-    WorldSafeLocsEntry const* ClosestGrave = GetGrave(dCount > 10 || deadTime > 15 * MINUTE || AI_VALUE(uint8, "durability") < 10);
+    WorldSafeLocsEntry const* ClosestGrave = GetGrave(dCount > 10 || deadTime > 15 * MINUTE || AI_VALUE(uint8, "durability") <= 20);
 
     if (bot->GetDistance2d(ClosestGrave->x, ClosestGrave->y) < sPlayerbotAIConfig.sightDistance)
     {

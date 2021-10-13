@@ -323,6 +323,8 @@ namespace ai
         virtual bool isOut(WorldPosition* pos, float radius = 0) { return !onMap(pos) || distanceTo(pos) > (radius? radius : radiusMax); }
         float getRadiusMin() { return radiusMin; }
 
+        ObjectGuid guid;
+
         vector<WorldPosition*> touchingPoints(WorldPosition* pos);
         vector<WorldPosition*> sortedPoints(WorldPosition* pos);
         vector<WorldPosition*> nextPoint(WorldPosition* pos, bool ignoreFull = true);
@@ -331,18 +333,19 @@ namespace ai
         float radiusMin = 0;
         float radiusMax = 0;
 
+      
         uint32 visitors = 0;
         uint32 maxVisitors = 0;
         uint32 maxVisitorsPerPoint = 0;
         uint32 expireDelay = 5 * 1000;
-        uint32 cooldownDelay = 60 * 1000;
+        uint32 cooldownDelay = 10 * 1000;
     };
 
     //A travel target that is always inactive and jumps to cooldown.
     class NullTravelDestination : public TravelDestination
     {
     public:
-        NullTravelDestination(uint32 cooldownDelay1 = 5 * 60 * 1000) : TravelDestination() { cooldownDelay = cooldownDelay1;};
+        NullTravelDestination(uint32 cooldownDelay1 = 20 * 1000) : TravelDestination() { cooldownDelay = cooldownDelay1;};
 
         virtual Quest const* GetQuestTemplate() { return NULL; }
 

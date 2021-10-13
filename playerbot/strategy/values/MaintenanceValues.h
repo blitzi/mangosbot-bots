@@ -17,7 +17,7 @@ namespace ai
 	{
 	public:
         ShouldRepairValue(PlayerbotAI* ai) : BoolCalculatedValue(ai,"should repair",2) {}
-        virtual bool Calculate() { return AI_VALUE(uint8, "durability") < 80; };
+        virtual bool Calculate() { return AI_VALUE(uint8, "durability") <= 20; };
     };
 
     class CanRepairValue : public BoolCalculatedValue

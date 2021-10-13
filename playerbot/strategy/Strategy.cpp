@@ -15,7 +15,6 @@ public:
         creators["melee"] = &melee;
         creators["healthstone"] = &healthstone;
         creators["be near"] = &follow_master_random;
-        creators["attack anything"] = &attack_anything;
         creators["move random"] = &move_random;
         creators["move to loot"] = &move_to_loot;
         creators["food"] = &food;
@@ -45,13 +44,6 @@ private:
         return new ActionNode ("be near",
             /*P*/ NULL,
             /*A*/ NextAction::array(0, new NextAction("follow"), NULL),
-            /*C*/ NULL);
-    }
-    static ActionNode* attack_anything(PlayerbotAI* ai)
-    {
-        return new ActionNode ("attack anything",
-            /*P*/ NULL,
-            /*A*/ NULL,
             /*C*/ NULL);
     }
     static ActionNode* move_random(PlayerbotAI* ai)

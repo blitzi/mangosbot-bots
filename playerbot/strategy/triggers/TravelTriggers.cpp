@@ -14,7 +14,7 @@ bool NoTravelTargetTrigger::IsActive()
 
 bool FarFromTravelTargetTrigger::IsActive()
 {
-    return context->GetValue<TravelTarget*>("travel target")->Get()->isActive();
+    return context->GetValue<TravelTarget*>("travel target")->Get()->isTraveling();
 }
 
 bool NearDarkPortalTrigger::IsActive()

@@ -22,9 +22,6 @@ list<ObjectGuid> AttackersValue::Calculate()
 
     AddAttackersOf(bot, targets);
 
-    if (!ai->AllowActive(ALL_ACTIVITY))
-        return result;
-
     Group* group = bot->GetGroup();
     if (group)
         AddAttackersOf(group, targets);

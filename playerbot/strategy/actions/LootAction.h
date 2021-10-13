@@ -12,6 +12,7 @@ namespace ai
     public:
         LootAction(PlayerbotAI* ai) : MovementAction(ai, "loot") {}
         virtual bool Execute(Event event);
+        virtual bool isPossible() { return Action::isPossible();  }
     };
 
     class OpenLootAction : public MovementAction
@@ -19,6 +20,7 @@ namespace ai
     public:
         OpenLootAction(PlayerbotAI* ai) : MovementAction(ai, "open loot") {}
         virtual bool Execute(Event event);
+        virtual bool isPossible() { return Action::isPossible(); }
 
     private:
         bool DoLoot(LootObject& lootObject);
@@ -41,5 +43,6 @@ namespace ai
     public:
         ReleaseLootAction(PlayerbotAI* ai) : MovementAction(ai, "release loot") {}
         virtual bool Execute(Event event);
+        virtual bool isPossible() { return Action::isPossible(); }
     };
 }

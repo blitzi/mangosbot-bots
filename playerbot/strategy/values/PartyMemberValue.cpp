@@ -30,9 +30,7 @@ Unit* PartyMemberValue::FindPartyMember(list<Player*>* party, FindPlayerPredicat
 Unit* PartyMemberValue::FindPartyMember(FindPlayerPredicate &predicate, bool ignoreOutOfGroup)
 {
     Player* master = GetMaster();
-    list<ObjectGuid> nearestPlayers;
-    if(ai->AllowActivity(OUT_OF_PARTY_ACTIVITY))
-        nearestPlayers = AI_VALUE(list<ObjectGuid>, "nearest friendly players");
+    list<ObjectGuid> nearestPlayers = AI_VALUE(list<ObjectGuid>, "nearest friendly players");
 
     list<ObjectGuid> nearestGroupPlayers;
 
