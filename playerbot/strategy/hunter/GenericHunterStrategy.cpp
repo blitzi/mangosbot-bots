@@ -77,10 +77,6 @@ void GenericHunterStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
         NextAction::array(0, new NextAction("mend pet", ACTION_HIGH + 2), NULL)));
 
     triggers.push_back(new TriggerNode(
-        "switch to melee",
-        NextAction::array(0, new NextAction("switch to melee", ACTION_HIGH + 1), NULL)));
-
-    triggers.push_back(new TriggerNode(
         "switch to ranged",
         NextAction::array(0, new NextAction("switch to ranged", ACTION_HIGH), NULL)));
 

@@ -159,9 +159,6 @@ namespace ai
             if (ai->HasActivePlayerMaster())
                 return false;
 
-            if (!ai->AllowActive(ALL_ACTIVITY))
-                return false;
-
             WorldPosition botPos(bot);            
 
             LogCalculatedValue<WorldPosition>* posVal = dynamic_cast<LogCalculatedValue<WorldPosition>*>(context->GetUntypedValue("current position"));
@@ -206,9 +203,6 @@ namespace ai
         virtual bool IsActive()
         {
             if (ai->HasActivePlayerMaster())
-                return false;
-
-            if (!ai->AllowActive(ALL_ACTIVITY))
                 return false;
 
             WorldPosition botPos(bot);
