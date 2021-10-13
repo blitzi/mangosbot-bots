@@ -25,8 +25,13 @@ namespace ai
         virtual Unit* GetTarget();
         virtual Value<Unit*>* GetTargetValue();
         virtual string GetTargetName() { return "self target"; }
+        virtual bool CheckOnMinimal() { return false;  }
 
-		bool needCheck() {
+		bool needCheck(bool minimal) {
+
+            if (minimal && !CheckOnMinimal())
+                return false;
+
 		    if (checkInterval < 2) return true;
 
 		    time_t now = time(0);

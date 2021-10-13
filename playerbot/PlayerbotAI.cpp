@@ -291,12 +291,7 @@ void PlayerbotAI::Reset(bool full)
         aiObjectContext->GetValue<TravelTarget* >("travel target")->Get()->setExpireIn(1000);
     }
     
-    aiObjectContext->GetValue<set<ObjectGuid>&>("ignore rpg target")->Get().clear();
-    
-    aiObjectContext->GetValue<TravelTarget* >("travel target")->Get()->setStatus(TRAVEL_STATUS_EXPIRED);
-    aiObjectContext->GetValue<TravelTarget* >("travel target")->Get()->setExpireIn(1000);
-
-    aiObjectContext->GetValue<set<ObjectGuid>&>("ignore rpg target")->Get().clear();
+    aiObjectContext->GetValue<set<ObjectGuid>&>("ignore rpg target")->Get().clear();   
 
     bot->GetMotionMaster()->Clear();
 #ifdef MANGOS
@@ -596,7 +591,7 @@ void PlayerbotAI::DoNextAction()
         }
     }
 
-    bool minimal = !AllowActivity(ALL_ACTIVITY);
+    bool minimal = !AllowActivity();
 
     if (bot->IsTaxiFlying())
         return;
@@ -2104,15 +2099,14 @@ enum ActivityType
 
 */
 
-bool PlayerbotAI::AllowActive(ActivityType activityType)
+bool PlayerbotAI::AllowActive()
 {
-    //General exceptions
-    if (activityType == PACKET_ACTIVITY)
-        return true;
-
     if (GetMaster()) //Has player master. Always active.
         if (!GetMaster()->GetPlayerbotAI() || GetMaster()->GetPlayerbotAI()->IsRealPlayer())
             return true;
+
+    if (HasPlayerNearby())
+        return true;
 
     Group* group = bot->GetGroup();
     if (group)
@@ -2129,9 +2123,6 @@ bool PlayerbotAI::AllowActive(ActivityType activityType)
 
             if(!member->GetPlayerbotAI() || (member->GetPlayerbotAI() && member->GetPlayerbotAI()->HasRealPlayerMaster()))
                 return true;
-
-            if (activityType != PARTY_ACTIVITY && member->GetPlayerbotAI()->AllowActive(PARTY_ACTIVITY))
-                return true;
         }
     }
 
@@ -2141,46 +2132,19 @@ bool PlayerbotAI::AllowActive(ActivityType activityType)
     if (bot->InBattleGroundQueue()) //In bg queue. Speed up bg queue/join.
         return true;
 
-    if (activityType != OUT_OF_PARTY_ACTIVITY && activityType != PACKET_ACTIVITY) //Is in combat. Defend yourself.
-        if (sServerFacade.IsInCombat(bot))
-            return true;
-
-    if (HasPlayerNearby()) //Player is near. Always active.
+    if (sServerFacade.IsInCombat(bot))
         return true;
 
-    if (activityType == OUT_OF_PARTY_ACTIVITY || activityType == GRIND_ACTIVITY) //Many bots nearby. Do not do heavy area checks.
-        if (HasManyPlayersNearby())
-            return false;
-
-    //Bots don't need to move using pathfinder.
-    if (activityType == DETAILED_MOVE_ACTIVITY)
-        return false;
-
-    //All exceptions are now done. 
-    //Below is code to have a specified % of bots active at all times.
-    //The default is 10%. With 0.1% of all bots going active or inactive each minute.
-    if (sPlayerbotAIConfig.botActiveAlone <= 0)
-        return false;
-
-    if (sPlayerbotAIConfig.botActiveAlone >= 100)
-        return true;
-
-    uint32 ActivityNumber = GetFixedBotNumer(BotTypeNumber::ACTIVITY_TYPE_NUMBER, 100, sPlayerbotAIConfig.botActiveAlone * 0.01);
-
-    return ActivityNumber <= sPlayerbotAIConfig.botActiveAlone;           //The given percentage of bots should be active and rotate 1% of those active bots each minute.
+    return false;
 }
 
-bool PlayerbotAI::AllowActivity(ActivityType activityType, bool checkNow)
+bool PlayerbotAI::AllowActivity()
 {
-    if (!allowActiveCheckTimer[activityType])
-        allowActiveCheckTimer[activityType] = time(NULL);
+    bool allowed = AllowActive();    
 
-    if (!checkNow && time(NULL) < allowActiveCheckTimer[activityType] + 5)
-        return allowActive[activityType];
+    if (!allowed)
+        allowed = !urand(0, sPlayerbotAIConfig.maxRandomBots / 150);
 
-    bool allowed = AllowActive(activityType);
-    allowActive[activityType] = allowed;
-    allowActiveCheckTimer[activityType] = time(NULL);
     return allowed;
 }
 

@@ -112,9 +112,6 @@ bool SayAction::Execute(Event event)
 
 bool SayAction::isUseful()
 {
-    if (!ai->AllowActivity())
-        return false;
-
     time_t lastSaid = AI_VALUE2(time_t, "last said", qualifier);
     return (time(0) - lastSaid) > 30;
 }

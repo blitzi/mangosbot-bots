@@ -22,7 +22,7 @@ namespace ai
 
         virtual bool isUseful()
         {
-            return !ai->AllowActivity(ALL_ACTIVITY);
+            return false;
         }
     };
 

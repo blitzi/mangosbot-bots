@@ -189,19 +189,6 @@ enum class GuilderType : uint8
     HUGE = 250
 };
 
-enum ActivityType
-{
-    GRIND_ACTIVITY = 1,
-    RPG_ACTIVITY = 2,
-    TRAVEL_ACTIVITY = 3,
-    OUT_OF_PARTY_ACTIVITY = 4,
-    PACKET_ACTIVITY = 5,
-    DETAILED_MOVE_ACTIVITY = 6,
-    PARTY_ACTIVITY = 7,
-    ALL_ACTIVITY = 8,
-    MAX_ACTIVITY_TYPE
-};
-
 enum BotRoles
 {
     BOT_ROLE_NONE = 0x00,
@@ -382,8 +369,8 @@ public:
     bool HasPlayerNearby(WorldPosition* pos, float range = sPlayerbotAIConfig.reactDistance);
     bool HasPlayerNearby(float range = sPlayerbotAIConfig.reactDistance) { WorldPosition botPos(bot);  return HasPlayerNearby(&botPos, range); };
     bool HasManyPlayersNearby(uint32 trigerrValue = 20, float range = sPlayerbotAIConfig.sightDistance);
-    bool AllowActive(ActivityType activityType);
-    bool AllowActivity(ActivityType activityType = ALL_ACTIVITY, bool checkNow = false);
+    bool AllowActive();
+    bool AllowActivity();
 
     bool HasCheat(BotCheatMask mask) { return ((uint32)mask & (uint32)cheatMask) != 0 || ((uint32)mask & (uint32)sPlayerbotAIConfig.botCheatMask) != 0; }
     BotCheatMask GetCheat() { return cheatMask; }
@@ -420,9 +407,7 @@ protected:
     string pullAction;
     ShortTimeTracker moveUpdateTimer;
     ShortTimeTracker spellUpdateTimer;
-    map<ActivityType, bool> allowActive;
-    map<ActivityType, time_t> allowActiveCheckTimer;
-    bool inCombat = false;;
+    bool inCombat = false;
     BotCheatMask cheatMask = BotCheatMask::none;
 };
 

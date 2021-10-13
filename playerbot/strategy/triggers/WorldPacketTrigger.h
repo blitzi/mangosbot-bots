@@ -23,6 +23,9 @@ namespace ai
             return Event(getName(), packet, owner);
         }
 
+        virtual bool CheckOnMinimal() { return true; }
+
+
         virtual void Reset()
         {
             triggered = false;
