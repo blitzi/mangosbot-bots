@@ -474,13 +474,15 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
             if (!urand(0, 4))
                 nonCombatEngine->addStrategy("attack tagged");
 
-            nonCombatEngine->addStrategy("pvp");
+            if (!urand(0, 4))
+                nonCombatEngine->addStrategy("pvp");
+
             nonCombatEngine->addStrategy("collision");
             nonCombatEngine->addStrategy("grind");
             nonCombatEngine->addStrategy("maintenance");
             nonCombatEngine->addStrategy("group");
             nonCombatEngine->addStrategy("guild");
-            //nonCombatEngine->addStrategy("rpg");
+            nonCombatEngine->addStrategy("rpg");
 
             if (sPlayerbotAIConfig.randomBotJoinLfg)
                 nonCombatEngine->addStrategy("lfg");
@@ -497,15 +499,17 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
                 Player* master = botAi->GetMaster();
                 if (master)
                 {
-                    if (master->GetPlayerbotAI() || sRandomPlayerbotMgr.IsRandomBot(player))
+                    if (master->GetPlayerbotAI())
                     {
-                        nonCombatEngine->addStrategy("pvp");
+                        if (!urand(0, 4))
+                            nonCombatEngine->addStrategy("pvp");
+
                         nonCombatEngine->addStrategy("collision");
                         nonCombatEngine->addStrategy("grind");
                         nonCombatEngine->addStrategy("maintenance");
                         nonCombatEngine->addStrategy("group");
                         nonCombatEngine->addStrategy("guild");
-                        //nonCombatEngine->addStrategy("rpg");
+                        nonCombatEngine->addStrategy("rpg");
 
                         nonCombatEngine->ChangeStrategy(sPlayerbotAIConfig.randomBotNonCombatStrategies);
                     }

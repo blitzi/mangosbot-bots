@@ -42,6 +42,7 @@ Unit* GrindTargetValue::FindTargetForGrinding(int assistCount)
     }
 
     list<ObjectGuid> targets = *context->GetValue<list<ObjectGuid> >("possible targets");
+    TravelTarget* travelTarget = context->GetValue<TravelTarget*>("travel target")->Get();
 
     if (targets.empty())
         return NULL;
@@ -54,7 +55,7 @@ Unit* GrindTargetValue::FindTargetForGrinding(int assistCount)
         if (!unit)
             continue;
 
-        if (abs(bot->GetPositionZ() - unit->GetPositionZ()) > sPlayerbotAIConfig.spellDistance)
+        if (abs(bot->GetPositionZ() - unit->GetPositionZ()) > sPlayerbotAIConfig.spellDistance / 2)
             continue;
 
         if (!bot->InBattleGround() && GetTargetingPlayerCount(unit) > assistCount)
@@ -63,13 +64,34 @@ Unit* GrindTargetValue::FindTargetForGrinding(int assistCount)
         if (!bot->InBattleGround() && !unit->GetObjectGuid().IsPlayer())
         {
             int gap = (int)unit->GetLevel() - (int)bot->GetLevel();
-
-            if(gap > 2 || gap < -3)
-                continue;
+            
+            //if nothing to do kill low mobs
+            if (travelTarget->getStatus() == TRAVEL_STATUS_COOLDOWN)
+            {
+                if (gap > 0)
+                    continue;
+            }
+            else
+            {
+                if(gap > 0 || gap < -4)
+                    continue;
+            }
         }
 
         Creature* creature = dynamic_cast<Creature*>(unit);
         if (creature && creature->GetCreatureInfo() && creature->GetCreatureInfo()->Rank > CREATURE_ELITE_NORMAL && !AI_VALUE(bool, "can fight boss"))
+            continue;
+
+        //ignore swimming units
+        if (creature && (!creature->CanWalk() && creature->CanSwim() || creature->IsSwimming()) )
+            continue;
+
+        if (creature && creature->IsInvisible())
+            continue;
+
+        Player* player = dynamic_cast<Player*>(unit);
+
+        if (player)
             continue;
 
         if (group)
