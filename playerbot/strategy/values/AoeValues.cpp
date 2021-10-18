@@ -8,31 +8,39 @@ using namespace ai;
 
 list<ObjectGuid> FindMaxDensity(Player* bot)
 {
-    list<ObjectGuid> units = *bot->GetPlayerbotAI()->GetAiObjectContext()->GetValue<list<ObjectGuid> >("possible targets");
+    list<ObjectGuid> unitGuids = *bot->GetPlayerbotAI()->GetAiObjectContext()->GetValue<list<ObjectGuid> >("possible targets");
+
+    list<Unit*> units;
+
+    for (auto guid : unitGuids)
+    {
+        Unit* unit = bot->GetPlayerbotAI()->GetUnit(guid);
+        if (unit)
+            units.push_back(unit);
+    }
+
     map<ObjectGuid, list<ObjectGuid> > groups;
     int maxCount = 0;
     ObjectGuid maxGroup;
-    for (list<ObjectGuid>::iterator i = units.begin(); i != units.end(); ++i)
+    for (auto i : units)
     {
-        Unit* unit = bot->GetPlayerbotAI()->GetUnit(*i);
-        if (!unit)
-            continue;
+        ObjectGuid gi = i->GetObjectGuid();
 
-        for (list<ObjectGuid>::iterator j = units.begin(); j != units.end(); ++j)
+        for (auto j : units)
         {
-            Unit* other = bot->GetPlayerbotAI()->GetUnit(*j);
-            if (!other)
+            if (i == j)
                 continue;
 
-            float d = sServerFacade.GetDistance2d(unit, other);
-            if (sServerFacade.IsDistanceLessOrEqualThan(d, sPlayerbotAIConfig.aoeRadius * 2))
-                groups[*i].push_back(*j);
+            ObjectGuid gj = i->GetObjectGuid();
+            float d = i->GetDistance2d(j->GetPositionX(), j->GetPositionY(), DIST_CALC_NONE);
+            if (sServerFacade.IsDistanceLessOrEqualThan(d, (sPlayerbotAIConfig.aoeRadius * sPlayerbotAIConfig.aoeRadius) * 2))
+                groups[gi].push_back(gj);
         }
 
-        if (maxCount < groups[*i].size())
+        if (maxCount < groups[gi].size())
         {
-            maxCount = groups[*i].size();
-            maxGroup = *i;
+            maxCount = groups[gi].size();
+            maxGroup = gi;
         }
     }
 
