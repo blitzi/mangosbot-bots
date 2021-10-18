@@ -3297,13 +3297,16 @@ bool ArenaTactics::Execute(Event event)
         return false;
     }
 
-    if (bot->GetBattleGround()->GetStatus() == STATUS_WAIT_LEAVE)
+    if (bot->GetBattleGround()->GetStatus() != STATUS_IN_PROGRESS)
         return false;
 
     if (bot->IsDead())
     {
         return false;
     }
+
+    if (bot->IsMoving())
+        return false;
 
     BattleGround *bg = bot->GetBattleGround();
     if (!bg)
