@@ -15,7 +15,7 @@ ServerFacade::~ServerFacade() {}
 
 float ServerFacade::GetDistance2d(Unit *unit, WorldObject* wo)
 {
-    if (!wo)
+    if (!unit || !wo)
         return 0.0f;
 
     float dist =

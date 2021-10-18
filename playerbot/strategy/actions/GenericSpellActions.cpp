@@ -78,6 +78,9 @@ bool CastSpellAction::isUseful()
     if (!target)
         return false;
 
+    if (!spellTarget->IsInWorld() || spellTarget->GetMapId() != bot->GetMapId())
+        return false;
+
     float maxRange = range;
 
     uint32 spellid = AI_VALUE2(uint32, "spell id", spell);
@@ -96,7 +99,6 @@ bool CastSpellAction::isUseful()
     }
 
     return target && AI_VALUE2(bool, "spell cast useful", spell) && bot->GetDistance(target, true, DIST_CALC_COMBAT_REACH) <= maxRange;
-    return GetTarget() && (GetTarget() != nullptr) && (GetTarget() != NULL) && AI_VALUE2(bool, "spell cast useful", spell) && sServerFacade.GetDistance2d(bot, GetTarget()) <= range;
 }
 
 bool CastAuraSpellAction::isUseful()
