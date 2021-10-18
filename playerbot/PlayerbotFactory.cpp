@@ -1808,6 +1808,8 @@ void PlayerbotFactory::InitMounts()
 
     map<uint8, map<int32, vector<uint32> > > mounts;
     vector<uint32> slow, fast, fslow, ffast;
+    vector<uint32> ridingSkill = { 33388 , 33391, 34090, 34091 };
+
     switch (bot->getRace())
     {
     case RACE_HUMAN:
@@ -1882,11 +1884,18 @@ void PlayerbotFactory::InitMounts()
             continue;
 
         uint32 index = urand(0, mounts[bot->getRace()][type].size() - 1);
-        uint32 spell = mounts[bot->getRace()][type][index];
-        if (spell && spell != 0)
-        {
-            bot->learnSpell(spell, false);
-            sLog.outDetail("Bot %d (%d) learned %s mount %d", bot->GetGUIDLow(), bot->GetLevel(), type == 0 ? "slow" : (type == 1 ? "fast" : "flying"), spell);
+        uint32 mountItem = mounts[bot->getRace()][type][index];
+        uint32 mountSkill = ridingSkill[type];
+
+        if (!bot->HasItemCount(mountItem,1, true))
+        {            
+            bot-> learnSpell(mountSkill, false);
+
+            Item* newItem = bot->StoreNewItemInInventorySlot(mountItem, 1);
+            if (newItem)
+                newItem->AddToUpdateQueueOf(bot);
+
+            sLog.outDetail("Bot %d (%d) earned %s mount %d", bot->GetGUIDLow(), bot->GetLevel(), type == 0 ? "slow" : (type == 1 ? "fast" : "flying"), mountItem);
         }
     }
 }
