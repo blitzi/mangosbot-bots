@@ -790,7 +790,10 @@ bool PlayerbotAI::DoSpecificAction(string name, Event event, bool silent, string
         case ACTION_RESULT_UNKNOWN:
             continue;
         case ACTION_RESULT_OK:
-            PlaySound(TEXTEMOTE_NOD);
+
+            if (!silent)
+                PlaySound(TEXTEMOTE_NOD);
+
             return true;
         case ACTION_RESULT_IMPOSSIBLE:
             out << name << ": impossible";
@@ -2134,7 +2137,7 @@ bool PlayerbotAI::AllowActive()
 
     if (sServerFacade.IsInCombat(bot))
         return true;
-
+         
     return false;
 }
 
