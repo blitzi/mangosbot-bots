@@ -368,7 +368,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
             }
         }
 
-        if (pathType == TravelNodePathType::teleportSpell && entry)
+        /*if (pathType == TravelNodePathType::teleportSpell && entry)
         {
             if (entry == 8690)
             {
@@ -382,7 +382,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
                     return false;
                 }
             }
-        }
+        }*/
         //if (!isTransport && bot->GetTransport())
         //    bot->GetTransport()->RemovePassenger(bot);
     }

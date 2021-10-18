@@ -65,54 +65,43 @@ bool BuyAction::Execute(Event event)
 
             for (auto& tItem : m_items_sorted)
             {
-                for (uint32 i=0; i<10; i++) //Buy 10 times or until no longer usefull/possible
+
+                ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", tItem->item);
+                ItemPrototype const* proto = sObjectMgr.GetItemPrototype(tItem->item);
+
+                uint32 price = proto->BuyPrice;
+
+                // reputation discount
+                price = uint32(floor(price * bot->GetReputationPriceDiscount(pCreature)));
+
+                NeedMoneyFor needMoneyFor = NeedMoneyFor::none;
+
+                switch (usage)
                 {
-                    ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", tItem->item);
-                    ItemPrototype const* proto = sObjectMgr.GetItemPrototype(tItem->item);
+                case ITEM_USAGE_REPLACE:
+                case ITEM_USAGE_EQUIP:
+                    needMoneyFor = NeedMoneyFor::gear;
+                    break;
+                }
 
-                    uint32 price = proto->BuyPrice;
+                if (needMoneyFor == NeedMoneyFor::none)
+                    break;
 
-                    // reputation discount
-                    price = uint32(floor(price * bot->GetReputationPriceDiscount(pCreature)));
+                if (AI_VALUE2(uint32, "free money for", uint32(needMoneyFor)) < price)
+                    break;
 
-                    NeedMoneyFor needMoneyFor = NeedMoneyFor::none;
-
-                    switch (usage)
-                    {
-                    case ITEM_USAGE_REPLACE:
-                    case ITEM_USAGE_EQUIP:
-                        needMoneyFor = NeedMoneyFor::gear;
-                        break;
-                    case ITEM_USAGE_AMMO:
-                        needMoneyFor = NeedMoneyFor::ammo;
-                        break;
-                    case ITEM_USAGE_QUEST:
-                        needMoneyFor = NeedMoneyFor::anything;
-                        break;
-                    case ITEM_USAGE_USE:
-                        needMoneyFor = NeedMoneyFor::consumables;
-                        break;
-                    }
-
-                    if (needMoneyFor == NeedMoneyFor::none)
-                        break;
-
-                    if (AI_VALUE2(uint32, "free money for", uint32(needMoneyFor)) < price)
-                        break;
-
-                    if (!BuyItem(tItems, vendorguid, proto))
+                if (!BuyItem(tItems, vendorguid, proto))
 #ifndef MANGOSBOT_ZERO
-                        if(!BuyItem(vItems, vendorguid, proto))
+                    if(!BuyItem(vItems, vendorguid, proto))
 #endif
-                        break;    
+                    break;    
 
-                    if (usage == ITEM_USAGE_REPLACE || usage == ITEM_USAGE_EQUIP) //Equip upgrades and stop buying this time.
-                    {
-                        ai->DoSpecificAction("equip upgrades");
-                        break;
-                    }
-                } 
-            }
+                if (usage == ITEM_USAGE_REPLACE || usage == ITEM_USAGE_EQUIP) //Equip upgrades and stop buying this time.
+                {
+                    ai->DoSpecificAction("equip upgrades", Event(), true);
+                    break;
+                }
+            } 
         }
         else
         {

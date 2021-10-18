@@ -3,6 +3,12 @@
 #include "../../LootObjectStack.h"
 #include "ChooseTravelTargetAction.h"
 #include "../../PlayerbotAIConfig.h"
+#include "../values/ItemUsageValue.h"
+#include "../ItemVisitors.h"
+#include "../values/ItemCountValue.h"
+#include "../values/ItemUsageValue.h"
+#include "../values/BudgetValues.h"
+
 
 using namespace ai;
 
@@ -49,8 +55,13 @@ void ChooseTravelTargetAction::getNewTarget(TravelTarget* newTarget, TravelTarge
         foundTarget = SetGroupTarget(newTarget);
     }
 
+    if (!foundTarget && !urand(0,2))
+    {
+        foundTarget = SetBuyGearTarget(newTarget);
+    }
+
     if(!foundTarget)
-        foundTarget = SetGrindTarget(newTarget);                         //Go grind mobs for money
+        foundTarget = SetGrindTarget(newTarget);                        
              
      if (!foundTarget && ai->HasStrategy("explore", BOT_STATE_NON_COMBAT)) //Explore a unexplored sub-zone.
         foundTarget = SetExploreTarget(newTarget);    
@@ -64,10 +75,6 @@ void ChooseTravelTargetAction::getNewTarget(TravelTarget* newTarget, TravelTarge
 
 void ChooseTravelTargetAction::setNewTarget(TravelTarget* newTarget, TravelTarget* oldTarget)
 {
-    //Tell the master where we are going.
-    if (!bot->GetGroup() || (ai->GetGroupMaster() == bot))
-        ReportTravelTarget(newTarget, oldTarget);
-
     //If we are heading to a creature/npc clear it from the ignore list. 
     if (oldTarget && oldTarget == newTarget && newTarget->getEntry())
     {
@@ -254,9 +261,18 @@ bool ChooseTravelTargetAction::getBestDestination(vector<TravelDestination*>* ac
 
     TravelDestination* targetDestination = NULL;
 
-    for (auto activeTarget : *activeDestinations) //Pick the destination that has this point.
-        if (activeTarget->distanceTo(availablePoints.front()) == 0)
-            targetDestination = activeTarget;
+    //Pick the destination that has this point.
+    for (auto activeTarget : *activeDestinations)
+    {
+        for (auto point : activeTarget->getPoints())
+        {
+            if (point == availablePoints.front())
+            {
+                targetDestination = activeTarget;
+                break;
+            }
+        }
+    }
 
     if (!targetDestination)
         return false;
@@ -483,6 +499,8 @@ bool ChooseTravelTargetAction::SetGrindTarget(TravelTarget* target)
         return false;
 
     target->setTarget(activeDestinations.front(), activePoints.front());
+    target->setForced(true);
+    target->setRetry(true);
 
     return target->isActive();
 }
@@ -643,9 +661,6 @@ bool ChooseTravelTargetAction::SetNpcFlagTarget(TravelTarget* target, vector<NPC
     if (!dests.empty())
     {
         TravelDestination* dest = *std::min_element(dests.begin(), dests.end(), [botPos](TravelDestination* i, TravelDestination* j) {return i->distanceTo(botPos) < j->distanceTo(botPos); });
-
-        float dist = dest->distanceTo(botPos);
-
         vector <WorldPosition*> points = dest->nextPoint(botPos, true);
 
         if (points.empty())
@@ -653,12 +668,137 @@ bool ChooseTravelTargetAction::SetNpcFlagTarget(TravelTarget* target, vector<NPC
 
         target->setTarget(dest, points.front());
         target->setForced(true);
+        target->setRetry(true);
 
         return true;
     }
 
     return false;
 }
+
+bool ChooseTravelTargetAction::SetBuyGearTarget(TravelTarget* target)
+{
+    vector<NPCFlags> flags = { UNIT_NPC_FLAG_VENDOR };
+
+    WorldPosition* botPos = &WorldPosition(bot);
+
+    TravelDestination* bestDest = NULL;
+    VendorItem* bestItem = NULL;
+    uint32 bestItemLevel = 0;
+    float minDist = 200000;
+
+    vector<TravelDestination*> possibleDest = sTravelMgr.getRpgTravelDestinations(bot, true, true);
+
+    for (auto& d : possibleDest)
+    {
+        if (!d->getEntry())
+            continue;
+
+        CreatureInfo const* cInfo = ObjectMgr::GetCreatureTemplate(d->getEntry());
+
+        if (!cInfo)
+            continue;
+
+        bool foundFlag = false;
+        for (auto flag : flags)
+            if (cInfo->NpcFlags & flag)
+            {
+                foundFlag = true;
+                break;
+            }
+
+        if (!foundFlag)
+            continue;
+
+        FactionTemplateEntry const* factionEntry = sFactionTemplateStore.LookupEntry(cInfo->Faction);
+        ReputationRank reaction = ai->getReaction(factionEntry);
+
+        if (reaction <= REP_NEUTRAL)
+            continue;
+
+        bool foundItem = false;
+        VendorItemList vendorItems;
+
+        uint32 vendorId = cInfo->VendorTemplateId;
+        if (vendorId)
+        {
+            VendorItemData const* vItems = sObjectMgr.GetNpcVendorItemList(d->getEntry());
+            VendorItemData const* tItems = sObjectMgr.GetNpcVendorTemplateItemList(vendorId);
+
+            if (tItems)
+                vendorItems.insert(vendorItems.begin(), tItems->m_items.begin(), tItems->m_items.end());
+            if (vItems)
+                vendorItems.insert(vendorItems.begin(), vItems->m_items.begin(), vItems->m_items.end());
+        }
+
+        for (auto& tItem : vendorItems)
+        {
+            ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", tItem->item);
+            ItemPrototype const* proto = sObjectMgr.GetItemPrototype(tItem->item);
+
+            uint32 price = proto->BuyPrice;       
+            uint32 itemLevel = proto->ItemLevel;
+
+            // reputation discount
+            price = uint32(floor(price * bot->GetReputationPriceDiscount(factionEntry)));
+
+            NeedMoneyFor needMoneyFor = NeedMoneyFor::none;
+
+            switch (usage)
+            {
+            case ITEM_USAGE_REPLACE:
+            case ITEM_USAGE_EQUIP:
+                needMoneyFor = NeedMoneyFor::gear;
+                break;
+            }
+
+            if (needMoneyFor == NeedMoneyFor::none)
+                continue;
+
+            if (AI_VALUE2(uint32, "free money for", uint32(needMoneyFor)) < price)
+                continue;
+
+            if (itemLevel > bestItemLevel)
+            {
+                bestItem = tItem;
+                bestDest = d;
+                minDist = d->distanceTo(botPos);
+            }
+            else
+            {
+                if (itemLevel == bestItemLevel)
+                {
+                    float dist = d->distanceTo(botPos);
+
+                    if (dist <= minDist)
+                    {
+                        bestItem = tItem;
+                        bestDest = d;
+                        minDist = dist;
+                    }
+                }
+            }
+        }       
+    }
+
+    if (bestDest)
+    {        
+        vector <WorldPosition*> points = bestDest->nextPoint(botPos, true);
+
+        if (points.empty())
+            return false;
+
+        target->setTarget(bestDest, points.front());
+        target->setForced(true);
+        target->setRetry(true);
+
+        return true;
+    }
+
+    return false;
+}
+
+
 
 bool ChooseTravelTargetAction::SetNullTarget(TravelTarget* target)
 {
@@ -717,7 +857,10 @@ TravelDestination* ChooseTravelTargetAction::FindDestination(Player* bot, string
 };
 
 bool ChooseTravelTargetAction::isUseful()
-{
+{ 
+    if (GetTarget())
+        return false;
+
     return !context->GetValue<TravelTarget *>("travel target")->Get()->isActive() 
         && !context->GetValue<LootObject>("loot target")->Get().IsLootPossible(bot)
         && !bot->IsInCombat();

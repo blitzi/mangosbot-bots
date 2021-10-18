@@ -32,6 +32,9 @@ bool AttackAnythingAction::isUseful() {
     if (AI_VALUE2(bool, "group or", "should sell,can sell"))
         return false;
 
+    if (context->GetValue<ObjectGuid>("rpg target")->Get())
+        return false;
+
     if(context->GetValue<TravelTarget*>("travel target")->Get()->isTraveling() && ChooseRpgTargetAction::isFollowValid(bot, context->GetValue<TravelTarget*>("travel target")->Get()->getLocation())) //Bot is traveling
         return false;
 

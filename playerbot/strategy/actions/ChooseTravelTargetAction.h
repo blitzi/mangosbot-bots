@@ -15,6 +15,7 @@ namespace ai
 
         protected:
 
+        virtual string GetTargetName() { return "grind target"; }
         void getNewTarget(TravelTarget* newTarget, TravelTarget* oldTarget);
 
         void setNewTarget(TravelTarget* newTarget, TravelTarget* oldTarget);
@@ -32,6 +33,7 @@ namespace ai
         bool SetExploreTarget(TravelTarget* target);
         bool SetNpcFlagTarget(TravelTarget* target, vector<NPCFlags> flags, string name = "", vector<uint32> items = {});
         bool SetNullTarget(TravelTarget* target);
+        bool SetBuyGearTarget(TravelTarget* target);
 
     public:
         static TravelDestination* FindDestination(Player* bot, string name);

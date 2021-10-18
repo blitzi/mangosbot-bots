@@ -77,7 +77,7 @@ bool RpgAction::Execute(Event event)
 
     if (unit)
     {       
-        if (unit->isVendor() && AI_VALUE(bool, "should sell") && AI_VALUE(bool, "can sell"))
+        if (unit->isVendor())
             elements.push_back(&RpgAction::trade);
         if (unit->isArmorer() && AI_VALUE(bool, "should repair") && AI_VALUE(bool, "can repair"))
             elements.push_back(&RpgAction::repair);
@@ -340,8 +340,7 @@ void RpgAction::trade(ObjectGuid guid)
         factory.Randomize(false);
     }
 
-    if(AI_VALUE(uint8, "durability") > 50)
-        ai->DoSpecificAction("buy", Event("rpg action", "vendor"));
+    ai->DoSpecificAction("buy", Event("rpg action", "vendor"));
 
     Unit* unit = ai->GetUnit(guid);
     if (unit)
@@ -351,6 +350,7 @@ void RpgAction::trade(ObjectGuid guid)
         bot->SetSelectionGuid(oldSelection);
 
     setDelay(true);
+    context->GetValue<ObjectGuid>("rpg target")->Set(ObjectGuid());
 }
 
 void RpgAction::repair(ObjectGuid guid)

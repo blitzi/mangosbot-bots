@@ -197,6 +197,8 @@ bool ChooseRpgTargetAction::Execute(Event event)
             if (!isFollowValid(bot, unit))
                 continue;
 
+            if (travelTarget && travelTarget->getDestination()->getEntry() == unit->GetEntry())
+                priority = 110;
             if (unit->isVendor() && AI_VALUE2(bool, "group or", "should sell,can sell"))
                 priority = 100;
             else if (unit->isArmorer() && AI_VALUE2(bool, "group or", "should repair,can repair"))

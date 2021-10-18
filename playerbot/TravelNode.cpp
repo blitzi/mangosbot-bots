@@ -1174,7 +1174,6 @@ TravelNode* TravelNodeMap::getNode(WorldPosition pos, vector<WorldPosition>& ppa
 
 TravelNodeRoute TravelNodeMap::getRoute(TravelNode* start, TravelNode* goal, Player* bot)
 {
-
     float botSpeed = bot ? bot->GetSpeed(MOVE_RUN) : 7.0f;
 
     if (start == goal)
@@ -1206,13 +1205,16 @@ TravelNodeRoute TravelNodeMap::getRoute(TravelNode* start, TravelNode* goal, Pla
         else
             startStub->currentGold = bot->GetMoney();
 
-        if (bot->IsAlive() && sServerFacade.IsSpellReady(bot, 8690) && bot->HasItemCount(6948, 1, false))
+        /*if (bot->IsAlive() && sServerFacade.IsSpellReady(bot, 8690) && bot->HasItemCount(6948, 1, false))
         {
             AiObjectContext* context = ai->GetAiObjectContext();
 
             TravelNode* homeNode = sTravelNodeMap.getNode(AI_VALUE(WorldPosition, "home bind"), nullptr, 10.0f);
             if (homeNode)
             {
+                sLog.outError("Get Teleport Node for Bot %s %u", bot->GetName(), bot->GetObjectGuid());
+                sLog.outError("sTravelNodeMap.teleportNodes depth 1 %p", sTravelNodeMap.teleportNodes[bot->GetObjectGuid()]);
+                sLog.outError("sTravelNodeMap.teleportNodes depth 2 %p", (PortalNode*)sTravelNodeMap.teleportNodes[bot->GetObjectGuid()][8690]);
                 PortalNode* portNode = (PortalNode*)sTravelNodeMap.teleportNodes[bot->GetObjectGuid()][8690];
                 if (!portNode)
                 {
@@ -1232,7 +1234,7 @@ TravelNodeRoute TravelNodeMap::getRoute(TravelNode* start, TravelNode* goal, Pla
                 std::push_heap(open.begin(), open.end(), [](TravelNodeStub* i, TravelNodeStub* j) {return i->m_f < j->m_f; });
                 childNode->open = true;
             }
-        }
+        }*/
     }
 
     if (open.size() == 0 && !start->hasRouteTo(goal))
@@ -1244,8 +1246,18 @@ TravelNodeRoute TravelNodeMap::getRoute(TravelNode* start, TravelNode* goal, Pla
     std::push_heap(open.begin(), open.end(), [](TravelNodeStub* i, TravelNodeStub* j) {return i->m_f < j->m_f; });
     startStub->open = true;
 
+    int cycles = 0;
+
     while (!open.empty())
     {
+        cycles++;
+
+        if (cycles > 9999)
+        {
+            sLog.outError("TravelNodeMap::getRoute(TravelNode, TravelNode, Player) took too much cycles...aborting");
+            return TravelNodeRoute();
+        }
+
         std::sort(open.begin(), open.end(), [](TravelNodeStub* i, TravelNodeStub* j) {return i->m_f < j->m_f; });
 
         currentNode = open.front(); // pop n node from open for which f is minimal
@@ -1325,6 +1337,8 @@ TravelNodeRoute TravelNodeMap::getRoute(WorldPosition startPos, WorldPosition en
     std::partial_sort(startNodes.begin(), startNodes.begin() + 5, startNodes.end(), [startPos](TravelNode* i, TravelNode* j) {return i->fDist(startPos) < j->fDist(startPos); });
     std::partial_sort(endNodes.begin(), endNodes.begin() + 5, endNodes.end(), [endPos](TravelNode* i, TravelNode* j) {return i->fDist(endPos) < j->fDist(endPos); });
 
+    int cycles = 0;    
+
     //Cycle over the combinations of these 5 nodes.
     uint32 startI = 0, endI = 0;
     while (startI < 5 && endI < 5)
@@ -1349,12 +1363,20 @@ TravelNodeRoute TravelNodeMap::getRoute(WorldPosition startPos, WorldPosition en
         //Cycle to a different start-node if needed.
         if (endI > startI + 1)
         {
-            startI++;
+            startI++;                     
             endI = 0;
+        }
+
+        cycles++;
+
+        if (cycles > 9999)
+        {
+            sLog.outError("TravelNodeMap::getRoute(WorldPosition, WorldPosition, vector<WorldPosition>&, Player* bot) took too much cycles...aborting");
+            break;
         }
     }
 
-    if (bot && sServerFacade.IsSpellReady(bot, 8690) && bot->HasItemCount(6948, 1, false))
+    /*if (bot && sServerFacade.IsSpellReady(bot, 8690) && bot->HasItemCount(6948, 1, false))
     {
         TravelNode* botNode = sTravelNodeMap.teleportNodes[bot->GetObjectGuid()][0];
         if (!botNode)
@@ -1375,7 +1397,7 @@ TravelNodeRoute TravelNodeMap::getRoute(WorldPosition startPos, WorldPosition en
                 return route;
             endI++;
         }
-    }
+    }*/
 
     return TravelNodeRoute();
 }
