@@ -3208,7 +3208,7 @@ vector<TravelDestination*> TravelMgr::getQuestTravelDestinations(Player* bot, ui
     return retTravelLocations;
 }
 
-vector<TravelDestination*> TravelMgr::getRpgTravelDestinations(Player* bot, bool ignoreFull, bool ignoreInactive, float maxDistance)
+vector<TravelDestination*> TravelMgr::getRpgTravelDestinations(Player* bot, bool ignoreFull, bool ignoreInactive)
 {
     WorldPosition botLocation(bot);
 
@@ -3220,9 +3220,6 @@ vector<TravelDestination*> TravelMgr::getRpgTravelDestinations(Player* bot, bool
             continue;
         
         if (dest->isFull(ignoreFull))
-            continue;
-
-        if (maxDistance > 0 && dest->distanceTo(&botLocation) > maxDistance)
             continue;
 
         Unit* u = bot->GetPlayerbotAI()->GetUnit(dest->guid);
@@ -3256,11 +3253,14 @@ vector<TravelDestination*> TravelMgr::getExploreTravelDestinations(Player* bot, 
     return retTravelLocations;
 }
 
-vector<TravelDestination*> TravelMgr::getGrindTravelDestinations(Player* bot, bool ignoreFull, bool ignoreInactive, float maxDistance)
+vector<TravelDestination*> TravelMgr::getGrindTravelDestinations(Player* bot, bool ignoreFull, bool ignoreInactive)
 {
     WorldPosition botLocation(bot);
-
+        
     vector<TravelDestination*> retTravelLocations;
+
+    bool onlySearchThisMap = urand(0, 10);
+    uint32 botMap = bot->GetMap()->GetId();
 
     for (auto& dest : grindMobs)
     {
@@ -3270,16 +3270,14 @@ vector<TravelDestination*> TravelMgr::getGrindTravelDestinations(Player* bot, bo
         if (dest->isFull(ignoreFull))
             continue;
 
+        if (!(onlySearchThisMap && dest->getPoints()[0]->getMapId() == botMap))
+            continue;
+
         int level = bot->GetLevel();        
         CreatureInfo const* cInfo = ObjectMgr::GetCreatureTemplate(dest->getEntry());      
 
         if (level >= cInfo->MinLevel && level <= cInfo->MaxLevel)
         {
-            float dist = dest->distanceTo(&botLocation);
-
-            if (maxDistance > 0 && dist > maxDistance)
-                continue;
-
             //ignore creatures that can only swim
             if (cInfo->InhabitType & INHABIT_GROUND == 0 && cInfo->InhabitType & INHABIT_WATER != 0)
                 continue;           
@@ -3294,8 +3292,8 @@ vector<TravelDestination*> TravelMgr::getGrindTravelDestinations(Player* bot, bo
             ReputationRank reaction = bot->GetPlayerbotAI()->getReaction(factionEntry);
 
             if (reaction > REP_NEUTRAL)
-                continue;            
-            
+                continue;                      
+
             retTravelLocations.push_back(dest);
         }
     }
@@ -3303,7 +3301,7 @@ vector<TravelDestination*> TravelMgr::getGrindTravelDestinations(Player* bot, bo
     return retTravelLocations;
 }
 
-vector<TravelDestination*> TravelMgr::getBossTravelDestinations(Player* bot, bool ignoreFull, bool ignoreInactive, float maxDistance)
+vector<TravelDestination*> TravelMgr::getBossTravelDestinations(Player* bot, bool ignoreFull, bool ignoreInactive)
 {
     WorldPosition botLocation(bot);
 
@@ -3315,9 +3313,6 @@ vector<TravelDestination*> TravelMgr::getBossTravelDestinations(Player* bot, boo
             continue;
 
         if (dest->isFull(ignoreFull))
-            continue;
-
-        if (maxDistance > 0 && dest->distanceTo(&botLocation) > maxDistance)
             continue;
 
         retTravelLocations.push_back(dest);

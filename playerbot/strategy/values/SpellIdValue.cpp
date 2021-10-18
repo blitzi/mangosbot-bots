@@ -77,11 +77,6 @@ uint32 SpellIdValue::Calculate()
         spellIds.push_back(spellId);
     }
 
-    if (Utf8FitTo("consecration rank 1", wnamepart))
-    {
-        int x = 0;
-    }
-
     Pet* pet = bot->GetPet();
     if (spellIds.empty() && pet)
     {

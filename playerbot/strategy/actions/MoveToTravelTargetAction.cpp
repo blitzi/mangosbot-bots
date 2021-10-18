@@ -73,12 +73,6 @@ bool MoveToTravelTargetAction::Execute(Event event)
     //Evenly distribute around the target.
     float angle = 2 * M_PI * urand(0, 100) / 100.0;
 
-    if (target->getMaxTravelTime() > target->getTimeLeft()) //The bot is late. Speed it up.
-    {
-        //distance = sPlayerbotAIConfig.fleeDistance;
-        //angle = bot->GetAngle(location.coord_x, location.coord_y);
-        //location = botLocation.getLocation();
-    }
     float x = location.coord_x;
     float y = location.coord_y;
     float z = location.coord_z;
