@@ -69,6 +69,9 @@ bool GroupBoolANDValue::Calculate()
             if (!memberAi)
                 continue;
 
+            if (member->GetMapId() != bot->GetMapId())
+                continue;
+
             AiObjectContext* memberContext = memberAi->GetAiObjectContext();
 
             if (!memberContext)
@@ -96,6 +99,9 @@ bool GroupBoolORValue::Calculate()
             PlayerbotAI* memberAi = member->GetPlayerbotAI();
 
             if (!memberAi)
+                continue;
+
+            if (member->GetMapId() != bot->GetMapId())
                 continue;
 
             AiObjectContext* memberContext = memberAi->GetAiObjectContext();
