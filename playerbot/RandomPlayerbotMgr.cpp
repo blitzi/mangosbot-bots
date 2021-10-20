@@ -343,6 +343,7 @@ uint32 RandomPlayerbotMgr::AddRandomBots()
                 guids.push_back(guid);
                 uint32 bot = guid;
                 SetEventValue(bot, "add", 1, urand(sPlayerbotAIConfig.minRandomBotInWorldTime, sPlayerbotAIConfig.maxRandomBotInWorldTime));
+                SetEventValue(bot, "logout", 0, 0);
                 bots.insert(bot);
                 currentBots.push_back(bot);
                 sLog.outDetail("Bot #%d %s:%d <%s>: log in", guid, IsAlliance(race) ? "A" : "H", level, name);
@@ -882,15 +883,6 @@ bool RandomPlayerbotMgr::ProcessBot(uint32 bot)
     if (player->GetGroup() || player->IsTaxiFlying())
         return false;
 
-    uint32 logout = GetEventValue(bot, "logout");
-    if (player && !logout && !isValid)
-    {
-        sLog.outBasic("Bot #%d %s:%d <%s>: log out", bot, IsAlliance(player->getRace()) ? "A" : "H", player->GetLevel(), player->GetName());
-        LogoutPlayerBot(bot);
-        SetEventValue(bot, "logout", 1, urand(sPlayerbotAIConfig.minRandomBotInWorldTime, sPlayerbotAIConfig.maxRandomBotInWorldTime));
-        return true;
-    }
-
     return false;
 }
 
@@ -1364,7 +1356,7 @@ uint32 RandomPlayerbotMgr::GetEventValue(uint32 bot, string event)
         }
     }
 
-    if ((time(0) - e.lastChangeTime) >= e.validIn && (event == "add" || IsRandomBot(bot)) && event != "specNo" && event != "specLink")
+    if (bot > 0 && (time(0) - e.lastChangeTime) >= e.validIn && (event == "add" || IsRandomBot(bot)) && event != "specNo" && event != "specLink")
         e.value = 0;
 
     return e.value;
