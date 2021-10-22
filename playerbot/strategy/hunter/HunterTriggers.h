@@ -87,10 +87,10 @@ namespace ai
     BEGIN_TRIGGER(HunterPetNotHappy, Trigger)
     END_TRIGGER()
 
-    class ConsussiveShotSnareTrigger : public SnareTargetTrigger
+    class ConcussiveShotSnareTrigger : public SnareTargetTrigger
     {
     public:
-        ConsussiveShotSnareTrigger(PlayerbotAI* ai) : SnareTargetTrigger(ai, "concussive shot") {}
+        ConcussiveShotSnareTrigger(PlayerbotAI* ai) : SnareTargetTrigger(ai, "concussive shot") {}
     };
 
     class ScareBeastTrigger : public HasCcTargetTrigger
