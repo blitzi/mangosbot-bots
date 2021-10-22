@@ -294,7 +294,7 @@ bool AttackersValue::IsPossibleTarget(Unit *attacker, Player *bot)
         attacker->IsInWorld() &&
         attacker->GetMapId() == bot->GetMapId() &&
         !sServerFacade.UnitIsDead(attacker) &&
-        !attacker->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE) &&
+        !attacker->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING) &&
         !attacker->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE) &&
         attacker->IsVisibleForOrDetect(bot, attacker, false) &&
         !sServerFacade.IsFriendlyTo(attacker, bot) &&
