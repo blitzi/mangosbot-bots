@@ -78,7 +78,7 @@ bool CastSpellAction::isUseful()
     if (!target)
         return false;
 
-    if (!spellTarget->IsInWorld() || spellTarget->GetMapId() != bot->GetMapId())
+    if (!target->IsInWorld() || target->GetMapId() != bot->GetMapId())
         return false;
 
     float maxRange = range;
