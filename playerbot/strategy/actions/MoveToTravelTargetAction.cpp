@@ -125,7 +125,7 @@ bool MoveToTravelTargetAction::isUseful()
     if (bot->IsMoving())
         return false;
 
-    if (bot->IsInCombat())
+    if (sServerFacade.IsInCombat(bot, true))
         return false;
 
     if (bot->IsNonMeleeSpellCasted(false))

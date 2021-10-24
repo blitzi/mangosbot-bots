@@ -858,14 +858,27 @@ TravelDestination* ChooseTravelTargetAction::FindDestination(Player* bot, string
 
 bool ChooseTravelTargetAction::isUseful()
 { 
-    if (GetTarget())
+    if (context->GetValue<TravelTarget*>("travel target")->Get()->isActive())
         return false;
 
-    return !context->GetValue<TravelTarget *>("travel target")->Get()->isActive() 
-        && !context->GetValue<LootObject>("loot target")->Get().IsLootPossible(bot)
-        && !bot->IsInCombat();
-}
+    if (context->GetValue<LootObject>("loot target")->Get().IsLootPossible(bot))
+        return false;
 
+    if (sServerFacade.IsInCombat(bot, true))
+        return false;
+
+    if(context->GetValue<ObjectGuid>("rpg target")->Get())
+        return false;
+
+    if (AI_VALUE2(bool, "group or", "should repair,can repair"))
+        return true;
+
+    if (AI_VALUE2(bool, "group or", "should sell,can sell"))
+        return true;
+
+
+    return !GetTarget();
+}
 
 bool ChooseTravelTargetAction::needForQuest(Unit* target)
 {

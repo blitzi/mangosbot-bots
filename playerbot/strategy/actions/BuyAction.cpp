@@ -85,23 +85,19 @@ bool BuyAction::Execute(Event event)
                 }
 
                 if (needMoneyFor == NeedMoneyFor::none)
-                    break;
+                    continue;
 
                 if (AI_VALUE2(uint32, "free money for", uint32(needMoneyFor)) < price)
-                    break;
+                    continue;
 
                 if (!BuyItem(tItems, vendorguid, proto))
 #ifndef MANGOSBOT_ZERO
                     if(!BuyItem(vItems, vendorguid, proto))
 #endif
-                    break;    
-
-                if (usage == ITEM_USAGE_REPLACE || usage == ITEM_USAGE_EQUIP) //Equip upgrades and stop buying this time.
-                {
-                    ai->DoSpecificAction("equip upgrades", Event(), true);
-                    break;
-                }
+                        continue;
             } 
+
+            ai->DoSpecificAction("equip upgrades", Event(), true);            
         }
         else
         {

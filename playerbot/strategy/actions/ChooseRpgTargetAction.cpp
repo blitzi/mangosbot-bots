@@ -285,8 +285,14 @@ bool ChooseRpgTargetAction::Execute(Event event)
 
 bool ChooseRpgTargetAction::isUseful()
 {
+    if (context->GetValue<TravelTarget*>("travel target")->Get()->isTraveling())
+        return false;
+
+    if (bot->IsMoving())
+        return false;
+
     return
-        !bot->IsInCombat()
+        !sServerFacade.IsInCombat(bot, true)
         && !context->GetValue<ObjectGuid>("rpg target")->Get()      
         && !context->GetValue <list<ObjectGuid>>("possible rpg targets")->Get().empty();
 }
