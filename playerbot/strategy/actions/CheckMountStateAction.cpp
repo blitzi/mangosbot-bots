@@ -101,6 +101,10 @@ bool CheckMountStateAction::Execute(Event event)
             return Mount();
     }
 
+    TravelTarget* travelTarget = context->GetValue<TravelTarget*>("travel target")->Get();
+    if (!bot->IsMounted() && travelTarget->isTraveling() && noattackers && !dps && !enemy)
+        return Mount();
+
     if (((!AI_VALUE(list<ObjectGuid>, "possible rpg targets").empty()) && noattackers && !dps && !enemy) && urand(0, 100) > 50)
         return Mount();
 

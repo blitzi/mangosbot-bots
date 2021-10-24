@@ -1813,57 +1813,57 @@ void PlayerbotFactory::InitMounts()
     switch (bot->getRace())
     {
     case RACE_HUMAN:
-        slow = { 470, 6648, 458, 472 };
-        fast = { 23228, 23227, 23229 };
+        slow = { 2411, 5655, 5656, 2414 };
+        fast = { 18778, 18776, 18777 };
         break;
     case RACE_ORC:
-        slow = { 6654, 6653, 580 };
-        fast = { 23250, 23252, 23251 };
+        slow = { 5668, 5665, 1132 };
+        fast = { 18796, 18798, 18797 };
         break;
     case RACE_DWARF:
-        slow = { 6899, 6777, 6898 };
-        fast = { 23238, 23239, 23240 };
+        slow = { 5872, 5864, 5873 };
+        fast = { 18786, 18787, 18785 };
         break;
     case RACE_NIGHTELF:
-        slow = { 10789, 8394, 10793 };
-        fast = { 23221, 23219, 23338 };
+        slow = { 8632, 8631, 8629 };
+        fast = { 18766, 18767, 18902 };
         break;
     case RACE_UNDEAD:
-        slow = { 17463, 17464, 17462 };
-        fast = { 17465, 23246 };
+        slow = { 13332, 13333, 13331 };
+        fast = { 13334, 18791 };
         break;
     case RACE_TAUREN:
-        slow = { 18990, 18989 };
-        fast = { 23249, 23248, 23247 };
+        slow = { 15290, 15277 };
+        fast = { 18794, 18795, 18793 };
         break;
     case RACE_GNOME:
-        slow = { 10969, 17453, 10873, 17454 };
-        fast = { 23225, 23223, 23222 };
+        slow = { 8595, 13321, 8563, 13322 };
+        fast = { 18772, 18773, 18774 };
         break;
     case RACE_TROLL:
-        slow = { 8395, 10796, 10799 };
-        fast = { 23241, 23242, 23243 };
+        slow = { 8588, 8591, 8592 };
+        fast = { 18788, 18789, 18790 };
         break;
 #ifndef MANGOSBOT_ZERO
     case RACE_DRAENEI:
-        slow = { 34406, 35711, 35710 };
-        fast = { 35713, 35712, 35714 };
+        slow = { 28481, 29743, 29744 };
+        fast = { 29745, 29746, 29747 };
         break;
     case RACE_BLOODELF:
-        slow = { 33660, 35020, 35022, 35018 };
-        fast = { 35025, 35025, 35027 };
+        slow = { 29220, 29221, 29222 };
+        fast = { 29223, 28936, 35025, 29224 };
         break;
 
     }
     switch (bot->GetTeam())
     {
     case ALLIANCE:
-        fslow = { 32235, 32239, 32240 };
-        ffast = { 32242, 32289, 32290, 32292 };
+        fslow = { 25470, 25471, 25472 };
+        ffast = { 25473, 25527, 25528, 25529 };
         break;
     case HORDE:
-        fslow = { 32244, 32245, 32243 };
-        ffast = { 32295, 32297, 32246, 32296 };
+        fslow = { 25475, 25476, 25474 };
+        ffast = { 25531, 25533, 25477, 25532 };
         break;
 #endif
     }
@@ -1887,10 +1887,10 @@ void PlayerbotFactory::InitMounts()
         uint32 mountItem = mounts[bot->getRace()][type][index];
         uint32 mountSkill = ridingSkill[type];
 
+        bot->learnSpell(mountSkill, false);
+
         if (!bot->HasItemCount(mountItem,1, true))
         {            
-            bot-> learnSpell(mountSkill, false);
-
             Item* newItem = bot->StoreNewItemInInventorySlot(mountItem, 1);
             if (newItem)
                 newItem->AddToUpdateQueueOf(bot);
