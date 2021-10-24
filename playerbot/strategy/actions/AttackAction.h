@@ -22,7 +22,7 @@ namespace ai
     {
     public:
         AttackMyTargetAction(PlayerbotAI* ai, string name = "attack my target") : AttackAction(ai, name) {}
-        virtual bool IgnoresCasting() { return true; }
+        virtual bool IgnoresCasting() { return false; }
 
     public:
         virtual bool Execute(Event event);

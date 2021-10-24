@@ -1009,7 +1009,7 @@ float MovementAction::MoveDelay(float distance)
     return distance / bot->GetSpeed(MOVE_RUN);
 }
 
-bool MovementAction::Flee(Unit *target)
+bool MovementAction::Flee(Unit *target, bool forced)
 {
     Player* master = GetMaster();
     if (!target)
@@ -1018,7 +1018,7 @@ bool MovementAction::Flee(Unit *target)
     if (!target)
         return false;
 
-    if (!sPlayerbotAIConfig.fleeingEnabled)
+    if (!forced && !sPlayerbotAIConfig.fleeingEnabled)
         return false;
 
     if (!IsMovingAllowed())
@@ -1255,12 +1255,12 @@ bool FleeWithPetAction::Execute(Event event)
             pet->AttackStop();
         }
     }
-    return Flee(AI_VALUE(Unit*, "current target"));
+    return Flee(AI_VALUE(Unit*, "current target"), true);
 }
 
 bool RunAwayAction::Execute(Event event)
 {
-    return Flee(AI_VALUE(Unit*, "master target"));
+    return Flee(AI_VALUE(Unit*, "current target"), true);
 }
 
 bool MoveToLootAction::Execute(Event event)
@@ -1271,6 +1271,14 @@ bool MoveToLootAction::Execute(Event event)
 
     WorldObject *wo = loot.GetWorldObject(bot);
     return MoveNear(wo, sPlayerbotAIConfig.contactDistance);
+}
+
+bool MoveToLootAction::isUseful()
+{
+    if (context->GetValue<TravelTarget*>("travel target")->Get()->isTraveling())
+        return false;
+
+    return true;
 }
 
 bool MoveOutOfEnemyContactAction::Execute(Event event)

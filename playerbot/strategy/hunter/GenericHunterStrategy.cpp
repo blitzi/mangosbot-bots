@@ -68,9 +68,9 @@ void GenericHunterStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
         "enemy is close",
         NextAction::array(0, new NextAction("wing clip", ACTION_HIGH), NULL)));
 
-    triggers.push_back(new TriggerNode(
+    /*triggers.push_back(new TriggerNode(
         "medium threat",
-        NextAction::array(0, new NextAction("feign death", 35.0f), NULL)));
+        NextAction::array(0, new NextAction("feign death", 35.0f), NULL)));*/
 
     triggers.push_back(new TriggerNode(
         "hunters pet low health",
@@ -79,6 +79,10 @@ void GenericHunterStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
     triggers.push_back(new TriggerNode(
         "switch to ranged",
         NextAction::array(0, new NextAction("switch to ranged", ACTION_HIGH), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "switch to melee",
+        NextAction::array(0, new NextAction("switch to melee", ACTION_HIGH + 1), NULL)));
 
     triggers.push_back(new TriggerNode(
         "no ammo",

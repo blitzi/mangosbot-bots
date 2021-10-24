@@ -29,7 +29,7 @@ namespace ai
         bool IsMovingAllowed(Unit* target);
         bool IsMovingAllowed(uint32 mapId, float x, float y, float z);
         bool IsMovingAllowed();
-        bool Flee(Unit *target);
+        bool Flee(Unit *target, bool forced = false);
         void ClearIdleState();
         void UpdateMovementState();
         
@@ -70,6 +70,7 @@ namespace ai
     public:
         MoveToLootAction(PlayerbotAI* ai) : MovementAction(ai, "move to loot") {}
         virtual bool Execute(Event event);
+        virtual bool isUseful();
     };
 
     class MoveOutOfEnemyContactAction : public MovementAction

@@ -78,12 +78,16 @@ class ServerFacade
 
         bool isMoving(Unit *unit);
 
-        bool IsInCombat(Unit *unit)
+        bool IsInCombat(Unit *unit, bool withPet = false)
         {
 #ifdef MANGOS
             return unit->IsInCombat();
 #endif
 #ifdef CMANGOS
+
+            if (withPet && unit->GetPet() && unit->GetPet()->IsInCombat())
+                return true;
+
             return unit->IsInCombat();
 #endif
         }

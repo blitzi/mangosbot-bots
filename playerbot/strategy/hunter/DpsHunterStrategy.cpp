@@ -16,6 +16,7 @@ public:
         creators["explosive shot"] = &explosive_shot;
         creators["concussive shot"] = &concussive_shot;
         creators["viper sting"] = &viper_sting;
+        creators["arcane shot"] = &arcane_shot;
     }
 private:
     static ActionNode* viper_sting(PlayerbotAI* ai)
@@ -25,6 +26,14 @@ private:
             /*A*/ NextAction::array(0, new NextAction("mana potion", 10.0f), NULL),
             /*C*/ NULL);
     }
+    static ActionNode* explosive_shot(PlayerbotAI* ai)
+    {
+        return new ActionNode ("explosive shot",
+            /*P*/ NULL,
+            /*A*/ NextAction::array(0, new NextAction("aimed shot"), NULL),
+            /*C*/ NULL);
+    }
+
     static ActionNode* aimed_shot(PlayerbotAI* ai)
     {
         return new ActionNode ("aimed shot",
@@ -39,11 +48,12 @@ private:
             /*A*/ NextAction::array(0, new NextAction("arcane shot", 10.0f), NULL),
             /*C*/ NULL);
     }
-    static ActionNode* explosive_shot(PlayerbotAI* ai)
+
+    static ActionNode* arcane_shot(PlayerbotAI* ai)
     {
-        return new ActionNode ("explosive shot",
+        return new ActionNode("arcane shot",
             /*P*/ NULL,
-            /*A*/ NextAction::array(0, new NextAction("aimed shot"), NULL),
+            /*A*/ NextAction::array(0, new NextAction("concussive shot"), NULL),
             /*C*/ NULL);
     }
 
@@ -51,7 +61,7 @@ private:
     {
         return new ActionNode ("concussive shot",
             /*P*/ NULL,
-            /*A*/ NULL,
+            /*A*/ NextAction::array(0, new NextAction("auto shot"), NULL),
             /*C*/ NULL);
     }
 
@@ -64,13 +74,13 @@ DpsHunterStrategy::DpsHunterStrategy(PlayerbotAI* ai) : GenericHunterStrategy(ai
 
 NextAction** DpsHunterStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("explosive shot", 11.0f), new NextAction("auto shot", 10.0f), new NextAction("melee", 8.0f), NULL);
+    return NextAction::array(0, new NextAction("melee", 5.0f), NULL);
 }
 
 void DpsHunterStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
     GenericHunterStrategy::InitTriggers(triggers);
-
+    
     triggers.push_back(new TriggerNode(
         "black arrow",
         NextAction::array(0, new NextAction("black arrow", 15.0f), NULL)));
@@ -81,15 +91,19 @@ void DpsHunterStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 
     triggers.push_back(new TriggerNode(
         "hunter's mark",
-        NextAction::array(0, new NextAction("hunter's mark", 19.0f), NULL)));
+        NextAction::array(0, new NextAction("hunter's mark", 31.0f), NULL)));
 
     triggers.push_back(new TriggerNode(
         "concussive shot on snare target",
-        NextAction::array(0, new NextAction("concussive shot", 20.0f), NULL)));
+        NextAction::array(0, new NextAction("concussive shot", 30.0f), NULL)));
 
-    /*triggers.push_back(new TriggerNode(
+    triggers.push_back(new TriggerNode(
+        "arcane shot",
+        NextAction::array(0, new NextAction("arcane shot", 15.0f), NULL)));
+
+    triggers.push_back(new TriggerNode(
         "has aggro",
-        NextAction::array(0, new NextAction("concussive shot", 20.0f), NULL)));*/
+        NextAction::array(0, new NextAction("concussive shot", 20.0f), NULL)));
 }
 
 void DpsAoeHunterStrategy::InitTriggers(std::list<TriggerNode*> &triggers)

@@ -14,6 +14,7 @@ namespace ai
 	private:
         void AddAttackersOf(Group* group, set<Unit*>& targets);
         void AddAttackersOf(Player* player, set<Unit*>& targets);
+        void AddAttackersOf(Unit* pet, set<Unit*>& targets);
 		void RemoveNonThreating(set<Unit*>& targets);
 		void RemoveNonEliteTargets(set<Unit*>& targets);
 		void RemoveNonTotemTargets(set<Unit*>& targets);

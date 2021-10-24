@@ -144,7 +144,7 @@ bool BGJoinAction::gatherArenaTeam(ArenaType type)
             if (member->GetGroup() && !member->GetGroup()->IsLeader(bot->GetObjectGuid()))
                 continue;
 
-            if (member->IsInCombat())
+            if (sServerFacade.IsInCombat(member, true))
                 continue;
 
             if (member->GetObjectGuid() == bot->GetObjectGuid())

@@ -138,7 +138,8 @@ bool AttackAction::Attack(Unit* target)
         else
             return ChaseTo(target, distance);
     }
-    else
+    
+    if(!bot->GetVictim())
         context->GetValue<Unit*>("current target")->Set(NULL);
 
     return false;

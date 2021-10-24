@@ -22,6 +22,10 @@ list<ObjectGuid> AttackersValue::Calculate()
 
     AddAttackersOf(bot, targets);
 
+    if(bot->GetPet())
+        AddAttackersOf(bot->GetPet(), targets);
+
+
     Group* group = bot->GetGroup();
     if (group)
         AddAttackersOf(group, targets);
@@ -90,9 +94,9 @@ void AttackersValue::AddAttackersOf(Player* player, set<Unit*>& targets)
     Cell::VisitAllObjects(player, searcher, sPlayerbotAIConfig.sightDistance);
 	for (list<Unit*>::iterator i = units.begin(); i != units.end(); i++)
     {
+        Unit* unit = *i;
 		if (!player->GetGroup())
 		{
-			Unit* unit = *i;
 #ifdef CMANGOS
 			if (!unit->getThreatManager().getThreat(player) && (!unit->getThreatManager().getCurrentVictim() || unit->getThreatManager().getCurrentVictim()->getTarget() != player))
 #endif
@@ -101,11 +105,31 @@ void AttackersValue::AddAttackersOf(Player* player, set<Unit*>& targets)
 #endif
 				continue;
 		}
-        {
-            Unit* unit = *i;
-            targets.insert(unit);
-            unit->CallForAllControlledUnits(AddGuardiansHelper(units), CONTROLLED_PET | CONTROLLED_GUARDIANS | CONTROLLED_CHARM | CONTROLLED_MINIPET | CONTROLLED_TOTEMS);
-        }
+        
+        targets.insert(unit);
+        unit->CallForAllControlledUnits(AddGuardiansHelper(units), CONTROLLED_PET | CONTROLLED_GUARDIANS | CONTROLLED_CHARM | CONTROLLED_MINIPET | CONTROLLED_TOTEMS);        
+    }
+}
+
+void AttackersValue::AddAttackersOf(Unit* pet, set<Unit*>& targets)
+{
+    list<Unit*> units;
+    AnyEnemyInObjectRangeCheck u_check(pet, sPlayerbotAIConfig.sightDistance);
+    UnitListSearcher<AnyEnemyInObjectRangeCheck> searcher(units, u_check);
+    Cell::VisitAllObjects(pet, searcher, sPlayerbotAIConfig.sightDistance);
+    for (list<Unit*>::iterator i = units.begin(); i != units.end(); i++)
+    {
+        Unit* unit = *i;
+#ifdef CMANGOS
+            if (!unit->getThreatManager().getThreat(pet) && (!unit->getThreatManager().getCurrentVictim() || unit->getThreatManager().getCurrentVictim()->getTarget() != pet))
+#endif
+#ifdef MANGOS
+            if (!unit->GetThreatManager().getThreat(player))
+#endif
+                    continue;
+
+        targets.insert(unit);
+        unit->CallForAllControlledUnits(AddGuardiansHelper(units), CONTROLLED_PET | CONTROLLED_GUARDIANS | CONTROLLED_CHARM | CONTROLLED_MINIPET | CONTROLLED_TOTEMS);                
     }
 }
 
@@ -289,6 +313,7 @@ bool AttackersValue::ListContainsRti(set<Unit*>& targets) const
 bool AttackersValue::IsPossibleTarget(Unit *attacker, Player *bot)
 {
     Creature *c = dynamic_cast<Creature*>(attacker);
+    Group* group = bot->GetGroup();
 
     bool basicConditions = attacker &&
         attacker->IsInWorld() &&
@@ -305,6 +330,9 @@ bool AttackersValue::IsPossibleTarget(Unit *attacker, Player *bot)
     bool rti = IsRti(attacker, bot);
 
     if (rti)
+        return basicConditions;
+
+    if (!group && bot->GetPet() && bot->GetPet()->IsAttackedBy(attacker))
         return basicConditions;
 
     if (c)
@@ -355,8 +383,6 @@ bool AttackersValue::IsPossibleTarget(Unit *attacker, Player *bot)
 			    waitForTankAggro = c->GetHealthPercent() > 90 && myAggroInPct > 90; 
 		}
 	}
-
-	Group* group = bot->GetGroup();
 
     int tanks = 0;
 

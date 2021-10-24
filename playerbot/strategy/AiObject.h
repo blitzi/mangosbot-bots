@@ -442,6 +442,7 @@ class clazz : public CastSpellAction \
         { \
         public: \
         clazz(PlayerbotAI* ai) : CastSpellAction(ai, name) {} \
+        virtual bool isPossible() { return ai->HasStrategy("ranged", BOT_STATE_COMBAT); } \
 
 #define BEGIN_MELEE_SPELL_ACTION(clazz, name) \
 class clazz : public CastMeleeSpellAction \

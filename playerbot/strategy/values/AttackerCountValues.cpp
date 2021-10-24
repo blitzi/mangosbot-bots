@@ -8,7 +8,14 @@ using namespace ai;
 
 uint8 MyAttackerCountValue::Calculate()
 {
-    return bot->getAttackers().size();
+    uint8 size = 0;
+
+    if (bot->GetPet())
+        size = bot->GetPet()->getAttackers().size();
+
+    size += bot->getAttackers().size();
+
+    return size;
 }
 
 bool HasAggroValue::Calculate()

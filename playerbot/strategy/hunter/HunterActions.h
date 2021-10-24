@@ -4,7 +4,7 @@
 
 namespace ai
 {
-    BEGIN_RANGED_SPELL_ACTION(CastHuntersMarkAction, "hunter's mark")
+    BEGIN_DEBUFF_ACTION(CastHuntersMarkAction, "hunter's mark")
     END_SPELL_ACTION()
 
     BEGIN_RANGED_SPELL_ACTION(CastAutoShotAction, "auto shot")

@@ -117,7 +117,7 @@ bool IsInCombatValue::Calculate()
     if (!target)
         return false;
 
-    if (sServerFacade.IsInCombat(target)) return true;
+    if (sServerFacade.IsInCombat(target, true)) return true;
 
     if (target == bot)
     {

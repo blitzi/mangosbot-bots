@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../triggers/GenericTriggers.h"
+#include "../values/LastMovementValue.h"
 
 namespace ai
 {
@@ -64,6 +65,7 @@ namespace ai
     {
     public:
         FreezingTrapTrigger(PlayerbotAI* ai) : HasCcTargetTrigger(ai, "freezing trap") {}
+        virtual bool IsActive();
     };
 
     class RapidFireTrigger : public BuffTrigger
@@ -93,6 +95,11 @@ namespace ai
         ConcussiveShotSnareTrigger(PlayerbotAI* ai) : SnareTargetTrigger(ai, "concussive shot") {}
     };
 
+    class ArcaneShotTrigger : public SpellCanBeCastTrigger {
+    public:
+        ArcaneShotTrigger(PlayerbotAI* ai) : SpellCanBeCastTrigger(ai, "arcane shot") {}
+    };
+
     class ScareBeastTrigger : public HasCcTargetTrigger
     {
     public:
@@ -109,13 +116,13 @@ namespace ai
     class HunterNoAmmoTrigger : public AmmoCountTrigger
     {
     public:
-        HunterNoAmmoTrigger(PlayerbotAI* ai) : AmmoCountTrigger(ai, "ammo", 1, 10) {}
+        HunterNoAmmoTrigger(PlayerbotAI* ai) : AmmoCountTrigger(ai, "ammo", 1, 1) {}
     };
 
     class HunterHasAmmoTrigger : public AmmoCountTrigger
     {
     public:
-        HunterHasAmmoTrigger(PlayerbotAI* ai) : AmmoCountTrigger(ai, "ammo", 1, 10) {}
+        HunterHasAmmoTrigger(PlayerbotAI* ai) : AmmoCountTrigger(ai, "ammo", 1, 1) {}
         virtual bool IsActive() { return !AmmoCountTrigger::IsActive(); }
     };
 
@@ -125,7 +132,12 @@ namespace ai
         virtual bool IsActive()
         {
             Unit* target = AI_VALUE(Unit*, "current target");
-            return ai->HasStrategy("close", BOT_STATE_COMBAT) && (sServerFacade.IsDistanceGreaterThan(AI_VALUE2(float, "distance", "current target"), 8.0f));
+            LastMovement& lastMove = *context->GetValue<LastMovement&>("last movement");
+
+            if (lastMove.lastFlee)
+                return target && ai->HasStrategy("close", BOT_STATE_COMBAT);
+
+            return target && ai->HasStrategy("close", BOT_STATE_COMBAT) && (sServerFacade.IsDistanceGreaterThan(AI_VALUE2(float, "distance", "current target"), 8.0f));
         }
     };
 
@@ -135,7 +147,12 @@ namespace ai
         virtual bool IsActive()
         {
             Unit* target = AI_VALUE(Unit*, "current target");
-            return ai->HasStrategy("ranged", BOT_STATE_COMBAT) && sServerFacade.IsDistanceLessOrEqualThan(AI_VALUE2(float, "distance", "current target"), 8.0f);
+            LastMovement& lastMove = *context->GetValue<LastMovement&>("last movement");
+
+            if (lastMove.lastFlee)
+                return false;
+
+            return target && ai->HasStrategy("ranged", BOT_STATE_COMBAT) && sServerFacade.IsDistanceLessOrEqualThan(AI_VALUE2(float, "distance", "current target"), 8.0f);
         }
     };
 }

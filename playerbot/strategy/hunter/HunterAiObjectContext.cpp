@@ -95,6 +95,7 @@ namespace ai
                 creators["has ammo"] = &TriggerFactoryInternal::has_ammo;
                 creators["switch to melee"] = &TriggerFactoryInternal::switch_to_melee;
                 creators["switch to ranged"] = &TriggerFactoryInternal::switch_to_ranged;
+                creators["arcane shot"] = &TriggerFactoryInternal::arcane_shot;
             }
 
         private:
@@ -119,6 +120,7 @@ namespace ai
             static Trigger* has_ammo(PlayerbotAI* ai) { return new HunterHasAmmoTrigger(ai); }
             static Trigger* switch_to_melee(PlayerbotAI* ai) { return new SwitchToMeleeTrigger(ai); }
             static Trigger* switch_to_ranged(PlayerbotAI* ai) { return new SwitchToRangedTrigger(ai); }
+            static Trigger* arcane_shot(PlayerbotAI* ai) { return new ArcaneShotTrigger(ai); }
         };
     };
 };

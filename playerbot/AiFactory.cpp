@@ -324,6 +324,11 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
                 engine->addStrategies("holy", "shadow debuff", "shadow aoe", "threat", NULL);
             }
 
+            if (player->getClass() == CLASS_HUNTER && player->GetLevel() >= 10)
+            {
+                engine->addStrategy("kite");
+            }
+
             if (player->getClass() == CLASS_SHAMAN && tab == 2)
             {
                 engine->addStrategies("caster", "caster aoe", NULL);
