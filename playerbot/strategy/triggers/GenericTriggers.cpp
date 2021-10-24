@@ -135,7 +135,7 @@ Value<Unit*>* DebuffOnAttackerTrigger::GetTargetValue()
 
 bool NoAttackersTrigger::IsActive()
 {
-    return !AI_VALUE(Unit*, "current target") && AI_VALUE(uint8, "my attacker count") > 0;
+    return !AI_VALUE(Unit*, "current target") && AI_VALUE(uint8, "my attacker count") == 0;
 }
 
 bool InvalidTargetTrigger::IsActive()
