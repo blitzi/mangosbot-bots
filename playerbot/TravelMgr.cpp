@@ -657,7 +657,11 @@ bool FindPointCreatureData::operator()(CreatureDataPair const& dataPair)
     if (!entry || dataPair.second.id == entry)
         if ((!point || dataPair.second.mapid == point.getMapId()) && (!radius || point.sqDistance(WorldPosition(dataPair.second.mapid, dataPair.second.posX, dataPair.second.posY, dataPair.second.posZ)) < radius * radius))
         {
-            data.push_back(&dataPair);
+            //for now only add creatures that are not bound to any game event (e.g. 33 = Arena Event...etc)
+            if (dataPair.second.gameEvent == 0)
+            {
+                data.push_back(&dataPair);
+            }
         }
 
     return false;
@@ -1541,6 +1545,18 @@ void TravelMgr::LoadQuestTravelTable()
         if (!point.getMapEntry()->IsContinent())
             continue;
 
+        //ignore creatures that can only swim
+        if (cInfo->InhabitType & INHABIT_GROUND == 0 && cInfo->InhabitType & INHABIT_WATER != 0)
+            continue;
+
+        //ignore invisible targets
+        if (cInfo->ExtraFlags & CREATURE_EXTRA_FLAG_INVISIBLE != 0)
+            continue;
+
+        //ignore all creature types of Type: CRITTER, MECHANICAL, NOT_SPECIFIED, CREATURE_TYPE_TOTEM, TYPE_NON_COMBAT_PET, GAS_CLOUD
+        if (cInfo->CreatureType >= CREATURE_TYPE_CRITTER)
+            continue;
+
         for (vector<uint32>::iterator i = allowedNpcFlags.begin(); i != allowedNpcFlags.end(); ++i)
         {
             if ((cInfo->NpcFlags & *i) != 0)
@@ -1552,15 +1568,13 @@ void TravelMgr::LoadQuestTravelTable()
 
                 pointsMap.insert_or_assign(u.guidx, point);
                 rLoc->addPoint(&pointsMap.find(u.guidx)->second);
+
                 rpgNpcs.push_back(rLoc);
                 break;
             }
         }
 
         gLoc = new GrindTravelDestination(u.entry, sPlayerbotAIConfig.tooCloseDistance, sPlayerbotAIConfig.sightDistance);
-
-
-
         gLoc->setExpireDelay(60 * 1000);
         gLoc->setMaxVisitors(100, 0);
 
@@ -3222,12 +3236,7 @@ vector<TravelDestination*> TravelMgr::getRpgTravelDestinations(Player* bot, bool
         if (dest->isFull(ignoreFull))
             continue;
 
-        Unit* u = bot->GetPlayerbotAI()->GetUnit(dest->guid);
-
-        if (u && u->IsInWorld())
-        {
-            retTravelLocations.push_back(dest);            
-        }
+        retTravelLocations.push_back(dest);                    
     }
 
     return retTravelLocations;
@@ -3278,13 +3287,6 @@ vector<TravelDestination*> TravelMgr::getGrindTravelDestinations(Player* bot, bo
 
         if (level >= cInfo->MinLevel && level <= cInfo->MaxLevel)
         {
-            //ignore creatures that can only swim
-            if (cInfo->InhabitType & INHABIT_GROUND == 0 && cInfo->InhabitType & INHABIT_WATER != 0)
-                continue;           
-
-            if (cInfo->ExtraFlags & CREATURE_EXTRA_FLAG_INVISIBLE != 0)
-                continue;
-
             if (cInfo->Rank > 0 && !bot->GetPlayerbotAI()->GetAiObjectContext()->GetValue<bool>("can fight boss"))
                 continue;
 
