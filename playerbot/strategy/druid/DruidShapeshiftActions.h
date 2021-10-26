@@ -40,6 +40,11 @@ namespace ai {
     class CastAquaticFormAction : public CastBuffSpellAction {
     public:
         CastAquaticFormAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "aquatic form") {}
+
+		virtual bool isUseful() 
+		{
+			return bot->GetShapeshiftForm() == FORM_NONE;
+		}
     };
 
     class CastTravelFormAction : public CastBuffSpellAction {

@@ -215,4 +215,5 @@ ChatCommandHandlerStrategy::ChatCommandHandlerStrategy(PlayerbotAI* ai) : PassTr
     supported.push_back("guild remove");
     supported.push_back("guild leave");
     supported.push_back("sell");
+    supported.push_back("cancel form");
 }

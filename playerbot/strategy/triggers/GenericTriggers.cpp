@@ -360,7 +360,7 @@ bool NotDpsAoeTargetActiveTrigger::IsActive()
 
 bool IsSwimmingTrigger::IsActive()
 {
-    return AI_VALUE2(bool, "swimming", "self target");
+    return AI_VALUE2(bool, "swimming", "self target") && AI_VALUE2(bool, "moving", "self target");
 }
 
 bool HasNearestAddsTrigger::IsActive()
