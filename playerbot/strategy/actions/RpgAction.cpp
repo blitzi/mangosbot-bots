@@ -351,6 +351,7 @@ void RpgAction::trade(ObjectGuid guid)
 
     setDelay(true);
     context->GetValue<ObjectGuid>("rpg target")->Set(ObjectGuid());
+    sTravelMgr.setNullTravelTarget(bot);
 }
 
 void RpgAction::repair(ObjectGuid guid)
