@@ -30,7 +30,7 @@ private:
     {
         return new ActionNode ("mutilate",
             /*P*/ NULL,
-            /*A*/ NextAction::array(0, new NextAction("sinister strike"), NULL),
+            /*A*/ NextAction::array(0, new NextAction("backstab"), NULL),
             /*C*/ NULL);
     }
     static ActionNode* sinister_strike(PlayerbotAI* ai)
@@ -110,7 +110,7 @@ void DpsRogueStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 
     triggers.push_back(new TriggerNode(
         "behind target",
-        NextAction::array(0, new NextAction("backstab", ACTION_HIGH + 1), NULL)));
+        NextAction::array(0, new NextAction("mutilate", ACTION_HIGH + 2), NULL)));
 
     triggers.push_back(new TriggerNode(
         "player has flag",
