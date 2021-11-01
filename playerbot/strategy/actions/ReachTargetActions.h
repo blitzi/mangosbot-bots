@@ -59,11 +59,10 @@ namespace ai
             if (target)
             {
                 float distance = ai->IsRanged(bot) ? ai->GetRange("spell") : 0;
-                bool a = !bot->IsWithinDistInMap(target, distance);
-                bool b = bot->IsWithinDistInMap(target, distance);
-                bool c = !bot->IsWithinLOSInMap(target);
+                bool isInDist = bot->IsWithinDistInMap(target, distance);
+                bool isInLOS = bot->IsWithinLOSInMap(target);
                 
-                return (a || (b && c));
+                return (!isInDist || (isInDist && !isInLOS));
             }
 
             return false;
