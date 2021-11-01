@@ -262,7 +262,7 @@ bool ChooseTravelTargetAction::getBestDestination(vector<TravelDestination*>* ac
     TravelDestination* targetDestination = NULL;
 
     //Pick the destination that has this point.
-    for (auto activeTarget : *activeDestinations)
+    /*for (auto activeTarget : *activeDestinations)
     {
         for (auto point : activeTarget->getPoints())
         {
@@ -272,7 +272,11 @@ bool ChooseTravelTargetAction::getBestDestination(vector<TravelDestination*>* ac
                 break;
             }
         }
-    }
+    }*/
+
+    for (auto activeTarget : *activeDestinations) //Pick the destination that has this point.
+        if (activeTarget->distanceTo(availablePoints.front()) == 0)
+            targetDestination = activeTarget;
 
     if (!targetDestination)
         return false;
