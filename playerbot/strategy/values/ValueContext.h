@@ -200,7 +200,7 @@ namespace ai
             creators["snare target"] = &ValueContext::snare_target;
             creators["formation"] = &ValueContext::formation;
             creators["stance"] = &ValueContext::stance;
-            creators["item usage"] = &ValueContext::item_usage;
+            creators["item usage"] = &ValueContext::item_usage;            
             creators["speed"] = &ValueContext::speed;
             creators["last said"] = &ValueContext::last_said;
             creators["last emote"] = &ValueContext::last_emote;
@@ -252,6 +252,7 @@ namespace ai
             creators["should repair"] = &ValueContext::should_repair;
             creators["can repair"] = &ValueContext::can_repair;
             creators["should sell"] = &ValueContext::should_sell;
+            creators["should buy ammo"] = &ValueContext::should_buy_ammo;
             creators["can sell"] = &ValueContext::can_sell;
             creators["can fight equal"] = &ValueContext::can_fight_equal;
             creators["can fight boss"] = &ValueContext::can_fight_boss;
@@ -288,7 +289,7 @@ namespace ai
         static UntypedValue* collision(PlayerbotAI* ai) { return new CollisionValue(ai); }
         static UntypedValue* already_seen_players(PlayerbotAI* ai) { return new AlreadySeenPlayersValue(ai); }
         static UntypedValue* new_player_nearby(PlayerbotAI* ai) { return new NewPlayerNearbyValue(ai); }
-        static UntypedValue* item_usage(PlayerbotAI* ai) { return new ItemUsageValue(ai); }
+        static UntypedValue* item_usage(PlayerbotAI* ai) { return new ItemUsageValue(ai); }        
         static UntypedValue* formation(PlayerbotAI* ai) { return new FormationValue(ai); }
         static UntypedValue* stance(PlayerbotAI* ai) { return new StanceValue(ai); }
         static UntypedValue* mana_save_level(PlayerbotAI* ai) { return new ManaSaveLevelValue(ai); }
@@ -427,6 +428,7 @@ namespace ai
         static UntypedValue* should_repair(PlayerbotAI* ai) { return new ShouldRepairValue(ai); }
         static UntypedValue* can_repair(PlayerbotAI* ai) { return new CanRepairValue(ai); }
         static UntypedValue* should_sell(PlayerbotAI* ai) { return new ShouldSellValue(ai); }
+        static UntypedValue* should_buy_ammo(PlayerbotAI* ai) { return new ShouldBuyAmmoValue(ai); }
         static UntypedValue* can_sell(PlayerbotAI* ai) { return new CanSellValue(ai); }
         static UntypedValue* can_fight_equal(PlayerbotAI* ai) { return new CanFightEqualValue(ai); }
         static UntypedValue* can_fight_boss(PlayerbotAI* ai) { return new CanFightBossValue(ai); }

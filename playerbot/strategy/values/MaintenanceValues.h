@@ -34,6 +34,13 @@ namespace ai
         virtual bool Calculate() { return AI_VALUE(uint8, "bag space") > 80; };
     };
 
+    class ShouldBuyAmmoValue : public BoolCalculatedValue
+    {
+    public:
+        ShouldBuyAmmoValue(PlayerbotAI* ai) : BoolCalculatedValue(ai, "should buy ammo", 2) {}
+        virtual bool Calculate() { return ai->GetBot()->getClass() == CLASS_HUNTER && AI_VALUE(bool, "no ammo"); };
+    };
+
     class CanSellValue : public BoolCalculatedValue
     {
     public:
