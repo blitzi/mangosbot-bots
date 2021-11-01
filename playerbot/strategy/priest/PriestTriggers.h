@@ -67,6 +67,7 @@ namespace ai
         PrayerOfFortitudeTrigger(PlayerbotAI* ai) : BuffOnPartyTrigger(ai, "prayer of fortitude", 3) {}
 
         virtual bool IsActive() { return BuffOnPartyTrigger::IsActive() &&
+            GetTarget() &&
             !ai->HasAura("prayer of fortitude", GetTarget()) &&
 #ifdef MANGOS
             (ai->GetBot()->IsInSameGroupWith((Player*)GetTarget()) || ai->GetBot()->IsInSameRaidWith((Player*)GetTarget())) &&
@@ -85,6 +86,7 @@ namespace ai
 
         virtual bool IsActive() {
             return BuffOnTankTrigger::IsActive() &&
+                GetTarget() &&
                 !ai->HasAura("prayer of mending", GetTarget()) &&
 #ifdef MANGOS
                 (ai->GetBot()->IsInSameGroupWith((Player*)GetTarget()) || ai->GetBot()->IsInSameRaidWith((Player*)GetTarget())) &&
@@ -102,6 +104,7 @@ namespace ai
 
         virtual bool IsActive() { return BuffOnPartyTrigger::IsActive() &&
             !ai->HasAura("prayer of spirit", GetTarget()) &&
+            GetTarget() &&
 #ifdef MANGOS
             (ai->GetBot()->IsInSameGroupWith((Player*)GetTarget()) || ai->GetBot()->IsInSameRaidWith((Player*)GetTarget())) &&
 #endif

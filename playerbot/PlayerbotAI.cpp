@@ -2111,6 +2111,15 @@ bool PlayerbotAI::AllowActive()
     if (HasPlayerNearby())
         return true;
 
+    if (!WorldPosition(bot).isOverworld()) // bg, raid, dungeon
+        return true;
+
+    if (bot->InBattleGroundQueue()) //In bg queue. Speed up bg queue/join.
+        return true;
+
+    if (sServerFacade.IsInCombat(bot))
+        return true;
+
     Group* group = bot->GetGroup();
     if (group)
     {
@@ -2129,15 +2138,6 @@ bool PlayerbotAI::AllowActive()
         }
     }
 
-    if (bot->InBattleGround()) //In battle ground. Always active.
-        return true;
-
-    if (bot->InBattleGroundQueue()) //In bg queue. Speed up bg queue/join.
-        return true;
-
-    if (sServerFacade.IsInCombat(bot))
-        return true;
-         
     return false;
 }
 
@@ -3039,7 +3039,7 @@ uint32 PlayerbotAI::GetBuffedCount(Player* player, string spellname)
             if (!member || !member->IsInWorld())
                 continue;
 
-            if (!member->IsInGroup(player, true))
+            if (!player || (player && !member->IsInGroup(player, true)))
                 continue;
 
             if (HasAura(spellname, member, true))

@@ -272,6 +272,7 @@ namespace ai
 
         virtual bool IsActive() {
             return BuffOnTankTrigger::IsActive() &&
+                GetTarget() &&
                 !ai->HasAura("earth shield", GetTarget()) &&
 #ifdef MANGOS
                 (ai->GetBot()->IsInSameGroupWith((Player*)GetTarget()) || ai->GetBot()->IsInSameRaidWith((Player*)GetTarget())) &&
