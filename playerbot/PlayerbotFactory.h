@@ -52,10 +52,12 @@ public:
     static list<uint32> classQuestIds;
     static list<uint32> specialQuestIds;
     void InitSkills();
+    bool ShouldEquipArmor(Item* item);
+    bool ShouldEquipWeapon(Item* item);
+    float CalculateItemValue(Item* item);
 
 private:
-    void Prepare();
-    void InitSecondEquipmentSet();
+    void Prepare();    
     void InitEquipment(bool incremental);
     bool CanEquipItem(ItemPrototype const* proto, uint32 desiredQuality);
     bool CanEquipUnseenItem(uint8 slot, uint16 &dest, uint32 item);
@@ -78,8 +80,6 @@ private:
     void InitPotions();
     void InitFood();
     void InitReagents();
-    bool CanEquipArmor(ItemPrototype const* proto);
-    bool CanEquipWeapon(ItemPrototype const* proto);
     void EnchantItem(Item* item);
     void AddItemStats(uint32 mod, uint8 &sp, uint8 &ap, uint8 &tank);
     bool CheckItemStats(uint8 sp, uint8 ap, uint8 tank);
@@ -88,7 +88,6 @@ private:
     void InitBags();
     void InitInventory();
     void InitInventoryTrade();
-    void InitInventoryEquip();
     void InitInventorySkill();
     Item* StoreItem(uint32 itemId, uint32 count);
     void InitGuild();

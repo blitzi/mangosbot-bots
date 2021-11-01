@@ -30,7 +30,7 @@ namespace ai
         virtual ItemUsage Calculate();
 
     private:
-        ItemUsage QueryItemUsageForEquip(ItemPrototype const * proto);
+        ItemUsage QueryItemUsageForEquip(Item* item);
 
         uint32 GetSmallestBagSize();
         bool IsItemUsefulForQuest(Player* player, ItemPrototype const* proto);
