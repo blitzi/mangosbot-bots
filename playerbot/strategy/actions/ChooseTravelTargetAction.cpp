@@ -42,12 +42,12 @@ void ChooseTravelTargetAction::getNewTarget(TravelTarget* newTarget, TravelTarge
     //Enpty bags/repair
     if (!foundTarget && (AI_VALUE2(bool, "group or", "should sell,can sell")))
     {
-        foundTarget = SetNpcFlagTarget(newTarget, { UNIT_NPC_FLAG_VENDOR });                       
+       // foundTarget = SetNpcFlagTarget(newTarget, { UNIT_NPC_FLAG_VENDOR });                       
     }
        
     if (!foundTarget && AI_VALUE2(bool, "group or", "should repair,can repair"))
     {
-        foundTarget = SetNpcFlagTarget(newTarget, { UNIT_NPC_FLAG_REPAIR });
+       // foundTarget = SetNpcFlagTarget(newTarget, { UNIT_NPC_FLAG_REPAIR });
     }     
 
     if (!foundTarget)
@@ -57,7 +57,7 @@ void ChooseTravelTargetAction::getNewTarget(TravelTarget* newTarget, TravelTarge
 
     if (!foundTarget && !urand(0,2))
     {
-        foundTarget = SetBuyGearTarget(newTarget);
+        //foundTarget = SetBuyGearTarget(newTarget);
     }
 
     if(!foundTarget)
