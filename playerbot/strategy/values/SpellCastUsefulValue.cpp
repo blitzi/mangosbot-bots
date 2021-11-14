@@ -19,8 +19,13 @@ bool SpellCastUsefulValue::Calculate()
 	if (!spellInfo)
 		return true; // there can be known alternatives
 
+#if MANGOSBOT_ONE
 	if (spellInfo->Attributes & SPELL_ATTR_ON_NEXT_SWING_NO_DAMAGE ||
 		spellInfo->Attributes & SPELL_ATTR_ON_NEXT_SWING)
+#else
+    if (spellInfo->Attributes & SPELL_ATTR_ON_NEXT_SWING_1 ||
+        spellInfo->Attributes & SPELL_ATTR_ON_NEXT_SWING_2)
+#endif
 	{
 		Spell* spell = bot->GetCurrentSpell(CURRENT_MELEE_SPELL);
 #ifdef CMANGOS

@@ -187,9 +187,15 @@ bool RandomPlayerbotFactory::CreateRandomBot(uint8 cls)
 #ifndef MANGOSBOT_ZERO
 		2,
 #endif
-        0, LOCALE_enUS, "", 0, 0, false);
+        0, LOCALE_enUS
+#ifdef MANGOSBOT_ONE //Anticheat parameters for latest TBC server - might be updated for wotlk soon
+        , "", 0, 0, false
+#endif
+    );
 
+#ifdef MANGOSBOT_ONE
     session->SetNoAnticheat();
+#endif
 
     Player *player = new Player(session);
 	if (!player->Create(sObjectMgr.GeneratePlayerLowGuid(), name, race, cls, gender,
@@ -210,7 +216,7 @@ bool RandomPlayerbotFactory::CreateRandomBot(uint8 cls)
     player->setCinematic(2);
     player->SetAtLoginFlag(AT_LOGIN_NONE);
 
-    player->SaveToDB();
+    sObjectAccessor.AddObject(player);
 
     sLog.outDebug( "Random bot created for account %d - name: \"%s\"; race: %u; class: %u",
             accountId, name.c_str(), race, cls);

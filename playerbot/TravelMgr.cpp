@@ -2602,9 +2602,16 @@ void TravelMgr::LoadQuestTravelTable()
 #ifndef MANGOSBOT_ZERO
                 2,
 #endif
-                0, LOCALE_enUS, "", 0, 0, false);
+                0, LOCALE_enUS
+#ifdef MANGOSBOT_ONE
+                , "", 0, 0, false
+#endif            
+            );
 
+#ifdef MANGOSBOT_ONE
             session->SetNoAnticheat();
+
+#endif
 
             vector <pair<pair<uint32, uint32>, uint32>> classSpecLevel;
 
