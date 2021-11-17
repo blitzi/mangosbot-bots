@@ -57,10 +57,10 @@ namespace ai
 		CastConcentrationAuraAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "concentration aura") {}
 	};
 
-	class CastDivineStormAction : public CastBuffSpellAction
+	class CastDivineStormAction : public CastMeleeSpellAction
 	{
 	public:
-		CastDivineStormAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "divine storm") {}
+		CastDivineStormAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "divine storm") {}
 	};
 
 	class CastCrusaderStrikeAction : public CastMeleeSpellAction

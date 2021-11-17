@@ -62,7 +62,7 @@ DpsPaladinStrategy::DpsPaladinStrategy(PlayerbotAI* ai) : GenericPaladinStrategy
 
 NextAction** DpsPaladinStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("crusader strike", ACTION_NORMAL + 2), NULL);
+    return NextAction::array(0, new NextAction("melee", ACTION_NORMAL), NULL);
 }
 
 void DpsPaladinStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
@@ -71,7 +71,7 @@ void DpsPaladinStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 
 	triggers.push_back(new TriggerNode(
 		"crusader strike",
-		NextAction::array(0, new NextAction("crusader strike", ACTION_HIGH + 2), NULL)));
+		NextAction::array(0, new NextAction("divine storm", ACTION_HIGH + 2), new NextAction("crusader strike", ACTION_HIGH + 1), NULL)));
 
     triggers.push_back(new TriggerNode(
 		"seal",
@@ -87,7 +87,7 @@ void DpsPaladinStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 
 	triggers.push_back(new TriggerNode(
 		"medium aoe",
-		NextAction::array(0, new NextAction("divine storm", ACTION_HIGH + 1), new NextAction("consecration", ACTION_HIGH + 1), NULL)));
+		NextAction::array(0, new NextAction("consecration", ACTION_HIGH + 1), NULL)));
 
     triggers.push_back(new TriggerNode(
         "avenging wrath",

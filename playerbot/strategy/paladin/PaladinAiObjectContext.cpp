@@ -112,6 +112,7 @@ namespace ai
             {
                 creators["judgement of wisdom"] = &TriggerFactoryInternal::judgement_of_wisdom;
                 creators["judgement"] = &TriggerFactoryInternal::judgement;
+                creators["crusader strike"] = &TriggerFactoryInternal::crusader_strike;
                 creators["judgement of light"] = &TriggerFactoryInternal::judgement_of_light;
                 creators["blessing"] = &TriggerFactoryInternal::blessing;
                 creators["seal"] = &TriggerFactoryInternal::seal;
@@ -150,6 +151,7 @@ namespace ai
             static Trigger* righteous_fury(PlayerbotAI* ai) { return new RighteousFuryTrigger(ai); }
             static Trigger* judgement_of_wisdom(PlayerbotAI* ai) { return new JudgementOfWisdomTrigger(ai); }
             static Trigger* judgement(PlayerbotAI* ai) { return new JudgementTrigger(ai); }
+            static Trigger* crusader_strike(PlayerbotAI* ai) { return new SpellCanBeCastTrigger(ai, "crusader strike"); }
             static Trigger* judgement_of_light(PlayerbotAI* ai) { return new JudgementOfLightTrigger(ai); }
             static Trigger* blessing(PlayerbotAI* ai) { return new BlessingTrigger(ai); }
             static Trigger* seal(PlayerbotAI* ai) { return new SealTrigger(ai); }
