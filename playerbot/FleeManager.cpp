@@ -81,7 +81,7 @@ void FleeManager::calculatePossibleDestinations(list<FleePoint*> &points)
                 if (terrain && terrain->IsInWater(x, y, z))
                     continue;
 
-                if (!bot->IsWithinLOS(x, y, z) || (target && !target->IsWithinLOS(x, y, z)))
+                if (!bot->IsWithinLOS(x, y, z, false, true) || (target && !target->IsWithinLOS(x, y, z, false, true)))
                     continue;
 
                 FleePoint *point = new FleePoint(bot->GetPlayerbotAI(), x, y, z);
