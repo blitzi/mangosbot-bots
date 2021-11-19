@@ -46,13 +46,7 @@ bool NearestEnemyPlayersValue::AcceptUnit(Unit* unit)
         ai->IsOpposing(enemy) &&
         enemy->IsPvP() &&
         !sPlayerbotAIConfig.IsInPvpProhibitedZone(enemy->GetAreaId()) &&
-
-#ifdef MANGOSBOT_ONE        
         !enemy->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING) &&
-#else
-        !enemy->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE) &&
-#endif
-
         enemy->IsVisibleForOrDetect(bot, enemy, false) &&
         !(enemy->HasAuraType(SPELL_AURA_SPIRIT_OF_REDEMPTION)));
 }

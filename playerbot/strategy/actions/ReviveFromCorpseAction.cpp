@@ -172,11 +172,7 @@ WorldSafeLocsEntry const* SpiritHealerAction::GetGrave(bool startZone)
     WorldSafeLocsEntry const* ClosestGrave = nullptr;
     WorldSafeLocsEntry const* NewGrave = nullptr;
 
-#ifdef MANGOSBOT_ONE
     ClosestGrave = bot->GetMap()->GetGraveyardManager().GetClosestGraveYard(bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetMapId(), bot->GetTeam());
-#else
-    ClosestGrave = sObjectMgr.GetClosestGraveYard(bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ(), bot->GetMapId(), bot->GetTeam());
-#endif
 
     if (!startZone && ClosestGrave)
         return ClosestGrave;
@@ -187,11 +183,7 @@ WorldSafeLocsEntry const* SpiritHealerAction::GetGrave(bool startZone)
 
         if (master && master != bot)
         {
-#ifdef MANGOSBOT_ONE
             ClosestGrave = bot->GetMap()->GetGraveyardManager().GetClosestGraveYard(master->GetPositionX(), master->GetPositionY(), master->GetPositionZ(), master->GetMapId(), bot->GetTeam());
-#else
-            ClosestGrave = sObjectMgr.GetClosestGraveYard(master->GetPositionX(), master->GetPositionY(), master->GetPositionZ(), master->GetMapId(), bot->GetTeam());
-#endif
 
             if (ClosestGrave)
                 return ClosestGrave;
@@ -218,11 +210,7 @@ WorldSafeLocsEntry const* SpiritHealerAction::GetGrave(bool startZone)
             if (!info)
                 continue;
 
-#ifdef MANGOSBOT_ONE
             NewGrave = bot->GetMap()->GetGraveyardManager().GetClosestGraveYard(info->positionX, info->positionY, info->positionZ, info->mapId, bot->GetTeam());
-#else
-            NewGrave = sObjectMgr.GetClosestGraveYard(info->positionX, info->positionY, info->positionZ, info->mapId, bot->GetTeam());
-#endif
 
             if (!NewGrave)
                 continue;

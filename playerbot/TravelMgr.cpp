@@ -2603,9 +2603,7 @@ void TravelMgr::LoadQuestTravelTable()
                 2,
 #endif
                 0, LOCALE_enUS
-#ifdef MANGOSBOT_ONE
-                , "", 0, 0, false
-#endif            
+                , "", 0, 0, false           
             );
 
 #ifdef MANGOSBOT_ONE

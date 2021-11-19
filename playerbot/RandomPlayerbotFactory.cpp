@@ -188,9 +188,7 @@ bool RandomPlayerbotFactory::CreateRandomBot(uint8 cls)
 		2,
 #endif
         0, LOCALE_enUS
-#ifdef MANGOSBOT_ONE //Anticheat parameters for latest TBC server - might be updated for wotlk soon
         , "", 0, 0, false
-#endif
     );
 
 #ifdef MANGOSBOT_ONE

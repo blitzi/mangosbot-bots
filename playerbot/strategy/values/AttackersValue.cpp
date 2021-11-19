@@ -319,11 +319,7 @@ bool AttackersValue::IsPossibleTarget(Unit *attacker, Player *bot)
         attacker->IsInWorld() &&
         attacker->GetMapId() == bot->GetMapId() &&
         !sServerFacade.UnitIsDead(attacker) &&
-#ifdef MANGOSBOT_ONE
         !attacker->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING) &&
-#else
-        !attacker->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE) &&       
-#endif
         !attacker->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE) &&
         attacker->IsVisibleForOrDetect(bot, attacker, false) &&
         !sServerFacade.IsFriendlyTo(attacker, bot) &&
