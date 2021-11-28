@@ -455,6 +455,30 @@ bool StoreLootAction::IsLootAllowed(uint32 itemid, PlayerbotAI *ai)
     AiObjectContext *context = ai->GetAiObjectContext();
     LootStrategy* lootStrategy = AI_VALUE(LootStrategy*, "loot strategy");
 
+    ItemPrototype const* proto = sObjectMgr.GetItemPrototype(itemid);
+    if (!proto)
+        return false;
+
+    for (uint8 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
+    {
+        uint32 entry = ai->GetBot()->GetQuestSlotQuestId(slot);
+        Quest const* quest = sObjectMgr.GetQuestTemplate(entry);
+        if (!quest)
+            continue;
+
+        for (int i = 0; i < 4; i++)
+        {
+            if (quest->ReqItemId[i] == itemid)
+            {
+                if (ai->GetMaster() && sPlayerbotAIConfig.syncQuestWithPlayer)
+                    return false; //Quest is autocomplete for the bot so no item needed.
+
+                if (AI_VALUE2(uint32, "item count", proto->Name1) >= quest->ReqItemCount[i])
+                    return false;
+            }
+        }
+    }
+
     return true;
 
     /*set<uint32>& lootItems = AI_VALUE(set<uint32>&, "always loot list");

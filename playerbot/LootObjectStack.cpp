@@ -86,6 +86,24 @@ void LootObject::Refresh(Player* bot, ObjectGuid guid)
 #endif
         && go->GetGoState() == GO_STATE_READY)
     {
+        bool isQuestItemOnly = false;
+
+        for (int i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; i++)
+        {
+            int itemId = go->GetGOInfo()->questItems[i];
+
+            if (IsNeededForQuest(bot, itemId))
+            {
+                this->guid = guid;
+                return;
+            }
+
+            isQuestItemOnly |= itemId > 0;
+        }        
+
+        if (isQuestItemOnly)
+            return;
+
         uint32 lockId = go->GetGOInfo()->GetLockId();
         LockEntry const *lockInfo = sLockStore.LookupEntry(lockId);
         if (!lockInfo)
