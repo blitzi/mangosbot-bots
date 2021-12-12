@@ -143,6 +143,21 @@ namespace ai
         float distance;
     };
 
+    class ForceFollowTooFarTrigger : public Trigger {
+    public:
+        ForceFollowTooFarTrigger(PlayerbotAI* ai, string name = "force follow too far", int checkInterval = 1) : Trigger(ai, name, checkInterval), distance(distance) {}
+
+        virtual bool IsActive()
+        {            
+            return bot->GetPlayerbotAI()->HasStrategy("force follow", BotState::BOT_STATE_NON_COMBAT) &&
+                   sServerFacade.IsDistanceGreaterThan(AI_VALUE2(float, "distance", "master target"), sPlayerbotAIConfig.forceFollowDistance);
+        }
+
+    private:
+        float distance;
+    };
+
+
     class OutOfReactRangeTrigger : public FarFromMasterTrigger
     {
     public:

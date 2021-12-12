@@ -11,6 +11,7 @@ namespace ai
 		virtual bool Execute(Event event);
         virtual bool isUseful();
         virtual bool CanDeadFollow(Unit* target);
+        virtual bool IgnoresCasting() { return ai->HasStrategy("force follow", BotState::BOT_STATE_NON_COMBAT); }
 	};
 
     class FleeToMasterAction : public FollowAction {

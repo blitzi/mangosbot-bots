@@ -133,10 +133,13 @@ bool AttackAction::Attack(Unit* target)
         float distance = ai->IsRanged(bot) ? ai->GetRange("spell") : 0;        
         Stance* stance = context->GetValue<Stance*>("stance")->Get();
 
-        if (stance && stance->getName() != "near")
-            return MoveToStance(target);
-        else
-            return ChaseTo(target, distance);
+        if (!ai->HasStrategy("force follow", BotState::BOT_STATE_NON_COMBAT))
+        {
+            if (stance && stance->getName() != "near")
+                return MoveToStance(target);
+            else
+                return ChaseTo(target, distance);
+        }
     }
     
     if(!bot->GetVictim())

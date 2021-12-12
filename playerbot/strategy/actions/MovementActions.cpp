@@ -692,9 +692,10 @@ bool MovementAction::IsMovingAllowed()
 #endif
 }
 
-bool MovementAction::Follow(Unit* target, float distance)
+bool MovementAction::Follow(Unit* target)
 {
-    return Follow(target, distance, GetFollowAngle());
+    return Follow(target, 0, 0);
+    //return MoveTo(target->GetMapId(), target->GetPositionX(), target->GetPositionY(), target->GetPositionZ());
 }
 
 void MovementAction::UpdateMovementState()

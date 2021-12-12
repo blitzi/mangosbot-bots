@@ -13,6 +13,15 @@ bool FollowAction::Execute(Event event)
     Formation* formation = AI_VALUE(Formation*, "formation");
     string target = formation->GetTargetName();
     bool moved = false;
+
+    if (ai->HasStrategy("force follow", BotState::BOT_STATE_NON_COMBAT))
+    {
+        Unit* target = AI_VALUE(Unit*, "master target");
+
+        if(target)
+            return Follow(target);
+    }
+
     if (!target.empty())
     {
         moved = Follow(AI_VALUE(Unit*, target));
@@ -20,6 +29,7 @@ bool FollowAction::Execute(Event event)
     else
     {
         WorldLocation loc = formation->GetLocation();
+
         if (Formation::IsNullLocation(loc) || loc.mapid == -1)
             return false;
 

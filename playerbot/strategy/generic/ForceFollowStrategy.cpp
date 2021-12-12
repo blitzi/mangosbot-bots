@@ -26,9 +26,17 @@ float ForceFollowMultiplier::GetValue(Action* action)
     if (name == "follow" || name == "co" || name == "nc" || name == "drop target")
         return 1.0f;
 
+    if (name == "reach spell" || name == "reach melee" || name == "move to loot")
+        return 0.0f;
+
+    float distance = sServerFacade.GetDistance2d(ai->GetBot(), ai->GetMaster());
+
+    if(name == "set facing" || name == "set behind" || name == "melee" || name == "dps assist")
+        return distance > sPlayerbotAIConfig.forceFollowDistance ? 0.0f : 1.0f;
+
     uint32 spellId = AI_VALUE2(uint32, "spell id", name);
     const SpellEntry* const pSpellInfo = sServerFacade.LookupSpellInfo(spellId);
-    if (!pSpellInfo) return 0.0f;
+    if (!pSpellInfo) return 1.0f;
 
     if (spellId && pSpellInfo->Targets & TARGET_FLAG_DEST_LOCATION)
         return 1.0f;
@@ -42,10 +50,8 @@ float ForceFollowMultiplier::GetValue(Action* action)
     );
 
     if (spellId && castTime > 0)
-    {
-        float distance = sServerFacade.GetDistance2d(ai->GetBot(), ai->GetMaster());
-
-        return distance > 5 ? 0.0f : 1.0f;
+    {        
+        return distance > sPlayerbotAIConfig.forceFollowDistance ? 0.0f : 1.0f;
     }        
 
     return 1.0f;
@@ -53,14 +59,14 @@ float ForceFollowMultiplier::GetValue(Action* action)
 
 NextAction** ForceFollowStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("follow", 250.0f), NULL);
+    return NextAction::array(0, new NextAction("follow", 1), NULL);
 }
 
 void ForceFollowStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
     triggers.push_back(new TriggerNode(
-        "out of react range",
-        NextAction::array(0, new NextAction("flee to master", ACTION_HIGH), NULL)));
+        "force follow too far",
+        NextAction::array(0, new NextAction("follow", 250), NULL)));
 }
 
 void ForceFollowStrategy::InitMultipliers(std::list<Multiplier*>& multipliers)
