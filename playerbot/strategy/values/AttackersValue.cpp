@@ -393,8 +393,8 @@ bool AttackersValue::IsPossibleTarget(Unit *attacker, Player *bot)
 		{
 			Player* p = ref->getSource();
 
- 			if (ai->GetBot()->IsPlayer() && ai->IsTank(p) && p->IsAlive() && 
-                !(ai->GetBot()->IsStunned() || ai->GetBot()->isFeared() || ai->GetBot()->IsPolymorphed()))
+ 			if (ai->GetBot()->IsPlayer() && ai->IsTank(p) && ai->GetBot()->InSamePhase(p) && p->IsAlive() &&
+                !(p->IsStunned() || p->isFeared() || p->IsPolymorphed()))
 			{
                 tanks++;
 			}
