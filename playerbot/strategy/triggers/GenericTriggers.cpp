@@ -174,6 +174,12 @@ bool SpellCanBeCastTrigger::IsActive()
 	return target && ai->CanCastSpell(spell, target);
 }
 
+bool SpellCanBeCastInstantTrigger::IsActive()
+{
+	Unit* target = GetTarget();
+	return target && ai->CanCastSpellInstant(spell, target);
+}
+
 bool RandomTrigger::IsActive()
 {
     if (time(0) - lastCheck < sPlayerbotAIConfig.repeatDelay / 1000)

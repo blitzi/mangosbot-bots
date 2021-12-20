@@ -94,6 +94,6 @@ void DpsPaladinStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
         NextAction::array(0, new NextAction("avenging wrath", ACTION_EMERGENCY + 5), NULL)));
 
 	triggers.push_back(new TriggerNode(
-		"art of war",
-		NextAction::array(0, new NextAction("exorcism", ACTION_HIGH + 2), NULL)));
+		"instant exorcism",
+		NextAction::array(0, new NextAction("exorcism", ACTION_EMERGENCY + 4), NULL)));
 }

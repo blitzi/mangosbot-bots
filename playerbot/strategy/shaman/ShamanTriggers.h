@@ -283,9 +283,4 @@ namespace ai
                 ;
         }
     };
-
-    class LightningBoltTrigger : public SpellCanBeCastTrigger {
-    public:
-        LightningBoltTrigger(PlayerbotAI* ai) : SpellCanBeCastTrigger(ai, "lightning bolt") {}
-    };
 }

@@ -20,7 +20,6 @@ public:
         creators["chain heal on party"] = &chain_heal_on_party;
         creators["riptide on party"] = &riptide_on_party;
         creators["earth shock"] = &earth_shock;
-        creators["earth shock"] = &earth_shock;
         creators["mana spring totem"] = &mana_spring_totem;
         creators["healing stream totem"] = &healing_stream_totem;
 

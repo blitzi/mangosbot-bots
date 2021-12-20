@@ -1217,6 +1217,20 @@ bool PlayerbotAI::HasAnyAuraOf(Unit* player, ...)
     return false;
 }
 
+
+bool PlayerbotAI::CanCastSpellInstant(string name, Unit* target, Item* itemTarget)
+{
+	uint32 spellId = aiObjectContext->GetValue<uint32>("spell id", name)->Get();
+
+	SpellEntry const* spellInfo = sServerFacade.LookupSpellInfo(spellId);
+	if (!spellInfo)
+		return false;
+
+	uint32 CastingTime = !IsChanneledSpell(spellInfo) ? GetSpellCastTime(spellInfo, bot) : GetSpellDuration(spellInfo);
+
+	return CastingTime == 0 && CanCastSpell(spellId, target, true, itemTarget);
+}
+
 bool PlayerbotAI::CanCastSpell(string name, Unit* target, Item* itemTarget)
 {
     return CanCastSpell(aiObjectContext->GetValue<uint32>("spell id", name)->Get(), target, true, itemTarget);

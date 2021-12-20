@@ -122,6 +122,13 @@ namespace ai
 		virtual bool IsActive();
 	};
 
+	class SpellCanBeCastInstantTrigger : public SpellTrigger
+	{
+	public:
+		SpellCanBeCastInstantTrigger(PlayerbotAI* ai, string spell) : SpellTrigger(ai, spell) {}
+		virtual bool IsActive();
+	};
+
 	// TODO: check other targets
     class InterruptSpellTrigger : public SpellTrigger
 	{

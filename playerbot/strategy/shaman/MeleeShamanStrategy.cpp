@@ -10,19 +10,11 @@ class MeleeShamanStrategyActionNodeFactory : public NamedObjectFactory<ActionNod
 public:
     MeleeShamanStrategyActionNodeFactory()
     {
-        creators["stormstrike"] = &stormstrike;
         creators["shamanistic rage"] = &shamanistic_rage;
-        creators["lava lash"] = &lava_lash;
         creators["magma totem"] = &magma_totem;
     }
 private:
-    static ActionNode* stormstrike(PlayerbotAI* ai)
-    {
-        return new ActionNode ("stormstrike",
-            /*P*/ NULL,
-            /*A*/ NextAction::array(0, new NextAction("lava lash"), NULL),
-            /*C*/ NULL);
-    }
+
     static ActionNode* shamanistic_rage(PlayerbotAI* ai)
     {
         return new ActionNode("shamanistic rage",
@@ -30,13 +22,7 @@ private:
             /*A*/ NextAction::array(0, new NextAction("mana potion"), NULL),
             /*C*/ NULL);
     }
-    static ActionNode* lava_lash(PlayerbotAI* ai)
-    {
-        return new ActionNode ("lava lash",
-            /*P*/ NULL,
-            /*A*/ NextAction::array(0, new NextAction("melee"), NULL),
-            /*C*/ NULL);
-    }
+
     static ActionNode* magma_totem(PlayerbotAI* ai)
     {
         return new ActionNode ("magma totem",
@@ -53,12 +39,24 @@ MeleeShamanStrategy::MeleeShamanStrategy(PlayerbotAI* ai) : GenericShamanStrateg
 
 NextAction** MeleeShamanStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("stormstrike", 10.0f), NULL);
+	return NextAction::array(0, new NextAction("melee", ACTION_NORMAL), NULL);
 }
 
 void MeleeShamanStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
     GenericShamanStrategy::InitTriggers(triggers);
+
+	triggers.push_back(new TriggerNode(
+		"stormstrike",
+		NextAction::array(0, new NextAction("stormstrike", ACTION_HIGH + 2), NULL)));
+
+	triggers.push_back(new TriggerNode(
+		"lava lash",
+		NextAction::array(0, new NextAction("lava lash", ACTION_HIGH + 1), NULL)));
+
+	triggers.push_back(new TriggerNode(
+		"instant chain lightning",
+		NextAction::array(0, new NextAction("chain lightning", ACTION_EMERGENCY + 10), NULL)));
 
     triggers.push_back(new TriggerNode(
         "shamanistic rage",
@@ -83,6 +81,8 @@ void MeleeShamanStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
     triggers.push_back(new TriggerNode(
         "enemy too close for melee",
         NextAction::array(0, new NextAction("move out of enemy contact", ACTION_NORMAL + 8), NULL)));
+
+
 
     triggers.push_back(new TriggerNode(
         "windfury totem",

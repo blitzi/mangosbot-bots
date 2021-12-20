@@ -124,6 +124,10 @@ namespace ai
                 creators["party member cure disease"] = &TriggerFactoryInternal::party_member_cure_disease;
                 creators["earth shield on tank"] = &TriggerFactoryInternal::earth_shield_on_tank;
                 creators["lightning bolt"] = &TriggerFactoryInternal::lightning_bolt;
+                creators["stormstrike"] = &TriggerFactoryInternal::stormstrike;
+                creators["lava lash"] = &TriggerFactoryInternal::lava_lash;
+                creators["instant chain lightning"] = &TriggerFactoryInternal::instant_chain_lightning;
+
             }
 
         private:
@@ -166,7 +170,10 @@ namespace ai
             static Trigger* cure_disease(PlayerbotAI* ai) { return new CureDiseaseTrigger(ai); }
             static Trigger* party_member_cure_disease(PlayerbotAI* ai) { return new PartyMemberCureDiseaseTrigger(ai); }
             static Trigger* earth_shield_on_tank(PlayerbotAI* ai) { return new EarthShieldOnTankTrigger(ai); }
-            static Trigger* lightning_bolt(PlayerbotAI* ai) { return new LightningBoltTrigger(ai); }
+			static Trigger* lightning_bolt(PlayerbotAI* ai) { return new SpellCanBeCastTrigger(ai, "lightning bolt"); }
+            static Trigger* stormstrike(PlayerbotAI* ai) { return new SpellCanBeCastTrigger(ai, "stormstrike"); }
+            static Trigger* lava_lash(PlayerbotAI* ai) { return new SpellCanBeCastTrigger(ai, "lava lash"); }
+			static Trigger* instant_chain_lightning(PlayerbotAI* ai) { return new SpellCanBeCastInstantTrigger(ai, "chain lightning"); }
         };
     };
 };
