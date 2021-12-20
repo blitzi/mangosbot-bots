@@ -64,6 +64,8 @@ NextAction** ForceFollowStrategy::getDefaultActions()
 
 void ForceFollowStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
+	ai->GetMoveTimer()->Reset(0);
+
     triggers.push_back(new TriggerNode(
         "force follow too far",
         NextAction::array(0, new NextAction("follow", 250), NULL)));
