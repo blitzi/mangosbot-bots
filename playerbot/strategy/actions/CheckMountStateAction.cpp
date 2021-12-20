@@ -130,10 +130,12 @@ bool CheckMountStateAction::isUseful()
     if (!isOutdoor)
         return false;    
 
+#ifndef MANGOSBOT_TWO
     list<Item*> items = AI_VALUE2(list<Item*>, "inventory items", "mount");
 
     if (items.size() == 0)
         return false;
+#endif
 
     if (bot->IsTaxiFlying())
         return false;
