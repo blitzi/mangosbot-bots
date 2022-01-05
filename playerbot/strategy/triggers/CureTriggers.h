@@ -7,7 +7,7 @@ namespace ai
 
     class NeedCureTrigger : public SpellTrigger {
     public:
-        NeedCureTrigger(PlayerbotAI* ai, string spell, uint32 dispelType) : SpellTrigger(ai, spell, 5)
+        NeedCureTrigger(PlayerbotAI* ai, string spell, uint32 dispelType) : SpellTrigger(ai, spell)
   	    {
 			this->dispelType = dispelType;
         }
