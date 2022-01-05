@@ -205,6 +205,7 @@ namespace ai
                 creators["mana tide totem"] = &AiObjectContextInternal::mana_tide_totem;
                 creators["earthbind totem"] = &AiObjectContextInternal::earthbind_totem;
                 creators["healing stream totem"] = &AiObjectContextInternal::healing_stream_totem;
+                creators["cleansing totem"] = &AiObjectContextInternal::cleansing_totem;
                 creators["wind shear"] = &AiObjectContextInternal::wind_shear;
                 creators["wind shear on enemy healer"] = &AiObjectContextInternal::wind_shear_on_enemy_healer;
                 creators["rockbiter weapon"] = &AiObjectContextInternal::rockbiter_weapon;
@@ -282,6 +283,7 @@ namespace ai
             static Action* mana_tide_totem(PlayerbotAI* ai) { return new CastManaTideTotemAction(ai); }
             static Action* earthbind_totem(PlayerbotAI* ai) { return new CastEarthbindTotemAction(ai); }
             static Action* healing_stream_totem(PlayerbotAI* ai) { return new CastHealingStreamTotemAction(ai); }
+            static Action* cleansing_totem(PlayerbotAI* ai) { return new CastCleansingTotemAction(ai); }
             static Action* wind_shear(PlayerbotAI* ai) { return new CastWindShearAction(ai); }
             static Action* rockbiter_weapon(PlayerbotAI* ai) { return new CastRockbiterWeaponAction(ai); }
             static Action* flametongue_weapon(PlayerbotAI* ai) { return new CastFlametongueWeaponAction(ai); }

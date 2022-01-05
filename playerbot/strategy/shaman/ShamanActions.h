@@ -134,7 +134,7 @@ namespace ai
     {
     public:
         CastManaSpringTotemAction(PlayerbotAI* ai) : CastTotemAction(ai, "mana spring totem") {}
-        virtual bool isUseful() { return CastTotemAction::isUseful() && !AI_VALUE2(bool, "has totem", "healing stream totem"); }
+		virtual bool isUseful() { return CastTotemAction::isUseful() && !AI_VALUE2(bool, "has totem", "cleansing totem") && !AI_VALUE2(bool, "has totem", "healing stream totem"); }
     };
 
 	class CastManaTideTotemAction : public CastTotemAction
@@ -142,12 +142,15 @@ namespace ai
 	public:
 		CastManaTideTotemAction(PlayerbotAI* ai) : CastTotemAction(ai, "mana tide totem") {}
 		virtual string GetTargetName() { return "self target"; }
+		virtual bool isUseful() { return CastTotemAction::isUseful() && !AI_VALUE2(bool, "has totem", "cleansing totem"); }
 	};
 
 	class CastHealingStreamTotemAction : public CastTotemAction
 	{
 	public:
 		CastHealingStreamTotemAction(PlayerbotAI* ai) : CastTotemAction(ai, "healing stream totem") {}
+
+		virtual bool isUseful() { return CastTotemAction::isUseful() && !AI_VALUE2(bool, "has totem", "cleansing totem"); }
 	};
 
     class CastCleansingTotemAction : public CastTotemAction

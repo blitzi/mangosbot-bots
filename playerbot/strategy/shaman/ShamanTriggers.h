@@ -205,10 +205,17 @@ namespace ai
         PartyMemberCleanseSpiritDiseaseTrigger(PlayerbotAI* ai) : PartyMemberNeedCureTrigger(ai, "cleanse spirit", DISPEL_DISEASE) {}
     };
 
+#ifndef MANGOSBOT_TWO
     class ShockTrigger : public InterruptSpellTrigger {
     public:
         ShockTrigger(PlayerbotAI* ai) : InterruptSpellTrigger(ai, "earth shock") {}
     };
+#else
+	class ShockTrigger : public InterruptSpellTrigger {
+	public:
+		ShockTrigger(PlayerbotAI* ai) : InterruptSpellTrigger(ai, "wind shear") {}
+	};
+#endif
 
     class FrostShockSnareTrigger : public SnareTargetTrigger {
     public:

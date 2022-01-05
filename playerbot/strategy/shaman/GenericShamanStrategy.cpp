@@ -158,17 +158,30 @@ void GenericShamanStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
         "cure poison",
         NextAction::array(0, new NextAction("cure poison", 21.0f), NULL)));
 
+#ifndef MANGOSBOT_TWO
     triggers.push_back(new TriggerNode(
         "party member cure poison",
         NextAction::array(0, new NextAction("cure poison on party", 21.0f), NULL)));
+#else
+	triggers.push_back(new TriggerNode(
+		"party member cure poison",
+		NextAction::array(0, new NextAction("cleansing totem", ACTION_CRITICAL_HEAL), NULL)));
+#endif
 
     triggers.push_back(new TriggerNode(
         "cure disease",
         NextAction::array(0, new NextAction("cure disease", 31.0f), NULL)));
 
+#ifndef MANGOSBOT_TWO
     triggers.push_back(new TriggerNode(
         "party member cure disease",
         NextAction::array(0, new NextAction("cure disease on party", 30.0f), NULL)));
+
+#else
+	triggers.push_back(new TriggerNode(
+		"party member cure disease",
+		NextAction::array(0, new NextAction("cleansing totem", ACTION_CRITICAL_HEAL), NULL)));
+#endif
 
     triggers.push_back(new TriggerNode(
         "medium aoe",
@@ -177,13 +190,23 @@ void GenericShamanStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
     triggers.push_back(new TriggerNode(
         "mana spring totem",
         NextAction::array(0, new NextAction("mana spring totem", 19.0f), NULL)));
+
+#ifndef MANGOSBOT_TWO
+	triggers.push_back(new TriggerNode(
+		"shock",
+		NextAction::array(0, new NextAction("earth shock", 200), NULL)));
+#else
+	triggers.push_back(new TriggerNode(
+		"shock",
+		NextAction::array(0, new NextAction("wind shear", 200), NULL)));
+#endif
 }
 
 void ShamanBuffDpsStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
     triggers.push_back(new TriggerNode(
-        "water shield",
-        NextAction::array(0, new NextAction("water shield", 22.0f), NULL)));
+        "lightning shield",
+        NextAction::array(0, new NextAction("lightning shield", 22.0f), NULL)));
 }
 
 void ShamanBuffManaStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
@@ -235,9 +258,4 @@ void ShamanCureStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
     triggers.push_back(new TriggerNode(
         "party member cleanse spirit curse",
         NextAction::array(0, new NextAction("cleanse spirit curse on party", 23.0f), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "shock",
-        NextAction::array(0, new NextAction("earth shock", 200), NULL)));
-
 }
