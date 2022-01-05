@@ -19,7 +19,6 @@ void HealPriestStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
         "almost full health",
         NextAction::array(0, new NextAction("renew", 43.0f), NULL)));
 
-
     triggers.push_back(new TriggerNode(
         "prayer of mending on tank",
         NextAction::array(0, new NextAction("prayer of mending on tank", ACTION_HIGH), NULL)));
@@ -30,7 +29,7 @@ void HealPriestStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 
     triggers.push_back(new TriggerNode(
         "party member almost full health",
-        NextAction::array(0, new NextAction("heal on party", 41.0f), new NextAction("renew on party", 40.0f), NULL)));
+        NextAction::array(0, new NextAction("renew on party", 41.0f), new NextAction("flash heal on party", 40.0f), NULL)));
 
     triggers.push_back(new TriggerNode(
         "party member medium health",
@@ -51,6 +50,10 @@ void HealPriestStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
     triggers.push_back(new TriggerNode(
         "medium aoe heal",
         NextAction::array(0, new NextAction("circle of healing", 48.0f), NULL)));
+
+	triggers.push_back(new TriggerNode(
+		"high aoe",
+		NextAction::array(0, new NextAction("holy nova", 50), NULL)));
 
     triggers.push_back(new TriggerNode(
         "binding heal",
