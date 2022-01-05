@@ -903,6 +903,9 @@ bool PlayerbotAI::IsTank(Player* player)
     if(player->getClass() == CLASS_DRUID)
         return HasAnyAuraOf(player, "cat form", "bear form", "dire bear form", NULL);
 
+	if (player->getClass() == CLASS_DEATH_KNIGHT)
+		return HasAura("frost presence", player);
+
     return AiFactory::GetPlayerRoles(player) & BotRoles::BOT_ROLE_TANK;
 }
 
