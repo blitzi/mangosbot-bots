@@ -98,12 +98,11 @@ void PaladinBuffThreatStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 
 void PaladinBuffStatsStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
-
     triggers.push_back(new TriggerNode(
-        "blessing on party",
+        "blessing of kings on party",
         NextAction::array(0, new NextAction("blessing of kings on party", 11.0f), NULL)));
 
     triggers.push_back(new TriggerNode(
-        "blessing",
+        "blessing of kings",
         NextAction::array(0, new NextAction("blessing of kings", ACTION_HIGH + 8), NULL)));
 }

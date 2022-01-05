@@ -157,6 +157,7 @@ namespace ai
 	public:
         CastBlessingOfMightOnPartyAction(PlayerbotAI* ai) : CastBlessingOnPartyAction(ai, "blessing of might") {}
         virtual string getName() { return "blessing of might on party";}
+
         virtual bool Execute(Event event);
 	};
 
@@ -172,7 +173,7 @@ namespace ai
 	public:
         CastBlessingOfWisdomOnPartyAction(PlayerbotAI* ai) : CastBlessingOnPartyAction(ai, "blessing of wisdom") {}
         virtual string getName() { return "blessing of wisdom on party";}
-        virtual bool Execute(Event event);
+        virtual bool Execute(Event event);		
 	};
 
 	class CastBlessingOfKingsAction : public CastBuffSpellAction
@@ -186,6 +187,7 @@ namespace ai
 	public:
         CastBlessingOfKingsOnPartyAction(PlayerbotAI* ai) : CastBlessingOnPartyAction(ai, "blessing of kings") {}
         virtual string getName() { return "blessing of kings on party";}
+		virtual Value<Unit*>* GetTargetValue() { return context->GetValue<Unit*>("party member without aura", "blessing of kings"); }
 	};
 
 	class CastBlessingOfSanctuaryAction : public CastBuffSpellAction
@@ -199,6 +201,7 @@ namespace ai
 	public:
         CastBlessingOfSanctuaryOnPartyAction(PlayerbotAI* ai) : CastBlessingOnPartyAction(ai, "blessing of sanctuary") {}
         virtual string getName() { return "blessing of sanctuary on party";}
+		virtual Value<Unit*>* GetTargetValue() { return context->GetValue<Unit*>("party member without aura", "blessing of sanctuary"); }
 	};
 
 	class CastBlessingOfSalvationOnPartyAction : public BuffOnPartyAction

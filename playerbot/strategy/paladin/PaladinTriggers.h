@@ -43,8 +43,14 @@ namespace ai
     class BlessingOnPartyTrigger : public BuffOnPartyTrigger
     {
     public:
-        BlessingOnPartyTrigger(PlayerbotAI* ai) : BuffOnPartyTrigger(ai, "blessing of kings,blessing of might,blessing of wisdom", 1) {}
+        BlessingOnPartyTrigger(PlayerbotAI* ai) : BuffOnPartyTrigger(ai, "blessing of might,blessing of wisdom", 1) {}
     };
+
+	class BlessingOfKingsOnPartyTrigger : public BuffOnPartyTrigger
+	{
+	public:
+		BlessingOfKingsOnPartyTrigger(PlayerbotAI* ai) : BuffOnPartyTrigger(ai, "blessing of kings", 1) {}
+	};
 
     class BlessingTrigger : public BuffTrigger
     {
@@ -52,6 +58,12 @@ namespace ai
         BlessingTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "blessing of sanctuary", 1) {}
         virtual bool IsActive();
     };
+
+	class BlessingOfKingsTrigger : public BuffTrigger
+	{
+	public:
+		BlessingOfKingsTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "blessing of kings", 1) {}
+	};
 
     class HammerOfJusticeInterruptSpellTrigger : public InterruptSpellTrigger
     {

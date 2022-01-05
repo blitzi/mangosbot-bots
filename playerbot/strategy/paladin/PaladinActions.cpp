@@ -30,7 +30,7 @@ string GetActualBlessingOfWisdom(Unit* target)
 Value<Unit*>* CastBlessingOnPartyAction::GetTargetValue()
 {
     return context->GetValue<Unit*>("party member without aura",
-        "blessing of kings,blessing of might,blessing of wisdom");
+        "blessing of might,blessing of wisdom");
 }
 
 bool CastBlessingOfMightAction::Execute(Event event)

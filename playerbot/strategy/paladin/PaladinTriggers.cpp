@@ -34,5 +34,5 @@ bool BlessingTrigger::IsActive()
 {
     Unit* target = GetTarget();
     return SpellTrigger::IsActive() && !ai->HasAnyAuraOf(target,
-        "blessing of might", "blessing of wisdom", "blessing of kings", "blessing of sanctuary", NULL);
+        "blessing of might", "blessing of wisdom", "blessing of sanctuary", NULL);
 }
