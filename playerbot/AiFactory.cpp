@@ -205,7 +205,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             else
                 engine->addStrategies("heal", "threat", NULL);
 
-            engine->addStrategies("dps assist", "flee", "cure", "ranged", "cc", NULL);
+            engine->addStrategies("dps assist", "flee", "cure", "ranged", NULL);
             break;
         case CLASS_MAGE:
             if (tab == 0)
