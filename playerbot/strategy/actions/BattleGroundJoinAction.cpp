@@ -166,11 +166,7 @@ bool BGJoinAction::gatherArenaTeam(ArenaType type)
         return false;
     }
 
-#ifndef MANGOSBOT_TWO
     Group* group = new Group();
-#else
-    Group* group = new Group(GROUPTYPE_NORMAL);
-#endif
     uint32 count = 1;
     group->Create(bot->GetObjectGuid(), bot->GetName());
     for (auto i = begin(members); i != end(members); ++i)

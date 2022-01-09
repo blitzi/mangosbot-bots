@@ -21,6 +21,8 @@
 #include "BattleGround.h"
 #include "BattleGroundMgr.h"
 
+#include "LFGMgr.h"
+
 #include "World/WorldState.h"
 
 #ifndef MANGOSBOT_ZERO
@@ -750,45 +752,18 @@ void RandomPlayerbotMgr::CheckLfgQueue()
 #endif
 #ifdef MANGOSBOT_TWO
         Group* group = player->GetGroup();
-        if (group)
+		
+		LfgData data = group ? group->GetLfgData() : player->GetLfgData();
+			
+        if (data.GetState() != LFG_STATE_NONE)
         {
-            if (sLFGMgr.GetQueueInfo(group->GetObjectGuid()))
+            isLFG = true;				
+            if (data.GetState() != LFG_STATE_NONE && data.GetState() < LFG_STATE_DUNGEON)
             {
-                isLFG = true;
-                LFGGroupState* gState = sLFGMgr.GetLFGGroupState(group->GetObjectGuid());
-                if (gState->GetState() != LFG_STATE_NONE && gState->GetState() < LFG_STATE_DUNGEON)
-                {
-                    LFGDungeonSet const* dList = gState->GetDungeons();
-                    for (LFGDungeonSet::const_iterator itr = dList->begin(); itr != dList->end(); ++itr)
-                    {
-                        LFGDungeonEntry const* dungeon = *itr;
-
-                        if (!dungeon)
-                            continue;
-
-                        LfgDungeons[player->GetTeam()].push_back(dungeon->ID);
-                    }
-                }
-            }
-        }
-        else
-        {
-            if (sLFGMgr.GetQueueInfo(player->GetObjectGuid()))
-            {
-                isLFG = true;
-                LFGPlayerState* pState = sLFGMgr.GetLFGPlayerState(player->GetObjectGuid());
-                if (pState->GetState() != LFG_STATE_NONE && pState->GetState() < LFG_STATE_DUNGEON)
-                {
-                    LFGDungeonSet const* dList = pState->GetDungeons();
-                    for (LFGDungeonSet::const_iterator itr = dList->begin(); itr != dList->end(); ++itr)
-                    {
-                        LFGDungeonEntry const* dungeon = *itr;
-
-                        if (!dungeon)
-                            continue;
-
-                        LfgDungeons[player->GetTeam()].push_back(dungeon->ID);
-                    }
+				LfgDungeonSet const dList = data.GetListedDungeonSet();
+                for (uint32 id : dList)
+                {						
+                    LfgDungeons[player->GetTeam()].push_back(id);
                 }
             }
         }

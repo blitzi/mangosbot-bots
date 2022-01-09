@@ -24,7 +24,7 @@ public:
 
         Group* group = ai->GetBot()->GetGroup();
         
-        if (group && group->isRaidGroup() && onlyMainTank && !group->IsAssistant(unit->GetObjectGuid()))
+        if (group && group->IsRaidGroup() && onlyMainTank && !group->IsAssistant(unit->GetObjectGuid()))
             return false;
 
         for (vector<string>::iterator i = auras.begin(); i != auras.end(); ++i)
