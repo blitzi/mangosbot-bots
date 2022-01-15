@@ -1886,7 +1886,7 @@ bool PlayerbotAI::IsInterruptableSpellCasting(Unit* target, string spell, uint8 
 
 	for (int32 i = EFFECT_INDEX_0; i <= EFFECT_INDEX_2; i++)
 	{
-		if ((spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_INTERRUPT) && spellInfo->PreventionType == SPELL_PREVENTION_TYPE_SILENCE)
+		if ((spellInfo->InterruptFlags & SPELL_INTERRUPT_FLAG_COMBAT) && spellInfo->PreventionType == SPELL_PREVENTION_TYPE_SILENCE)
 			return true;
 
 		if ((spellInfo->Effect[i] == SPELL_EFFECT_INTERRUPT_CAST) &&

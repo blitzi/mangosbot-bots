@@ -1088,7 +1088,7 @@ void PlayerbotFactory::EnchantItem(Item* item)
                 continue;
 
             SpellItemEnchantmentEntry const* enchant = sSpellItemEnchantmentStore.LookupEntry(enchant_id);
-            if (!enchant || enchant->slot != PERM_ENCHANTMENT_SLOT)
+            if (!enchant || enchant->flags != PERM_ENCHANTMENT_SLOT)
                 continue;
 
 			const SpellEntry *enchantSpell = sServerFacade.LookupSpellInfo(enchant->spellid[0]);
