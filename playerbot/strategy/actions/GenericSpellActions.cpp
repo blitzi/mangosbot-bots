@@ -102,8 +102,8 @@ bool CastSpellAction::isUseful()
 }
 
 bool CastAuraSpellAction::isUseful()
-{
-    return GetTarget() && (GetTarget() != nullptr) && (GetTarget() != NULL) && CastSpellAction::isUseful() && !ai->HasAura(spell, GetTarget(), true);
+{       
+    return GetTarget() && (GetTarget() != nullptr) && (GetTarget() != NULL) && CastSpellAction::isUseful() && !ai->HasAura(spell, GetTarget(), true, isOwner);
 }
 
 bool CastEnchantItemAction::isPossible()

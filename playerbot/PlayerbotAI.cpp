@@ -1131,7 +1131,7 @@ bool IsRealAura(Player* bot, Aura const* aura, Unit* unit)
     return false;
 }
 
-bool PlayerbotAI::HasAura(string name, Unit* unit, bool maxStack)
+bool PlayerbotAI::HasAura(string name, Unit* unit, bool maxStack, bool checkIsOwner, int maxAuraAmount)
 {
     if (!unit)
         return false;
@@ -1141,6 +1141,8 @@ bool PlayerbotAI::HasAura(string name, Unit* unit, bool maxStack)
         return 0;
 
     wstrToLower(wnamepart);
+
+    int auraAmount = 0;
 
 	for (uint32 auraType = SPELL_AURA_BIND_SIGHT; auraType < TOTAL_AURAS; auraType++)
 	{
@@ -1161,21 +1163,35 @@ bool PlayerbotAI::HasAura(string name, Unit* unit, bool maxStack)
 
 			if (IsRealAura(bot, aura, unit))
             {
+                if (checkIsOwner && aura->GetHolder())
+                {
+                    if (aura->GetHolder()->GetCasterGuid() != bot->GetObjectGuid())
+                        continue;
+                }
+
                 uint32 maxStackAmount = aura->GetSpellProto()->StackAmount;
                 uint32 maxProcCharges = aura->GetSpellProto()->procCharges;                   
 
                 if (maxStack)
                 {
-                    if(maxStackAmount)
-                        return aura->GetStackAmount() >= maxStackAmount;
+                    if (maxStackAmount && aura->GetStackAmount() >= maxStackAmount)
+                       auraAmount++;
 
-                    if (maxProcCharges)
-                        return aura->GetHolder()->GetAuraCharges() >= maxProcCharges;
+                    if (maxProcCharges && aura->GetHolder()->GetAuraCharges() >= maxProcCharges)
+                       auraAmount++;
                 }
 
-                return true;
+                auraAmount++;
+
+                if (maxAuraAmount < 0)
+                    return auraAmount > 0;
             }
 		}
+    }
+
+    if (maxAuraAmount >= 0)
+    {
+        return auraAmount == maxAuraAmount || (auraAmount > 0 && auraAmount <= maxAuraAmount);
     }
 
     return false;
@@ -1903,7 +1919,6 @@ bool PlayerbotAI::IsInterruptableSpellCasting(Unit* target, string spell, uint8 
 bool PlayerbotAI::HasAuraToDispel(Unit* target, uint32 dispelType)
 {
     bool isFriend = sServerFacade.IsFriendlyTo(bot, target);
-    bool isHostile = sServerFacade.IsHostileTo(bot, target);
 	for (uint32 type = SPELL_AURA_NONE; type < TOTAL_AURAS; ++type)
 	{
 		Unit::AuraList const& auras = target->GetAurasByType((AuraType)type);
@@ -1917,13 +1932,13 @@ bool PlayerbotAI::HasAuraToDispel(Unit* target, uint32 dispelType)
 			if (isPositiveSpell && isFriend)
 				continue;
 
-			if (!isPositiveSpell && isHostile)
+			if (!isPositiveSpell && !isFriend)
 				continue;
 
             int32 duration = aura->GetAuraDuration();
 
 			if (aura->GetStackAmount() > 5)
-				return true;
+				return canDispel(entry, dispelType);
 
 			if (sPlayerbotAIConfig.dispelAuraDuration && aura->GetAuraDuration() > 0 && aura->GetAuraDuration() < (int32)sPlayerbotAIConfig.dispelAuraDuration)
 			    return false;

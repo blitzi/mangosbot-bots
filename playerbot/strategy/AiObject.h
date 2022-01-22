@@ -89,6 +89,20 @@ class clazz : public super \
         clazz(PlayerbotAI* ai) : DebuffTrigger(ai, spell) {} \
     }
 
+#define DEBUFF_IMMEDIATE_TRIGGER(clazz, spell) \
+    class clazz : public DebuffImmediateTrigger \
+    { \
+    public: \
+        clazz(PlayerbotAI* ai) : DebuffImmediateTrigger(ai, spell) {} \
+    }
+
+#define MY_DEBUFF_TRIGGER(clazz, spell) \
+    class clazz : public DebuffTrigger \
+    { \
+    public: \
+        clazz(PlayerbotAI* ai) : DebuffTrigger(ai, spell, 1, true) {} \
+    }
+
 #define DEBUFF_TRIGGER_A(clazz, spell) \
     class clazz : public DebuffTrigger \
     { \

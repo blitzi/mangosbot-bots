@@ -103,7 +103,7 @@ bool BuffTrigger::IsActive()
 {
     Unit* target = GetTarget();
     return SpellTrigger::IsActive() &&
-        !ai->HasAura(spell, target, false);
+        !ai->HasAura(spell, target, false, checkIsOwner);
 }
 
 Value<Unit*>* PartyMemberHasAggroTrigger::GetTargetValue()
@@ -160,7 +160,20 @@ bool AoeTrigger::IsActive()
 
 bool DebuffTrigger::IsActive()
 {
-    return BuffTrigger::IsActive() && AI_VALUE2(uint8, "health", GetTargetName()) > 15;
+    return BuffTrigger::IsActive();
+}
+
+bool DebuffImmediateTrigger::IsActive()
+{
+    Unit* target = GetTarget();
+
+    if (target == NULL)
+        return false;
+
+    bool isNoDebuffActive = ai->HasAura(spell, target, false, false, 0);
+    bool isMyDebuffActive = ai->HasAura(spell, target, false, true, 1);
+    
+    return ai->CanCastSpell(spell, GetTarget()) && isNoDebuffActive || isMyDebuffActive;
 }
 
 bool SpellTrigger::IsActive()
