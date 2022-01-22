@@ -117,6 +117,7 @@ namespace ai
                 creators["earth shock"] = &TriggerFactoryInternal::earth_shock;
                 creators["heroism"] = &TriggerFactoryInternal::heroism;
                 creators["bloodlust"] = &TriggerFactoryInternal::bloodlust;
+                creators["feral spirit"] = &TriggerFactoryInternal::feral_spirit;
                 creators["maelstrom weapon"] = &TriggerFactoryInternal::maelstrom_weapon;
                 creators["wind shear on enemy healer"] = &TriggerFactoryInternal::wind_shear_on_enemy_healer;
                 creators["cure poison"] = &TriggerFactoryInternal::cure_poison;
@@ -135,6 +136,7 @@ namespace ai
             static Trigger* maelstrom_weapon(PlayerbotAI* ai) { return new MaelstromWeaponTrigger(ai); }
             static Trigger* heroism(PlayerbotAI* ai) { return new HeroismTrigger(ai); }
             static Trigger* bloodlust(PlayerbotAI* ai) { return new BloodlustTrigger(ai); }
+            static Trigger* feral_spirit(PlayerbotAI* ai) { return new FeralSpiritTrigger(ai); }
             static Trigger* party_member_cleanse_disease(PlayerbotAI* ai) { return new PartyMemberCleanseSpiritDiseaseTrigger(ai); }
             static Trigger* party_member_cleanse_curse(PlayerbotAI* ai) { return new PartyMemberCleanseSpiritCurseTrigger(ai); }
             static Trigger* party_member_cleanse_poison(PlayerbotAI* ai) { return new PartyMemberCleanseSpiritPoisonTrigger(ai); }
@@ -209,6 +211,7 @@ namespace ai
                 creators["healing stream totem"] = &AiObjectContextInternal::healing_stream_totem;
                 creators["cleansing totem"] = &AiObjectContextInternal::cleansing_totem;
                 creators["wind shear"] = &AiObjectContextInternal::wind_shear;
+                creators["feral spirit"] = &AiObjectContextInternal::feral_spirit;
                 creators["wind shear on enemy healer"] = &AiObjectContextInternal::wind_shear_on_enemy_healer;
                 creators["rockbiter weapon"] = &AiObjectContextInternal::rockbiter_weapon;
                 creators["flametongue weapon"] = &AiObjectContextInternal::flametongue_weapon;
@@ -287,6 +290,7 @@ namespace ai
             static Action* healing_stream_totem(PlayerbotAI* ai) { return new CastHealingStreamTotemAction(ai); }
             static Action* cleansing_totem(PlayerbotAI* ai) { return new CastCleansingTotemAction(ai); }
             static Action* wind_shear(PlayerbotAI* ai) { return new CastWindShearAction(ai); }
+            static Action* feral_spirit(PlayerbotAI* ai) { return new CastFeralSpiritAction(ai); }
             static Action* rockbiter_weapon(PlayerbotAI* ai) { return new CastRockbiterWeaponAction(ai); }
             static Action* flametongue_weapon(PlayerbotAI* ai) { return new CastFlametongueWeaponAction(ai); }
             static Action* frostbrand_weapon(PlayerbotAI* ai) { return new CastFrostbrandWeaponAction(ai); }

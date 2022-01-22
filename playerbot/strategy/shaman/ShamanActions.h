@@ -223,6 +223,12 @@ namespace ai
 		CastAncestralSpiritAction(PlayerbotAI* ai) : ResurrectPartyMemberAction(ai, "ancestral spirit") {}
 	};
 
+    class CastFeralSpiritAction : public CastSpellAction
+    {
+    public:
+        CastFeralSpiritAction(PlayerbotAI* ai) : CastSpellAction(ai, "feral spirit") {}
+    };
+
 	class CastPurgeAction : public CastSpellAction
 	{
 	public:

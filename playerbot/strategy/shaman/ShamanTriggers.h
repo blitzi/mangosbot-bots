@@ -237,6 +237,12 @@ namespace ai
         HeroismTrigger(PlayerbotAI* ai) : BoostTrigger(ai, "heroism") {}
     };
 
+    class FeralSpiritTrigger : public BoostTrigger
+    {
+    public:
+        FeralSpiritTrigger(PlayerbotAI* ai) : BoostTrigger(ai, "feral spirit", 150.0f) {}
+    };
+
     class BloodlustTrigger : public BoostTrigger
     {
     public:

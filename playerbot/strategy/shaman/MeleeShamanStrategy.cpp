@@ -54,6 +54,10 @@ void MeleeShamanStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 		"lava lash",
 		NextAction::array(0, new NextAction("lava lash", ACTION_HIGH + 1), NULL)));
 
+    triggers.push_back(new TriggerNode(
+        "feral spirit",
+        NextAction::array(0, new NextAction("feral spirit", ACTION_EMERGENCY + 5), NULL)));
+
 	triggers.push_back(new TriggerNode(
 		"instant chain lightning",
 		NextAction::array(0, new NextAction("chain lightning", ACTION_EMERGENCY + 10), NULL)));
