@@ -39,17 +39,9 @@ void HealShamanStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
     GenericShamanStrategy::InitTriggers(triggers);
 
-    /*triggers.push_back(new TriggerNode(
+    triggers.push_back(new TriggerNode(
         "earth shield on tank",
-        NextAction::array(0, new NextAction("earth shield on party", ACTION_HIGH), NULL)));*/
-
-    triggers.push_back(new TriggerNode(
-        "shock",
-        NextAction::array(0, new NextAction("earth shock", 30.0f), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "enemy out of spell",
-        NextAction::array(0, new NextAction("reach spell", ACTION_NORMAL + 9), NULL)));
+        NextAction::array(0, new NextAction("earth shield on party", ACTION_HIGH), NULL)));
 
     triggers.push_back(new TriggerNode(
         "shaman weapon",
@@ -63,9 +55,12 @@ void HealShamanStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
         "party member to heal out of spell range",
         NextAction::array(0, new NextAction("reach party member to heal", ACTION_CRITICAL_HEAL + 1), NULL)));
 
-    triggers.push_back(new TriggerNode(
-        "wrath of air totem",
-        NextAction::array(0, new NextAction("wrath of air totem", 20.0f), NULL)));
+    if (sRandomPlayerbotMgr.IsRandomBot(ai->GetBot()))
+    {
+        triggers.push_back(new TriggerNode(
+            "wrath of air totem",
+            NextAction::array(0, new NextAction("wrath of air totem", 20.0f), NULL)));
+    }
 
     triggers.push_back(new TriggerNode(
         "party member medium health",
