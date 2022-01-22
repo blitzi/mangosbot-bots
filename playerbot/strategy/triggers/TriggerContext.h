@@ -47,6 +47,8 @@ namespace ai
             creators["party member almost full health"] = &TriggerContext::PartyMemberAlmostFullHealth;
             creators["party member to cancel health"] = &TriggerContext::PartyMemberToCancelHealth;
 
+            creators["use trinket"] = &TriggerContext::use_trinket;
+
             creators["party member has aggro"] = &TriggerContext::PartyMemberHasAggro;
 
             creators["protect party member"] = &TriggerContext::protect_party_member;
@@ -279,6 +281,7 @@ namespace ai
         static Trigger* movement_stuck(PlayerbotAI* ai) { return new MovementStuckTrigger(ai); }
         static Trigger* location_stuck(PlayerbotAI* ai) { return new LocationStuckTrigger(ai); }
         static Trigger* player_wants_in_bg(PlayerbotAI* ai) { return new PlayerWantsInBattlegroundTrigger(ai); } 
+        static Trigger* use_trinket(PlayerbotAI* ai) { return new UseTrinketTrigger(ai); } 
 
         static Trigger* petition_signed(PlayerbotAI* ai) { return new PetitionTurnInTrigger(ai); }
         static Trigger* buy_tabard(PlayerbotAI* ai) { return new BuyTabardTrigger(ai); }        

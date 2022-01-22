@@ -50,7 +50,7 @@
 #include "GuildCreateActions.h"
 #include "GuildManagementActions.h"
 #include "GuildAcceptAction.h"
-
+#include "UseTrinketAction.h"
 
 namespace ai
 {
@@ -164,6 +164,7 @@ namespace ai
             creators["buy tabard"] = &ActionContext::buy_tabard;
             creators["guild manage nearby"] = &ActionContext::guild_manage_nearby;
             creators["cancel heal"] = &ActionContext::cancel_heal;
+            creators["use trinket"] = &ActionContext::use_trinket;
 
             // BG Tactics
             creators["bg tactics"] = &ActionContext::bg_tactics;
@@ -287,6 +288,7 @@ namespace ai
        
         
         static Action* cancel_heal(PlayerbotAI* ai) { return new CancelHealAction(ai); }
+        static Action* use_trinket(PlayerbotAI* ai) { return new UseTrinketAction(ai); }
 
         // BG Tactics
         static Action* bg_tactics(PlayerbotAI* ai) { return new BGTactics(ai); }
