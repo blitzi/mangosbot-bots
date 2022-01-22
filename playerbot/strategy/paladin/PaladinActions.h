@@ -263,11 +263,31 @@ namespace ai
         virtual string getName() { return "lay on hands on party"; }
     };
 
+    class CastHolyShockAction : public CastHealingSpellAction
+    {
+    public:
+        CastHolyShockAction(PlayerbotAI* ai) : CastHealingSpellAction(ai, "holy shock") {}
+    };
+
+    class CastHolyShockOnPartyAction : public HealPartyMemberAction
+    {
+    public:
+        CastHolyShockOnPartyAction(PlayerbotAI* ai) : HealPartyMemberAction(ai, "holy shock") {}
+
+        virtual string getName() { return "holy shock on party"; }
+    };
+
 	class CastDivineProtectionAction : public CastBuffSpellAction
 	{
 	public:
 		CastDivineProtectionAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "divine protection") {}
 	};
+
+    class CastDivinePleaAction : public CastBuffSpellAction
+    {
+    public:
+        CastDivinePleaAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "divine plea") {}
+    };
 
     class CastDivineProtectionOnPartyAction : public HealPartyMemberAction
     {
@@ -456,6 +476,11 @@ namespace ai
     public:
         CastTurnUndeadAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "turn undead") {}
         virtual Value<Unit*>* GetTargetValue() { return context->GetValue<Unit*>("cc target", getName()); }
+    };
+
+    class CastBeaconOfLightOnPartyAction : public BuffOnPartyAction {
+    public:
+        CastBeaconOfLightOnPartyAction(PlayerbotAI* ai) : BuffOnPartyAction(ai, "beacon of light") {}
     };
 
     PROTECT_ACTION(CastBlessingOfProtectionProtectAction, "blessing of protection");

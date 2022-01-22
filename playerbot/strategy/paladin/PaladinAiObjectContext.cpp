@@ -144,6 +144,7 @@ namespace ai
                 creators["divine favor"] = &TriggerFactoryInternal::divine_favor;
                 creators["turn undead"] = &TriggerFactoryInternal::turn_undead;
                 creators["avenging wrath"] = &TriggerFactoryInternal::avenging_wrath;
+                creators["beacon of light on tank"] = &TriggerFactoryInternal::beacon_of_light_on_tank;
             }
 
         private:
@@ -181,6 +182,7 @@ namespace ai
             static Trigger* hammer_of_justice_on_enemy_target(PlayerbotAI* ai) { return new HammerOfJusticeEnemyHealerTrigger(ai); }
             static Trigger* hammer_of_justice_on_snare_target(PlayerbotAI* ai) { return new HammerOfJusticeSnareTrigger(ai); }
             static Trigger* avenging_wrath(PlayerbotAI* ai) { return new AvengingWrathTrigger(ai); }
+            static Trigger* beacon_of_light_on_tank(PlayerbotAI* ai) { return new BeaconofLightOnTankTrigger(ai); }
         };
     };
 };
@@ -261,6 +263,10 @@ namespace ai
                 creators["hammer of justice on snare target"] = &AiObjectContextInternal::hammer_of_justice_on_snare_target;
                 creators["divine favor"] = &AiObjectContextInternal::divine_favor;
                 creators["turn undead"] = &AiObjectContextInternal::turn_undead;
+                creators["beacon of light on party"] = &AiObjectContextInternal::beacon_of_light_on_party;
+                creators["holy shock"] = &AiObjectContextInternal::holy_shock;
+                creators["holy shock on party"] = &AiObjectContextInternal::holy_shock_hands_on_party;
+                creators["divine plea"] = &AiObjectContextInternal::divine_plea;
             }
 
         private:            
@@ -329,6 +335,10 @@ namespace ai
             static Action* fire_resistance_aura(PlayerbotAI* ai) { return new CastFireResistanceAuraAction(ai); }
             static Action* hammer_of_justice_on_enemy_healer(PlayerbotAI* ai) { return new CastHammerOfJusticeOnEnemyHealerAction(ai); }
             static Action* hammer_of_justice_on_snare_target(PlayerbotAI* ai) { return new CastHammerOfJusticeSnareAction(ai); }
+            static Action* beacon_of_light_on_party(PlayerbotAI* ai) { return new CastBeaconOfLightOnPartyAction(ai); }
+            static Action* holy_shock(PlayerbotAI* ai) { return new CastHolyShockAction(ai); }
+            static Action* holy_shock_hands_on_party(PlayerbotAI* ai) { return new CastHolyShockOnPartyAction(ai); }
+            static Action* divine_plea(PlayerbotAI* ai) { return new CastDivinePleaAction(ai); }
         };
     };
 };
