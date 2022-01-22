@@ -69,21 +69,25 @@ void DpsPaladinStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
     GenericPaladinStrategy::InitTriggers(triggers);
 
-	triggers.push_back(new TriggerNode(
-		"crusader strike",
-		NextAction::array(0, new NextAction("divine storm", ACTION_HIGH + 2), new NextAction("crusader strike", ACTION_HIGH + 1), NULL)));
-
     triggers.push_back(new TriggerNode(
-		"seal",
-		NextAction::array(0, new NextAction("seal of command", ACTION_HIGH + 2), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "low health",
-        NextAction::array(0, new NextAction("divine shield", ACTION_CRITICAL_HEAL + 2), new NextAction("holy light", ACTION_CRITICAL_HEAL + 2), NULL)));
+        "seal",
+        NextAction::array(0, new NextAction("seal of command", ACTION_HIGH + 10), NULL)));
 
     triggers.push_back(new TriggerNode(
         "judgement of wisdom",
-        NextAction::array(0, new NextAction("judgement of wisdom", ACTION_NORMAL + 2), NULL)));
+        NextAction::array(0, new NextAction("judgement of wisdom", ACTION_HIGH + 5), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "judgement",
+        NextAction::array(0, new NextAction("judgement", ACTION_HIGH + 3), new NextAction("judgement of wisdom", ACTION_HIGH + 2), NULL)));
+
+	triggers.push_back(new TriggerNode(
+		"crusader strike",
+		NextAction::array(0, new NextAction("divine storm", ACTION_HIGH + 1), new NextAction("crusader strike", ACTION_HIGH), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "low health",
+        NextAction::array(0, new NextAction("divine shield", ACTION_CRITICAL_HEAL + 2), new NextAction("holy light", ACTION_CRITICAL_HEAL + 2), NULL)));    
 
 	triggers.push_back(new TriggerNode(
 		"medium aoe",

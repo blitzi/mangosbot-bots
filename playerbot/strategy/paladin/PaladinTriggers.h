@@ -30,8 +30,8 @@ namespace ai
         virtual bool IsActive();
     };
 
-    DEBUFF_TRIGGER(JudgementOfLightTrigger, "judgement of light");
-    DEBUFF_TRIGGER(JudgementOfWisdomTrigger, "judgement of wisdom");
+    DEBUFF_IMMEDIATE_TRIGGER(JudgementOfLightTrigger, "judgement of light");
+    DEBUFF_IMMEDIATE_TRIGGER(JudgementOfWisdomTrigger, "judgement of wisdom");
     DEBUFF_TRIGGER(JudgementTrigger, "judgement");
 
     class BlessingOfSalvationOnPartyTrigger : public BuffOnPartyTrigger
