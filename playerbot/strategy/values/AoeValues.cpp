@@ -32,8 +32,8 @@ list<ObjectGuid> FindMaxDensity(Player* bot)
                 continue;
 
             ObjectGuid gj = i->GetObjectGuid();
-            float d = i->GetDistance2d(j->GetPositionX(), j->GetPositionY(), DIST_CALC_NONE);
-            if (sServerFacade.IsDistanceLessOrEqualThan(d, (sPlayerbotAIConfig.aoeRadius * sPlayerbotAIConfig.aoeRadius) * 2))
+            float d = i->GetDistance2d(j->GetPositionX(), j->GetPositionY(), DIST_CALC_BOUNDING_RADIUS);
+            if (sServerFacade.IsDistanceLessOrEqualThan(d, (sPlayerbotAIConfig.aoeRadius * 2)))
                 groups[gi].push_back(gj);
         }
 
@@ -82,5 +82,5 @@ WorldLocation AoePositionValue::Calculate()
 
 uint8 AoeCountValue::Calculate()
 {
-    return FindMaxDensity(bot).size();
+    return FindMaxDensity(bot).size() + 1;//+ 1 to also add the target
 }
