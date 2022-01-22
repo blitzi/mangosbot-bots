@@ -219,7 +219,7 @@ string AndTrigger::getName()
 
 bool BoostTrigger::IsActive()
 {
-	return BuffTrigger::IsActive() && AI_VALUE(uint8, "balance") <= balance;
+	return BuffTrigger::IsActive() && AI_VALUE(float, "balance") >= balance;
 }
 
 bool ItemCountTrigger::IsActive()

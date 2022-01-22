@@ -43,17 +43,17 @@ namespace ai
         virtual bool Calculate();
     };
 
-    class BalancePercentValue : public Uint8CalculatedValue, public Qualified
+    class BalanceThreatValue : public FloatCalculatedValue, public Qualified
     {
     public:
-        BalancePercentValue(PlayerbotAI* ai) : Uint8CalculatedValue(ai) {}
+        BalanceThreatValue(PlayerbotAI* ai) : FloatCalculatedValue(ai) {}
 
         Unit* GetTarget()
         {
             AiObjectContext* ctx = AiObject::context;
             return ctx->GetValue<Unit*>(qualifier)->Get();
         }
-        virtual uint8 Calculate();
+        virtual float Calculate();
     };
 
 }

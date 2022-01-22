@@ -344,7 +344,7 @@ namespace ai
 	class BoostTrigger : public BuffTrigger
 	{
 	public:
-		BoostTrigger(PlayerbotAI* ai, string spell, float balance = 50) : BuffTrigger(ai, spell, 1)
+		BoostTrigger(PlayerbotAI* ai, string spell, float balance = 300.0f) : BuffTrigger(ai, spell, 1)
 		{
 			this->balance = balance;
 		}
@@ -797,6 +797,12 @@ namespace ai
 
     public:
         virtual bool IsActive();
+    };
+
+    class UseTrinketTrigger : public BoostTrigger
+    {
+    public:
+        UseTrinketTrigger(PlayerbotAI* ai) : BoostTrigger(ai, "use trinket", 150.0f) {}
     };
 }
 

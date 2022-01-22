@@ -294,7 +294,7 @@ namespace ai
         static UntypedValue* stance(PlayerbotAI* ai) { return new StanceValue(ai); }
         static UntypedValue* mana_save_level(PlayerbotAI* ai) { return new ManaSaveLevelValue(ai); }
         static UntypedValue* invalid_target(PlayerbotAI* ai) { return new InvalidTargetValue(ai); }
-        static UntypedValue* balance(PlayerbotAI* ai) { return new BalancePercentValue(ai); }
+        static UntypedValue* balance(PlayerbotAI* ai) { return new BalanceThreatValue(ai); }
         static UntypedValue* attackers(PlayerbotAI* ai) { return new AttackersValue(ai); }
 
         static UntypedValue* position(PlayerbotAI* ai) { return new PositionValue(ai); }

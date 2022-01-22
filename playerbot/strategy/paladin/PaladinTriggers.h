@@ -164,6 +164,24 @@ namespace ai
     class AvengingWrathTrigger : public BoostTrigger
     {
     public:
-        AvengingWrathTrigger(PlayerbotAI* ai) : BoostTrigger(ai, "avenging wrath") {}
+        AvengingWrathTrigger(PlayerbotAI* ai) : BoostTrigger(ai, "avenging wrath", 150.0f) {}
+    };
+
+    class BeaconofLightOnTankTrigger : public BuffOnTankTrigger {
+    public:
+        BeaconofLightOnTankTrigger(PlayerbotAI* ai) : BuffOnTankTrigger(ai, "beacon of light", 1) {}
+
+        virtual bool IsActive() {
+            return BuffOnTankTrigger::IsActive() &&
+                GetTarget() &&
+                !ai->HasAura("beacon of light", GetTarget()) &&
+#ifdef MANGOS
+                (ai->GetBot()->IsInSameGroupWith((Player*)GetTarget()) || ai->GetBot()->IsInSameRaidWith((Player*)GetTarget())) &&
+#endif
+#ifdef CMANGOS
+                (ai->GetBot()->IsInGroup((Player*)GetTarget(), true) || ai->GetBot()->IsInGroup((Player*)GetTarget()))
+#endif               
+                ;
+        }
     };
 }

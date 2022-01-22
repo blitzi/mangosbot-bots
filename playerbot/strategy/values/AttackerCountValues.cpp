@@ -77,10 +77,10 @@ uint8 AttackerCountValue::Calculate()
     return count;
 }
 
-uint8 BalancePercentValue::Calculate()
+float BalanceThreatValue::Calculate()
 {
-    float playerLevel = 0,
-        attackerLevel = 0;
+    float playerValue = 0,
+        attackerValue = 0;
 
     Group* group = bot->GetGroup();
     if (group)
@@ -89,44 +89,27 @@ uint8 BalancePercentValue::Calculate()
         for (Group::member_citerator itr = groupSlot.begin(); itr != groupSlot.end(); itr++)
         {
             Player *player = sObjectMgr.GetPlayer(itr->guid);
-            if( !player || !sServerFacade.IsAlive(player))
+            if(!player || !sServerFacade.IsAlive(player))
                 continue;
 
-            playerLevel += player->GetLevel();
+            playerValue += player->GetHealth();
         }
     }
 
-    list<ObjectGuid> v = context->GetValue<list<ObjectGuid> >("attackers")->Get();
+    if (playerValue <= 0)
+        return 0;
+
+    list<ObjectGuid> v = context->GetValue<list<ObjectGuid>>("attackers")->Get();
 
     for (list<ObjectGuid>::iterator i = v.begin(); i!=v.end(); i++)
     {
         Creature* creature = ai->GetCreature((*i));
         if (!creature || !sServerFacade.IsAlive(creature))
-            continue;
+            continue;        
 
-        uint32 level = creature->GetLevel();
-
-        switch (creature->GetCreatureInfo()->Rank) {
-        case CREATURE_ELITE_RARE:
-            level *= 2;
-            break;
-        case CREATURE_ELITE_ELITE:
-            level *= 3;
-            break;
-        case CREATURE_ELITE_RAREELITE:
-            level *= 3;
-            break;
-        case CREATURE_ELITE_WORLDBOSS:
-            level *= 5;
-            break;
-        }
-        attackerLevel += level;
+        attackerValue += creature->GetHealth();
     }
 
-    if (!attackerLevel)
-        return 100;
-
-    float percent = playerLevel * 100 / attackerLevel;
-    return percent <= 200 ? (uint8)percent : 200;
+    return attackerValue * 100.0f / playerValue;
 }
 
