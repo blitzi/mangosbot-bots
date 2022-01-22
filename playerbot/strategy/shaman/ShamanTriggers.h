@@ -101,6 +101,12 @@ namespace ai
         WaterShieldTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "water shield") {}
     };
 
+    class ClearCastingTrigger : public HasAuraTrigger
+    {
+    public:
+        ClearCastingTrigger(PlayerbotAI* ai) : HasAuraTrigger(ai, "clearcasting") {}
+    };
+
 
     class ShamanisticRageTrigger : public BuffTrigger
     {
@@ -222,8 +228,8 @@ namespace ai
         FrostShockSnareTrigger(PlayerbotAI* ai) : SnareTargetTrigger(ai, "frost shock") {}
     };
 
-    DEBUFF_TRIGGER(FlameshockTrigger, "flame shock");
-    DEBUFF_TRIGGER(EarthshockTrigger, "earth shock");
+    MY_DEBUFF_TRIGGER(FlameshockTrigger, "flame shock");
+    MY_DEBUFF_TRIGGER(EarthshockTrigger, "earth shock");
 
     class HeroismTrigger : public BoostTrigger
     {

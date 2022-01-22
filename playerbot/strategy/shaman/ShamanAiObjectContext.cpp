@@ -100,6 +100,7 @@ namespace ai
                 creators["shamanistic rage"] = &TriggerFactoryInternal::shamanistic_rage;
                 creators["water shield"] = &TriggerFactoryInternal::water_shield;
                 creators["lightning shield"] = &TriggerFactoryInternal::lightning_shield;
+                creators["clearcasting"] = &TriggerFactoryInternal::clearcasting;
                 creators["water breathing"] = &TriggerFactoryInternal::water_breathing;
                 creators["water walking"] = &TriggerFactoryInternal::water_walking;
                 creators["water breathing on party"] = &TriggerFactoryInternal::water_breathing_on_party;
@@ -160,6 +161,7 @@ namespace ai
             static Trigger* shamanistic_rage(PlayerbotAI* ai) { return new ShamanisticRageTrigger(ai); }
             static Trigger* water_shield(PlayerbotAI* ai) { return new WaterShieldTrigger(ai); }
             static Trigger* lightning_shield(PlayerbotAI* ai) { return new LightningShieldTrigger(ai); }
+            static Trigger* clearcasting(PlayerbotAI* ai) { return new ClearCastingTrigger(ai); }
             static Trigger* shock(PlayerbotAI* ai) { return new ShockTrigger(ai); }
             static Trigger* frost_shock_snare(PlayerbotAI* ai) { return new FrostShockSnareTrigger(ai); }
             static Trigger* flame_shock(PlayerbotAI* ai) { return new FlameshockTrigger(ai); }
