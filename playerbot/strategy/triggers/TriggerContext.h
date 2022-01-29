@@ -48,6 +48,7 @@ namespace ai
             creators["party member to cancel health"] = &TriggerContext::PartyMemberToCancelHealth;
 
             creators["use trinket"] = &TriggerContext::use_trinket;
+            creators["damage stop"] = &TriggerContext::damage_stop;
 
             creators["party member has aggro"] = &TriggerContext::PartyMemberHasAggro;
 
@@ -78,9 +79,7 @@ namespace ai
             creators["range aoe"] = &TriggerContext::RangeAoe;
             creators["light aoe"] = &TriggerContext::LightAoe;
             creators["medium aoe"] = &TriggerContext::MediumAoe;
-            creators["high aoe"] = &TriggerContext::HighAoe;
-
-            creators["bossfight"] = &TriggerContext::Bossfight;
+            creators["high aoe"] = &TriggerContext::HighAoe;            
 
             creators["enemy out of melee"] = &TriggerContext::EnemyOutOfMelee;
             creators["enemy out of spell"] = &TriggerContext::EnemyOutOfSpell;
@@ -219,8 +218,7 @@ namespace ai
         static Trigger* RangeAoe(PlayerbotAI* ai) { return new RangeAoeTrigger(ai); }
         static Trigger* LightAoe(PlayerbotAI* ai) { return new LightAoeTrigger(ai); }
         static Trigger* MediumAoe(PlayerbotAI* ai) { return new MediumAoeTrigger(ai); }
-        static Trigger* HighAoe(PlayerbotAI* ai) { return new HighAoeTrigger(ai); }
-        static Trigger* Bossfight(PlayerbotAI* ai) { return new BossfightTrigger(ai); }
+        static Trigger* HighAoe(PlayerbotAI* ai) { return new HighAoeTrigger(ai); }        
         static Trigger* LoseAggro(PlayerbotAI* ai) { return new LoseAggroTrigger(ai); }
         static Trigger* HasAggro(PlayerbotAI* ai) { return new HasAggroTrigger(ai); }
         static Trigger* HasAreaDebuff(PlayerbotAI* ai) { return new HasAreaDebuffTrigger(ai); }
@@ -282,6 +280,7 @@ namespace ai
         static Trigger* location_stuck(PlayerbotAI* ai) { return new LocationStuckTrigger(ai); }
         static Trigger* player_wants_in_bg(PlayerbotAI* ai) { return new PlayerWantsInBattlegroundTrigger(ai); } 
         static Trigger* use_trinket(PlayerbotAI* ai) { return new UseTrinketTrigger(ai); } 
+        static Trigger* damage_stop(PlayerbotAI* ai) { return new DamageStopTrigger(ai); }
 
         static Trigger* petition_signed(PlayerbotAI* ai) { return new PetitionTurnInTrigger(ai); }
         static Trigger* buy_tabard(PlayerbotAI* ai) { return new BuyTabardTrigger(ai); }        

@@ -165,6 +165,7 @@ namespace ai
             creators["guild manage nearby"] = &ActionContext::guild_manage_nearby;
             creators["cancel heal"] = &ActionContext::cancel_heal;
             creators["use trinket"] = &ActionContext::use_trinket;
+            creators["damage stop"] = &ActionContext::damage_stop;
 
             // BG Tactics
             creators["bg tactics"] = &ActionContext::bg_tactics;
@@ -285,10 +286,11 @@ namespace ai
         static Action* turn_in_petition(PlayerbotAI* ai) { return new PetitionTurnInAction(ai); }
         static Action* buy_tabard(PlayerbotAI* ai) { return new BuyTabardAction(ai); }
         static Action* guild_manage_nearby(PlayerbotAI* ai) { return new GuildManageNearbyAction(ai); }
-       
+        
         
         static Action* cancel_heal(PlayerbotAI* ai) { return new CancelHealAction(ai); }
         static Action* use_trinket(PlayerbotAI* ai) { return new UseTrinketAction(ai); }
+        static Action* damage_stop(PlayerbotAI* ai) { return new DamageStopAction(ai); }
 
         // BG Tactics
         static Action* bg_tactics(PlayerbotAI* ai) { return new BGTactics(ai); }

@@ -22,4 +22,13 @@ namespace ai
     public:
         Unit* Calculate();
     };
+
+    class DamageStopValue : public TargetValue
+    {
+    public:
+        DamageStopValue(PlayerbotAI* ai) : TargetValue(ai) {}
+
+    protected:
+        Unit* Calculate();
+    };
 }

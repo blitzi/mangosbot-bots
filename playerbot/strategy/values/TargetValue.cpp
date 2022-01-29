@@ -114,5 +114,3 @@ WorldPosition HomeBindValue::Calculate()
     bot->GetHomebindLocation(x, y, z, mapId);
     return WorldPosition(mapId, x, y, z, 0.0);
 }
-
-

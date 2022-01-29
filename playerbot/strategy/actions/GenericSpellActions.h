@@ -14,53 +14,53 @@ namespace ai
             this->spell = spell;
         }
 
-		virtual string GetTargetName() { return "current target"; };
+        virtual string GetTargetName() { return "current target"; };
         virtual bool Execute(Event event);
         virtual bool isPossible();
-		virtual bool isUseful();
+        virtual bool isUseful();
         virtual bool IsCast() { return true; }
         virtual ActionThreatType getThreatType() { return ACTION_THREAT_SINGLE; }
 
-		virtual NextAction** getPrerequisites()
-		{
+        virtual NextAction** getPrerequisites()
+        {
             if (spell == "mount")
                 return NULL;
             if (range > ai->GetRange("spell"))
-				return NULL;
-			else if (range > ATTACK_DISTANCE)
-				return NextAction::merge( NextAction::array(0, new NextAction("reach spell"), NULL), Action::getPrerequisites());
-			else
-				return NextAction::merge( NextAction::array(0, new NextAction("reach melee"), NULL), Action::getPrerequisites());
-		}
+                return NULL;
+            else if (range > ATTACK_DISTANCE)
+                return NextAction::merge( NextAction::array(0, new NextAction("reach spell"), NULL), Action::getPrerequisites());
+            else
+                return NextAction::merge( NextAction::array(0, new NextAction("reach melee"), NULL), Action::getPrerequisites());
+        }
 
     protected:
         string spell;
-		float range;
+        float range;
     };
 
-	//---------------------------------------------------------------------------------------------------------------------
-	class CastAuraSpellAction : public CastSpellAction
-	{
-	public:
+    //---------------------------------------------------------------------------------------------------------------------
+    class CastAuraSpellAction : public CastSpellAction
+    {
+    public:
         CastAuraSpellAction(PlayerbotAI* ai, string spell, bool isOwner = false) : CastSpellAction(ai, spell) { this->isOwner = isOwner; }
 
-		virtual bool isUseful();
+        virtual bool isUseful();
 
     protected:
         bool isOwner;
-	};
+    };
 
     //---------------------------------------------------------------------------------------------------------------------
     class CastMeleeSpellAction : public CastSpellAction
     {
     public:
         CastMeleeSpellAction(PlayerbotAI* ai, string spell) : CastSpellAction(ai, spell) {
-			range = ATTACK_DISTANCE;
+            range = ATTACK_DISTANCE;
 
             Unit* target = AI_VALUE(Unit*, "current target");
             if (target)
                 range = max(5.0f, bot->GetCombinedCombatReach(target, true));
-		}
+        }
     };
 
     //---------------------------------------------------------------------------------------------------------------------
@@ -82,28 +82,28 @@ namespace ai
         virtual ActionThreatType getThreatType() { return ACTION_THREAT_AOE; }
     };
 
-	class CastBuffSpellAction : public CastAuraSpellAction
-	{
-	public:
-		CastBuffSpellAction(PlayerbotAI* ai, string spell) : CastAuraSpellAction(ai, spell)
-		{
+    class CastBuffSpellAction : public CastAuraSpellAction
+    {
+    public:
+        CastBuffSpellAction(PlayerbotAI* ai, string spell) : CastAuraSpellAction(ai, spell)
+        {
             range = ai->GetRange("spell");
-		}
+        }
 
         virtual string GetTargetName() { return "self target"; }
-	};
+    };
 
-	class CastEnchantItemAction : public CastSpellAction
-	{
-	public:
-	    CastEnchantItemAction(PlayerbotAI* ai, string spell) : CastSpellAction(ai, spell)
-		{
+    class CastEnchantItemAction : public CastSpellAction
+    {
+    public:
+        CastEnchantItemAction(PlayerbotAI* ai, string spell) : CastSpellAction(ai, spell)
+        {
             range = ai->GetRange("spell");
-		}
+        }
 
         virtual bool isPossible();
         virtual string GetTargetName() { return "self target"; }
-	};
+    };
 
     //---------------------------------------------------------------------------------------------------------------------
 
@@ -111,11 +111,11 @@ namespace ai
     {
     public:
         CastHealingSpellAction(PlayerbotAI* ai, string spell, uint8 estAmount = 15.0f) : CastAuraSpellAction(ai, spell)
-		{
+        {
             this->estAmount = estAmount;
             range = ai->GetRange("spell");
         }
-		virtual string GetTargetName() { return "self target"; }
+        virtual string GetTargetName() { return "self target"; }
         virtual bool isUseful();
         virtual ActionThreatType getThreatType() { return ACTION_THREAT_AOE; }
 
@@ -126,8 +126,8 @@ namespace ai
     class CastAoeHealSpellAction : public CastHealingSpellAction
     {
     public:
-    	CastAoeHealSpellAction(PlayerbotAI* ai, string spell, uint8 estAmount = 15.0f) : CastHealingSpellAction(ai, spell, estAmount) {}
-		virtual string GetTargetName() { return "party member to heal"; }
+        CastAoeHealSpellAction(PlayerbotAI* ai, string spell, uint8 estAmount = 15.0f) : CastHealingSpellAction(ai, spell, estAmount) {}
+        virtual string GetTargetName() { return "party member to heal"; }
         virtual bool isUseful();
     };
 
@@ -159,60 +159,98 @@ namespace ai
         }
     };
 
-	class CastCureSpellAction : public CastSpellAction
-	{
-	public:
-		CastCureSpellAction(PlayerbotAI* ai, string spell) : CastSpellAction(ai, spell)
-		{
+
+    class DamageStopAction : public Action
+    {
+    public:
+        DamageStopAction(PlayerbotAI* ai) : Action(ai) {}        
+        virtual bool IgnoresCasting() { return true; }
+        virtual bool Execute(Event event)
+        {
+            Unit* target = GetTargetValue()->Get();
+
+            if (target)
+            {
+                ostringstream o; o << "damage stop for " << target->GetName();
+                ai->TellMaster(o.str());
+                ai->GetBot()->CastStop();
+
+                ai->GetBot()->StopMoving();
+                ai->GetBot()->GetMotionMaster()->Clear();
+                ai->GetBot()->GetMotionMaster()->MoveIdle();
+
+                ai->GetAiObjectContext()->GetValue<Unit*>("current target")->Set(NULL);
+                ai->GetAiObjectContext()->GetValue<Unit*>("enemy player target")->Set(NULL);
+				ai->GetAiObjectContext()->GetValue<ObjectGuid>("pull target")->Set(ObjectGuid());
+                ai->ChangeEngine(BOT_STATE_NON_COMBAT);
+                return true;
+            }        
+
+            return false;
+        }
+
+        virtual bool isUseful()
+        {
+            Unit* target = GetTargetValue()->Get();
+            return target;
+        }
+    };
+
+
+    class CastCureSpellAction : public CastSpellAction
+    {
+    public:
+        CastCureSpellAction(PlayerbotAI* ai, string spell) : CastSpellAction(ai, spell)
+        {
             range = ai->GetRange("spell");
-		}
+        }
 
-		virtual string GetTargetName() { return "self target"; }
-	};
+        virtual string GetTargetName() { return "self target"; }
+    };
 
-	class PartyMemberActionNameSupport {
-	public:
-		PartyMemberActionNameSupport(string spell)
-		{
-			name = string(spell) + " on party";
-		}
+    class PartyMemberActionNameSupport {
+    public:
+        PartyMemberActionNameSupport(string spell)
+        {
+            name = string(spell) + " on party";
+        }
 
-		virtual string getName() { return name; }
+        virtual string getName() { return name; }
 
-	private:
-		string name;
-	};
+    private:
+        string name;
+    };
 
     class HealPartyMemberAction : public CastHealingSpellAction, public PartyMemberActionNameSupport
     {
     public:
         HealPartyMemberAction(PlayerbotAI* ai, string spell, uint8 estAmount = 15.0f) :
-			CastHealingSpellAction(ai, spell, estAmount), PartyMemberActionNameSupport(spell) {}
+            CastHealingSpellAction(ai, spell, estAmount), PartyMemberActionNameSupport(spell) {}
 
-		virtual string GetTargetName() { return "party member to heal"; }
-		virtual string getName() { return PartyMemberActionNameSupport::getName(); }
+        virtual string GetTargetName() { return "party member to heal"; }
+        virtual string getName() { return PartyMemberActionNameSupport::getName(); }
     };
 
-	class ResurrectPartyMemberAction : public CastSpellAction
-	{
-	public:
-		ResurrectPartyMemberAction(PlayerbotAI* ai, string spell) : CastSpellAction(ai, spell) {}
+    class ResurrectPartyMemberAction : public CastSpellAction
+    {
+    public:
+        ResurrectPartyMemberAction(PlayerbotAI* ai, string spell) : CastSpellAction(ai, spell) {}
 
-		virtual string GetTargetName() { return "party member to resurrect"; }
-	};
+        virtual string GetTargetName() { return "party member to resurrect"; }
+    };
     //---------------------------------------------------------------------------------------------------------------------
 
     class CurePartyMemberAction : public CastSpellAction, public PartyMemberActionNameSupport
     {
     public:
         CurePartyMemberAction(PlayerbotAI* ai, string spell, uint32 dispelType) :
-			CastSpellAction(ai, spell), PartyMemberActionNameSupport(spell)
+            CastSpellAction(ai, spell), PartyMemberActionNameSupport(spell)
         {
             this->dispelType = dispelType;
         }
 
-		virtual Value<Unit*>* GetTargetValue();
-		virtual string getName() { return PartyMemberActionNameSupport::getName(); }
+        virtual Value<Unit*>* GetTargetValue();
+        virtual string getName() { return PartyMemberActionNameSupport::getName(); }
 
     protected:
         uint32 dispelType;
@@ -224,10 +262,10 @@ namespace ai
     {
     public:
         BuffOnPartyAction(PlayerbotAI* ai, string spell) :
-			CastBuffSpellAction(ai, spell), PartyMemberActionNameSupport(spell) {}
+            CastBuffSpellAction(ai, spell), PartyMemberActionNameSupport(spell) {}
     public:
-		virtual Value<Unit*>* GetTargetValue();
-		virtual string getName() { return PartyMemberActionNameSupport::getName(); }
+        virtual Value<Unit*>* GetTargetValue();
+        virtual string getName() { return PartyMemberActionNameSupport::getName(); }
     };
 
     //---------------------------------------------------------------------------------------------------------------------
@@ -259,17 +297,17 @@ namespace ai
         virtual ActionThreatType getThreatType() { return ACTION_THREAT_NONE; }
     };
 
-	class CastLifeBloodAction : public CastHealingSpellAction
-	{
-	public:
-		CastLifeBloodAction(PlayerbotAI* ai) : CastHealingSpellAction(ai, "lifeblood") {}
-	};
+    class CastLifeBloodAction : public CastHealingSpellAction
+    {
+    public:
+        CastLifeBloodAction(PlayerbotAI* ai) : CastHealingSpellAction(ai, "lifeblood") {}
+    };
 
-	class CastGiftOfTheNaaruAction : public CastHealingSpellAction
-	{
-	public:
-		CastGiftOfTheNaaruAction(PlayerbotAI* ai) : CastHealingSpellAction(ai, "gift of the naaru") {}
-	};
+    class CastGiftOfTheNaaruAction : public CastHealingSpellAction
+    {
+    public:
+        CastGiftOfTheNaaruAction(PlayerbotAI* ai) : CastHealingSpellAction(ai, "gift of the naaru") {}
+    };
 
     class CastArcaneTorrentAction : public CastBuffSpellAction
     {

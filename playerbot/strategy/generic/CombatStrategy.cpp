@@ -29,4 +29,8 @@ void CombatStrategy::InitTriggers(list<TriggerNode*> &triggers)
     triggers.push_back(new TriggerNode(
         "use trinket",
         NextAction::array(0, new NextAction("use trinket", ACTION_EMERGENCY), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "damage stop",
+        NextAction::array(0, new NextAction("damage stop", 200.0f), NULL)));
 }

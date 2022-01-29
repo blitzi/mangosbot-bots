@@ -53,6 +53,8 @@ public:
     std::list<uint32> randomBotAccounts;
     std::list<uint32> randomBotSpellIds;
     std::list<uint32> randomBotQuestIds;
+    std::list<uint32> damageStopSpellIds;
+    std::list<uint32> damageFocusGUIDs;
     uint32 randomBotTeleportDistance;
     float randomGearLoweringChance;
     float randomBotMaxLevelChance;

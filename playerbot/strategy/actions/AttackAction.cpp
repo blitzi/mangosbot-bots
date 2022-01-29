@@ -39,12 +39,17 @@ bool AttackMyTargetAction::Execute(Event event)
 
 bool AttackAction::Attack(Unit* target)
 {
+    Unit* u = AI_VALUE(Unit*, "dps stop target");
+
+    if(u && (u != bot || u != GetTarget()))
+        return false;
+
     MotionMaster &mm = *bot->GetMotionMaster();
 #ifdef CMANGOS
-	if (mm.GetCurrentMovementGeneratorType() == TAXI_MOTION_TYPE || bot->IsFlying())
+    if (mm.GetCurrentMovementGeneratorType() == TAXI_MOTION_TYPE || bot->IsFlying())
 #endif
 #ifdef MANGOS
-	if (mm.GetCurrentMovementGeneratorType() == FLIGHT_MOTION_TYPE || bot->IsFlying())
+    if (mm.GetCurrentMovementGeneratorType() == FLIGHT_MOTION_TYPE || bot->IsFlying())
 #endif
     {
         if (verbose) ai->TellError("I cannot attack in flight");

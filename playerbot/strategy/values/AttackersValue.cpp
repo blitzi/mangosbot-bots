@@ -1,6 +1,7 @@
 #include "botpch.h"
 #include "../../playerbot.h"
 #include "AttackersValue.h"
+#include "PlayerbotAIConfig.h"
 
 #include "../../ServerFacade.h"
 #include "GridNotifiers.h"
@@ -12,8 +13,6 @@
 using namespace ai;
 using namespace MaNGOS;
 
-set<int> focusTargets = { 17096 /*astral-flare*/ };
-
 list<ObjectGuid> AttackersValue::Calculate()
 {
     set<Unit*> targets;
@@ -24,7 +23,6 @@ list<ObjectGuid> AttackersValue::Calculate()
 
     if(bot->GetPet())
         AddAttackersOf(bot->GetPet(), targets);
-
 
     Group* group = bot->GetGroup();
     if (group)
@@ -50,13 +48,13 @@ list<ObjectGuid> AttackersValue::Calculate()
     if(ListContainsRti(targets))
         RemoveNonRtiTargets(targets);
     
-	for (set<Unit*>::iterator i = targets.begin(); i != targets.end(); i++)
-		result.push_back((*i)->GetObjectGuid());
+    for (set<Unit*>::iterator i = targets.begin(); i != targets.end(); i++)
+        result.push_back((*i)->GetObjectGuid());
 
     if (bot->duel && bot->duel->opponent)
         result.push_back(bot->duel->opponent->GetObjectGuid());
 
-	return result;
+    return result;
 }
 
 void AttackersValue::AddAttackersOf(Group* group, set<Unit*>& targets)
@@ -88,23 +86,23 @@ void AttackersValue::AddAttackersOf(Player* player, set<Unit*>& targets)
     if (player->IsBeingTeleported())
         return;
 
-	list<Unit*> units;
-	AnyEnemyInObjectRangeCheck u_check(player, sPlayerbotAIConfig.sightDistance);
+    list<Unit*> units;
+    AnyEnemyInObjectRangeCheck u_check(player, sPlayerbotAIConfig.sightDistance);
     UnitListSearcher<AnyEnemyInObjectRangeCheck> searcher(units, u_check);
     Cell::VisitAllObjects(player, searcher, sPlayerbotAIConfig.sightDistance);
-	for (list<Unit*>::iterator i = units.begin(); i != units.end(); i++)
+    for (list<Unit*>::iterator i = units.begin(); i != units.end(); i++)
     {
         Unit* unit = *i;
-		if (!player->GetGroup())
-		{
+        if (!player->GetGroup())
+        {
 #ifdef CMANGOS
-			if (!unit->getThreatManager().getThreat(player) && (!unit->getThreatManager().getCurrentVictim() || unit->getThreatManager().getCurrentVictim()->getTarget() != player))
+            if (!unit->getThreatManager().getThreat(player) && (!unit->getThreatManager().getCurrentVictim() || unit->getThreatManager().getCurrentVictim()->getTarget() != player))
 #endif
 #ifdef MANGOS
-			if (!unit->GetThreatManager().getThreat(player))
+            if (!unit->GetThreatManager().getThreat(player))
 #endif
-				continue;
-		}
+                continue;
+        }
         
         targets.insert(unit);
         unit->CallForAllControlledUnits(AddGuardiansHelper(units), CONTROLLED_PET | CONTROLLED_GUARDIANS | CONTROLLED_CHARM | CONTROLLED_MINIPET | CONTROLLED_TOTEMS);        
@@ -219,9 +217,9 @@ void AttackersValue::RemoveNonFocusTargets(set<Unit*>& targets)
 
         if (c)
         {
-            CreatureData const* data = sObjectMgr.GetCreatureData(c->GetDbGuid());
+            std::list<uint32>::iterator findIter = std::find(sPlayerbotAIConfig.damageFocusGUIDs.begin(), sPlayerbotAIConfig.damageFocusGUIDs.end(), c->GetDbGuid());
 
-            if (data && focusTargets.find(data->id) == focusTargets.end())
+            if (findIter != sPlayerbotAIConfig.damageFocusGUIDs.end())
             {
                 set<Unit*>::iterator tIter2 = tIter;
                 ++tIter;
@@ -277,8 +275,9 @@ bool AttackersValue::ListContainsFocusTarget(set<Unit*>& targets) const
 
         if (c)
         {
-            CreatureData const* data = sObjectMgr.GetCreatureData(c->GetDbGuid());
-            if (data && focusTargets.find(data->id) != focusTargets.end())
+            std::list<uint32>::iterator findIter = std::find(sPlayerbotAIConfig.damageFocusGUIDs.begin(), sPlayerbotAIConfig.damageFocusGUIDs.end(), c->GetDbGuid());
+            
+            if (findIter != sPlayerbotAIConfig.damageFocusGUIDs.end())
                 return true;
         }
     }
@@ -315,6 +314,11 @@ bool AttackersValue::IsPossibleTarget(Unit *attacker, Player *bot)
     Creature *c = dynamic_cast<Creature*>(attacker);
     Group* group = bot->GetGroup();
 
+    Unit* dmgStopTarget = bot->GetPlayerbotAI()->GetAiObjectContext()->GetValue<Unit*>("dps stop target")->Get();
+
+    if (c == dmgStopTarget || bot == dmgStopTarget)
+        return false;
+
     bool basicConditions = attacker &&
         attacker->IsInWorld() &&
         attacker->GetMapId() == bot->GetMapId() &&
@@ -328,6 +332,14 @@ bool AttackersValue::IsPossibleTarget(Unit *attacker, Player *bot)
         (!c || !c->GetCombatManager().IsInEvadeMode());
 
     bool rti = IsRti(attacker, bot);
+  
+    if (c)
+    {
+        std::list<uint32>::iterator findIter = std::find(sPlayerbotAIConfig.damageFocusGUIDs.begin(), sPlayerbotAIConfig.damageFocusGUIDs.end(), c->GetDbGuid());
+
+        if (findIter != sPlayerbotAIConfig.damageFocusGUIDs.end())
+            return basicConditions;
+    }
 
     if (rti)
         return basicConditions;
@@ -335,71 +347,63 @@ bool AttackersValue::IsPossibleTarget(Unit *attacker, Player *bot)
     if (!group && bot->GetPet() && bot->GetPet()->IsAttackedBy(attacker))
         return basicConditions;
 
-    if (c)
-    {
-        CreatureData const* data = sObjectMgr.GetCreatureData(c->GetDbGuid());
-        if (data && focusTargets.find(data->id) != focusTargets.end())
-            return basicConditions;
-    }
-
-
     PlayerbotAI* ai = bot->GetPlayerbotAI();
-    	
+        
     bool isRaid = sMapStore.LookupEntry(bot->GetMapId())->IsRaid();
-	bool tankHasAggro = false;
-	bool targetIsNonElite = isRaid ? false : (!c || !c->IsElite());//normal mobs in raids count as "elites"
+    bool tankHasAggro = false;
+    bool targetIsNonElite = isRaid ? false : (!c || !c->IsElite());//normal mobs in raids count as "elites"
     bool targetIsAlmostDead = false;//!c || c->GetHealthPercent() < 50;
-	float highestThreat = 0;
-	float myThreat = 0;  
-	float tankThreat = 0;
-	bool waitForTankAggro = true;    
-	bool iAmTank = ai->IsTank(ai->GetBot());
+    float highestThreat = 0;
+    float myThreat = 0;  
+    float tankThreat = 0;
+    bool waitForTankAggro = true;    
+    bool iAmTank = ai->IsTank(ai->GetBot());
     bool carefulTanking = ai->HasStrategy("careful tanking", BOT_STATE_COMBAT);
 
-	if (attacker)
-	{
-		highestThreat = attacker->getThreatManager().GetHighestThreat();
-		myThreat = attacker->getThreatManager().getThreat(bot);
-		float myMaxDamage = bot->GetFloatValue(UNIT_FIELD_MAXDAMAGE) * (carefulTanking ? 3.0f : 1.5f);
-		uint32 maxSpellDmg = 0;
+    if (attacker)
+    {
+        highestThreat = attacker->getThreatManager().GetHighestThreat();
+        myThreat = attacker->getThreatManager().getThreat(bot);
+        float myMaxDamage = bot->GetFloatValue(UNIT_FIELD_MAXDAMAGE) * (carefulTanking ? 3.0f : 1.5f);
+        uint32 maxSpellDmg = 0;
 
-		for (int i = 0; i < MAX_SPELL_SCHOOL; ++i)
-		{
-			uint32 spellDmg = bot->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + i) * (carefulTanking ? 3.0f : 1.5f);
+        for (int i = 0; i < MAX_SPELL_SCHOOL; ++i)
+        {
+            uint32 spellDmg = bot->GetUInt32Value(PLAYER_FIELD_MOD_DAMAGE_DONE_POS + i) * (carefulTanking ? 3.0f : 1.5f);
 
-			if (spellDmg > maxSpellDmg)
-				maxSpellDmg = spellDmg;
-		}
+            if (spellDmg > maxSpellDmg)
+                maxSpellDmg = spellDmg;
+        }
 
-		myMaxDamage += maxSpellDmg;//fantasy aggro value for testing
+        myMaxDamage += maxSpellDmg;//fantasy aggro value for testing
         
-		if (highestThreat > 0)
-		{			
-			float myAggroInPct = ((100.0f / highestThreat) * (myThreat + myMaxDamage));			
+        if (highestThreat > 0)
+        {			
+            float myAggroInPct = ((100.0f / highestThreat) * (myThreat + myMaxDamage));			
 
             if(carefulTanking)
-			    waitForTankAggro = myAggroInPct > 90;
+                waitForTankAggro = myAggroInPct > 90;
             else
-			    waitForTankAggro = c->GetHealthPercent() > 90 && myAggroInPct > 90; 
-		}
-	}
+                waitForTankAggro = c->GetHealthPercent() > 90 && myAggroInPct > 90; 
+        }
+    }
 
     int tanks = 0;
 
-	if (group)
-	{
+    if (group)
+    {
 
-		for (GroupReference *ref = group->GetFirstMember(); ref; ref = ref->next())
-		{
-			Player* p = ref->getSource();
+        for (GroupReference *ref = group->GetFirstMember(); ref; ref = ref->next())
+        {
+            Player* p = ref->getSource();
 
- 			if (ai->GetBot()->IsPlayer() && ai->IsTank(p) && ai->GetBot()->InSamePhase(p) && p->IsAlive() &&
+            if (ai->GetBot()->IsPlayer() && ai->IsTank(p) && ai->GetBot()->InSamePhase(p) && p->IsAlive() &&
                 !(p->IsStunned() || p->isFeared() || p->IsPolymorphed()))
-			{
+            {
                 tanks++;
-			}
-		}
-	}
+            }
+        }
+    }
 
     bool groupHasTank = tanks > 0;
 
@@ -454,7 +458,7 @@ bool AttackersValue::IsRti(Unit* enemy, Player* bot)
 
 bool AttackersValue::IsValidTarget(Unit *attacker, Player *bot)
 {
-	bool possibleTarget = IsPossibleTarget(attacker, bot);
+    bool possibleTarget = IsPossibleTarget(attacker, bot);
 
     return possibleTarget &&
         (sServerFacade.GetThreatManager(attacker).getCurrentVictim() ||

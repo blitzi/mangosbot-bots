@@ -1,6 +1,7 @@
 #include "botpch.h"
 #include "../../playerbot.h"
 #include "DpsTargetValue.h"
+#include "PlayerbotAIConfig.h"
 
 using namespace ai;
 
@@ -84,5 +85,37 @@ Unit* DpsAoeTargetValue::Calculate()
     if (rti) return rti;
 
     FindMaxHpTargetStrategy strategy(ai);
+    return TargetValue::FindTarget(&strategy);
+}
+
+
+
+class FindStopDpsTargetStrategy : public FindTargetStrategy
+{
+public:
+    FindStopDpsTargetStrategy(PlayerbotAI* ai) : FindTargetStrategy(ai) {}
+
+public:
+    virtual void CheckAttacker(Unit* attacker, ThreatManager* threatManager)
+    {
+        for (uint32 spellId : sPlayerbotAIConfig.damageStopSpellIds)
+        {
+            if (ai->HasAura(spellId, attacker))
+            {
+                result = attacker;
+                return;
+            }
+            else if (ai->HasAura(spellId, ai->GetBot()))
+            {
+                result = ai->GetBot();
+                return;
+            }
+        }
+    }   
+};
+
+Unit* DamageStopValue::Calculate()
+{
+    FindStopDpsTargetStrategy strategy(ai);
     return TargetValue::FindTarget(&strategy);
 }
