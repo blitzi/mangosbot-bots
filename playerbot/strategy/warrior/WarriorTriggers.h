@@ -30,7 +30,7 @@ namespace ai
     SNARE_TRIGGER(InterceptSnareTrigger, "intercept");
     SNARE_TRIGGER(ShockwaveSnareTrigger, "shockwave");
     DEBUFF_TRIGGER(ShockwaveTrigger, "shockwave");
-    BOOST_TRIGGER(DeathWishTrigger, "death wish");
+    BOOST_BUFF_TRIGGER(DeathWishTrigger, "death wish");
     BUFF_TRIGGER(BloodthirstBuffTrigger, "bloodthirst");
     BUFF_TRIGGER(BerserkerRageBuffTrigger, "berserker rage");
     INTERRUPT_HEALER_TRIGGER(ShieldBashInterruptEnemyHealerSpellTrigger, "shield bash");

@@ -62,16 +62,16 @@ namespace ai
         CounterspellInterruptSpellTrigger(PlayerbotAI* ai) : InterruptSpellTrigger(ai, "counterspell") {}
     };
 
-    class CombustionTrigger : public BoostTrigger
+    class CombustionTrigger : public BoostBuffTrigger
     {
     public:
-        CombustionTrigger(PlayerbotAI* ai) : BoostTrigger(ai, "combustion") {}
+        CombustionTrigger(PlayerbotAI* ai) : BoostBuffTrigger(ai, "combustion") {}
     };
 
-    class IcyVeinsTrigger : public BoostTrigger
+    class IcyVeinsTrigger : public BoostBuffTrigger
     {
     public:
-        IcyVeinsTrigger(PlayerbotAI* ai) : BoostTrigger(ai, "icy veins") {}
+        IcyVeinsTrigger(PlayerbotAI* ai) : BoostBuffTrigger(ai, "icy veins") {}
     };
 
     class PolymorphTrigger : public HasCcTargetTrigger

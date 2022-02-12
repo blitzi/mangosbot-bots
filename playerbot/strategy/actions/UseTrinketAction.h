@@ -6,12 +6,14 @@
 
 namespace ai
 {
-    class UseTrinketAction : public UseItemAction {
+    class UseTrinketAction : public Action {
     public:
-        UseTrinketAction(PlayerbotAI* ai) : UseItemAction(ai, "use trinket") {}
-        virtual bool Execute(Event event);    
+        UseTrinketAction(PlayerbotAI* ai) : Action(ai, "use trinket") {	}
+        virtual bool Execute(Event event);
 
-        virtual bool isUseful() { return true; };
-        virtual bool isPossible() { return true; }
+		virtual bool isUseful() { return true; };
+		virtual bool isPossible();
+
+	private:
     };
 }

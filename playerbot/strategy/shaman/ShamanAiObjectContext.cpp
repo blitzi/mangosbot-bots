@@ -118,7 +118,6 @@ namespace ai
                 creators["heroism"] = &TriggerFactoryInternal::heroism;
                 creators["bloodlust"] = &TriggerFactoryInternal::bloodlust;
                 creators["feral spirit"] = &TriggerFactoryInternal::feral_spirit;
-                creators["maelstrom weapon"] = &TriggerFactoryInternal::maelstrom_weapon;
                 creators["wind shear on enemy healer"] = &TriggerFactoryInternal::wind_shear_on_enemy_healer;
                 creators["cure poison"] = &TriggerFactoryInternal::cure_poison;
                 creators["party member cure poison"] = &TriggerFactoryInternal::party_member_cure_poison;
@@ -133,7 +132,6 @@ namespace ai
             }
 
         private:
-            static Trigger* maelstrom_weapon(PlayerbotAI* ai) { return new MaelstromWeaponTrigger(ai); }
             static Trigger* heroism(PlayerbotAI* ai) { return new HeroismTrigger(ai); }
             static Trigger* bloodlust(PlayerbotAI* ai) { return new BloodlustTrigger(ai); }
             static Trigger* feral_spirit(PlayerbotAI* ai) { return new FeralSpiritTrigger(ai); }

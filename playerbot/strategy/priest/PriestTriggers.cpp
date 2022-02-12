@@ -18,5 +18,5 @@ bool ShadowformTrigger::IsActive()
 
 bool ShadowfiendTrigger::IsActive()
 {
-    return BoostTrigger::IsActive() && bot->IsSpellReady(34433);
+    return BoostBuffTrigger::IsActive() && bot->IsSpellReady(34433);
 }

@@ -217,9 +217,19 @@ string AndTrigger::getName()
     return name;
 }
 
-bool BoostTrigger::IsActive()
+bool BoostBuffTrigger::IsActive()
 {
     return BuffTrigger::IsActive() && AI_VALUE(float, "balance") >= balance;
+}
+
+bool BoostCastTrigger::IsActive()
+{
+	return SpellCanBeCastTrigger::IsActive() && AI_VALUE(float, "balance") >= balance;
+}
+
+bool BoostTrigger::IsActive()
+{
+	return AI_VALUE(float, "balance") >= balance;
 }
 
 bool ItemCountTrigger::IsActive()

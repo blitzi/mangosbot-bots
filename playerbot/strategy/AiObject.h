@@ -214,18 +214,18 @@ class clazz : public super \
         clazz(PlayerbotAI* ai) : DeflectSpellTrigger(ai, spell) {} \
     }
 
-#define BOOST_TRIGGER(clazz, spell) \
-    class clazz : public BoostTrigger \
+#define BOOST_BUFF_TRIGGER(clazz, spell) \
+    class clazz : public BoostBuffTrigger \
     { \
     public: \
-        clazz(PlayerbotAI* ai) : BoostTrigger(ai, spell) {} \
+        clazz(PlayerbotAI* ai) : BoostBuffTrigger(ai, spell) {} \
     }
 
-#define BOOST_TRIGGER_A(clazz, spell) \
-    class clazz : public BoostTrigger \
+#define BOOST__BUFF_TRIGGER_A(clazz, spell) \
+    class clazz : public BoostBuffTrigger \
     { \
     public: \
-        clazz(PlayerbotAI* ai) : BoostTrigger(ai, spell) {} \
+        clazz(PlayerbotAI* ai) : BoostBuffTrigger(ai, spell) {} \
         virtual bool IsActive(); \
     }
 

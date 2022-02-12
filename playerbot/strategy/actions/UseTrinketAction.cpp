@@ -6,29 +6,39 @@ using namespace ai;
 
 bool UseTrinketAction::Execute(Event event)
 {
-  /*  Item* trinket1 = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_TRINKET1);
-    Item* trinket2 = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_TRINKET2);
+	auto trinkets = AI_VALUE(list<Item*>, "trinkets on use");
 
-    ItemPrototype const* proto = NULL;
+	for each(Item * item in trinkets)
+	{
+		uint32 spellId = 0;
+		ItemPrototype const* proto = item->GetProto();
 
-    if (trinket1 && UseItemAuto(trinket1))
-        proto = trinket1->GetProto();
+		for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
+		{
+			if (proto->Spells[i].SpellId > 0)
+			{
+				spellId = proto->Spells[i].SpellId;
+				break;
+			}
+		}
 
-    if (trinket2 && UseItemAuto(trinket2))
-        proto = trinket2->GetProto();
+		if (spellId > 0 && proto->InventoryType == INVTYPE_TRINKET && item->IsEquipped())
+		{
+			if (bot->CanUseItem(item) == EQUIP_ERR_OK && !item->IsInTrade())
+			{				
+				WorldPacket packet(CMSG_USE_ITEM, 1 + 1 + 1 + 4 + 8 + 4 + 1 + 8 + 1);
+				packet << item->GetBagSlot() << item->GetSlot() << (uint8)1 << spellId << item->GetObjectGuid() << 0 << (uint8)0 << bot->GetObjectGuid() << TARGET_FLAG_SELF;
 
-    if (proto != NULL && (proto->Spells->SpellCategory == 1141))
-    {
-        for (int i = 0; i < MAX_ITEM_PROTO_SPELLS; i++)
-        {
-            uint32 spellId = item->GetProto()->Spells[i].SpellId;
-            if (!spellId)
-                continue;
-
-            if (!ai->CanCastSpell(spellId, bot, false))
-                continue;
-        }
-    }*/
+				bot->GetSession()->HandleUseItemOpcode(packet);
+				return true;
+			}
+		}
+	}	
 
     return false;
+}
+
+bool UseTrinketAction::isPossible()
+{
+	return AI_VALUE(list<Item*>, "trinkets on use").size() > 0;
 }

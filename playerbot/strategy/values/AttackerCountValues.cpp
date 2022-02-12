@@ -103,11 +103,11 @@ float BalanceThreatValue::Calculate()
 
     for (list<ObjectGuid>::iterator i = v.begin(); i!=v.end(); i++)
     {
-        Creature* creature = ai->GetCreature((*i));
-        if (!creature || !sServerFacade.IsAlive(creature))
+        Unit* u = ai->GetUnit((*i));
+        if (!u || !sServerFacade.IsAlive(u))
             continue;        
 
-        attackerValue += creature->GetHealth();
+        attackerValue += u->GetHealth();
     }
 
     return attackerValue * 100.0f / playerValue;

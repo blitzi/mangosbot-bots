@@ -231,28 +231,22 @@ namespace ai
     MY_DEBUFF_TRIGGER(FlameshockTrigger, "flame shock");
     MY_DEBUFF_TRIGGER(EarthshockTrigger, "earth shock");
 
-    class HeroismTrigger : public BoostTrigger
+    class HeroismTrigger : public BoostBuffTrigger
     {
     public:
-        HeroismTrigger(PlayerbotAI* ai) : BoostTrigger(ai, "heroism") {}
+        HeroismTrigger(PlayerbotAI* ai) : BoostBuffTrigger(ai, "heroism") {}
     };
 
-    class FeralSpiritTrigger : public BoostTrigger
+    class FeralSpiritTrigger : public BoostCastTrigger
     {
     public:
-        FeralSpiritTrigger(PlayerbotAI* ai) : BoostTrigger(ai, "feral spirit", 150.0f) {}
+        FeralSpiritTrigger(PlayerbotAI* ai) : BoostCastTrigger(ai, "feral spirit", 10.0f) {}
     };
 
-    class BloodlustTrigger : public BoostTrigger
+    class BloodlustTrigger : public BoostBuffTrigger
     {
     public:
-        BloodlustTrigger(PlayerbotAI* ai) : BoostTrigger(ai, "bloodlust") {}
-    };
-
-    class MaelstromWeaponTrigger : public HasAuraTrigger
-    {
-    public:
-        MaelstromWeaponTrigger(PlayerbotAI* ai) : HasAuraTrigger(ai, "maelstrom weapon") {}
+        BloodlustTrigger(PlayerbotAI* ai) : BoostBuffTrigger(ai, "bloodlust") {}
     };
 
     class WindShearInterruptEnemyHealerSpellTrigger : public InterruptEnemyHealerTrigger

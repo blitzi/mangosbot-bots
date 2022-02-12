@@ -16,10 +16,10 @@ namespace ai
         SliceAndDiceTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "slice and dice") {}
     };
 
-    class AdrenalineRushTrigger : public BoostTrigger
+    class AdrenalineRushTrigger : public BoostBuffTrigger
     {
     public:
-        AdrenalineRushTrigger(PlayerbotAI* ai) : BoostTrigger(ai, "adrenaline rush", 200.0f) {}
+        AdrenalineRushTrigger(PlayerbotAI* ai) : BoostBuffTrigger(ai, "adrenaline rush", 200.0f) {}
         virtual bool IsPossible()
         {
             return !ai->HasAura("stealth", bot);

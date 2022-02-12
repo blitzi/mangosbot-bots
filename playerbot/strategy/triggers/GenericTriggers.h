@@ -333,10 +333,10 @@ namespace ai
         virtual string getName() { return spell + " on attacker"; }
     };
 
-    class BoostTrigger : public BuffTrigger
+    class BoostBuffTrigger : public BuffTrigger
     {
     public:
-        BoostTrigger(PlayerbotAI* ai, string spell, float balance = 300.0f) : BuffTrigger(ai, spell, 1)
+        BoostBuffTrigger(PlayerbotAI* ai, string spell, float balance = 300.0f) : BuffTrigger(ai, spell, 1)
         {
             this->balance = balance;
         }
@@ -346,6 +346,34 @@ namespace ai
     protected:
         float balance;
     };
+
+	class BoostCastTrigger : public SpellCanBeCastTrigger
+	{
+	public:
+		BoostCastTrigger(PlayerbotAI* ai, string spell, float balance = 300.0f) : SpellCanBeCastTrigger(ai, spell)
+		{
+			this->balance = balance;
+		}
+	public:
+		virtual bool IsActive();
+
+	protected:
+		float balance;
+	};
+
+	class BoostTrigger : public Trigger
+	{
+	public:
+		BoostTrigger(PlayerbotAI* ai, string spell, float balance = 300.0f) : Trigger(ai, spell)
+		{
+			this->balance = balance;
+		}
+	public:
+		virtual bool IsActive();
+
+	protected:
+		float balance;
+	};
 
     class RandomTrigger : public Trigger
     {

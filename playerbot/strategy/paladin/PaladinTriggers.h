@@ -149,10 +149,10 @@ namespace ai
         HammerOfJusticeEnemyHealerTrigger(PlayerbotAI* ai) : InterruptEnemyHealerTrigger(ai, "hammer of justice") {}
     };
 
-    class DivineFavorTrigger : public BoostTrigger
+    class DivineFavorTrigger : public BoostBuffTrigger
     {
     public:
-        DivineFavorTrigger(PlayerbotAI* ai) : BoostTrigger(ai, "divine favor") {}
+        DivineFavorTrigger(PlayerbotAI* ai) : BoostBuffTrigger(ai, "divine favor") {}
     };
 
     class TurnUndeadTrigger : public HasCcTargetTrigger
@@ -161,10 +161,10 @@ namespace ai
         TurnUndeadTrigger(PlayerbotAI* ai) : HasCcTargetTrigger(ai, "turn undead") {}
     };
 
-    class AvengingWrathTrigger : public BoostTrigger
+    class AvengingWrathTrigger : public BoostBuffTrigger
     {
     public:
-        AvengingWrathTrigger(PlayerbotAI* ai) : BoostTrigger(ai, "avenging wrath", 150.0f) {}
+        AvengingWrathTrigger(PlayerbotAI* ai) : BoostBuffTrigger(ai, "avenging wrath", 150.0f) {}
     };
 
     class BeaconofLightOnTankTrigger : public BuffOnTankTrigger {

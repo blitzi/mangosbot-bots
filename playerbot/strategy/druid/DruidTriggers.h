@@ -78,16 +78,16 @@ namespace ai {
         BashInterruptSpellTrigger(PlayerbotAI* ai) : InterruptSpellTrigger(ai, "bash") {}
     };
 
-    class TigersFuryTrigger : public BoostTrigger
+    class TigersFuryTrigger : public BoostBuffTrigger
     {
     public:
-        TigersFuryTrigger(PlayerbotAI* ai) : BoostTrigger(ai, "tiger's fury") {}
+        TigersFuryTrigger(PlayerbotAI* ai) : BoostBuffTrigger(ai, "tiger's fury") {}
     };
 
-    class NaturesGraspTrigger : public BoostTrigger
+    class NaturesGraspTrigger : public BoostBuffTrigger
     {
     public:
-        NaturesGraspTrigger(PlayerbotAI* ai) : BoostTrigger(ai, "nature's grasp") {}
+        NaturesGraspTrigger(PlayerbotAI* ai) : BoostBuffTrigger(ai, "nature's grasp") {}
     };
 
     class EntanglingRootsTrigger : public HasCcTargetTrigger

@@ -76,10 +76,10 @@ namespace ai
 		StrangulateInterruptSpellTrigger(PlayerbotAI* ai) : InterruptSpellTrigger(ai, "strangulate") {}
 	};
 
-    class KillingMachineTrigger : public BoostTrigger
+    class KillingMachineTrigger : public BoostBuffTrigger
     {
     public:
-		KillingMachineTrigger(PlayerbotAI* ai) : BoostTrigger(ai, "killing machine") {}
+		KillingMachineTrigger(PlayerbotAI* ai) : BoostBuffTrigger(ai, "killing machine") {}
     };
 
     class MindFreezeOnEnemyHealerTrigger : public InterruptEnemyHealerTrigger

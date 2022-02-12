@@ -32,7 +32,7 @@ namespace ai
     DEFLECT_TRIGGER(FeedbackTrigger, "feedback");
     SNARE_TRIGGER(ChastiseTrigger, "chastise");
 
-    BOOST_TRIGGER_A(ShadowfiendTrigger, "shadowfiend");
+    BOOST__BUFF_TRIGGER_A(ShadowfiendTrigger, "shadowfiend");
 
     class PowerWordFortitudeOnPartyTrigger : public BuffOnPartyTrigger {
     public:
