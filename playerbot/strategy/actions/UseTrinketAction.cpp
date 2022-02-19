@@ -15,6 +15,10 @@ bool UseTrinketAction::Execute(Event event)
 
 		for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
 		{
+			// wrong triggering type
+			if (proto->Spells[i].SpellTrigger != ITEM_SPELLTRIGGER_ON_USE)
+				continue;
+
 			if (proto->Spells[i].SpellId > 0)
 			{
 				spellId = proto->Spells[i].SpellId;
