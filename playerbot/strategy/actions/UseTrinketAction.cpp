@@ -26,8 +26,8 @@ bool UseTrinketAction::Execute(Event event)
 		{
 			if (bot->CanUseItem(item) == EQUIP_ERR_OK && !item->IsInTrade())
 			{				
-				WorldPacket packet(CMSG_USE_ITEM, 1 + 1 + 1 + 4 + 8 + 4 + 1 + 8 + 1);
-				packet << item->GetBagSlot() << item->GetSlot() << (uint8)1 << spellId << item->GetObjectGuid() << 0 << (uint8)0 << bot->GetObjectGuid() << TARGET_FLAG_SELF;
+				WorldPacket packet(CMSG_USE_ITEM, 1 + 1 + 1 + 4 + 8 + 4 + 1 + 4);
+				packet << item->GetBagSlot() << item->GetSlot() << (uint8)1 << spellId << item->GetObjectGuid() << uint32(0) << (uint8)0 << (uint32)TARGET_FLAG_SELF;
 
 				bot->GetSession()->HandleUseItemOpcode(packet);
 				return true;
