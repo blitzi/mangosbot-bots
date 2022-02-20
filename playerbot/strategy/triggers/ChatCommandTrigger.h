@@ -20,7 +20,7 @@ namespace ai
             if (!triggered)
                 return Event();
 
-            return Event(getName(), param, owner);
+            return Event(GetName(), param, owner);
         }
 
         virtual void Reset()
