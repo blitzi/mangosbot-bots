@@ -109,7 +109,7 @@ bool PartyMemberToHeal::Check(Unit* player)
 
     Stance* stance = ai->GetAiObjectContext()->GetValue<Stance*>("stance")->Get();
 
-    if(stance && stance->getName() != "near")
+    if(stance && stance->GetName() != "near")
     {
         return sServerFacade.GetDistance2d(bot, player) <= ai->GetRange("spell");
     }

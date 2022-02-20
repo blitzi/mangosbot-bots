@@ -8,7 +8,7 @@ namespace ai
 		CastSapAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "sap") {} 
         virtual Value<Unit*>* GetTargetValue()
         {
-            return context->GetValue<Unit*>("cc target", getName());
+            return context->GetValue<Unit*>("cc target", GetName());
         }
         virtual bool isUseful() { return true; }
 	};

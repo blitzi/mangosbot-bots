@@ -154,7 +154,7 @@ bool CastRandomSpellAction::Execute(Event event)
 
     string name = event.getParam();
     if (name.empty())
-        name = getName();
+        name = GetName();
 
     list<ObjectGuid> wos = chat->parseGameobjects(name);
 

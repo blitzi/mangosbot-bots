@@ -181,7 +181,7 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
                     action->setRelevance(relevance);
                     if (!relevance)
                     {
-                        LogAction("Multiplier %s made action %s useless", multiplier->getName().c_str(), action->getName().c_str());
+                        LogAction("Multiplier %s made action %s useless", multiplier->GetName().c_str(), action->GetName().c_str());
                         break;
                     }
                 }
@@ -193,7 +193,7 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
 
                     if (!skipPrerequisites)
                     {
-                        LogAction("A:%s - PREREQ", action->getName().c_str());
+                        LogAction("A:%s - PREREQ", action->GetName().c_str());
                         if (MultiplyAndPush(actionNode->getPrerequisites(), relevance + 0.02, false, event, "prereq"))
                         {
                             PushAgain(actionNode, relevance + 0.01, event);
@@ -201,7 +201,7 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
                         }
                     }
 
-                    PerformanceMonitorOperation *pmo = sPerformanceMonitor.start(PERF_MON_ACTION, action->getName());
+                    PerformanceMonitorOperation *pmo = sPerformanceMonitor.start(PERF_MON_ACTION, action->GetName());
                     actionExecuted = ListenAndExecute(action, event);
                     if (pmo) pmo->finish();
 
@@ -212,26 +212,26 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
                             lastCastRelevance = relevance;                         
                         }
 
-                        LogAction("A:%s - OK", action->getName().c_str());
+                        LogAction("A:%s - OK", action->GetName().c_str());
                         MultiplyAndPush(actionNode->getContinuers(), 0, false, event, "cont");
                         delete actionNode;
                         break;
                     }
                     else
                     {
-                        LogAction("A:%s - FAILED", action->getName().c_str());
+                        LogAction("A:%s - FAILED", action->GetName().c_str());
                         MultiplyAndPush(actionNode->getAlternatives(), relevance + 0.03, false, event, "alt");
                     }
                 }
                 else
                 {
-                    LogAction("A:%s - IMPOSSIBLE", action->getName().c_str());
+                    LogAction("A:%s - IMPOSSIBLE", action->GetName().c_str());
                     MultiplyAndPush(actionNode->getAlternatives(), relevance + 0.03, false, event, "alt");
                 }
             }
             else
             {               
-                LogAction("A:%s - USELESS", action->getName().c_str());
+                LogAction("A:%s - USELESS", action->GetName().c_str());
                 MultiplyAndPush(actionNode->getAlternatives(), relevance + 0.03, false, event, "alt");
             }
             delete actionNode;
@@ -452,13 +452,13 @@ void Engine::ProcessTriggers(bool minimal)
 
         if (testMode || trigger->needCheck(minimal))
         {
-            PerformanceMonitorOperation *pmo = sPerformanceMonitor.start(PERF_MON_TRIGGER, trigger->getName());
+            PerformanceMonitorOperation *pmo = sPerformanceMonitor.start(PERF_MON_TRIGGER, trigger->GetName());
             Event event = trigger->Check();
             if (pmo) pmo->finish();
             if (!event)
                 continue;
             fires[trigger] = event;
-            LogAction("T:%s", trigger->getName().c_str());
+            LogAction("T:%s", trigger->GetName().c_str());
         }
     }
 
@@ -559,7 +559,7 @@ bool Engine::ListenAndExecute(Action* action, Event event)
     {
         ostringstream out;
         out << "do: ";
-        out << action->getName();
+        out << action->GetName();
         if (actionExecuted)
             out << " 1 (";
         else

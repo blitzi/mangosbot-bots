@@ -24,7 +24,7 @@ namespace ai
             float distance = ai->IsRanged(bot) ? ai->GetRange("spell") : 0;
             Stance* stance = context->GetValue<Stance*>("stance")->Get();
 
-            if (stance && stance->getName() != "near")
+            if (stance && stance->GetName() != "near")
                 return MoveToStance(target);
             else
             {
@@ -48,7 +48,7 @@ namespace ai
             Unit* target = AI_VALUE(Unit*, GetTargetName());
             Stance* stance = context->GetValue<Stance*>("stance")->Get();
 
-            if (target && stance && stance->getName() != "near")
+            if (target && stance && stance->GetName() != "near")
             {
                 WorldLocation location;
                 WorldLocation loc = stance->GetLocation();

@@ -42,7 +42,7 @@ float RunAwayOnAreaDebuffMultiplier::GetValue(Action* action)
     if (!action)
         return 1.0f;
 
-    string name = action->getName();
+    string name = action->GetName();
     if (name == "follow" || name == "co" || name == "nc" || name == "drop target")
         return 1.0f;
 

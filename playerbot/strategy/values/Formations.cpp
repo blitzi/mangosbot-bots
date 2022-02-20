@@ -451,7 +451,7 @@ FormationValue::FormationValue(PlayerbotAI* ai) : ManualSetValue<Formation*>(ai,
 
 string FormationValue::Save()
 {
-    return value ? value->getName() : "?";
+    return value ? value->GetName() : "?";
 }
 
 bool FormationValue::Load(string formation)
@@ -515,7 +515,7 @@ bool SetFormationAction::Execute(Event event)
     FormationValue* value = (FormationValue*)context->GetValue<Formation*>("formation");
     if (formation == "?" || formation.empty())
     {
-        ostringstream str; str << "Formation: |cff00ff00" << value->Get()->getName();
+        ostringstream str; str << "Formation: |cff00ff00" << value->Get()->GetName();
         ai->TellMaster(str);
         return true;
     }

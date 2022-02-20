@@ -309,7 +309,7 @@ public:
     uint8 GetManaPercent(const Unit& target) const;
     uint8 GetManaPercent() const;
 
-    virtual bool IsInterruptableSpellCasting(Unit* player, string spell, uint8 effectMask);
+    virtual bool IsInterruptableSpellCasting(Unit* player, string spell);
     virtual bool HasAuraToDispel(Unit* player, uint32 dispelType);
     bool CanCastSpell(uint32 spellid, Unit* target, bool checkHasSpell = true, Item* itemTarget = NULL);
     bool CanCastSpell(uint32 spellid, GameObject* goTarget, bool checkHasSpell = true);

@@ -140,7 +140,7 @@ bool AttackAction::Attack(Unit* target)
 
         if (!ai->HasStrategy("force follow", BotState::BOT_STATE_NON_COMBAT))
         {
-            if (stance && stance->getName() != "near")
+            if (stance && stance->GetName() != "near")
                 return MoveToStance(target);
             else
                 return ChaseTo(target, distance);

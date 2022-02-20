@@ -13,7 +13,7 @@ bool UseItemAction::Execute(Event event)
 {
    string name = event.getParam();
    if (name.empty())
-      name = getName();
+      name = GetName();
 
    list<Item*> items = AI_VALUE2(list<Item*>, "inventory items", name);
    list<ObjectGuid> gos = chat->parseGameobjects(name);
@@ -436,12 +436,12 @@ bool UseItemAction::SocketItem(Item* item, Item* gem, bool replace)
 
 bool UseItemAction::isPossible()
 {
-   return getName() == "use" || AI_VALUE2(uint32, "item count", getName()) > 0;
+   return GetName() == "use" || AI_VALUE2(uint32, "item count", GetName()) > 0;
 }
 
 bool UseSpellItemAction::isUseful()
 {
-   return AI_VALUE2(bool, "spell cast useful", getName());
+   return AI_VALUE2(bool, "spell cast useful", GetName());
 }
 
 bool UseHearthStone::Execute(Event event)

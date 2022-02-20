@@ -1890,7 +1890,7 @@ void PlayerbotAI::RemoveAura(string name)
         bot->RemoveAurasDueToSpell(spellid);
 }
 
-bool PlayerbotAI::IsInterruptableSpellCasting(Unit* target, string spell, uint8 effectMask)
+bool PlayerbotAI::IsInterruptableSpellCasting(Unit* target, string spell)
 {
 	uint32 spellid = aiObjectContext->GetValue<uint32>("spell id", spell)->Get();
 	if (!spellid || !target->IsNonMeleeSpellCasted(true))

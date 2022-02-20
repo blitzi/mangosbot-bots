@@ -21,7 +21,7 @@ public:
 
         Stance* stance = ai->GetAiObjectContext()->GetValue<Stance*>("stance")->Get();        
 
-        if (stance && stance->getName() != "near" &&
+        if (stance && stance->GetName() != "near" &&
             sServerFacade.GetDistance2d(ai->GetBot(), unit) > ai->GetRange("spell"))     
                 return false;        
 

@@ -212,7 +212,7 @@ StanceValue::StanceValue(PlayerbotAI* ai) : ManualSetValue<Stance*>(ai, new Near
 
 string StanceValue::Save()
 {
-    return value ? value->getName() : "?";
+    return value ? value->GetName() : "?";
 }
 
 bool StanceValue::Load(string name)
@@ -255,7 +255,7 @@ bool SetStanceAction::Execute(Event event)
     StanceValue* value = (StanceValue*)context->GetValue<Stance*>("stance");
     if (stance == "?" || stance.empty())
     {
-        ostringstream str; str << "Stance: |cff00ff00" << value->Get()->getName();
+        ostringstream str; str << "Stance: |cff00ff00" << value->Get()->GetName();
         ai->TellMaster(str);
         return true;
     }

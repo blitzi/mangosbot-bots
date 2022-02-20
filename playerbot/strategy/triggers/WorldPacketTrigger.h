@@ -20,7 +20,7 @@ namespace ai
             if (!triggered)
                 return Event();
 
-            return Event(getName(), packet, owner);
+            return Event(GetName(), packet, owner);
         }
 
         virtual bool CheckOnMinimal() { return true; }

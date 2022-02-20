@@ -356,10 +356,10 @@ namespace ai
         CastCrowdControlSpellAction(PlayerbotAI* ai, string spell) : CastBuffSpellAction(ai, spell) {}
         Value<Unit*>* GetTargetValue()
         {
-            return context->GetValue<Unit*>("cc target", getName());
+            return context->GetValue<Unit*>("cc target", GetName());
         }
-        virtual bool Execute(Event event) { return ai->CastSpell(getName(), GetTarget()); }
-        virtual bool isPossible() { return ai->CanCastSpell(getName(), GetTarget()); }
+        virtual bool Execute(Event event) { return ai->CastSpell(GetName(), GetTarget()); }
+        virtual bool isPossible() { return ai->CanCastSpell(GetName(), GetTarget()); }
         virtual bool isUseful() { return true; }
         virtual ActionThreatType getThreatType() { return ACTION_THREAT_NONE; }
     };

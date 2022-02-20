@@ -9,7 +9,7 @@ Event Trigger::Check()
 {
 	if (IsActive())
 	{
-		Event event(getName());
+		Event event(GetName());
 		return event;
 	}
 	Event event;

@@ -475,7 +475,7 @@ namespace ai
     {
     public:
         CastTurnUndeadAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "turn undead") {}
-        virtual Value<Unit*>* GetTargetValue() { return context->GetValue<Unit*>("cc target", getName()); }
+        virtual Value<Unit*>* GetTargetValue() { return context->GetValue<Unit*>("cc target", GetName()); }
     };
 
     class CastBeaconOfLightOnPartyAction : public BuffOnPartyAction {

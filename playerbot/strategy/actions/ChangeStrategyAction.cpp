@@ -8,7 +8,7 @@ using namespace ai;
 bool ChangeCombatStrategyAction::Execute(Event event)
 {
     string text = event.getParam();
-    ai->ChangeStrategy(text.empty() ? getName() : text, BOT_STATE_COMBAT);
+    ai->ChangeStrategy(text.empty() ? GetName() : text, BOT_STATE_COMBAT);
     if (event.getSource() == "co")
     {
         vector<string> splitted = split(text, ',');

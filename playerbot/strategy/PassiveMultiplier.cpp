@@ -30,7 +30,7 @@ float PassiveMultiplier::GetValue(Action* action) {
     if (!action)
 		return 1.0f;
 
-    string name = action->getName();
+    string name = action->GetName();
 
     for (list<string>::iterator i = allowedActions.begin(); i != allowedActions.end(); i++)
     {

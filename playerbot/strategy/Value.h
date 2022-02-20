@@ -78,7 +78,7 @@ namespace ai
             {
                 lastCheckTime = now;
 
-                PerformanceMonitorOperation *pmo = sPerformanceMonitor.start(PERF_MON_VALUE, getName());
+                PerformanceMonitorOperation *pmo = sPerformanceMonitor.start(PERF_MON_VALUE, GetName());
                 value = Calculate();
                 if (pmo) pmo->finish();
             }

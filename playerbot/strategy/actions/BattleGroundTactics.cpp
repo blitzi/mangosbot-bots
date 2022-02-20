@@ -2043,15 +2043,15 @@ bool BGTactics::Execute(Event event)
         break;
     }
 
-    if (getName() == "move to start")
+    if (GetName() == "move to start")
         return moveToStart();
 
-    if (getName() == "select objective")
+    if (GetName() == "select objective")
     {
         return selectObjective();
     }
     
-    if (getName() == "protect fc")
+    if (GetName() == "protect fc")
     {
         if (!bot->IsMounted() && !sServerFacade.IsInCombat(bot))
             if (ai->DoSpecificAction("check mount state"))
@@ -2064,7 +2064,7 @@ bool BGTactics::Execute(Event event)
                 return true;
     }
 
-    if (getName() == "move to objective")
+    if (GetName() == "move to objective")
     {
         if (bg->GetStatus() == STATUS_WAIT_JOIN)
             return false;
@@ -2117,10 +2117,10 @@ bool BGTactics::Execute(Event event)
             return true;
     }
 
-    if (getName() == "use buff")
+    if (GetName() == "use buff")
         return useBuff();
 
-    if (getName() == "check flag")
+    if (GetName() == "check flag")
     {
         if (vFlagIds)
         {
@@ -2133,7 +2133,7 @@ bool BGTactics::Execute(Event event)
             return false;
     }
 
-    if (getName() == "check objective")
+    if (GetName() == "check objective")
         return resetObjective();
 
     return false;

@@ -21,7 +21,7 @@ float PullMultiplier::GetValue(Action* action)
     if (!action)
         return 1.0f;
 
-    string name = action->getName();
+    string name = action->GetName();
     if (ai->GetPullAction() == name ||
         name == "reach spell" ||
         name == "follow" ||

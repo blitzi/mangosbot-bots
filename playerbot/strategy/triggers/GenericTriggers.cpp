@@ -211,9 +211,9 @@ bool AndTrigger::IsActive()
 
 string AndTrigger::getName()
 {
-    std::string name(ls->getName());
+    std::string name(ls->GetName());
     name = name + " and ";
-    name = name + rs->getName();
+    name = name + rs->GetName();
     return name;
 }
 
@@ -239,7 +239,7 @@ bool ItemCountTrigger::IsActive()
 
 bool InterruptSpellTrigger::IsActive()
 {
-    return SpellTrigger::IsActive() && ai->IsInterruptableSpellCasting(GetTarget(), getName(), true);
+    return SpellTrigger::IsActive() && ai->IsInterruptableSpellCasting(GetTarget(), getName());
 }
 
 bool DeflectSpellTrigger::IsActive()
@@ -289,12 +289,12 @@ bool DeflectSpellTrigger::IsActive()
 
 bool HasAuraTrigger::IsActive()
 {
-    return ai->HasAura(getName(), GetTarget());
+    return ai->HasAura(GetName(), GetTarget());
 }
 
 bool HasNoAuraTrigger::IsActive()
 {
-    return !ai->HasAura(getName(), GetTarget());
+    return !ai->HasAura(GetName(), GetTarget());
 }
 
 bool TankAssistTrigger::IsActive()
@@ -336,7 +336,7 @@ bool IsNotFacingTargetTrigger::IsActive()
 
 bool HasCcTargetTrigger::IsActive()
 {
-    return AI_VALUE2(Unit*, "cc target", getName()) && !AI_VALUE2(Unit*, "current cc target", getName());
+    return AI_VALUE2(Unit*, "cc target", GetName()) && !AI_VALUE2(Unit*, "current cc target", GetName());
 }
 
 bool NoMovementTrigger::IsActive()
@@ -400,7 +400,7 @@ bool HasNearestAddsTrigger::IsActive()
 
 bool HasItemForSpellTrigger::IsActive()
 {
-    string spell = getName();
+    string spell = GetName();
     uint32 spellId = AI_VALUE2(uint32, "spell id", spell);
     return spellId && AI_VALUE2(Item*, "item for spell", spellId);
 }

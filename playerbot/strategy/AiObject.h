@@ -22,13 +22,15 @@ namespace ai
     class AiNamedObject : public AiObject
     {
     public:
-        AiNamedObject(PlayerbotAI* ai, string name) : AiObject(ai), name(name) {}
+		AiNamedObject(PlayerbotAI* ai, string name) : AiObject(ai), name(name) { baseName = name; }
 
     public:
-        virtual string getName() { return name; }
+        virtual string GetName() { return name; }
+		string GetBaseName() { return baseName; }
 
     protected:
         string name;
+        string baseName;
     };
 }
 
