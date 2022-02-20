@@ -103,13 +103,14 @@ namespace ai
                 creators["shockwave"] = &TriggerFactoryInternal::shockwave;
                 creators["shockwave on snare target"] = &TriggerFactoryInternal::shockwave_on_snare_target;
                 creators["taste for blood"] = &TriggerFactoryInternal::taste_for_blood;
+                creators["whirlwind"] = &TriggerFactoryInternal::whirlwind;
             }
 
         private:
             static Trigger* taste_for_blood(PlayerbotAI* ai) { return new TasteForBloodTrigger(ai); }
             static Trigger* shockwave_on_snare_target(PlayerbotAI* ai) { return new ShockwaveSnareTrigger(ai); }
             static Trigger* shockwave(PlayerbotAI* ai) { return new ShockwaveTrigger(ai); }
-            static Trigger* instant_slam(PlayerbotAI* ai) { return new SlamInstantTrigger(ai); }
+            static Trigger* instant_slam(PlayerbotAI* ai) { return new SpellCanBeCastInstantTrigger(ai, "slam"); }
             static Trigger* sudden_death(PlayerbotAI* ai) { return new SuddenDeathTrigger(ai); }
             static Trigger* spell_reflection(PlayerbotAI* ai) { return new SpellReflectionTrigger(ai); }
             static Trigger* intercept_on_snare_target(PlayerbotAI* ai) { return new InterceptSnareTrigger(ai); }
@@ -120,7 +121,7 @@ namespace ai
             static Trigger* pummel(PlayerbotAI* ai) { return new PummelInterruptSpellTrigger(ai); }
             static Trigger* pummel_on_enemy_healer(PlayerbotAI* ai) { return new PummelInterruptEnemyHealerSpellTrigger(ai); }
             static Trigger* berserker_rage(PlayerbotAI* ai) { return new BerserkerRageBuffTrigger(ai); }
-            static Trigger* bloodthirst(PlayerbotAI* ai) { return new BloodthirstBuffTrigger(ai); }
+            static Trigger* bloodthirst(PlayerbotAI* ai) { return new SpellCanBeCastTrigger(ai, "bloodthirst"); }
             static Trigger* thunder_clap_on_snare_target(PlayerbotAI* ai) { return new ThunderClapSnareTrigger(ai); }
             static Trigger* thunder_clap(PlayerbotAI* ai) { return new ThunderClapTrigger(ai); }
             static Trigger* mortal_strike(PlayerbotAI* ai) { return new MortalStrikeDebuffTrigger(ai); }
@@ -145,6 +146,7 @@ namespace ai
             static Trigger* concussion_blow(PlayerbotAI* ai) { return new ConcussionBlowTrigger(ai); }
             static Trigger* SwordAndBoard(PlayerbotAI* ai) { return new SwordAndBoardTrigger(ai); }
             static Trigger* shield_bash_on_enemy_healer(PlayerbotAI* ai) { return new ShieldBashInterruptEnemyHealerSpellTrigger(ai); }
+            static Trigger* whirlwind(PlayerbotAI* ai) { return new SpellCanBeCastTrigger(ai, "whirlwind"); }
         };
     };
 };
