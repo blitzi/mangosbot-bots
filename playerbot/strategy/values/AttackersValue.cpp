@@ -316,7 +316,7 @@ bool AttackersValue::IsPossibleTarget(Unit *attacker, Player *bot)
 
     Unit* dmgStopTarget = bot->GetPlayerbotAI()->GetAiObjectContext()->GetValue<Unit*>("dps stop target")->Get();
 
-    if (c == dmgStopTarget || bot == dmgStopTarget)
+    if (dmgStopTarget != NULL && (c == dmgStopTarget || bot == dmgStopTarget))
         return false;
 
     bool basicConditions = attacker &&

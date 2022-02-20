@@ -98,6 +98,12 @@ public:
 public:
     virtual void CheckAttacker(Unit* attacker, ThreatManager* threatManager)
     {
+		if(attacker->IsImmuneToDamage(SPELL_SCHOOL_MASK_ALL))
+		{
+			result = attacker;
+			return;
+		}
+
         for (uint32 spellId : sPlayerbotAIConfig.damageStopSpellIds)
         {
             if (ai->HasAura(spellId, attacker))
