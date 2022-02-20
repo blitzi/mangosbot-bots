@@ -22,7 +22,7 @@ float ForceFollowMultiplier::GetValue(Action* action)
     if (!action)
         return 1.0f;
 
-    string name = action->getName();
+	string name = action->GetBaseName();
     if (name == "follow" || name == "co" || name == "nc" || name == "drop target")
         return 1.0f;
 
@@ -31,7 +31,10 @@ float ForceFollowMultiplier::GetValue(Action* action)
 
     float distance = sServerFacade.GetDistance2d(ai->GetBot(), ai->GetMaster());
 
-    if(name == "set facing" || name == "set behind" || name == "melee" || name == "dps assist")
+	if (name == "melee" && ai->IsRanged(ai->GetBot()))
+		return 0.0f;
+
+    if(name == "set behind" || name == "melee" || name == "dps assist")
         return distance > sPlayerbotAIConfig.forceFollowDistance ? 0.0f : 1.0f;
 
     uint32 spellId = AI_VALUE2(uint32, "spell id", name);
