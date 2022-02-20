@@ -55,12 +55,9 @@ void HealShamanStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
         "party member to heal out of spell range",
         NextAction::array(0, new NextAction("reach party member to heal", ACTION_CRITICAL_HEAL + 1), NULL)));
 
-    if (sRandomPlayerbotMgr.IsRandomBot(ai->GetBot()))
-    {
-        triggers.push_back(new TriggerNode(
-            "wrath of air totem",
-            NextAction::array(0, new NextAction("wrath of air totem", 20.0f), NULL)));
-    }
+    triggers.push_back(new TriggerNode(
+        "wrath of air totem",
+        NextAction::array(0, new NextAction("wrath of air totem", 20.0f), NULL)));   
 
     triggers.push_back(new TriggerNode(
         "party member medium health",
@@ -89,21 +86,5 @@ void HealShamanStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
     triggers.push_back(new TriggerNode(
         "party member almost full health",
         NextAction::array(0, new NextAction("lesser healing wave on party", 17.0f), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "low health",
-        NextAction::array(0, new NextAction("healing wave", ACTION_CRITICAL_HEAL + 2), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "party member low health",
-        NextAction::array(0, new NextAction("healing wave on party", ACTION_CRITICAL_HEAL + 1), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "critical health",
-        NextAction::array(0, new NextAction("lesser healing wave", ACTION_CRITICAL_HEAL + 4), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "party member critical health",
-        NextAction::array(0, new NextAction("lesser healing wave party", ACTION_CRITICAL_HEAL + 3), NULL)));
 
 }

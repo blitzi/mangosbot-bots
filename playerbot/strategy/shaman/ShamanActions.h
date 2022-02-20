@@ -4,6 +4,8 @@
 
 namespace ai
 {
+	BUFF_ACTION(COEAction, "call of the elements");
+
     class CastLesserHealingWaveAction : public CastHealingSpellAction {
     public:
         CastLesserHealingWaveAction(PlayerbotAI* ai) : CastHealingSpellAction(ai, "lesser healing wave") {}

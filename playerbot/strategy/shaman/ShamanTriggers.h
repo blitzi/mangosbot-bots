@@ -32,18 +32,30 @@ namespace ai
     class WindfuryTotemTrigger : public TotemTrigger {
     public:
         WindfuryTotemTrigger(PlayerbotAI* ai) : TotemTrigger(ai, "windfury totem") {}
+		virtual bool IsActive()
+		{
+			return TotemTrigger::IsActive() && !AI_VALUE2(bool, "has totem", "grounding totem");
+		}
     };
 
     class GraceOfAirTotemTrigger : public TotemTrigger
     {
     public:
         GraceOfAirTotemTrigger(PlayerbotAI* ai) : TotemTrigger(ai, "grace of air totem") {}
+		virtual bool IsActive()
+		{
+			return TotemTrigger::IsActive() && !AI_VALUE2(bool, "has totem", "grounding totem");
+		}
     };
 
     class WrathOfAirTotemTrigger : public TotemTrigger
     {
     public:
         WrathOfAirTotemTrigger(PlayerbotAI* ai) : TotemTrigger(ai, "wrath of air totem") {}
+		virtual bool IsActive()
+		{
+			return TotemTrigger::IsActive() && !AI_VALUE2(bool, "has totem", "grounding totem");
+		}
     };
 
     class ManaSpringTotemTrigger : public TotemTrigger {
@@ -51,9 +63,8 @@ namespace ai
         ManaSpringTotemTrigger(PlayerbotAI* ai) : TotemTrigger(ai, "mana spring totem") {}
         virtual bool IsActive()
         {
-            return AI_VALUE(uint8, "attacker count") >= attackerCount &&
-                    !AI_VALUE2(bool, "has totem", "mana tide totem") &&
-                    !AI_VALUE2(bool, "has totem", name);
+			return TotemTrigger::IsActive() && !AI_VALUE2(bool, "has totem", "mana tide totem");
+                    
         }
     };
 
@@ -229,7 +240,7 @@ namespace ai
     };
 
     MY_DEBUFF_TRIGGER(FlameshockTrigger, "flame shock");
-    MY_DEBUFF_TRIGGER(EarthshockTrigger, "earth shock");
+	DEBUFF_IMMEDIATE_TRIGGER(EarthshockTrigger, "earth shock");
 
     class HeroismTrigger : public BoostBuffTrigger
     {

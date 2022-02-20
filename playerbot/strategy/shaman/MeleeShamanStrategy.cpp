@@ -86,13 +86,32 @@ void MeleeShamanStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
         "enemy too close for melee",
         NextAction::array(0, new NextAction("move out of enemy contact", ACTION_NORMAL + 8), NULL)));
 
-    triggers.push_back(new TriggerNode(
-        "windfury totem",
-        NextAction::array(0, new NextAction("windfury totem", 19.0f), NULL)));
+	if (sRandomPlayerbotMgr.IsRandomBot(ai->GetBot()))
+	{
+		triggers.push_back(new TriggerNode(
+			"windfury totem",
+			NextAction::array(0, new NextAction("windfury totem", 19.0f), NULL)));
 
-    triggers.push_back(new TriggerNode(
-        "strength of earth totem",
-        NextAction::array(0, new NextAction("strength of earth totem", 19.0f), NULL)));
+		triggers.push_back(new TriggerNode(
+			"strength of earth totem",
+			NextAction::array(0, new NextAction("strength of earth totem", 19.0f), NULL)));
+	}
+	else
+	{
+		triggers.push_back(new TriggerNode(
+			"windfury totem",
+			NextAction::array(0, new NextAction("call of the elements", 50), NULL)));
+	}
+
+#ifndef MANGOSBOT_TWO
+	triggers.push_back(new TriggerNode(
+		"shock",
+		NextAction::array(0, new NextAction("earth shock", 200), NULL)));
+#else
+	triggers.push_back(new TriggerNode(
+		"shock",
+		NextAction::array(0, new NextAction("wind shear", 200), NULL)));
+#endif
 }
 
 void MeleeAoeShamanStrategy::InitTriggers(std::list<TriggerNode*> &triggers)

@@ -31,6 +31,10 @@ void CasterShamanStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
     GenericShamanStrategy::InitTriggers(triggers);
 
+	triggers.push_back(new TriggerNode(
+		"enemy out of spell",
+		NextAction::array(0, new NextAction("reach spell", ACTION_NORMAL + 9), NULL)));
+
     triggers.push_back(new TriggerNode(
         "shaman weapon",
         NextAction::array(0, new NextAction("flametongue weapon", 23.0f), NULL)));
@@ -45,11 +49,11 @@ void CasterShamanStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 
     triggers.push_back(new TriggerNode(
         "tremor totem",
-        NextAction::array(0, new NextAction("tremor totem", 19.0f), NULL))); 
-    
-    triggers.push_back(new TriggerNode(
-        "totem of wrath",
-        NextAction::array(0, new NextAction("totem of wrath", 24.0f), NULL)));
+        NextAction::array(0, new NextAction("tremor totem", 19.0f), NULL)));     
+
+	triggers.push_back(new TriggerNode(
+		"totem of wrath",
+		NextAction::array(0, new NextAction("totem of wrath", 24.0f), NULL)));
 
     triggers.push_back(new TriggerNode(
         "lightning bolt",
@@ -58,6 +62,16 @@ void CasterShamanStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
     triggers.push_back(new TriggerNode(
         "clearcasting",
         NextAction::array(0, new NextAction("chain lightning", 26.0f), NULL)));
+
+#ifndef MANGOSBOT_TWO
+	triggers.push_back(new TriggerNode(
+		"shock",
+		NextAction::array(0, new NextAction("earth shock", 200), NULL)));
+#else
+	triggers.push_back(new TriggerNode(
+		"shock",
+		NextAction::array(0, new NextAction("wind shear", 200), NULL)));
+#endif
 }
 
 void CasterAoeShamanStrategy::InitTriggers(std::list<TriggerNode*> &triggers)

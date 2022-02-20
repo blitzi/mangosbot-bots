@@ -128,7 +128,6 @@ namespace ai
                 creators["stormstrike"] = &TriggerFactoryInternal::stormstrike;
                 creators["lava lash"] = &TriggerFactoryInternal::lava_lash;
                 creators["instant chain lightning"] = &TriggerFactoryInternal::instant_chain_lightning;
-
             }
 
         private:
@@ -251,6 +250,7 @@ namespace ai
                 creators["cure disease on party"] = &AiObjectContextInternal::cure_disease_on_party;
                 creators["cure poison"] = &AiObjectContextInternal::cure_poison;
                 creators["cure poison on party"] = &AiObjectContextInternal::cure_poison_on_party;
+				creators["call of the elements"] = &AiObjectContextInternal::coe_wotlk_action;
             }
 
         private:
@@ -313,6 +313,7 @@ namespace ai
             static Action* cure_poison_on_party(PlayerbotAI* ai) { return new CastCurePoisonOnPartyAction(ai); }
             static Action* cure_disease(PlayerbotAI* ai) { return new CastCureDiseaseAction(ai); }
             static Action* cure_disease_on_party(PlayerbotAI* ai) { return new CastCureDiseaseOnPartyAction(ai); }
+            static Action* coe_wotlk_action(PlayerbotAI* ai) { return new COEAction(ai); }
         };
     };
 };
