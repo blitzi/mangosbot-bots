@@ -175,10 +175,6 @@ namespace ai
                 ai->TellMaster(o.str());
                 ai->GetBot()->CastStop();
 
-                ai->GetBot()->StopMoving();
-                ai->GetBot()->GetMotionMaster()->Clear();
-                ai->GetBot()->GetMotionMaster()->MoveIdle();
-
                 ai->GetAiObjectContext()->GetValue<Unit*>("current target")->Set(NULL);
                 ai->GetAiObjectContext()->GetValue<Unit*>("enemy player target")->Set(NULL);
 				ai->GetAiObjectContext()->GetValue<ObjectGuid>("pull target")->Set(ObjectGuid());
