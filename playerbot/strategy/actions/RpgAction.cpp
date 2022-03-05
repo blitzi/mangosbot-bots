@@ -292,9 +292,9 @@ void RpgAction::quest(ObjectGuid guid)
     uint32 dStatus = bot->GetSession()->getDialogStatus(bot, wo, DIALOG_STATUS_NONE);
 
 #ifndef MANGOSBOT_TWO
-    if (dStatus == DIALOG_STATUS_AVAILABLE || (AI_VALUE(uint8, "durability") <= 20 || dStatus == DIALOG_STATUS_CHAT))
+    if (dStatus == DIALOG_STATUS_AVAILABLE || (AI_VALUE(float, "durability") <= 20 || dStatus == DIALOG_STATUS_CHAT))
 #else
-    if (dStatus == DIALOG_STATUS_AVAILABLE || (AI_VALUE(uint8, "durability") <= 20 || dStatus == DIALOG_STATUS_LOW_LEVEL_AVAILABLE))
+    if (dStatus == DIALOG_STATUS_AVAILABLE || (AI_VALUE(float, "durability") <= 20 || dStatus == DIALOG_STATUS_LOW_LEVEL_AVAILABLE))
 #endif    
         retVal = ai->DoSpecificAction("accept all quests", Event("rpg action", p));
 #ifdef MANGOSBOT_ZERO

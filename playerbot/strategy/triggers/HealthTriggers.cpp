@@ -6,7 +6,7 @@ using namespace ai;
 
 float HealthInRangeTrigger::GetValue()
 {
-    return AI_VALUE2(uint8, "health", GetTargetName());
+    return AI_VALUE2(float, "health", GetTargetName());
 }
 
 bool PartyMemberDeadTrigger::IsActive()

@@ -183,7 +183,7 @@ namespace ai
     public:
         CastLifeTapAction(PlayerbotAI* ai) : CastSpellAction(ai, "life tap") {}
         virtual string GetTargetName() { return "self target"; }
-        virtual bool isUseful() { return AI_VALUE2(uint8, "health", "self target") > sPlayerbotAIConfig.lowHealth; }
+        virtual bool isUseful() { return AI_VALUE2(float, "health", "self target") > sPlayerbotAIConfig.lowHealth; }
     };
 
     class CastAmplifyCurseAction : public CastBuffSpellAction

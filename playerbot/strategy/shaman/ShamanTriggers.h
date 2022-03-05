@@ -129,7 +129,7 @@ namespace ai
             return 
                 AI_VALUE(uint8, "attacker count") >= 1 &&
                 AI_VALUE2(bool, "has mana", "self target") &&
-                AI_VALUE2(uint8, "mana", "self target") < sPlayerbotAIConfig.lowMana &&
+                AI_VALUE2(float, "mana", "self target") < sPlayerbotAIConfig.lowMana &&
                 BuffTrigger::IsActive();
         }
     };

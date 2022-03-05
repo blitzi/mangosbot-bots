@@ -1092,7 +1092,7 @@ bool MovementAction::Flee(Unit *target, bool forced)
         bool isHealer = ai->IsHeal(bot);
         bool isDps = !isHealer && !ai->IsTank(bot);
         bool isTank = ai->IsTank(bot);
-        bool needHealer = !isHealer && AI_VALUE2(uint8, "health", "self target") < 50;
+        bool needHealer = !isHealer && AI_VALUE2(float, "health", "self target") < 50;
         bool isRanged = ai->IsRanged(bot);
 
         Group *group = bot->GetGroup();

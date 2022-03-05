@@ -8,33 +8,33 @@ using namespace ai;
 
 bool LowManaTrigger::IsActive()
 {
-    return AI_VALUE2(bool, "has mana", "self target") && AI_VALUE2(uint8, "mana", "self target") < sPlayerbotAIConfig.lowMana;
+    return AI_VALUE2(bool, "has mana", "self target") && AI_VALUE2(float, "mana", "self target") < sPlayerbotAIConfig.lowMana;
 }
 
 bool MediumManaTrigger::IsActive()
 {
-    return AI_VALUE2(bool, "has mana", "self target") && AI_VALUE2(uint8, "mana", "self target") < sPlayerbotAIConfig.mediumMana;
+    return AI_VALUE2(bool, "has mana", "self target") && AI_VALUE2(float, "mana", "self target") < sPlayerbotAIConfig.mediumMana;
 }
 
 bool HighManaTrigger::IsActive()
 {
-    return AI_VALUE2(bool, "has mana", "self target") && AI_VALUE2(uint8, "mana", "self target") < 65;
+    return AI_VALUE2(bool, "has mana", "self target") && AI_VALUE2(float, "mana", "self target") < 65;
 }
 
 bool AlmostFullManaTrigger::IsActive()
 {
-    return AI_VALUE2(bool, "has mana", "self target") && AI_VALUE2(uint8, "mana", "self target") > 85;
+    return AI_VALUE2(bool, "has mana", "self target") && AI_VALUE2(float, "mana", "self target") > 85;
 }
 
 
 bool RageAvailable::IsActive()
 {
-    return AI_VALUE2(uint8, "rage", "self target") >= amount;
+    return AI_VALUE2(uint32, "rage", "self target") >= amount;
 }
 
 bool EnergyAvailable::IsActive()
 {
-    return AI_VALUE2(uint8, "energy", "self target") >= amount;
+    return AI_VALUE2(uint32, "energy", "self target") >= amount;
 }
 
 bool ComboPointsAvailableTrigger::IsActive()
@@ -59,8 +59,8 @@ bool HasAreaDebuffTrigger::IsActive()
 
 bool PanicTrigger::IsActive()
 {
-    return AI_VALUE2(uint8, "health", "self target") < sPlayerbotAIConfig.criticalHealth &&
-        (!AI_VALUE2(bool, "has mana", "self target") || AI_VALUE2(uint8, "mana", "self target") < sPlayerbotAIConfig.lowMana);
+    return AI_VALUE2(float, "health", "self target") < sPlayerbotAIConfig.criticalHealth &&
+        (!AI_VALUE2(bool, "has mana", "self target") || AI_VALUE2(float, "mana", "self target") < sPlayerbotAIConfig.lowMana);
 }
 
 bool OutNumberedTrigger::IsActive()

@@ -122,7 +122,7 @@ namespace ai
         BindingHealTrigger(PlayerbotAI* ai) : PartyMemberLowHealthTrigger(ai, "binding heal", sPlayerbotAIConfig.lowHealth, 0) {}
         virtual bool IsActive()
         {
-            return PartyMemberLowHealthTrigger::IsActive() && AI_VALUE2(uint8, "health", "self target") < sPlayerbotAIConfig.mediumHealth;
+            return PartyMemberLowHealthTrigger::IsActive() && AI_VALUE2(float, "health", "self target") < sPlayerbotAIConfig.mediumHealth;
         }
     };
 }

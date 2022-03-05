@@ -17,14 +17,14 @@ namespace ai
 	{
 	public:
         ShouldRepairValue(PlayerbotAI* ai) : BoolCalculatedValue(ai,"should repair",2) {}
-        virtual bool Calculate() { return AI_VALUE(uint8, "durability") <= 20; };
+        virtual bool Calculate() { return AI_VALUE(float, "durability") <= 20; };
     };
 
     class CanRepairValue : public BoolCalculatedValue
     {
     public:
         CanRepairValue(PlayerbotAI* ai) : BoolCalculatedValue(ai, "can repair",2) {}
-        virtual bool Calculate() { return AI_VALUE(uint8, "durability") < 100 && AI_VALUE(uint32, "repair cost") < AI_VALUE2(uint32, "free money for", (uint32)NeedMoneyFor::repair); };
+        virtual bool Calculate() { return AI_VALUE(float, "durability") < 100 && AI_VALUE(uint32, "repair cost") < AI_VALUE2(uint32, "free money for", (uint32)NeedMoneyFor::repair); };
     };
 
     class ShouldSellValue : public BoolCalculatedValue
@@ -52,7 +52,7 @@ namespace ai
     {
     public:
         CanFightEqualValue(PlayerbotAI* ai) : BoolCalculatedValue(ai, "can fight equal",2) {}
-        virtual bool Calculate() { return AI_VALUE(uint8, "durability") > 20; };
+        virtual bool Calculate() { return AI_VALUE(float, "durability") > 20; };
     };
 
     class CanFightBossValue : public BoolCalculatedValue

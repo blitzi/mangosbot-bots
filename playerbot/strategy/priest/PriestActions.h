@@ -14,7 +14,7 @@ namespace ai
     CURE_PARTY_ACTION(CastDispelMagicOnPartyAction, "dispel magic", DISPEL_MAGIC);
     SPELL_ACTION(CastDispelMagicOnTargetAction, "dispel magic");
     CC_ACTION(CastShackleUndeadAction, "shackle undead");
-    SPELL_ACTION_U(CastManaBurnAction, "mana burn", AI_VALUE2(uint8, "mana", "self target") < 50 && AI_VALUE2(uint8, "mana", "current target") >= 20);
+    SPELL_ACTION_U(CastManaBurnAction, "mana burn", AI_VALUE2(float, "mana", "self target") < 50 && AI_VALUE2(float, "mana", "current target") >= 20);
     BUFF_ACTION(CastLevitateAction, "levitate");
     BUFF_ACTION(CastDivineSpiritAction, "divine spirit");
     BUFF_PARTY_ACTION(CastDivineSpiritOnPartyAction, "divine spirit");
@@ -96,7 +96,7 @@ namespace ai
     HEAL_ACTION(CastDesperatePrayerAction, "desperate prayer");
     BUFF_ACTION(CastFearWardAction, "fear ward");
     BUFF_PARTY_ACTION(CastFearWardOnPartyAction, "fear ward");
-    SPELL_ACTION_U(CastStarshardsAction, "starshards", (AI_VALUE2(uint8, "mana", "self target") > 50 && AI_VALUE(Unit*, "current target") && AI_VALUE2(float, "distance", "current target") > 15.0f));
+    SPELL_ACTION_U(CastStarshardsAction, "starshards", (AI_VALUE2(float, "mana", "self target") > 50 && AI_VALUE(Unit*, "current target") && AI_VALUE2(float, "distance", "current target") > 15.0f));
     BUFF_ACTION(CastElunesGraceAction, "elune's grace");
     BUFF_ACTION(CastFeedbackAction, "feedback");
     BUFF_ACTION(CastSymbolOfHopeAction, "symbol of hope");

@@ -44,7 +44,7 @@ class HealthChecker : public ReadyChecker
 public:
     virtual bool Check(PlayerbotAI *ai, AiObjectContext* context)
     {
-        return AI_VALUE2(uint8, "health", "self target") > sPlayerbotAIConfig.almostFullHealth;
+        return AI_VALUE2(float, "health", "self target") > sPlayerbotAIConfig.almostFullHealth;
     }
     virtual string GetName() { return "HP"; }
 };
@@ -54,7 +54,7 @@ class ManaChecker : public ReadyChecker
 public:
     virtual bool Check(PlayerbotAI *ai, AiObjectContext* context)
     {
-        return !AI_VALUE2(bool, "has mana", "self target") || AI_VALUE2(uint8, "mana", "self target") > sPlayerbotAIConfig.mediumHealth;
+        return !AI_VALUE2(bool, "has mana", "self target") || AI_VALUE2(float, "mana", "self target") > sPlayerbotAIConfig.mediumHealth;
     }
     virtual string GetName() { return "MP"; }
 };

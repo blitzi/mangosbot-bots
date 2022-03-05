@@ -19,7 +19,7 @@ bool SealTrigger::IsActive()
 
 bool SealOfWisdomTrigger::IsActive()
 {
-    bool lowMana = AI_VALUE2(bool, "has mana", "self target") && AI_VALUE2(uint8, "mana", "self target") < sPlayerbotAIConfig.mediumMana;
+    bool lowMana = AI_VALUE2(bool, "has mana", "self target") && AI_VALUE2(float, "mana", "self target") < sPlayerbotAIConfig.mediumMana;
 
     return SealTrigger::IsActive() && lowMana;
 }

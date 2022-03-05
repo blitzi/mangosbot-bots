@@ -20,10 +20,10 @@ bool AttackAnythingAction::isUseful() {
     if(!ChooseRpgTargetAction::isFollowValid(bot, target))                               //Do not grind mobs far away from master.
         return false;
 
-    if (AI_VALUE2(uint8, "health", "self target") <=  sPlayerbotAIConfig.mediumHealth)   //Bot does not has enough health.
+    if (AI_VALUE2(float, "health", "self target") <=  sPlayerbotAIConfig.mediumHealth)   //Bot does not has enough health.
         return false;
 
-    if (AI_VALUE2(uint8, "mana", "self target") && AI_VALUE2(uint8, "mana", "self target") <= sPlayerbotAIConfig.mediumMana) //Bot has mana and not enough mana.
+    if (AI_VALUE2(float, "mana", "self target") && AI_VALUE2(float, "mana", "self target") <= sPlayerbotAIConfig.mediumMana) //Bot has mana and not enough mana.
         return false;
 
     if (AI_VALUE2(bool, "group or", "should repair,can repair"))

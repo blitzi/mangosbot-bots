@@ -22,7 +22,7 @@ namespace ai
 
         virtual bool isUseful()
         {
-            return UseItemAction::isUseful() && AI_VALUE2(uint8, "mana", "self target") < 85;
+            return UseItemAction::isUseful() && AI_VALUE2(float, "mana", "self target") < 85;
         }
     };
 
@@ -41,7 +41,7 @@ namespace ai
 
         virtual bool isUseful()
         {
-            return UseItemAction::isUseful() && AI_VALUE2(uint8, "health", "self target") < sPlayerbotAIConfig.lowHealth;
+            return UseItemAction::isUseful() && AI_VALUE2(float, "health", "self target") < sPlayerbotAIConfig.lowHealth;
         }
     };
 

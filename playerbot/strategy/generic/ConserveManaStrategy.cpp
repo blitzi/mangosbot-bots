@@ -12,9 +12,9 @@ float ConserveManaMultiplier::GetValue(Action* action)
 {
     if (action == NULL) return 1.0f;
 
-    uint8 health = AI_VALUE2(uint8, "health", "self target");
-    uint8 targetHealth = AI_VALUE2(uint8, "health", "current target");
-    uint8 mana = AI_VALUE2(uint8, "mana", "self target");
+    float health = AI_VALUE2(float, "health", "self target");
+    float targetHealth = AI_VALUE2(float, "health", "current target");
+	float mana = AI_VALUE2(float, "mana", "self target");
     bool hasMana = AI_VALUE2(bool, "has mana", "self target");
     bool mediumMana = hasMana && mana < sPlayerbotAIConfig.mediumMana;
 

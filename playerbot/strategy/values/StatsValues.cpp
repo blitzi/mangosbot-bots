@@ -5,7 +5,7 @@
 #include "../../ServerFacade.h"
 using namespace ai;
 
-uint8 HealthValue::Calculate()
+float HealthValue::Calculate()
 {
     Unit* target = GetTarget();
     if (!target)
@@ -59,23 +59,23 @@ bool PetIsHappyValue::Calculate()
 }
 
 
-uint8 RageValue::Calculate()
+uint32 RageValue::Calculate()
 {
     Unit* target = GetTarget();
     if (!target)
         return 0;
-    return (static_cast<float> (target->GetPower(POWER_RAGE)));
+    return (target->GetPower(POWER_RAGE)) / 10.0f ;
 }
 
-uint8 EnergyValue::Calculate()
+uint32 EnergyValue::Calculate()
 {
     Unit* target = GetTarget();
     if (!target)
         return 0;
-    return (static_cast<float> (target->GetPower(POWER_ENERGY)));
+    return (target->GetPower(POWER_ENERGY));
 }
 
-uint8 ManaValue::Calculate()
+float ManaValue::Calculate()
 {
     Unit* target = GetTarget();
     if (!target)
@@ -168,7 +168,7 @@ uint8 BagSpaceValue::Calculate()
     return (static_cast<float> (totalused) / total) * 100;
 }
 
-uint8 DurabilityValue::Calculate()
+float DurabilityValue::Calculate()
 {
     uint32 totalMax = 0, total = 0;
 

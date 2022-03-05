@@ -3217,7 +3217,7 @@ bool BGTactics::useBuff()
     if (closeObjects.empty())
         return false;
 
-    bool needRegen = bot->GetHealthPercent() < sPlayerbotAIConfig.lowHealth || (AI_VALUE2(bool, "has mana", "self target") && AI_VALUE2(uint8, "mana", "self target") < sPlayerbotAIConfig.lowMana);
+    bool needRegen = bot->GetHealthPercent() < sPlayerbotAIConfig.lowHealth || (AI_VALUE2(bool, "has mana", "self target") && AI_VALUE2(float, "mana", "self target") < sPlayerbotAIConfig.lowMana);
     bool needSpeed = (bot->HasAura(BG_WS_SPELL_WARSONG_FLAG) || bot->HasAura(BG_WS_SPELL_SILVERWING_FLAG)) || !(teamFlagTaken() || flagTaken());
     bool foundBuff = false;
 

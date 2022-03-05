@@ -5,17 +5,17 @@ class Unit;
 
 namespace ai
 {
-    class HealthValue : public Uint8CalculatedValue, public Qualified
+    class HealthValue : public FloatCalculatedValue, public Qualified
     {
     public:
-        HealthValue(PlayerbotAI* ai) : Uint8CalculatedValue(ai) {}
+        HealthValue(PlayerbotAI* ai) : FloatCalculatedValue(ai) {}
 
         Unit* GetTarget()
         {
             AiObjectContext* ctx = AiObject::context;
             return ctx->GetValue<Unit*>(qualifier)->Get();
         }
-        virtual uint8 Calculate();
+        virtual float Calculate();
     };
 
     class IsDeadValue : public BoolCalculatedValue, public Qualified
@@ -45,43 +45,43 @@ namespace ai
         virtual bool Calculate();
     };
 
-    class RageValue : public Uint8CalculatedValue, public Qualified
+    class RageValue : public Uint32CalculatedValue, public Qualified
     {
     public:
-        RageValue(PlayerbotAI* ai) : Uint8CalculatedValue(ai) {}
+        RageValue(PlayerbotAI* ai) : Uint32CalculatedValue(ai) {}
 
         Unit* GetTarget()
         {
             AiObjectContext* ctx = AiObject::context;
             return ctx->GetValue<Unit*>(qualifier)->Get();
         }
-        virtual uint8 Calculate();
+        virtual uint32 Calculate();
     };
 
-    class EnergyValue : public Uint8CalculatedValue, public Qualified
+    class EnergyValue : public Uint32CalculatedValue, public Qualified
     {
     public:
-        EnergyValue(PlayerbotAI* ai) : Uint8CalculatedValue(ai) {}
+        EnergyValue(PlayerbotAI* ai) : Uint32CalculatedValue(ai) {}
 
         Unit* GetTarget()
         {
             AiObjectContext* ctx = AiObject::context;
             return ctx->GetValue<Unit*>(qualifier)->Get();
         }
-        virtual uint8 Calculate();
+        virtual uint32 Calculate();
     };
 
-    class ManaValue : public Uint8CalculatedValue, public Qualified
+    class ManaValue : public FloatCalculatedValue, public Qualified
     {
     public:
-        ManaValue(PlayerbotAI* ai) : Uint8CalculatedValue(ai) {}
+        ManaValue(PlayerbotAI* ai) : FloatCalculatedValue(ai) {}
 
         Unit* GetTarget()
         {
             AiObjectContext* ctx = AiObject::context;
             return ctx->GetValue<Unit*>(qualifier)->Get();
         }
-        virtual uint8 Calculate();
+        virtual float Calculate();
     };
 
     class HasManaValue : public BoolCalculatedValue, public Qualified
@@ -144,12 +144,12 @@ namespace ai
         virtual uint8 Calculate();
     };
 
-    class DurabilityValue : public Uint8CalculatedValue
+    class DurabilityValue : public FloatCalculatedValue
     {
     public:
-        DurabilityValue(PlayerbotAI* ai) : Uint8CalculatedValue(ai) {}
+        DurabilityValue(PlayerbotAI* ai) : FloatCalculatedValue(ai) {}
 
-        virtual uint8 Calculate();
+        virtual float Calculate();
     };
 
      class SpeedValue : public Uint8CalculatedValue, public Qualified
