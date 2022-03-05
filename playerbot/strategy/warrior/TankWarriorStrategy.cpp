@@ -50,6 +50,14 @@ void TankWarriorStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
         "enemy out of melee",
         NextAction::array(0, new NextAction("heroic throw", ACTION_MOVE + 10), new NextAction("charge", ACTION_MOVE + 9), NULL)));
 
+	triggers.push_back(new TriggerNode(
+		"shockwave on snare target",
+		NextAction::array(0, new NextAction("shockwave on snare target", ACTION_HIGH + 5), NULL)));
+
+	triggers.push_back(new TriggerNode(
+		"shockwave",
+		NextAction::array(0, new NextAction("shockwave", ACTION_HIGH + 4), NULL)));
+
     triggers.push_back(new TriggerNode(
         "defensive stance",
         NextAction::array(0, new NextAction("defensive stance", ACTION_HIGH + 9), NULL)));
@@ -137,4 +145,8 @@ void TankWarriorStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
     triggers.push_back(new TriggerNode(
         "protect party member",
         NextAction::array(0, new NextAction("intervene", ACTION_EMERGENCY), NULL)));
+
+	triggers.push_back(new TriggerNode(
+		"light aoe",
+		NextAction::array(0, new NextAction("demoralizing shout", ACTION_HIGH + 1), NULL)));
 }

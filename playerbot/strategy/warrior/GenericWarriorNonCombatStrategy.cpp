@@ -13,9 +13,11 @@ void GenericWarriorNonCombatStrategy::InitTriggers(std::list<TriggerNode*> &trig
       "often",
       NextAction::array(0, new NextAction("apply stone", 1.0f), NULL)));
 
+#ifndef MANGOSBOT_TWO
    triggers.push_back(new TriggerNode(
        "battle stance",
        NextAction::array(0, new NextAction("battle stance", 1.0f), NULL)));
+#endif
 
    triggers.push_back(new TriggerNode(
        "enemy out of melee",
