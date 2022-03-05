@@ -20,6 +20,9 @@ bool GoAction::Execute(Event event)
     if (!master)
         return false;
 
+	ai->GetMoveTimer()->Reset(0);
+	ai->GetBot()->CastStop();
+
     string param = event.getParam();
     if (param == "?")
     {
