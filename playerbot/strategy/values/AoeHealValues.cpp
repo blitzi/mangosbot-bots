@@ -30,6 +30,9 @@ uint8 AoeHealValue::Calculate()
 		if( !player || !sServerFacade.IsAlive(player))
 			continue;
 
+		if (!ai->GetBot()->InSamePhase(player))
+			continue;
+
 	    float percent = (static_cast<float> (player->GetHealth()) / player->GetMaxHealth()) * 100;
 	    if (percent <= range)
 	    	count++;
