@@ -61,7 +61,11 @@ void CasterShamanStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 
     triggers.push_back(new TriggerNode(
         "clearcasting",
-        NextAction::array(0, new NextAction("chain lightning", 26.0f), NULL)));
+        NextAction::array(0, new NextAction("chain lightning", 30), NULL)));
+	
+	triggers.push_back(new TriggerNode(
+        "elemental mastery",
+        NextAction::array(0, new NextAction("elemental mastery", 31.0f), NULL)));
 
 #ifndef MANGOSBOT_TWO
 	triggers.push_back(new TriggerNode(

@@ -116,6 +116,7 @@ namespace ai
                 creators["flame shock"] = &TriggerFactoryInternal::flame_shock;
                 creators["earth shock"] = &TriggerFactoryInternal::earth_shock;
                 creators["heroism"] = &TriggerFactoryInternal::heroism;
+                creators["elemental mastery"] = &TriggerFactoryInternal::elemental_mastery;
                 creators["bloodlust"] = &TriggerFactoryInternal::bloodlust;
                 creators["feral spirit"] = &TriggerFactoryInternal::feral_spirit;
                 creators["wind shear on enemy healer"] = &TriggerFactoryInternal::wind_shear_on_enemy_healer;
@@ -132,6 +133,7 @@ namespace ai
 
         private:
             static Trigger* heroism(PlayerbotAI* ai) { return new HeroismTrigger(ai); }
+            static Trigger* elemental_mastery(PlayerbotAI* ai) { return new BoostBuffTrigger(ai, "elemental mastery", 250.0f); }
             static Trigger* bloodlust(PlayerbotAI* ai) { return new BloodlustTrigger(ai); }
             static Trigger* feral_spirit(PlayerbotAI* ai) { return new FeralSpiritTrigger(ai); }
             static Trigger* party_member_cleanse_disease(PlayerbotAI* ai) { return new PartyMemberCleanseSpiritDiseaseTrigger(ai); }
@@ -245,6 +247,7 @@ namespace ai
                 creators["lightning bolt"] = &AiObjectContextInternal::lightning_bolt;
                 creators["thunderstorm"] = &AiObjectContextInternal::thunderstorm;
                 creators["heroism"] = &AiObjectContextInternal::heroism;
+                creators["elemental mastery"] = &AiObjectContextInternal::elemental_mastery;
                 creators["bloodlust"] = &AiObjectContextInternal::bloodlust;
                 creators["cure disease"] = &AiObjectContextInternal::cure_disease;
                 creators["cure disease on party"] = &AiObjectContextInternal::cure_disease_on_party;
@@ -255,6 +258,7 @@ namespace ai
 
         private:
             static Action* heroism(PlayerbotAI* ai) { return new CastHeroismAction(ai); }
+            static Action* elemental_mastery(PlayerbotAI* ai) { return new CastBuffSpellAction(ai, "elemental mastery"); }
             static Action* bloodlust(PlayerbotAI* ai) { return new CastBloodlustAction(ai); }
             static Action* thunderstorm(PlayerbotAI* ai) { return new CastThunderstormAction(ai); }
             static Action* lightning_bolt(PlayerbotAI* ai) { return new CastLightningBoltAction(ai); }
