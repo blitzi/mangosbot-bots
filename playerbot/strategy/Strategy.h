@@ -28,8 +28,9 @@ namespace ai
 	    ACTION_DISPEL = 50,
 	    ACTION_LIGHT_HEAL = 60,
 	    ACTION_MEDIUM_HEAL = 70,
-	    ACTION_CRITICAL_HEAL = 80,
-	    ACTION_EMERGENCY = 90
+	    ACTION_LOW_HEAL = 80,
+	    ACTION_CRITICAL_HEAL = 90,
+	    ACTION_EMERGENCY = 100
 	};
 
     class Strategy : public PlayerbotAIAware

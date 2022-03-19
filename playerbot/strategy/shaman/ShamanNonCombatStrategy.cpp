@@ -47,15 +47,15 @@ void ShamanNonCombatStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 
     triggers.push_back(new TriggerNode(
         "low health",
-        NextAction::array(0, new NextAction("healing wave", ACTION_CRITICAL_HEAL + 2), NULL)));
+        NextAction::array(0, new NextAction("healing wave", ACTION_LOW_HEAL + 2), NULL)));
 
     triggers.push_back(new TriggerNode(
         "party member low health",
-        NextAction::array(0, new NextAction("healing wave on party", ACTION_CRITICAL_HEAL + 1), NULL)));
+        NextAction::array(0, new NextAction("healing wave on party", ACTION_LOW_HEAL + 1), NULL)));
 
     triggers.push_back(new TriggerNode(
         "critical aoe heal",
-        NextAction::array(0, new NextAction("chain heal", ACTION_CRITICAL_HEAL), NULL)));
+        NextAction::array(0, new NextAction("chain heal", ACTION_LOW_HEAL), NULL)));
 
     triggers.push_back(new TriggerNode(
         "almost full health",
@@ -67,11 +67,11 @@ void ShamanNonCombatStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 
     triggers.push_back(new TriggerNode(
         "critical health",
-        NextAction::array(0, new NextAction("healing wave", ACTION_CRITICAL_HEAL + 2), NULL)));
+        NextAction::array(0, new NextAction("healing wave", ACTION_LOW_HEAL + 2), NULL)));
 
     triggers.push_back(new TriggerNode(
         "party member critical health",
-        NextAction::array(0, new NextAction("healing wave on party", ACTION_CRITICAL_HEAL + 1), NULL)));
+        NextAction::array(0, new NextAction("healing wave on party", ACTION_LOW_HEAL + 1), NULL)));
 
     triggers.push_back(new TriggerNode(
         "cure poison",

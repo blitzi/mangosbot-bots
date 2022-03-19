@@ -2,6 +2,7 @@
 #include "../../playerbot.h"
 #include "ShamanMultipliers.h"
 #include "HealShamanStrategy.h"
+#include "../actions/ActionUtils.h"
 
 using namespace ai;
 
@@ -36,55 +37,26 @@ HealShamanStrategy::HealShamanStrategy(PlayerbotAI* ai) : GenericShamanStrategy(
 }
 
 void HealShamanStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
-{
-    GenericShamanStrategy::InitTriggers(triggers);
+{    
+	GenericShamanStrategy::InitTriggers(triggers);
 
-    triggers.push_back(new TriggerNode(
-        "earth shield on tank",
-        NextAction::array(0, new NextAction("earth shield on party", ACTION_HIGH), NULL)));
+	AddGroupSpell(triggers, "cleanse spirit", 21.0f);
+
+	triggers.push_back(TRIGGER_AND_CAST("purge", ACTION_DISPEL));
 
     triggers.push_back(new TriggerNode(
         "shaman weapon",
         NextAction::array(0, new NextAction("earthliving weapon", 22.0f), NULL)));
 
     triggers.push_back(new TriggerNode(
+        "earth shield on tank",
+        NextAction::array(0, new NextAction("earth shield on party", ACTION_HIGH), NULL)));
+
+    triggers.push_back(new TriggerNode(
         "low mana",
         NextAction::array(0, new NextAction("mana tide totem", ACTION_EMERGENCY + 5), NULL)));
 
     triggers.push_back(new TriggerNode(
-        "party member to heal out of spell range",
-        NextAction::array(0, new NextAction("reach party member to heal", ACTION_CRITICAL_HEAL + 1), NULL)));
-
-    triggers.push_back(new TriggerNode(
         "wrath of air totem",
         NextAction::array(0, new NextAction("wrath of air totem", 20.0f), NULL)));   
-
-    triggers.push_back(new TriggerNode(
-        "party member medium health",
-        NextAction::array(0, new NextAction("lesser healing wave on party", 25.0f), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "almost full aoe heal",
-        NextAction::array(0, new NextAction("chain heal", 20.0f), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "medium aoe heal",
-        NextAction::array(0, new NextAction("chain heal", 27.0f), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "low aoe heal",
-        NextAction::array(0, new NextAction("chain heal", 30.0f), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "critical aoe heal",
-        NextAction::array(0, new NextAction("chain heal", ACTION_CRITICAL_HEAL), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "almost full health",
-        NextAction::array(0, new NextAction("lesser healing wave", 18.0f), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "party member almost full health",
-        NextAction::array(0, new NextAction("lesser healing wave on party", 17.0f), NULL)));
-
 }

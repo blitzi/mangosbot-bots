@@ -60,14 +60,13 @@ namespace ai
             CombatStrategyFactoryInternal() : NamedObjectContext<Strategy>(false, true)
             {
                 creators["heal"] = &shaman::CombatStrategyFactoryInternal::heal;
-                creators["melee"] = &shaman::CombatStrategyFactoryInternal::dps;
-                creators["dps"] = &shaman::CombatStrategyFactoryInternal::dps;
+                creators["melee"] = &shaman::CombatStrategyFactoryInternal::melee;
                 creators["caster"] = &shaman::CombatStrategyFactoryInternal::caster;
             }
 
         private:
             static Strategy* heal(PlayerbotAI* ai) { return new HealShamanStrategy(ai); }
-            static Strategy* dps(PlayerbotAI* ai) { return new MeleeShamanStrategy(ai); }
+            static Strategy* melee(PlayerbotAI* ai) { return new MeleeShamanStrategy(ai); }
             static Strategy* caster(PlayerbotAI* ai) { return new CasterShamanStrategy(ai); }
         };
     };
@@ -225,6 +224,7 @@ namespace ai
                 creators["earth shield"] = &AiObjectContextInternal::earth_shield;
                 creators["earth shield on party"] = &AiObjectContextInternal::earth_shield_on_party;
                 creators["chain heal"] = &AiObjectContextInternal::chain_heal;
+                creators["chain heal on party"] = &AiObjectContextInternal::chain_heal_on_party;
                 creators["riptide"] = &AiObjectContextInternal::riptide;
                 creators["riptide on party"] = &AiObjectContextInternal::riptide_on_party;
                 creators["stormstrike"] = &AiObjectContextInternal::stormstrike;
@@ -306,6 +306,7 @@ namespace ai
             static Action* earth_shield(PlayerbotAI* ai) { return new CastEarthShieldAction(ai); }
             static Action* earth_shield_on_party(PlayerbotAI* ai) { return new CastEarthShieldOnPartyAction(ai); }
             static Action* chain_heal(PlayerbotAI* ai) { return new CastChainHealAction(ai); }
+            static Action* chain_heal_on_party(PlayerbotAI* ai) { return new CastChainHealOnPartyAction(ai); }
             static Action* riptide(PlayerbotAI* ai) { return new CastRiptideAction(ai); }
             static Action* riptide_on_party(PlayerbotAI* ai) { return new CastRiptideOnPartyAction(ai); }
             static Action* stormstrike(PlayerbotAI* ai) { return new CastStormstrikeAction(ai); }

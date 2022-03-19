@@ -1,6 +1,9 @@
 #pragma once
+#include <list>
 
 class PlayerbotAI;
+
+using namespace std;
 
 namespace ai
 {
@@ -510,3 +513,18 @@ static ActionNode* name(PlayerbotAI* ai) \
         /*A*/ NULL, \
         /*C*/ NextAction::array(0, new NextAction(con), NULL); \
     }
+
+///
+/// Trigger Cast Combos
+/// 
+
+#define TRIGGER_AND_CAST(triggerAndAction, prio) new TriggerNode(triggerAndAction, NextAction::array(0, new NextAction(triggerAndAction, prio), NULL))
+#define TRIGGER_CAST_A(trigger, action, prio) new TriggerNode(trigger, NextAction::array(0, new NextAction(action, prio), NULL))
+#define TRIGGER_CAST_AB(trigger, actionA, actionB, prio) new TriggerNode(trigger, NextAction::array(0, new NextAction(actionA, prio + 1), \
+																				  new NextAction(actionB, prio), NULL))
+
+///
+/// Helpers
+/// 
+
+#define LIST_INSERT(from, to) from.insert(from.end(), to.begin(), to.end())

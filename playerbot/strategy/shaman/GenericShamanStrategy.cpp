@@ -2,131 +2,27 @@
 #include "../../playerbot.h"
 #include "ShamanMultipliers.h"
 #include "HealShamanStrategy.h"
+#include "../AiObject.h"
+#include "../actions/ActionUtils.h"
 
 using namespace ai;
 
 class GenericShamanStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 {
+#define CREATE(name) creators[name] = 
+
 public:
     GenericShamanStrategyActionNodeFactory()
     {
         creators["flametongue weapon"] = &flametongue_weapon;
         creators["frostbrand weapon"] = &frostbrand_weapon;
         creators["windfury weapon"] = &windfury_weapon;
-        creators["lesser healing wave"] = &lesser_healing_wave;
-        creators["lesser healing wave on party"] = &lesser_healing_wave_on_party;
-        creators["chain heal"] = &chain_heal;
-        creators["riptide"] = &riptide;
-        creators["critical riptide"] = &critical_riptide;
-        creators["chain heal on party"] = &chain_heal_on_party;
-        creators["riptide on party"] = &riptide_on_party;
-        creators["critical riptide on party"] = &critical_riptide_on_party;
-        creators["earth shock"] = &earth_shock;
-        creators["mana spring totem"] = &mana_spring_totem;
-        creators["healing stream totem"] = &healing_stream_totem;
-
     }
 private:
-    static ActionNode* earth_shock(PlayerbotAI* ai)
-    {
-        return new ActionNode ("earth shock",
-            /*P*/ NULL,
-            /*A*/ NULL,
-            /*C*/ NULL);
-    }
-    static ActionNode* flametongue_weapon(PlayerbotAI* ai)
-    {
-        return new ActionNode ("flametongue weapon",
-            /*P*/ NULL,
-            /*A*/ NextAction::array(0, new NextAction("frostbrand weapon"), NULL),
-            /*C*/ NULL);
-    }
-    static ActionNode* frostbrand_weapon(PlayerbotAI* ai)
-    {
-        return new ActionNode ("frostbrand weapon",
-            /*P*/ NULL,
-            /*A*/ NextAction::array(0, new NextAction("rockbiter weapon"), NULL),
-            /*C*/ NULL);
-    }
-    static ActionNode* windfury_weapon(PlayerbotAI* ai)
-    {
-        return new ActionNode ("windfury weapon",
-            /*P*/ NULL,
-            /*A*/ NextAction::array(0, new NextAction("rockbiter weapon"), NULL),
-            /*C*/ NULL);
-    }
-    static ActionNode* lesser_healing_wave(PlayerbotAI* ai)
-    {
-        return new ActionNode ("lesser healing wave",
-            /*P*/ NULL,
-            /*A*/ NextAction::array(0, new NextAction("healing wave"), NULL),
-            /*C*/ NULL);
-    }
-    static ActionNode* lesser_healing_wave_on_party(PlayerbotAI* ai)
-    {
-        return new ActionNode ("lesser healing wave on party",
-            /*P*/ NULL,
-            /*A*/ NextAction::array(0, new NextAction("healing wave on party"), NULL),
-            /*C*/ NULL);
-    }
-    static ActionNode* chain_heal(PlayerbotAI* ai)
-    {
-        return new ActionNode ("chain heal",
-            /*P*/ NULL,
-            /*A*/ NextAction::array(0, new NextAction("lesser healing wave"), NULL),
-            /*C*/ NULL);
-    }
-    static ActionNode* riptide(PlayerbotAI* ai)
-    {
-        return new ActionNode ("riptide",
-            /*P*/ NULL,
-            /*A*/ NextAction::array(0, new NextAction("healing wave"), NULL),
-            /*C*/ NULL);
-    }
-	static ActionNode* critical_riptide(PlayerbotAI* ai)
-	{
-		return new ActionNode("riptide",
-			/*P*/ NULL,
-			/*A*/ NextAction::array(0, new NextAction("lesser healing wave"), NULL),
-			/*C*/ NULL);
-	}
-    static ActionNode* chain_heal_on_party(PlayerbotAI* ai)
-    {
-        return new ActionNode ("chain heal on party",
-            /*P*/ NULL,
-            /*A*/ NextAction::array(0, new NextAction("lesser healing wave on party"), NULL),
-            /*C*/ NULL);
-    }
-    static ActionNode* riptide_on_party(PlayerbotAI* ai)
-    {
-        return new ActionNode ("riptide on party",
-            /*P*/ NULL,
-            /*A*/ NextAction::array(0, new NextAction("healing wave on party"), NULL),
-            /*C*/ NULL);
-    }
-	static ActionNode* critical_riptide_on_party(PlayerbotAI* ai)
-	{
-		return new ActionNode("riptide on party",
-			/*P*/ NULL,
-			/*A*/ NextAction::array(0, new NextAction("lesser healing wave on party"), NULL),
-			/*C*/ NULL);
-	}
 
-    static ActionNode* healing_stream_totem(PlayerbotAI* ai)
-    {
-        return new ActionNode("healing stream totem",
-            /*P*/ NULL,
-            /*A*/ NextAction::array(0, new NextAction("poison cleansing totem"), NULL),
-            /*C*/ NULL);
-    }
-    static ActionNode* mana_spring_totem(PlayerbotAI* ai)
-    {
-        return new ActionNode("mana spring totem",
-            /*P*/ NULL,
-            /*A*/ NextAction::array(0, new NextAction("disease cleansing totem"), NULL),
-            /*C*/ NULL);
-    }
-
+	ACTION_NODE_A(flametongue_weapon, "flametongue weapon", "frostbrand weapon");
+	ACTION_NODE_A(frostbrand_weapon, "frostbrand weapon", "rockbiter weapon");
+	ACTION_NODE_A(windfury_weapon, "windfury weapon", "rockbiter weapon");
 };
 
 GenericShamanStrategy::GenericShamanStrategy(PlayerbotAI* ai) : CombatStrategy(ai)
@@ -138,129 +34,28 @@ void GenericShamanStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
     CombatStrategy::InitTriggers(triggers);
 
-	triggers.push_back(new TriggerNode(
-        "purge",
-		NextAction::array(0, new NextAction("purge", ACTION_DISPEL), NULL)));
+	triggers.push_back(TRIGGER_AND_CAST("purge", ACTION_DISPEL));
+	triggers.push_back(TRIGGER_AND_CAST("heroism", 31.0f));
+	triggers.push_back(TRIGGER_AND_CAST("bloodlust", 31.0f));
+	triggers.push_back(TRIGGER_AND_CAST("mana spring totem", 19.0f));
 
-    triggers.push_back(new TriggerNode(
-        "low health",
-        NextAction::array(0, new NextAction("riptide", ACTION_CRITICAL_HEAL + 2), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "party member low health",
-        NextAction::array(0, new NextAction("riptide on party", ACTION_CRITICAL_HEAL + 1), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "critical health",
-        NextAction::array(0, new NextAction("critical riptide", ACTION_CRITICAL_HEAL + 4), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "party member critical health",
-        NextAction::array(0, new NextAction("critical riptide on party", ACTION_CRITICAL_HEAL + 3), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "critical aoe heal",
-        NextAction::array(0, new NextAction("chain heal", ACTION_CRITICAL_HEAL), NULL)));
-
-	triggers.push_back(new TriggerNode(
-		"heroism",
-		NextAction::array(0, new NextAction("heroism", 31.0f), NULL)));
-
-	triggers.push_back(new TriggerNode(
-		"bloodlust",
-		NextAction::array(0, new NextAction("bloodlust", 30.0f), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "cure poison",
-        NextAction::array(0, new NextAction("cure poison", 21.0f), NULL)));
-
-#ifndef MANGOSBOT_TWO
-    triggers.push_back(new TriggerNode(
-        "party member cure poison",
-        NextAction::array(0, new NextAction("cure poison on party", 21.0f), NULL)));
-#else
-	triggers.push_back(new TriggerNode(
-		"party member cure poison",
-		NextAction::array(0, new NextAction("cleansing totem", ACTION_CRITICAL_HEAL), NULL)));
-#endif
-
-    triggers.push_back(new TriggerNode(
-        "cure disease",
-        NextAction::array(0, new NextAction("cure disease", 31.0f), NULL)));
-
-#ifndef MANGOSBOT_TWO
-    triggers.push_back(new TriggerNode(
-        "party member cure disease",
-        NextAction::array(0, new NextAction("cure disease on party", 30.0f), NULL)));
-#else
-	triggers.push_back(new TriggerNode(
-		"party member cure disease",
-		NextAction::array(0, new NextAction("cleansing totem", ACTION_CRITICAL_HEAL), NULL)));
-#endif
-
-    triggers.push_back(new TriggerNode(
-        "medium aoe",
-        NextAction::array(0, new NextAction("healing stream totem", ACTION_LIGHT_HEAL), NULL)));	
-
-    triggers.push_back(new TriggerNode(
-        "mana spring totem",
-        NextAction::array(0, new NextAction("mana spring totem", 19.0f), NULL)));
+	FillAOEHealPipeline(triggers, "chain heal on party");
+	FillHealPipeline(triggers, "lesser healing wave", "riptide", "healing wave");
 }
 
 void ShamanBuffDpsStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
-    triggers.push_back(new TriggerNode(
-        "lightning shield",
-        NextAction::array(0, new NextAction("lightning shield", 22.0f), NULL)));
+	triggers.push_back(TRIGGER_AND_CAST("lightning shield", 22.0f));
 }
 
 void ShamanBuffManaStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
-    triggers.push_back(new TriggerNode(
-        "water shield",
-        NextAction::array(0, new NextAction("water shield", 22.0f), NULL)));
+	triggers.push_back(TRIGGER_AND_CAST("water shield", 22.0f));
 }
 
 void ShamanCureStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
-    triggers.push_back(new TriggerNode(
-        "cure poison",
-        NextAction::array(0, new NextAction("cure poison", 21.0f), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "party member cure poison",
-        NextAction::array(0, new NextAction("cure poison on party", 21.0f), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "cleanse spirit poison",
-        NextAction::array(0, new NextAction("cleanse spirit", 24.0f), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "party member cleanse spirit poison",
-        NextAction::array(0, new NextAction("cleanse spirit poison on party", 23.0f), NULL)));
-
-
-    triggers.push_back(new TriggerNode(
-        "cure disease",
-        NextAction::array(0, new NextAction("cure disease", 31.0f), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "party member cure disease",
-        NextAction::array(0, new NextAction("cure disease on party", 30.0f), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "cleanse spirit disease",
-        NextAction::array(0, new NextAction("cleanse spirit", 24.0f), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "party member cleanse spirit disease",
-        NextAction::array(0, new NextAction("cleanse spirit disease on party", 23.0f), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "cleanse spirit curse",
-        NextAction::array(0, new NextAction("cleanse spirit", 24.0f), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "party member cleanse spirit curse",
-        NextAction::array(0, new NextAction("cleanse spirit curse on party", 23.0f), NULL)));
+	AddGroupSpell(triggers, "cure poison", "cleanse spirit", 21);
+	AddGroupSpell(triggers, "cleanse spirit curse", "cleanse spirit", 23);
+	AddGroupSpell(triggers, "cure disease", "cleanse spirit", 31);
 }

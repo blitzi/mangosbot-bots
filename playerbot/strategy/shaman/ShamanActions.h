@@ -29,10 +29,15 @@ namespace ai
         CastHealingWaveOnPartyAction(PlayerbotAI* ai) : HealPartyMemberAction(ai, "healing wave") {}
     };
 
-    class CastChainHealAction : public CastAoeHealSpellAction {
+    class CastChainHealAction : public CastHealingSpellAction {
     public:
-        CastChainHealAction(PlayerbotAI* ai) : CastAoeHealSpellAction(ai, "chain heal") {}
+        CastChainHealAction(PlayerbotAI* ai) : CastHealingSpellAction(ai, "chain heal") {}
     };
+
+	class CastChainHealOnPartyAction : public HealPartyMemberAction {
+	public:
+		CastChainHealOnPartyAction(PlayerbotAI* ai) : HealPartyMemberAction(ai, "chain heal") {}
+	};
 
     class CastRiptideAction : public CastHealingSpellAction {
     public:

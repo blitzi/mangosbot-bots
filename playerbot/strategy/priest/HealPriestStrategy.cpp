@@ -41,7 +41,7 @@ void HealPriestStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 
     triggers.push_back(new TriggerNode(
         "party member to heal out of spell range",
-        NextAction::array(0, new NextAction("reach party member to heal", ACTION_CRITICAL_HEAL), NULL)));
+        NextAction::array(0, new NextAction("reach party member to heal", ACTION_LOW_HEAL), NULL)));
 
     triggers.push_back(new TriggerNode(
         "medium aoe heal",
