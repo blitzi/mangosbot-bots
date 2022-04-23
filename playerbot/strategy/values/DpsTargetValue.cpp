@@ -98,13 +98,8 @@ public:
 public:
     virtual void CheckAttacker(Unit* attacker, ThreatManager* threatManager)
     {
-		Creature* c = dynamic_cast<Creature*>(attacker);
-
-		if(c != NULL && c->IsInvisible())
-		{
-			result = attacker;
-			return;
-		}
+		//TODO check for current ai spell school
+		//attacker->IsImmuneToDamage()
 
         for (uint32 spellId : sPlayerbotAIConfig.damageStopSpellIds)
         {
