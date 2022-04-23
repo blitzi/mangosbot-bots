@@ -98,7 +98,9 @@ public:
 public:
     virtual void CheckAttacker(Unit* attacker, ThreatManager* threatManager)
     {
-		if(attacker->IsImmuneToDamage(SPELL_SCHOOL_MASK_ALL))
+		Creature* c = dynamic_cast<Creature*>(attacker);
+
+		if(c != NULL && c->IsInvisible())
 		{
 			result = attacker;
 			return;
