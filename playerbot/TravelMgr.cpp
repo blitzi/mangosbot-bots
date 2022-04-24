@@ -436,13 +436,13 @@ vector<WorldPosition> WorldPosition::frommGridPair(mGridPair gridPair)
     return retVec;
 }
 
-void WorldPosition::loadMapAndVMap(uint32 mapId, int x, int y)
+void WorldPosition::loadMapAndVMap(uint32 mapId , uint32 instanceId, int x, int y)
 {
     string fileName = "load_map_grid.csv";
 
     if (isOverworld() && false || false)
     {
-        if (!MMAP::MMapFactory::createOrGetMMapManager()->IsMMapIsLoaded(mapId, x, y))
+        if (!MMAP::MMapFactory::createOrGetMMapManager()->IsMMapTileLoaded(mapId, instanceId, x, y))
             if (sPlayerbotAIConfig.hasLog(fileName))
             {
                 ostringstream out;
@@ -455,7 +455,7 @@ void WorldPosition::loadMapAndVMap(uint32 mapId, int x, int y)
         int px = (float)(32 - x) * SIZE_OF_GRIDS;
         int py = (float)(32 - y) * SIZE_OF_GRIDS;
 
-        if (!MMAP::MMapFactory::createOrGetMMapManager()->IsMMapIsLoaded(mapId, x, y))
+        if (!MMAP::MMapFactory::createOrGetMMapManager()->IsMMapTileLoaded(mapId, instanceId, x, y))
             if(getTerrain())
                 getTerrain()->GetTerrainType(px, py);
 
@@ -498,10 +498,10 @@ void WorldPosition::loadMapAndVMap(uint32 mapId, int x, int y)
                 }
             }
 
-        if (!MMAP::MMapFactory::createOrGetMMapManager()->IsMMapIsLoaded(mapId, x, y) && !sTravelMgr.isBadMmap(mapId, x, y))
+        if (!MMAP::MMapFactory::createOrGetMMapManager()->IsMMapTileLoaded(mapId, instanceId, x, y) && !sTravelMgr.isBadMmap(mapId, x, y))
         {
             // load navmesh
-            if (!MMAP::MMapFactory::createOrGetMMapManager()->loadMap(mapId, x, y))
+            if (!MMAP::MMapFactory::createOrGetMMapManager()->loadMap(mapId, instanceId, x, y, 0))
                 sTravelMgr.addBadMmap(mapId, x, y);
 
             if (sPlayerbotAIConfig.hasLog(fileName))
@@ -520,7 +520,7 @@ void WorldPosition::loadMapAndVMaps(WorldPosition secondPos)
 {
     for (auto& grid : getmGridPairs(secondPos))
     {
-        loadMapAndVMap(getMapId(), grid.first, grid.second);
+        loadMapAndVMap(getMapId(), getInstanceId(), grid.first, grid.second);
     }
 }
 

@@ -156,8 +156,8 @@ namespace ai
         vector<mGridPair> getmGridPairs(WorldPosition secondPos);
         vector<WorldPosition> frommGridPair(mGridPair gridPair);
 
-        void loadMapAndVMap(uint32 mapId, int x, int y);
-        void loadMapAndVMap() {loadMapAndVMap(getMapId(), getmGridPair().first, getmGridPair().second); }
+        void loadMapAndVMap(uint32 mapId, uint32 instanceId, int x, int y);
+		void loadMapAndVMap() { loadMapAndVMap(getMapId(), getInstanceId(), getmGridPair().first, getmGridPair().second); }
         void loadMapAndVMaps(WorldPosition secondPos);
 
         //Display functions

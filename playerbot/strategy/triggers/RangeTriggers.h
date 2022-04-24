@@ -240,7 +240,7 @@ namespace ai
                 return true;
             }
 
-            if (cell.GridX() > 0 && cell.GridY() > 0 && !MMAP::MMapFactory::createOrGetMMapManager()->IsMMapIsLoaded(botPos.getMapId(), cell.GridX(), cell.GridY()) && !MMAP::MMapFactory::createOrGetMMapManager()->loadMap(botPos.getMapId(), cell.GridX(), cell.GridY()))
+            if (cell.GridX() > 0 && cell.GridY() > 0 && !MMAP::MMapFactory::createOrGetMMapManager()->IsMMapTileLoaded(botPos.getMapId(),  botPos.getInstanceId(), cell.GridX(), cell.GridY()) && !MMAP::MMapFactory::createOrGetMMapManager()->loadMap(botPos.getMapId(), botPos.getInstanceId(), cell.GridX(), cell.GridY(), 0))
             {
                 //sLog.outBasic("Bot #%d %s:%d <%s> was in unloaded grid %d,%d on map %d", bot->GetGUIDLow(), bot->GetTeam() == ALLIANCE ? "A" : "H", bot->getLevel(), bot->GetName(), grid.x_coord, grid.y_coord, botPos.getMapId());
 

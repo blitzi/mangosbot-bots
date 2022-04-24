@@ -98,8 +98,16 @@ public:
 public:
     virtual void CheckAttacker(Unit* attacker, ThreatManager* threatManager)
     {
-		//TODO check for current ai spell school
-		//attacker->IsImmuneToDamage()
+		for (int spellType = 0; spellType < CURRENT_MAX_SPELL; spellType++)
+		{
+			Spell* spell = ai->GetBot()->GetCurrentSpell((CurrentSpellTypes)spellType);
+
+			if (spell && attacker->IsImmuneToDamage(spell->GetSchoolMask()))
+			{
+				result = attacker;
+				return;
+			}
+		}
 
         for (uint32 spellId : sPlayerbotAIConfig.damageStopSpellIds)
         {
