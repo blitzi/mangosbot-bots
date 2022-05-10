@@ -753,7 +753,7 @@ void RandomPlayerbotMgr::CheckLfgQueue()
 #ifdef MANGOSBOT_TWO
         Group* group = player->GetGroup();
 		
-		LfgData data = group ? group->GetLfgData() : player->GetLfgData();
+		LFGData data = group ? group->GetLfgData() : player->GetLfgData();
 			
         if (data.GetState() != LFG_STATE_NONE)
         {

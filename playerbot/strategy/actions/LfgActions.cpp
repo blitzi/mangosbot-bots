@@ -85,7 +85,7 @@ LfgRoles LfgJoinAction::GetRoles()
 bool LfgJoinAction::SetRoles()
 {
 #ifdef MANGOSBOT_TWO
-	LfgData& data = bot->GetLfgData();
+	LFGData& data = bot->GetLfgData();
     
     if (data.GetState() == LFG_STATE_NONE)
         return false;
@@ -155,7 +155,7 @@ bool LfgJoinAction::JoinLFG()
     sLFGMgr.AddToQueue(bot, stoneInfo.area);
 #endif
 #ifdef MANGOSBOT_TWO
-	LfgData& data = bot->GetLfgData();
+	LFGData& data = bot->GetLfgData();
    
     // check if already in lfg
     if (data.GetState() == LFG_STATE_DUNGEON)
@@ -327,12 +327,12 @@ bool LfgRoleCheckAction::Execute(Event event)
     Group* group = bot->GetGroup();
     if (group)
     {
-		LfgData& data = bot->GetLfgData();
+		LFGData& data = bot->GetLfgData();
 		LfgRoles currentRoles = (LfgRoles)data.GetPlayerRoles();
 		LfgRoles newRoles = GetRoles();
         if (currentRoles == newRoles) return false;
         
-		data.SetPlayerRoles(newRoles);		
+		data.SetPlayerRoles(newRoles);
 
         sLog.outBasic("Bot #%d %s:%d <%s>: LFG roles checked", bot->GetGUIDLow(), bot->GetTeam() == ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName());
 
@@ -346,7 +346,7 @@ bool LfgRoleCheckAction::Execute(Event event)
 bool LfgAcceptAction::Execute(Event event)
 {
 #ifdef MANGOSBOT_TWO
-	LfgData& data = bot->GetLfgData();
+	LFGData& data = bot->GetLfgData();
     if (data.GetState() != LFG_STATE_PROPOSAL)
         return false;
 

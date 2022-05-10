@@ -115,8 +115,8 @@ bool PartyMemberToHeal::Check(Unit* player)
     }
     else
     {
-        return sServerFacade.GetDistance2d(bot, player) < (player->IsPlayer() && ai->IsTank((Player*)player)) ? 50.0f : 40.0f;
-    }        
+        return sServerFacade.GetDistance2d(bot, player) < ((player->IsPlayer() && ai->IsTank((Player*)player)) ? 50.0f : 40.0f);
+    }
 }
 
 Unit* PartyMemberToProtect::Calculate()
