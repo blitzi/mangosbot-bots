@@ -86,10 +86,6 @@ bool LfgJoinAction::SetRoles()
 {
 #ifdef MANGOSBOT_TWO
 	LFGData& data = bot->GetLfgData();
-    
-    if (data.GetState() == LFG_STATE_NONE)
-        return false;
-
 	data.SetPlayerRoles(GetRoles());
 #endif
 
@@ -330,9 +326,15 @@ bool LfgRoleCheckAction::Execute(Event event)
 		LFGData& data = bot->GetLfgData();
 		LfgRoles currentRoles = (LfgRoles)data.GetPlayerRoles();
 		LfgRoles newRoles = GetRoles();
+
         if (currentRoles == newRoles) return false;
-        
+
 		data.SetPlayerRoles(newRoles);
+        
+		sWorld.GetLFGQueue().GetMessager().AddMessage([group = group->GetObjectGuid(), playerGuid = bot->GetObjectGuid(), newRoles](LFGQueue* queue)
+		{
+			queue->SetPlayerRoles(group, playerGuid, newRoles);
+		});
 
         sLog.outBasic("Bot #%d %s:%d <%s>: LFG roles checked", bot->GetGUIDLow(), bot->GetTeam() == ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName());
 
@@ -346,48 +348,36 @@ bool LfgRoleCheckAction::Execute(Event event)
 bool LfgAcceptAction::Execute(Event event)
 {
 #ifdef MANGOSBOT_TWO
-	LFGData& data = bot->GetLfgData();
-    if (data.GetState() != LFG_STATE_PROPOSAL)
-        return false;
 
-    uint32 id = AI_VALUE(uint32, "lfg proposal");
-    if (id)
-    {
-        //if (urand(0, 1 + 10 / sPlayerbotAIConfig.randomChangeMultiplier))
-        //    return false;
+	uint32 id = AI_VALUE(uint32, "lfg proposal");
+	if (id)
+	{
+		ai->GetAiObjectContext()->GetValue<uint32>("lfg proposal")->Set(0);
 
-        if (bot->IsInCombat() || bot->IsDead())
-        {
-            sLog.outBasic("Bot #%d %s:%d <%s> is in combat and refuses LFG proposal %d", bot->GetGUIDLow(), bot->GetTeam() == ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName(), id);
-			//sLFGMgr.
-            //sLFGMgr.UpdateProposal(id, bot->GetObjectGuid(), false);
-            return true;
-        }
+		bool accept = true;
+		sWorld.GetLFGQueue().GetMessager().AddMessage([playerGuid = bot->GetObjectGuid(), id, accept](LFGQueue* queue)
+		{
+			queue->UpdateProposal(playerGuid, id, accept);
+		});
 
-        sLog.outBasic("Bot #%d %s:%d <%s> accepts LFG proposal %d", bot->GetGUIDLow(), bot->GetTeam() == ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName(), id);
-        ai->GetAiObjectContext()->GetValue<uint32>("lfg proposal")->Set(0);
-        bot->clearUnitState(UNIT_STAT_ALL_STATE);
-        //sLFGMgr.UpdateProposal(id, bot->GetObjectGuid(), true);
+		if (sRandomPlayerbotMgr.IsRandomBot(bot) && !bot->GetGroup())
+		{
+			sRandomPlayerbotMgr.Refresh(bot);
+			ai->ResetStrategies();
+		}
+		ai->Reset();
 
-        if (sRandomPlayerbotMgr.IsRandomBot(bot) && !bot->GetGroup())
-        {
-            sRandomPlayerbotMgr.Refresh(bot);
-            ai->ResetStrategies();
-            //bot->TeleportToHomebind();
-        }
+		return true;
+	}
 
-        ai->Reset();
+	WorldPacket p(event.getPacket());
 
-        return true;
-    }
+	uint32 dungeon;
+	uint8 state;
+	p >> dungeon >> state >> id;
 
-    WorldPacket p(event.getPacket());
+	ai->GetAiObjectContext()->GetValue<uint32>("lfg proposal")->Set(id);
 
-    uint32 dungeon;
-    uint8 state;
-    p >> dungeon >> state >> id;
-
-    ai->GetAiObjectContext()->GetValue<uint32>("lfg proposal")->Set(id);
 #endif
     return true;
 }

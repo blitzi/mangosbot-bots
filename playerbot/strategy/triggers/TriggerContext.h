@@ -132,7 +132,7 @@ namespace ai
             creators["far from rpg target"] = &TriggerContext::far_from_rpg_target;
             creators["near rpg target"] = &TriggerContext::near_rpg_target;
             creators["no travel target"] = &TriggerContext::no_travel_target;
-            creators["far from travel target"] = &TriggerContext::far_from_travel_target;			
+            creators["far from travel target"] = &TriggerContext::far_from_travel_target;
             creators["no rti target"] = &TriggerContext::no_rti;
 
             creators["give food"] = &TriggerContext::give_food;
