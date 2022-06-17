@@ -209,14 +209,14 @@ namespace ai
         virtual bool isUseful() { return CastMeleeSpellAction::isUseful() && !AI_VALUE2(bool, "has totem", name); }
     };
 
-    class CastFireNovaTotemAction : public CastSpellAction {
+    class CastFireNovaTotemAction : public CastRangeSpellAction {
     public:
-        CastFireNovaTotemAction(PlayerbotAI* ai) : CastSpellAction(ai, "fire nova totem") {}
+        CastFireNovaTotemAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "fire nova totem") {}
     };
 
-    class CastWindShearAction : public CastSpellAction {
+    class CastWindShearAction : public CastRangeSpellAction {
     public:
-        CastWindShearAction(PlayerbotAI* ai) : CastSpellAction(ai, "wind shear") {}
+        CastWindShearAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "wind shear") {}
     };
 
 	class CastAncestralSpiritAction : public ResurrectPartyMemberAction
@@ -231,10 +231,10 @@ namespace ai
         CastFeralSpiritAction(PlayerbotAI* ai) : CastSpellAction(ai, "feral spirit") {}
     };
 
-	class CastPurgeAction : public CastSpellAction
+	class CastPurgeAction : public CastRangeSpellAction
 	{
 	public:
-		CastPurgeAction(PlayerbotAI* ai) : CastSpellAction(ai, "purge") {}
+		CastPurgeAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "purge") {}
 	};
 
     class CastShamanisticRageAction : public CastBuffSpellAction {
@@ -306,6 +306,12 @@ namespace ai
         CastFlameShockAction(PlayerbotAI* ai) : CastDebuffSpellAction(ai, "flame shock", true) {}
     };
 
+	class CastLavaBurstAction : public CastRangeSpellAction
+	{
+	public:
+		CastLavaBurstAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "lava burst") {}
+	};
+
     class CastEarthShockAction : public CastDebuffSpellAction
     {
     public:
@@ -318,22 +324,22 @@ namespace ai
         CastFrostShockAction(PlayerbotAI* ai) : CastSnareSpellAction(ai, "frost shock") {}
     };
 
-    class CastChainLightningAction : public CastSpellAction
+    class CastChainLightningAction : public CastRangeSpellAction
     {
     public:
-        CastChainLightningAction(PlayerbotAI* ai) : CastSpellAction(ai, "chain lightning") {}
+        CastChainLightningAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "chain lightning") {}
     };
 
-    class CastLightningBoltAction : public CastSpellAction
+    class CastLightningBoltAction : public CastRangeSpellAction
     {
     public:
-        CastLightningBoltAction(PlayerbotAI* ai) : CastSpellAction(ai, "lightning bolt") {}
+        CastLightningBoltAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "lightning bolt") {}
     };
 
-    class CastThunderstormAction : public CastMeleeSpellAction
+    class CastThunderstormAction : public CastSpellAction
     {
     public:
-        CastThunderstormAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "thunderstorm") {}
+        CastThunderstormAction(PlayerbotAI* ai) : CastSpellAction(ai, "thunderstorm") {}
     };
 
     class CastHeroismAction : public CastBuffSpellAction

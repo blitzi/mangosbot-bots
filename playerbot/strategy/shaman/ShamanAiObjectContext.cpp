@@ -129,6 +129,7 @@ namespace ai
                 creators["stormstrike"] = &TriggerFactoryInternal::stormstrike;
                 creators["lava lash"] = &TriggerFactoryInternal::lava_lash;
                 creators["instant chain lightning"] = &TriggerFactoryInternal::instant_chain_lightning;
+                creators["crit lava burst"] = &TriggerFactoryInternal::crit_lava_burst;
             }
 
         private:
@@ -177,6 +178,7 @@ namespace ai
             static Trigger* stormstrike(PlayerbotAI* ai) { return new SpellCanBeCastTrigger(ai, "stormstrike"); }
             static Trigger* lava_lash(PlayerbotAI* ai) { return new SpellCanBeCastTrigger(ai, "lava lash"); }
 			static Trigger* instant_chain_lightning(PlayerbotAI* ai) { return new SpellCanBeCastInstantTrigger(ai, "chain lightning"); }
+			static Trigger* crit_lava_burst(PlayerbotAI* ai) { return new LavaBurstCritTrigger(ai); }
         };
     };
 };
@@ -254,6 +256,7 @@ namespace ai
                 creators["cure poison"] = &AiObjectContextInternal::cure_poison;
                 creators["cure poison on party"] = &AiObjectContextInternal::cure_poison_on_party;
 				creators["call of the elements"] = &AiObjectContextInternal::coe_wotlk_action;
+				creators["lava burst"] = &AiObjectContextInternal::lava_burst;
             }
 
         private:
@@ -318,6 +321,7 @@ namespace ai
             static Action* cure_disease(PlayerbotAI* ai) { return new CastCureDiseaseAction(ai); }
             static Action* cure_disease_on_party(PlayerbotAI* ai) { return new CastCureDiseaseOnPartyAction(ai); }
             static Action* coe_wotlk_action(PlayerbotAI* ai) { return new COEAction(ai); }
+            static Action* lava_burst(PlayerbotAI* ai) { return new CastLavaBurstAction(ai); }
         };
     };
 };

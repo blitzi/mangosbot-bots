@@ -39,6 +39,10 @@ void CasterShamanStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
         "shaman weapon",
         NextAction::array(0, new NextAction("flametongue weapon", 23.0f), NULL)));
 
+	triggers.push_back(new TriggerNode(
+		"crit lava burst",
+		NextAction::array(0, new NextAction("lava burst", ACTION_EMERGENCY + 11), NULL)));
+
     triggers.push_back(new TriggerNode(
         "flame shock",
         NextAction::array(0, new NextAction("flame shock", 24), NULL)));
@@ -66,6 +70,10 @@ void CasterShamanStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 	triggers.push_back(new TriggerNode(
         "elemental mastery",
         NextAction::array(0, new NextAction("elemental mastery", 31.0f), NULL)));
+	
+	triggers.push_back(new TriggerNode(
+        "high mana",
+        NextAction::array(0, new NextAction("thunderstorm", 31.0f), NULL)));
 
 #ifndef MANGOSBOT_TWO
 	triggers.push_back(new TriggerNode(

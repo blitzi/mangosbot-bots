@@ -60,7 +60,7 @@ void MeleeShamanStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 
 	triggers.push_back(new TriggerNode(
 		"instant chain lightning",
-		NextAction::array(0, new NextAction("chain lightning", ACTION_EMERGENCY + 10), NULL)));
+		NextAction::array(0, new NextAction("chain lightning", ACTION_EMERGENCY + 10), NULL)));	
 
     triggers.push_back(new TriggerNode(
         "shamanistic rage",

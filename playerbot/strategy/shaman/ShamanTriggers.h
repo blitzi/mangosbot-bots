@@ -138,7 +138,26 @@ namespace ai
     {
     public:
         LightningShieldTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "lightning shield") {}
-    };
+	};
+
+	class LavaBurstCritTrigger : public SpellTrigger
+	{
+	public:
+		LavaBurstCritTrigger(PlayerbotAI* ai) : SpellTrigger(ai, "flame shock") {}
+
+		virtual bool LavaBurstCritTrigger::IsActive()
+		{
+			Unit* target = GetTarget();
+
+			if (target == NULL)
+				return false;
+
+			bool enemyHasFlameshock = ai->HasAura(spell, target, false, true);
+
+			return enemyHasFlameshock && ai->CanCastSpell("lava burst", target);
+		}
+	};
+
 
     class PurgeTrigger : public TargetAuraDispelTrigger
     {
