@@ -1170,7 +1170,7 @@ bool PlayerbotAI::HasAura(string name, Unit* unit, bool maxStack, bool checkIsOw
                 }
 
                 uint32 maxStackAmount = aura->GetSpellProto()->StackAmount;
-                uint32 maxProcCharges = aura->GetSpellProto()->procCharges;                   
+                uint32 maxProcCharges = aura->GetSpellProto()->procCharges;
 
                 if (maxStack)
                 {

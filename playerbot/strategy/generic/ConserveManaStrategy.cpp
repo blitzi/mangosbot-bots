@@ -27,7 +27,7 @@ float ConserveManaMultiplier::GetValue(Action* action)
     if (action->GetTarget() != target)
         return 1.0f;
 
-    CastSpellAction* spellAction = dynamic_cast<CastSpellAction*>(action);
+    CastRangeSpellAction* spellAction = dynamic_cast<CastRangeSpellAction*>(action);
     if (!spellAction)
         return 1.0f;
 
@@ -61,7 +61,7 @@ float SaveManaMultiplier::GetValue(Action* action)
     if (saveLevel <= 1.0)
         return 1.0f;
 
-    CastSpellAction* spellAction = dynamic_cast<CastSpellAction*>(action);
+    CastRangeSpellAction* spellAction = dynamic_cast<CastRangeSpellAction*>(action);
     if (!spellAction)
         return 1.0f;
 

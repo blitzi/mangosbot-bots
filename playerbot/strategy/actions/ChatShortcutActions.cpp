@@ -87,7 +87,6 @@ bool StayChatShortcutAction::Execute(Event event)
     if (!master)
         return false;
 
-    ai->Reset();
     ai->ChangeStrategy("+stay,-passive", BOT_STATE_NON_COMBAT);
     ai->ChangeStrategy("-follow,-passive", BOT_STATE_COMBAT);
 

@@ -12,12 +12,12 @@ bool CastCasterFormAction::Execute(Event event)
 
 NextAction** CastAbolishPoisonAction::getAlternatives()
 {
-    return NextAction::merge( NextAction::array(0, new NextAction("cure poison"), NULL), CastSpellAction::getPrerequisites());
+    return NextAction::merge( NextAction::array(0, new NextAction("cure poison"), NULL), CastRangeSpellAction::getPrerequisites());
 }
 
 NextAction** CastAbolishPoisonOnPartyAction::getAlternatives()
 {
-    return NextAction::merge( NextAction::array(0, new NextAction("cure poison on party"), NULL), CastSpellAction::getPrerequisites());
+    return NextAction::merge( NextAction::array(0, new NextAction("cure poison on party"), NULL), CastRangeSpellAction::getPrerequisites());
 }
 
 Value<Unit*>* CastEntanglingRootsCcAction::GetTargetValue()

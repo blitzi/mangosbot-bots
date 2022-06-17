@@ -67,10 +67,10 @@ namespace ai
         }
     };
 
-	class CastKickAction : public CastSpellAction
+	class CastKickAction : public CastRangeSpellAction
 	{
 	public:
-		CastKickAction(PlayerbotAI* ai) : CastSpellAction(ai, "kick") {}
+		CastKickAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "kick") {}
 	};
 
 	class CastFeintAction : public CastBuffSpellAction
@@ -79,10 +79,10 @@ namespace ai
 		CastFeintAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "feint") {}
 	};
 
-	class CastDismantleAction : public CastSpellAction
+	class CastDismantleAction : public CastRangeSpellAction
 	{
 	public:
-		CastDismantleAction(PlayerbotAI* ai) : CastSpellAction(ai, "dismantle") {}
+		CastDismantleAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "dismantle") {}
 	};
 
 	class CastDistractAction : public CastSpellAction

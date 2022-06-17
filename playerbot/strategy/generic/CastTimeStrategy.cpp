@@ -17,7 +17,7 @@ float CastTimeMultiplier::GetValue(Action* action)
     if (action->GetTarget() != AI_VALUE(Unit*, "current target"))
         return 1.0f;
 
-    if (targetHealth < sPlayerbotAIConfig.criticalHealth && dynamic_cast<CastSpellAction*>(action))
+    if (targetHealth < sPlayerbotAIConfig.criticalHealth && dynamic_cast<CastRangeSpellAction*>(action))
     {
         uint32 spellId = AI_VALUE2(uint32, "spell id", name);
         const SpellEntry* const pSpellInfo = sServerFacade.LookupSpellInfo(spellId);

@@ -79,8 +79,8 @@ bool PlayerbotAIConfig::Initialize()
     errorDelay = (uint32) config.GetIntDefault("AiPlayerbot.ErrorDelay", 5000);
     rpgDelay = (uint32) config.GetIntDefault("AiPlayerbot.RpgDelay", 3000);
     sitDelay = (uint32) config.GetIntDefault("AiPlayerbot.SitDelay", 30000);
-    returnDelay = (uint32) config.GetIntDefault("AiPlayerbot.ReturnDelay", 7000);
-    lootDelay = (uint32)config.GetIntDefault("AiPlayerbot.LootDelayDelay", 750);
+    returnDelay = (uint32) config.GetIntDefault("AiPlayerbot.ReturnDelay", 500);
+    lootDelay = (uint32)config.GetIntDefault("AiPlayerbot.LootDelayDelay", 150);
 
     farDistance = config.GetFloatDefault("AiPlayerbot.FarDistance", 20.0f);
     sightDistance = config.GetFloatDefault("AiPlayerbot.SightDistance", 200.0f);

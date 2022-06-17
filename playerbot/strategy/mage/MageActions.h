@@ -8,22 +8,22 @@ namespace ai
     BUFF_ACTION(CastFireWardAction, "fire ward");
     BUFF_ACTION(CastFrostWardAction, "frost ward");
 
-    class CastFireballAction : public CastSpellAction
+    class CastFireballAction : public CastRangeSpellAction
     {
     public:
-        CastFireballAction(PlayerbotAI* ai) : CastSpellAction(ai, "fireball") {}
+        CastFireballAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "fireball") {}
     };
 
-    class CastScorchAction : public CastSpellAction
+    class CastScorchAction : public CastRangeSpellAction
     {
     public:
-        CastScorchAction(PlayerbotAI* ai) : CastSpellAction(ai, "scorch") {}
+        CastScorchAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "scorch") {}
     };
 
-    class CastFireBlastAction : public CastSpellAction
+    class CastFireBlastAction : public CastRangeSpellAction
     {
     public:
-        CastFireBlastAction(PlayerbotAI* ai) : CastSpellAction(ai, "fire blast") {}
+        CastFireBlastAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "fire blast") {}
     };
 
     class CastArcaneBlastAction : public CastBuffSpellAction
@@ -33,50 +33,50 @@ namespace ai
         virtual string GetTargetName() { return "current target"; }
     };
 
-    class CastArcaneBarrageAction : public CastSpellAction
+    class CastArcaneBarrageAction : public CastRangeSpellAction
     {
     public:
-        CastArcaneBarrageAction(PlayerbotAI* ai) : CastSpellAction(ai, "arcane barrage") {}
+        CastArcaneBarrageAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "arcane barrage") {}
     };
 
-    class CastArcaneMissilesAction : public CastSpellAction
+    class CastArcaneMissilesAction : public CastRangeSpellAction
     {
     public:
-        CastArcaneMissilesAction(PlayerbotAI* ai) : CastSpellAction(ai, "arcane missiles") {}
+        CastArcaneMissilesAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "arcane missiles") {}
     };
 
-    class CastPyroblastAction : public CastSpellAction
+    class CastPyroblastAction : public CastRangeSpellAction
     {
     public:
-        CastPyroblastAction(PlayerbotAI* ai) : CastSpellAction(ai, "pyroblast") {}
+        CastPyroblastAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "pyroblast") {}
     };
 
-    class CastFlamestrikeAction : public CastSpellAction
+    class CastFlamestrikeAction : public CastRangeSpellAction
     {
     public:
-        CastFlamestrikeAction(PlayerbotAI* ai) : CastSpellAction(ai, "flamestrike") {}
+        CastFlamestrikeAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "flamestrike") {}
     };
 
-    class CastFrostNovaAction : public CastSpellAction
+    class CastFrostNovaAction : public CastRangeSpellAction
     {
     public:
-        CastFrostNovaAction(PlayerbotAI* ai) : CastSpellAction(ai, "frost nova") {}
+        CastFrostNovaAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "frost nova") {}
         virtual bool isUseful()
         {
             return sServerFacade.IsDistanceLessOrEqualThan(AI_VALUE2(float, "distance", GetTargetName()), 10.0f);
         }
     };
 
-	class CastFrostboltAction : public CastSpellAction
+	class CastFrostboltAction : public CastRangeSpellAction
 	{
 	public:
-		CastFrostboltAction(PlayerbotAI* ai) : CastSpellAction(ai, "frostbolt") {}
+		CastFrostboltAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "frostbolt") {}
 	};
 
-	class CastBlizzardAction : public CastSpellAction
+	class CastBlizzardAction : public CastRangeSpellAction
 	{
 	public:
-		CastBlizzardAction(PlayerbotAI* ai) : CastSpellAction(ai, "blizzard") {}
+		CastBlizzardAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "blizzard") {}
         virtual ActionThreatType getThreatType() { return ACTION_THREAT_AOE; }
 	};
 
@@ -180,10 +180,10 @@ namespace ai
         virtual Value<Unit*>* GetTargetValue();
     };
 
-	class CastSpellstealAction : public CastSpellAction
+	class CastSpellstealAction : public CastRangeSpellAction
 	{
 	public:
-		CastSpellstealAction(PlayerbotAI* ai) : CastSpellAction(ai, "spellsteal") {}
+		CastSpellstealAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "spellsteal") {}
 	};
 
 	class CastLivingBombAction : public CastDebuffSpellAction
@@ -192,16 +192,16 @@ namespace ai
 	    CastLivingBombAction(PlayerbotAI* ai) : CastDebuffSpellAction(ai, "living bomb") {}
 	};
 
-	class CastDragonsBreathAction : public CastSpellAction
+	class CastDragonsBreathAction : public CastRangeSpellAction
 	{
 	public:
-	    CastDragonsBreathAction(PlayerbotAI* ai) : CastSpellAction(ai, "dragon's breath") {}
+	    CastDragonsBreathAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "dragon's breath") {}
 	};
 
-	class CastBlastWaveAction : public CastSpellAction
+	class CastBlastWaveAction : public CastRangeSpellAction
 	{
 	public:
-	    CastBlastWaveAction(PlayerbotAI* ai) : CastSpellAction(ai, "blast wave") {}
+	    CastBlastWaveAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "blast wave") {}
 	};
 
 	class CastInvisibilityAction : public CastBuffSpellAction
@@ -210,10 +210,10 @@ namespace ai
 	    CastInvisibilityAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "invisibility") {}
 	};
 
-	class CastEvocationAction : public CastSpellAction
+	class CastEvocationAction : public CastRangeSpellAction
 	{
 	public:
-	    CastEvocationAction(PlayerbotAI* ai) : CastSpellAction(ai, "evocation") {}
+	    CastEvocationAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "evocation") {}
 	    virtual string GetTargetName() { return "self target"; }
 	};
 

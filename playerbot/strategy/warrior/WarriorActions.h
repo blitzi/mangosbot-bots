@@ -10,7 +10,7 @@ namespace ai
 
     // shouts
     BUFF_ACTION(CastBattleShoutAction, "battle shout");
-    MELEE_ACTION_U(CastBattleShoutTauntAction, "battle shout", CastSpellAction::isUseful()); // useful to rebuff
+    MELEE_ACTION_U(CastBattleShoutTauntAction, "battle shout", CastRangeSpellAction::isUseful()); // useful to rebuff
     DEBUFF_ACTION_R(CastDemoralizingShoutAction, "demoralizing shout", 8.0f); // low range debuff
     MELEE_ACTION(CastChallengingShoutAction, "challenging shout");
     DEBUFF_ACTION_R(CastIntimidatingShoutAction, "intimidating shout", 8.0f);
@@ -95,6 +95,6 @@ namespace ai
         CastSunderArmorAction(PlayerbotAI* ai) : CastDebuffSpellAction(ai, "sunder armor") {
             range = ATTACK_DISTANCE;
         }
-        virtual bool isUseful() { return CastSpellAction::isUseful(); }
+        virtual bool isUseful() { return CastRangeSpellAction::isUseful(); }
     };
 }

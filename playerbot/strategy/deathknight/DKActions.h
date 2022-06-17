@@ -23,7 +23,7 @@ namespace ai
 	public:
 		CastDeathchillAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "deathchill") {}
 		virtual NextAction** getPrerequisites() {
-			return NextAction::merge(NextAction::array(0, new NextAction("frost presence"), NULL), CastSpellAction::getPrerequisites());
+			return NextAction::merge(NextAction::array(0, new NextAction("frost presence"), NULL), CastRangeSpellAction::getPrerequisites());
 		}
 	};
 
@@ -31,7 +31,7 @@ namespace ai
 	public:
 		CastDarkCommandAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "dark command") {}
 		virtual NextAction** getPrerequisites() {
-			return NextAction::merge(NextAction::array(0, new NextAction("blood presence"), NULL), CastSpellAction::getPrerequisites());
+			return NextAction::merge(NextAction::array(0, new NextAction("blood presence"), NULL), CastRangeSpellAction::getPrerequisites());
 		}
 	};
 
@@ -139,9 +139,9 @@ namespace ai
 	END_SPELL_ACTION()
 
 
-	class CastChainsOfIceAction : public CastSpellAction {
+	class CastChainsOfIceAction : public CastRangeSpellAction {
 	public:
-		CastChainsOfIceAction(PlayerbotAI* ai) : CastSpellAction(ai, "chains of ice") {}
+		CastChainsOfIceAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "chains of ice") {}
 	};
 
 	class CastHungeringColdAction : public CastMeleeSpellAction {
@@ -179,9 +179,9 @@ namespace ai
 		CastScourgeStrikeAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "scorgue strike") {}
 	};
 
-	class CastDeathCoilAction : public CastSpellAction {
+	class CastDeathCoilAction : public CastRangeSpellAction {
 	public:
-		CastDeathCoilAction(PlayerbotAI* ai) : CastSpellAction(ai, "death coill") {}
+		CastDeathCoilAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "death coill") {}
 	};
 
 	class CastBloodBoilAction : public CastBuffSpellAction {
@@ -189,9 +189,9 @@ namespace ai
 		CastBloodBoilAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "blood boil") {}
 	};
 
-	class CastDeathAndDecayAction : public CastSpellAction {
+	class CastDeathAndDecayAction : public CastRangeSpellAction {
 	public:
-		CastDeathAndDecayAction(PlayerbotAI* ai) : CastSpellAction(ai, "death and decay") {}
+		CastDeathAndDecayAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "death and decay") {}
 	};
 
 	class CastHornOfWinterAction : public CastBuffSpellAction

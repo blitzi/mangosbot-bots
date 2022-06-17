@@ -24,26 +24,26 @@ namespace ai
     BEGIN_RANGED_SPELL_ACTION(CastShadowBoltAction, "shadow bolt")
     END_SPELL_ACTION()
 
-	class CastDrainSoulAction : public CastSpellAction
+	class CastDrainSoulAction : public CastRangeSpellAction
 	{
 	public:
-		CastDrainSoulAction(PlayerbotAI* ai) : CastSpellAction(ai, "drain soul") {}
+		CastDrainSoulAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "drain soul") {}
 		virtual bool isUseful()
 		{
 			return AI_VALUE2(uint32, "item count", "soul shard") < int(AI_VALUE(uint8, "bag space") * 0.2);
 		}
 	};
 
-	class CastDrainManaAction : public CastSpellAction
+	class CastDrainManaAction : public CastRangeSpellAction
 	{
 	public:
-		CastDrainManaAction(PlayerbotAI* ai) : CastSpellAction(ai, "drain mana") {}
+		CastDrainManaAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "drain mana") {}
 	};
 
-	class CastDrainLifeAction : public CastSpellAction
+	class CastDrainLifeAction : public CastRangeSpellAction
 	{
 	public:
-		CastDrainLifeAction(PlayerbotAI* ai) : CastSpellAction(ai, "drain life") {}
+		CastDrainLifeAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "drain life") {}
 	};
 
 	class CastCurseOfAgonyAction : public CastDebuffSpellAction
@@ -132,16 +132,16 @@ namespace ai
         CastSeedOfCorruptionAction(PlayerbotAI* ai) : CastDebuffSpellAction(ai, "seed of corruption") {}
     };
 
-    class CastRainOfFireAction : public CastSpellAction
+    class CastRainOfFireAction : public CastRangeSpellAction
     {
     public:
-        CastRainOfFireAction(PlayerbotAI* ai) : CastSpellAction(ai, "rain of fire") {}
+        CastRainOfFireAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "rain of fire") {}
     };
 
-    class CastShadowfuryAction : public CastSpellAction
+    class CastShadowfuryAction : public CastRangeSpellAction
     {
     public:
-        CastShadowfuryAction(PlayerbotAI* ai) : CastSpellAction(ai, "shadowfury") {}
+        CastShadowfuryAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "shadowfury") {}
     };
 
     class CastImmolateAction : public CastDebuffSpellAction
@@ -150,16 +150,16 @@ namespace ai
         CastImmolateAction(PlayerbotAI* ai) : CastDebuffSpellAction(ai, "immolate") {}
     };
 
-    class CastConflagrateAction : public CastSpellAction
+    class CastConflagrateAction : public CastRangeSpellAction
     {
     public:
-        CastConflagrateAction(PlayerbotAI* ai) : CastSpellAction(ai, "conflagrate") {}
+        CastConflagrateAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "conflagrate") {}
     };
 
-    class CastIncinirateAction : public CastSpellAction
+    class CastIncinirateAction : public CastRangeSpellAction
     {
     public:
-        CastIncinirateAction(PlayerbotAI* ai) : CastSpellAction(ai, "incinirate") {}
+        CastIncinirateAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "incinirate") {}
     };
 
     class CastFearAction : public CastDebuffSpellAction
@@ -178,10 +178,10 @@ namespace ai
         virtual bool isUseful() { return true; }
     };
 
-    class CastLifeTapAction: public CastSpellAction
+    class CastLifeTapAction: public CastRangeSpellAction
     {
     public:
-        CastLifeTapAction(PlayerbotAI* ai) : CastSpellAction(ai, "life tap") {}
+        CastLifeTapAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "life tap") {}
         virtual string GetTargetName() { return "self target"; }
         virtual bool isUseful() { return AI_VALUE2(float, "health", "self target") > sPlayerbotAIConfig.lowHealth; }
     };

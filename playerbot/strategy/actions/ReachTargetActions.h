@@ -74,10 +74,10 @@ namespace ai
         float distance;
     };
 
-    class CastReachTargetSpellAction : public CastSpellAction
+    class CastReachTargetSpellAction : public CastRangeSpellAction
     {
     public:
-        CastReachTargetSpellAction(PlayerbotAI* ai, string spell, float distance) : CastSpellAction(ai, spell)
+        CastReachTargetSpellAction(PlayerbotAI* ai, string spell, float distance) : CastRangeSpellAction(ai, spell)
 		{
             this->distance = distance;
         }

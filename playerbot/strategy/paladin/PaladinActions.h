@@ -323,10 +323,10 @@ namespace ai
 		CastAvengingWrathAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "avenging wrath") {}
     };	
 	
-	class CastRighteousDefenseAction : public CastSpellAction
+	class CastRighteousDefenseAction : public CastRangeSpellAction
     {
     public:
-		CastRighteousDefenseAction(PlayerbotAI* ai) : CastSpellAction(ai, "righteous defense") {}
+		CastRighteousDefenseAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "righteous defense") {}
     };
 
 	class CastConsecration1Action : public CastMeleeSpellAction
@@ -387,10 +387,10 @@ namespace ai
 		virtual string getName() { return "purify disease on party"; }
 	};
 
-	class CastHandOfReckoningAction : public CastSpellAction
+	class CastHandOfReckoningAction : public CastRangeSpellAction
 	{
 	public:
-		CastHandOfReckoningAction(PlayerbotAI* ai) : CastSpellAction(ai, "hand of reckoning") {}
+		CastHandOfReckoningAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "hand of reckoning") {}
 	};
 
 	class CastCleansePoisonAction : public CastCureSpellAction

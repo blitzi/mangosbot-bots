@@ -260,7 +260,7 @@ namespace ai
         static Action* reveal_gathering_item(PlayerbotAI* ai) { return new RevealGatheringItemAction(ai); }
         static Action* outfit(PlayerbotAI* ai) { return new OutfitAction(ai); }
         static Action* delay(PlayerbotAI* ai) { return new DelayAction(ai); }
-        static Action* mount(PlayerbotAI *ai) { return new CastSpellAction(ai, "mount"); }
+        static Action* mount(PlayerbotAI *ai) { return new CastRangeSpellAction(ai, "mount"); }
         static Action* auto_talents(PlayerbotAI* ai) { return new AutoSetTalentsAction(ai); }
         static Action* increase_level(PlayerbotAI* ai) { return new IncreaseLevelAction(ai); }
 		static Action* auto_learn_spell(PlayerbotAI* ai) { return new AutoLearnSpellAction(ai); }
