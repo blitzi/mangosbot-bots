@@ -35,4 +35,20 @@ namespace ai
             return sServerFacade.IsUnderwater(target) || target->IsInSwimmableWater();
         }
     };
+
+	class GoTargetReachedValue : public BoolCalculatedValue
+	{
+	public:
+		GoTargetReachedValue(PlayerbotAI* ai) : BoolCalculatedValue(ai) {}
+
+		virtual bool Calculate()
+		{
+			Unit* target = AI_VALUE(Unit*, "go target");
+
+			if (target == NULL)
+				return true;
+
+			return sServerFacade.IsDistanceLessOrEqualThan(AI_VALUE2(float, "distance", "go target"), CONTACT_DISTANCE);
+		}
+	};
 }

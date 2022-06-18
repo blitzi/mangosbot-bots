@@ -117,6 +117,7 @@ namespace ai
             creators["party member to cancel heal"] = &ValueContext::party_member_to_cancel_heal;
             creators["party member to resurrect"] = &ValueContext::party_member_to_resurrect;
             creators["current target"] = &ValueContext::current_target;
+            creators["go target"] = &ValueContext::go_target;
             creators["self target"] = &ValueContext::self_target;
             creators["master target"] = &ValueContext::master;
             creators["line target"] = &ValueContext::line_target;
@@ -270,6 +271,7 @@ namespace ai
             creators["petition signs"] = &ValueContext::petition_signs;
 
             creators["experience"] = &ValueContext::experience;
+            creators["go target reached"] = &ValueContext::go_target_reached;
         }
 
     private:
@@ -369,6 +371,7 @@ namespace ai
         static UntypedValue* party_member_to_dispel(PlayerbotAI* ai) { return new PartyMemberToDispel(ai); }
         static UntypedValue* party_member_to_protect(PlayerbotAI* ai) { return new PartyMemberToProtect(ai); }
         static UntypedValue* current_target(PlayerbotAI* ai) { return new CurrentTargetValue(ai); }
+        static UntypedValue* go_target(PlayerbotAI* ai) { return new CurrentTargetValue(ai); }
         static UntypedValue* old_target(PlayerbotAI* ai) { return new CurrentTargetValue(ai); }
         static UntypedValue* self_target(PlayerbotAI* ai) { return new SelfTargetValue(ai); }
         static UntypedValue* master(PlayerbotAI* ai) { return new MasterTargetValue(ai); }
@@ -447,5 +450,6 @@ namespace ai
         static UntypedValue* petition_signs(PlayerbotAI* ai) { return new PetitionSignsValue(ai); }        
 
         static UntypedValue* experience(PlayerbotAI* ai) { return new ExperienceValue(ai); }
+        static UntypedValue* go_target_reached(PlayerbotAI* ai) { return new GoTargetReachedValue(ai); }
     };
 };

@@ -135,18 +135,3 @@ bool SetReturnPositionAction::Execute(Event event)
     }
     return false;
 }
-
-bool SetReturnPositionAction::isUseful()
-{
-    ai::PositionMap& posMap = context->GetValue<ai::PositionMap&>("position")->Get();
-    return posMap["return"].isSet() && !posMap["random"].isSet();
-}
-
-
-bool ReturnAction::isUseful()
-{
-    if (sServerFacade.isMoving(bot)) return false;
-
-    ai::PositionEntry pos = context->GetValue<ai::PositionMap&>("position")->Get()[qualifier];
-    return pos.isSet();
-}

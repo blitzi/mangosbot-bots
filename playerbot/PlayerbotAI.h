@@ -253,10 +253,12 @@ public:
     void DoNextAction();
     virtual bool DoSpecificAction(string name, Event event = Event(), bool silent = false, string qualifier = "");
     void ChangeStrategy(string name, BotState type);
+    void ChangeStrategy(string name);
     void ClearStrategies(BotState type);
     list<string> GetStrategies(BotState type);
     bool ContainsStrategy(StrategyType type);
     bool HasStrategy(string name, BotState type);
+    bool HasStrategy(string name);
     void ResetStrategies(bool load = true);
     void ReInitCurrentEngine();
     void Reset(bool full = false);

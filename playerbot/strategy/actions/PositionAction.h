@@ -42,15 +42,13 @@ namespace ai
         {}
 
         virtual bool Execute(Event event);
-        virtual bool isUseful();
+		virtual bool isUseful() { return true; };
     };
 
     class ReturnAction : public MoveToPositionAction
     {
     public:
         ReturnAction(PlayerbotAI* ai) : MoveToPositionAction(ai, "return", "return", true) {}
-
-        virtual bool isUseful();
     };
 
 }

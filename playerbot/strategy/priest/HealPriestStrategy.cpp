@@ -45,10 +45,6 @@ void HealPriestStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 
     triggers.push_back(new TriggerNode(
         "medium aoe heal",
-        NextAction::array(0, new NextAction("prayer of mending", 49.0f), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "medium aoe heal",
         NextAction::array(0, new NextAction("circle of healing", 48.0f), NULL)));
 
 	triggers.push_back(new TriggerNode(

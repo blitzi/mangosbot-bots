@@ -5,6 +5,7 @@
 #include "../../PlayerbotAIConfig.h"
 #include "../../ServerFacade.h"
 #include <playerbot/strategy/values/Stances.h>
+#include <playerbot/strategy/values/LastMovementValue.h>
 
 namespace ai
 {
@@ -45,6 +46,11 @@ namespace ai
         }
         virtual bool isUseful()
 		{
+			bool goTargetReached = AI_VALUE(bool, "go target reached");
+
+			if (!goTargetReached)
+				return false;
+
             Unit* target = AI_VALUE(Unit*, GetTargetName());
             Stance* stance = context->GetValue<Stance*>("stance")->Get();
 

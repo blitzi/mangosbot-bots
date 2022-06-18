@@ -679,7 +679,7 @@ bool MovementAction::IsMovingAllowed()
             bot->HasAuraType(SPELL_AURA_MOD_CONFUSE) || sServerFacade.IsCharmed(bot) ||
             bot->HasAuraType(SPELL_AURA_MOD_STUN) || bot->IsTaxiFlying() ||
             bot->hasUnitState(UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL) ||
-            ai->HasStrategy("dont move", BOT_STATE_NON_COMBAT)
+            ai->HasStrategy("dont move")
         )
         return false;
 
@@ -997,7 +997,7 @@ bool MovementAction::ChaseTo(WorldObject* obj, float distance, float angle)
 
     bot->GetMotionMaster()->Clear();
 
-    if (!ai->HasStrategy("dont move", BOT_STATE_NON_COMBAT))
+    if (!ai->HasStrategy("dont move"))
     {
         bot->GetMotionMaster()->MoveChase((Unit*)obj, distance, angle);
     }
@@ -1312,6 +1312,11 @@ bool SetFacingTargetAction::Execute(Event event)
 
 bool SetFacingTargetAction::isUseful()
 {
+	bool goTargetReached = AI_VALUE(bool, "go target reached");
+
+	if (!goTargetReached)
+		return false;
+
     return !AI_VALUE2(bool, "facing", "current target");
 }
 

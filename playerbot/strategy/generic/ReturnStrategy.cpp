@@ -10,6 +10,6 @@ void ReturnStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
     triggers.push_back(new TriggerNode(
         "return",
-        NextAction::array(0, new NextAction("set return position", 150.0f), new NextAction("return", 250.0f), NULL)));
+        NextAction::array(0, new NextAction("return", 250.0f), NULL)));
 }
 

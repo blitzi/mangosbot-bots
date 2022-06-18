@@ -149,7 +149,7 @@ namespace ai
 
         virtual bool IsActive()
         {            
-            return bot->GetPlayerbotAI()->HasStrategy("force follow", BotState::BOT_STATE_NON_COMBAT) &&
+            return bot->GetPlayerbotAI()->HasStrategy("force follow") &&
                    sServerFacade.IsDistanceGreaterThan(AI_VALUE2(float, "distance", "master target"), sPlayerbotAIConfig.forceFollowDistance);
         }
 

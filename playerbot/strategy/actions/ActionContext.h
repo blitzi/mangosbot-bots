@@ -6,7 +6,6 @@
 #include "AddLootAction.h"
 #include "LootAction.h"
 #include "AddLootAction.h"
-#include "StayActions.h"
 #include "FollowActions.h"
 #include "ChangeStrategyAction.h"
 #include "ChooseTargetActions.h"
@@ -104,8 +103,6 @@ namespace ai
             creators["follow"] = &ActionContext::follow;
             creators["flee to master"] = &ActionContext::flee_to_master;
             creators["runaway"] = &ActionContext::runaway;
-            creators["stay"] = &ActionContext::stay;
-            creators["sit"] = &ActionContext::sit;
             creators["attack anything"] = &ActionContext::attack_anything;
             creators["attack least hp target"] = &ActionContext::attack_least_hp_target;
             creators["attack enemy player"] = &ActionContext::attack_enemy_player;
@@ -234,8 +231,6 @@ namespace ai
         static Action* attack_anything(PlayerbotAI* ai) { return new AttackAnythingAction(ai); }
         static Action* attack_least_hp_target(PlayerbotAI* ai) { return new AttackLeastHpTargetAction(ai); }
         static Action* attack_enemy_player(PlayerbotAI* ai) { return new AttackEnemyPlayerAction(ai); }
-        static Action* stay(PlayerbotAI* ai) { return new StayAction(ai); }
-        static Action* sit(PlayerbotAI* ai) { return new SitAction(ai); }
         static Action* runaway(PlayerbotAI* ai) { return new RunAwayAction(ai); }
         static Action* follow(PlayerbotAI* ai) { return new FollowAction(ai); }
         static Action* flee_to_master(PlayerbotAI* ai) { return new FleeToMasterAction(ai); }

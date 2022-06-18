@@ -174,7 +174,7 @@ namespace ai
 
         virtual bool isUseful()
         {
-            Unit* target = GetTargetValue()->Get();            
+            Unit* target = GetTargetValue()->Get();
             return target != NULL;
         }
     };
@@ -183,7 +183,7 @@ namespace ai
     class DamageStopAction : public Action
     {
     public:
-        DamageStopAction(PlayerbotAI* ai) : Action(ai) {}        
+        DamageStopAction(PlayerbotAI* ai) : Action(ai) {}
         virtual bool IgnoresCasting() { return true; }
         virtual bool Execute(Event event)
         {
@@ -200,7 +200,7 @@ namespace ai
 				ai->GetAiObjectContext()->GetValue<ObjectGuid>("pull target")->Set(ObjectGuid());
                 ai->ChangeEngine(BOT_STATE_NON_COMBAT);
                 return true;
-            }        
+            }
 
             return false;
         }

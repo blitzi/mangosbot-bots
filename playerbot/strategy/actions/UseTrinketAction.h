@@ -11,7 +11,6 @@ namespace ai
         UseTrinketAction(PlayerbotAI* ai) : Action(ai, "use trinket") {	}
         virtual bool Execute(Event event);
 
-		virtual bool isUseful() { return true; };
 		virtual bool isPossible();
 
 	private:

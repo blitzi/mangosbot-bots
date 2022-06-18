@@ -14,7 +14,7 @@ bool FollowAction::Execute(Event event)
     string target = formation->GetTargetName();
     bool moved = false;
 
-    if (ai->HasStrategy("force follow", BotState::BOT_STATE_NON_COMBAT))
+    if (ai->HasStrategy("force follow"))
     {
         Unit* target = AI_VALUE(Unit*, "master target");
 
@@ -94,7 +94,6 @@ bool FleeToMasterAction::Execute(Event event)
     bool canFollow = Follow(fTarget);
     if (!canFollow)
     {
-        //ai->SetNextCheckDelay(5000);
         return false;
     }
 

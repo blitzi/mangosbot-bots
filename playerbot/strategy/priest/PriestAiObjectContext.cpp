@@ -239,14 +239,12 @@ namespace ai
                 creators["mass dispel"] = &AiObjectContextInternal::mass_dispel;
                 creators["pain suppression"] = &AiObjectContextInternal::pain_suppression;
                 creators["pain suppression on party"] = &AiObjectContextInternal::pain_suppression_on_party;
-                creators["prayer of mending"] = &AiObjectContextInternal::prayer_of_mending;
                 creators["binding heal"] = &AiObjectContextInternal::binding_heal;
                 creators["prayer of mending on tank"] = &AiObjectContextInternal::prayer_of_mending_on_tank;
             }
 
         private:
-            static Action* binding_heal(PlayerbotAI* ai) { return new CastBindingHealAction(ai); }
-            static Action* prayer_of_mending(PlayerbotAI* ai) { return new CastPrayerOfMendingAction(ai); }
+            static Action* binding_heal(PlayerbotAI* ai) { return new CastBindingHealAction(ai); }            
             static Action* pain_suppression_on_party(PlayerbotAI* ai) { return new CastPainSuppressionProtectAction(ai); }
             static Action* pain_suppression(PlayerbotAI* ai) { return new CastPainSuppressionAction(ai); }
             static Action* mass_dispel(PlayerbotAI* ai) { return new CastMassDispelAction(ai); }

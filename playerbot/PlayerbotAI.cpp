@@ -272,6 +272,7 @@ void PlayerbotAI::Reset(bool full)
 
     aiObjectContext->GetValue<Unit*>("old target")->Set(NULL);
     aiObjectContext->GetValue<Unit*>("current target")->Set(NULL);
+    aiObjectContext->GetValue<Unit*>("go target")->Set(NULL);
     aiObjectContext->GetValue<ObjectGuid>("pull target")->Set(ObjectGuid());
     aiObjectContext->GetValue<LootObject>("loot target")->Set(LootObject());
     aiObjectContext->GetValue<uint32>("lfg proposal")->Set(0);
@@ -761,6 +762,18 @@ void PlayerbotAI::ChangeStrategy(string names, BotState type)
     e->ChangeStrategy(names);
 }
 
+void PlayerbotAI::ChangeStrategy(string names)
+{
+	for (int i = 0; i < BOT_STATE_MAX; i++)
+	{
+		Engine* e = engines[i];
+		if (!e)
+			return;
+
+		e->ChangeStrategy(names);
+	}
+}
+
 void PlayerbotAI::ClearStrategies(BotState type)
 {
     Engine* e = engines[type];
@@ -854,6 +867,17 @@ bool PlayerbotAI::ContainsStrategy(StrategyType type)
 bool PlayerbotAI::HasStrategy(string name, BotState type)
 {
     return engines[type]->HasStrategy(name);
+}
+
+bool PlayerbotAI::HasStrategy(string name)
+{
+	for (int i = 0; i < BOT_STATE_MAX; i++)
+	{
+		return engines[i]->HasStrategy(name);
+			return true;
+	}
+
+	return false;
 }
 
 void PlayerbotAI::ResetStrategies(bool load)

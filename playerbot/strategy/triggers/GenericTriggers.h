@@ -724,7 +724,7 @@ namespace ai
     class StayTimeTrigger : public Trigger
     {
     public:
-        StayTimeTrigger(PlayerbotAI* ai, uint32 delay, string name) : Trigger(ai, name, 5), delay(delay) {}
+        StayTimeTrigger(PlayerbotAI* ai, uint32 delay, string name) : Trigger(ai, name), delay(delay) {}
 
     public:
         virtual bool IsActive();

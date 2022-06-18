@@ -33,50 +33,6 @@ bool FollowChatShortcutAction::Execute(Event event)
     ai->ChangeStrategy("+follow,-passive", BOT_STATE_NON_COMBAT);
     ai->ChangeStrategy("-follow,-passive", BOT_STATE_COMBAT);
 
-    ai::PositionMap& posMap = context->GetValue<ai::PositionMap&>("position")->Get();
-    ai::PositionEntry pos = posMap["return"];
-    pos.Reset();
-    posMap["return"] = pos;
-
-    if (sServerFacade.IsInCombat(bot))
-    {
-        Formation* formation = AI_VALUE(Formation*, "formation");
-        string target = formation->GetTargetName();
-        bool moved = false;
-        if (!target.empty())
-        {
-            moved = Follow(AI_VALUE(Unit*, target));
-        }
-        else
-        {
-            WorldLocation loc = formation->GetLocation();
-            if (Formation::IsNullLocation(loc) || loc.mapid == -1)
-                return false;
-
-            moved = MoveTo(loc.mapid, loc.coord_x, loc.coord_y, loc.coord_z);
-        }
-        if (moved)
-        {
-            ai->TellMaster("Following");
-            return true;
-        }
-    }
-    /* Default mechanics takes care of this now.
-    if (bot->GetMapId() != master->GetMapId() || (master && bot->GetDistance(master) > sPlayerbotAIConfig.sightDistance))
-    {
-        if (sServerFacade.UnitIsDead(bot))
-        {
-            bot->ResurrectPlayer(1.0f, false);
-            ai->TellMasterNoFacing("Back from the grave!");
-        }
-        else
-            ai->TellError("I will not follow you - too far away");
-
-        bot->TeleportTo(master->GetMapId(), master->GetPositionX(), master->GetPositionY(), master->GetPositionZ(), master->GetOrientation());
-        return true;
-    }
-    */
-
     ai->TellMaster("Following");
     return true;
 }
@@ -87,12 +43,13 @@ bool StayChatShortcutAction::Execute(Event event)
     if (!master)
         return false;
 
-    ai->ChangeStrategy("+stay,-passive", BOT_STATE_NON_COMBAT);
-    ai->ChangeStrategy("-follow,-passive", BOT_STATE_COMBAT);
-
     SetReturnPosition(bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ());
 
+	ai->Reset();
+	ai->ChangeStrategy("-follow");
+
     ai->TellMaster("Staying");
+
     return true;
 }
 

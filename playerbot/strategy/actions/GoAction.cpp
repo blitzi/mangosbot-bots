@@ -21,7 +21,6 @@ bool GoAction::Execute(Event event)
         return false;
 
 	ai->GetMoveTimer()->Reset(0);
-	ai->GetBot()->CastStop();
 
     string param = event.getParam();
     if (param == "?")
@@ -102,6 +101,9 @@ bool GoAction::Execute(Event event)
         {
             ostringstream out; out << "Moving to " << unit->GetName();
             ai->TellMasterNoFacing(out.str());
+
+			context->GetValue<Unit*>("go target")->Set(unit);
+
             return MoveNear(bot->GetMapId(), unit->GetPositionX(), unit->GetPositionY(), unit->GetPositionZ() + 0.5f, sPlayerbotAIConfig.followDistance);
         }
     }
