@@ -144,9 +144,11 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
 
     int iterations = 0;
     int iterationsPerTick = queue.Size() * (minimal ? 1 : sPlayerbotAIConfig.iterationsPerTick);
-    do {
+    do 
+	{
         basket = queue.Peek();
-        if (basket) {
+        if (basket) 
+		{
             float relevance = basket->getRelevance(); // just for reference
             bool skipPrerequisites = basket->isSkipPrerequisites();
             Event event = basket->getEvent();
@@ -162,11 +164,11 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
                 replaceCastWithBetterOption = lastCastRelevance + 100 < relevance;
 
                 if (!action->IgnoresCasting() &&  !replaceCastWithBetterOption)
-                    continue;    
+                    continue;
             }
 
-            if (action)            
-                action->setRelevance(relevance);            
+            if (action)
+                action->setRelevance(relevance);
 
             if (!action)
             {
@@ -206,10 +208,10 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
                     if (pmo) pmo->finish();
 
                     if (actionExecuted)
-                    {                 
+                    {
                         if (action->IsCast())
                         {
-                            lastCastRelevance = relevance;                         
+                            lastCastRelevance = relevance;
                         }
 
                         LogAction("A:%s - OK", action->GetName().c_str());
@@ -230,7 +232,7 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
                 }
             }
             else
-            {               
+            {
                 LogAction("A:%s - USELESS", action->GetName().c_str());
                 MultiplyAndPush(actionNode->getAlternatives(), relevance + 0.03, false, event, "alt");
             }

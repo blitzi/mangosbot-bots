@@ -258,13 +258,12 @@ namespace ai
         virtual string getName() { return spell + " on party"; }
     };
 
-    class BuffOnTankTrigger : public BuffTrigger
+    class BuffOnTankTrigger : public BuffOnPartyTrigger
     {
     public:
-        BuffOnTankTrigger(PlayerbotAI* ai, string spell, int checkInterval = 1) : BuffTrigger(ai, spell, checkInterval) {}
+        BuffOnTankTrigger(PlayerbotAI* ai, string spell, int checkInterval = 1) : BuffOnPartyTrigger(ai, spell, checkInterval) {}
     public:
         virtual Value<Unit*>* GetTargetValue();
-        virtual string getName() { return spell + " on tank"; }
     };
 
 

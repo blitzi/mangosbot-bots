@@ -82,7 +82,7 @@ namespace ai
 
     class PrayerOfMendingOnTankTrigger : public BuffOnTankTrigger {
     public:
-        PrayerOfMendingOnTankTrigger(PlayerbotAI* ai) : BuffOnTankTrigger(ai, "prayer of mending", 1) {}
+        PrayerOfMendingOnTankTrigger(PlayerbotAI* ai) : BuffOnTankTrigger(ai, "prayer of mending", 10) {}
 
         virtual bool IsActive() {
             return BuffOnTankTrigger::IsActive() &&

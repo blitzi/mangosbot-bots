@@ -8,9 +8,10 @@ namespace ai
     class Trigger : public AiNamedObject
 	{
 	public:
-        Trigger(PlayerbotAI* ai, string name = "trigger", int checkInterval = 1) : AiNamedObject(ai, name) {
+        Trigger(PlayerbotAI* ai, string name = "trigger", int checkInterval = 1) : AiNamedObject(ai, name)
+		{
 			this->checkInterval = checkInterval;
-			lastCheckTime = time(0) - rand() % checkInterval;
+			lastCheckTime = time(0);
 		}
         virtual ~Trigger() {}
 
@@ -27,15 +28,17 @@ namespace ai
         virtual string GetTargetName() { return "self target"; }
         virtual bool CheckOnMinimal() { return false;  }
 
-		bool needCheck(bool minimal) {
-
+		bool needCheck(bool minimal)
+		{
             if (minimal && !CheckOnMinimal())
                 return false;
 
 		    if (checkInterval < 2) return true;
 
 		    time_t now = time(0);
-			if (!lastCheckTime || now - lastCheckTime >= checkInterval) {
+
+			if (!lastCheckTime || ((now - lastCheckTime) >= checkInterval)) 
+			{
 			    lastCheckTime = now;
 				return true;
 			}

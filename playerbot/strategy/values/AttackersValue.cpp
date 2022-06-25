@@ -179,7 +179,7 @@ void AttackersValue::RemoveAlreadyTankedTargets(set<Unit*>& targets, Player* bot
             if (p == bot)
                 continue;
         
-            if (ai->IsTank(p) && p->IsAlive())        
+            if (ai->IsTank(p) && p->IsAlive())
             {
                 Unit* target = p->GetTarget();
 

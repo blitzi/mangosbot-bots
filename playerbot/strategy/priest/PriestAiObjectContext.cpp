@@ -240,7 +240,7 @@ namespace ai
                 creators["pain suppression"] = &AiObjectContextInternal::pain_suppression;
                 creators["pain suppression on party"] = &AiObjectContextInternal::pain_suppression_on_party;
                 creators["binding heal"] = &AiObjectContextInternal::binding_heal;
-                creators["prayer of mending on tank"] = &AiObjectContextInternal::prayer_of_mending_on_tank;
+                creators["prayer of mending on party"] = &AiObjectContextInternal::prayer_of_mending_on_party;
             }
 
         private:
@@ -269,7 +269,7 @@ namespace ai
             static Action* mana_burn(PlayerbotAI* ai) { return new CastManaBurnAction(ai); }
             static Action* silence_on_enemy_healer(PlayerbotAI* ai) { return new CastSilenceOnEnemyHealerAction(ai); }
             static Action* silence(PlayerbotAI* ai) { return new CastSilenceAction(ai); }
-            static Action* prayer_of_mending_on_tank(PlayerbotAI* ai) { return new CastPrayerOfMendingOnTankAction(ai); }
+            static Action* prayer_of_mending_on_party(PlayerbotAI* ai) { return new CastPrayerOfMendingOnPartyAction(ai); }
             static Action* prayer_of_spirit_on_party(PlayerbotAI* ai) { return new CastPrayerOfSpiritOnPartyAction(ai); }
             static Action* prayer_of_fortitude_on_party(PlayerbotAI* ai) { return new CastPrayerOfFortitudeOnPartyAction(ai); }
             static Action* shackle_undead(PlayerbotAI* ai) { return new CastShackleUndeadAction(ai); }

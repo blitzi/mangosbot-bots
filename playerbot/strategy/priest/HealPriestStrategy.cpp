@@ -21,7 +21,7 @@ void HealPriestStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 
     triggers.push_back(new TriggerNode(
         "prayer of mending on tank",
-        NextAction::array(0, new NextAction("prayer of mending on tank", ACTION_HIGH), NULL)));
+        NextAction::array(0, new NextAction("prayer of mending on party", ACTION_HIGH), NULL)));
 
     triggers.push_back(new TriggerNode(
         "enemy out of spell",
