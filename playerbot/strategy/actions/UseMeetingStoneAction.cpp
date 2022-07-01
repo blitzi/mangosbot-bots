@@ -76,7 +76,15 @@ bool SummonAction::Execute(Event event)
     if (!master)
         return false;
 
-    if (master->IsDead() || master->IsInCombat())
+	if (master->IsDead())
+		return false;
+
+	if (master->IsInCombat() && bot->IsDead())
+		return false;
+
+	bool sameMap = master->GetMapId() == bot->GetMapId();
+
+    if (master->IsInCombat() && !sameMap)
         return false;
 
     if (master->GetSession()->GetSecurity() >= SEC_PLAYER)
