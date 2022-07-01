@@ -111,7 +111,7 @@ namespace ai
                 creators["presence of mind"] = &TriggerFactoryInternal::presence_of_mind;
                 creators["fire ward"] = &TriggerFactoryInternal::fire_ward;
                 creators["frost ward"] = &TriggerFactoryInternal::frost_ward;
-
+                creators["cast fireball"] = &TriggerFactoryInternal::cast_fireball;
             }
 
         private:
@@ -136,6 +136,7 @@ namespace ai
             static Trigger* missile_barrage(PlayerbotAI* ai) { return new MissileBarrageTrigger(ai); }
             static Trigger* arcane_blast(PlayerbotAI* ai) { return new ArcaneBlastTrigger(ai); }
             static Trigger* counterspell_enemy_healer(PlayerbotAI* ai) { return new CounterspellEnemyHealerTrigger(ai); }
+            static Trigger* cast_fireball(PlayerbotAI* ai) { return new SpellCanBeCastTrigger(ai, "fireball"); }
         };
     };
 };

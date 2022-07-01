@@ -41,9 +41,9 @@ namespace ai
         PyroblastTrigger(PlayerbotAI* ai) : DebuffTrigger(ai, "pyroblast") {}
     };
 
-    class HotStreakTrigger : public HasAuraTrigger {
+    class HotStreakTrigger : public SpellCanBeCastInstantTrigger {
     public:
-        HotStreakTrigger(PlayerbotAI* ai) : HasAuraTrigger(ai, "hot streak") {}
+        HotStreakTrigger(PlayerbotAI* ai) : SpellCanBeCastInstantTrigger(ai, "pyroblast") {}
     };
 
     class MissileBarrageTrigger : public HasAuraTrigger {
