@@ -115,4 +115,10 @@ namespace ai
     public:
         PresenceOfMindTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "presence of mind") {}
     };
+
+    class ImprovedScorchTrigger : public DebuffTrigger
+    {
+    public:
+        ImprovedScorchTrigger(PlayerbotAI* ai) : DebuffTrigger(ai, "improved scorch") {}
+    };
 }
