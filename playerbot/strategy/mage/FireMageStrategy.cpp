@@ -9,6 +9,11 @@ void FireMageStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
     GenericMageStrategy::InitTriggers(triggers);
 
+	//Add living Bomb first
+	triggers.push_back(new TriggerNode(
+		"living bomb",
+		NextAction::array(0, new NextAction("living bomb", 60.0f), NULL)));
+
     // cast fireball as default
     triggers.push_back(new TriggerNode(
         "cast fireball",
@@ -22,7 +27,7 @@ void FireMageStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
     // always use pyroblast, when hotstreak is available
     triggers.push_back(new TriggerNode(
         "hot streak",
-        NextAction::array(0, new NextAction("pyroblast", 25.0f), NULL)));
+        NextAction::array(0, new NextAction("pyroblast", 250.0f), NULL)));
 
     // use combustion boost, when required
     triggers.push_back(new TriggerNode(
@@ -32,7 +37,8 @@ void FireMageStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
     // flee action (applies disorientation), when enemy is 2 close 2 you
     triggers.push_back(new TriggerNode(
         "enemy too close for spell",
-        NextAction::array(0, new NextAction("dragon's breath", 70.0f), NULL)));
+        NextAction::array(0, new NextAction("dragon's breath", 30.0f), NULL)));
+
 }
 
 void FireMageAoeStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
@@ -41,8 +47,9 @@ void FireMageAoeStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
         "medium aoe",
         NextAction::array(0, new NextAction("flamestrike", 20.0f), NULL)));
 
-    triggers.push_back(new TriggerNode(
-        "living bomb",
-        NextAction::array(0, new NextAction("living bomb", 25.0f), NULL)));
+	//Add living Bomb first
+	triggers.push_back(new TriggerNode(
+		"living bomb",
+		NextAction::array(0, new NextAction("living bomb", 60.0f), NULL)));
 }
 

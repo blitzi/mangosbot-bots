@@ -26,10 +26,7 @@ namespace ai
         virtual bool IsActive();
     };
 
-    class LivingBombTrigger : public DebuffTrigger {
-    public:
-        LivingBombTrigger(PlayerbotAI* ai) : DebuffTrigger(ai, "living bomb") {}
-	};
+	MY_DEBUFF_TRIGGER(LivingBombTrigger, "living bomb");
 
     class FireballTrigger : public DebuffTrigger {
     public:
