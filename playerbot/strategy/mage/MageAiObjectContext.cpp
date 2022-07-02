@@ -161,6 +161,7 @@ namespace ai
                 creators["arcane intellect on party"] = &AiObjectContextInternal::arcane_intellect_on_party;
                 creators["conjure water"] = &AiObjectContextInternal::conjure_water;
                 creators["conjure food"] = &AiObjectContextInternal::conjure_food;
+                creators["conjure refreshment"] = &AiObjectContextInternal::conjure_refreshment;
                 creators["molten armor"] = &AiObjectContextInternal::molten_armor;
                 creators["mage armor"] = &AiObjectContextInternal::mage_armor;
                 creators["ice armor"] = &AiObjectContextInternal::ice_armor;
@@ -208,6 +209,7 @@ namespace ai
             static Action* arcane_intellect_on_party(PlayerbotAI* ai) { return new CastArcaneIntellectOnPartyAction(ai); }
             static Action* conjure_water(PlayerbotAI* ai) { return new CastConjureWaterAction(ai); }
             static Action* conjure_food(PlayerbotAI* ai) { return new CastConjureFoodAction(ai); }
+            static Action* conjure_refreshment(PlayerbotAI* ai) { return new CastConjureRefreshmentAction(ai); }
             static Action* molten_armor(PlayerbotAI* ai) { return new CastMoltenArmorAction(ai); }
             static Action* mage_armor(PlayerbotAI* ai) { return new CastMageArmorAction(ai); }
             static Action* ice_armor(PlayerbotAI* ai) { return new CastIceArmorAction(ai); }

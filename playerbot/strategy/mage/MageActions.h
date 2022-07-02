@@ -143,6 +143,12 @@ namespace ai
 		CastConjureWaterAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "conjure water") {}
 	};
 
+    class CastConjureRefreshmentAction : public CastBuffSpellAction
+    {
+    public:
+        CastConjureRefreshmentAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "conjure refreshment") {}
+    };
+
 	class CastIceBlockAction : public CastBuffSpellAction
     {
 	public:

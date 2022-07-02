@@ -201,16 +201,22 @@ namespace ai
         float range;
     };
 
+    class NoRefreshmentTrigger : public Trigger {
+    public:
+        NoRefreshmentTrigger(PlayerbotAI* ai) : Trigger(ai, "no refreshment trigger") {}
+        virtual bool IsActive() { return AI_VALUE2(list<Item*>, "inventory items", "conjured refreshment").empty(); }
+    };
+
     class NoFoodTrigger : public Trigger {
     public:
         NoFoodTrigger(PlayerbotAI* ai) : Trigger(ai, "no food trigger") {}
-        virtual bool IsActive() { return AI_VALUE2(list<Item*>, "inventory items", "conjured food").empty(); }
+        virtual bool IsActive() { return AI_VALUE2(list<Item*>, "inventory items", "conjured food").empty() && AI_VALUE2(list<Item*>, "inventory items", "conjured refreshment").empty(); }
     };
 
     class NoDrinkTrigger : public Trigger {
     public:
         NoDrinkTrigger(PlayerbotAI* ai) : Trigger(ai, "no drink trigger") {}
-        virtual bool IsActive() { return AI_VALUE2(list<Item*>, "inventory items", "conjured water").empty(); }
+        virtual bool IsActive() { return AI_VALUE2(list<Item*>, "inventory items", "conjured water").empty() && AI_VALUE2(list<Item*>, "inventory items", "conjured refreshment").empty(); }
     };
 
     class RangeAoeTrigger : public AoeTrigger
@@ -767,7 +773,7 @@ namespace ai
     public:
         virtual bool IsActive()
         {
-            return AI_VALUE(Unit*, "party member without food") && AI_VALUE2(uint32, "item count", item);
+            return AI_VALUE(Unit*, "party member without food") && AI_VALUE(Unit*, "party member without refreshment") && AI_VALUE2(uint32, "item count", item);
         }
     };
 
@@ -778,7 +784,18 @@ namespace ai
     public:
         virtual bool IsActive()
         {
-            return AI_VALUE(Unit*, "party member without water") && AI_VALUE2(uint32, "item count", item);
+            return AI_VALUE(Unit*, "party member without water") && AI_VALUE(Unit*, "party member without refreshment") && AI_VALUE2(uint32, "item count", item);
+        }
+    };
+
+    class GiveRefreshmentTrigger : public GiveItemTrigger
+    {
+    public:
+        GiveRefreshmentTrigger(PlayerbotAI* ai) : GiveItemTrigger(ai, "give refreshment", "conjured refreshment") {}
+    public:
+        virtual bool IsActive()
+        {
+            return AI_VALUE(Unit*, "party member without refreshment") && AI_VALUE2(uint32, "item count", item);
         }
     };
 

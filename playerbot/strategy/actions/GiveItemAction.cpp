@@ -70,3 +70,8 @@ Unit* GiveWaterAction::GetTarget()
 {
     return AI_VALUE(Unit*, "party member without water");
 }
+
+Unit* GiveRefreshmentAction::GetTarget()
+{
+    return AI_VALUE(Unit*, "party member without refreshment");
+}
