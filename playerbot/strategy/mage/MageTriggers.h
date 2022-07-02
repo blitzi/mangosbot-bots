@@ -26,10 +26,7 @@ namespace ai
         virtual bool IsActive();
     };
 
-    class LivingBombTrigger : public DebuffTrigger {
-    public:
-        LivingBombTrigger(PlayerbotAI* ai) : DebuffTrigger(ai, "living bomb") {}
-	};
+	MY_DEBUFF_TRIGGER(LivingBombTrigger, "living bomb");
 
     class FireballTrigger : public DebuffTrigger {
     public:
@@ -41,9 +38,9 @@ namespace ai
         PyroblastTrigger(PlayerbotAI* ai) : DebuffTrigger(ai, "pyroblast") {}
     };
 
-    class HotStreakTrigger : public HasAuraTrigger {
+    class HotStreakTrigger : public SpellCanBeCastInstantTrigger {
     public:
-        HotStreakTrigger(PlayerbotAI* ai) : HasAuraTrigger(ai, "hot streak") {}
+        HotStreakTrigger(PlayerbotAI* ai) : SpellCanBeCastInstantTrigger(ai, "pyroblast") {}
     };
 
     class MissileBarrageTrigger : public HasAuraTrigger {
@@ -114,5 +111,11 @@ namespace ai
     {
     public:
         PresenceOfMindTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "presence of mind") {}
+    };
+
+    class ImprovedScorchTrigger : public DebuffTrigger
+    {
+    public:
+        ImprovedScorchTrigger(PlayerbotAI* ai) : DebuffTrigger(ai, "improved scorch") {}
     };
 }
