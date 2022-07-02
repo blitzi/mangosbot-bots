@@ -33,4 +33,13 @@ namespace ai
     protected:
         virtual FindPlayerPredicate* CreatePredicate();
     };
+
+    class PartyMemberWithoutRefreshmentValue : public PartyMemberWithoutItemValue
+    {
+    public:
+        PartyMemberWithoutRefreshmentValue(PlayerbotAI* ai) : PartyMemberWithoutItemValue(ai) {}
+
+    protected:
+        virtual FindPlayerPredicate* CreatePredicate();
+    };
 }

@@ -133,6 +133,7 @@ namespace ai
             creators["try emergency"] = &ActionContext::try_emergency;
             creators["give food"] = &ActionContext::give_food;
             creators["give water"] = &ActionContext::give_water;
+            creators["give refreshment"] = &ActionContext::give_refreshment;
             creators["mount"] = &ActionContext::mount;
             creators["war stomp"] = &ActionContext::war_stomp;
             creators["auto talents"] = &ActionContext::auto_talents;
@@ -178,6 +179,7 @@ namespace ai
         }
 
     private:
+        static Action* give_refreshment(PlayerbotAI* ai) { return new GiveRefreshmentAction(ai); }
         static Action* give_water(PlayerbotAI* ai) { return new GiveWaterAction(ai); }
         static Action* give_food(PlayerbotAI* ai) { return new GiveFoodAction(ai); }
         static Action* ra(PlayerbotAI* ai) { return new RemoveAuraAction(ai); }

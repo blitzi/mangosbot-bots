@@ -6,7 +6,7 @@ using namespace ai;
 
 bool CastSpellAction::Execute(Event event)
 {
-	if (spell == "conjure food" || spell == "conjure water")
+	if (spell == "conjure food" || spell == "conjure water" || spell == "conjure refreshment")
 	{
 		//uint32 id = AI_VALUE2(uint32, "spell id", spell);
 		//if (!id)

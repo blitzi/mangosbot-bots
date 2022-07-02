@@ -51,6 +51,10 @@ void GenericMageNonCombatStrategy::InitTriggers(std::list<TriggerNode*> &trigger
         "arcane intellect",
         NextAction::array(0, new NextAction("arcane intellect", 21.0f), NULL)));
 
+    triggers.push_back(new TriggerNode(
+        "no refreshment",
+        NextAction::array(0, new NextAction("conjure refreshment", 17.0f), NULL)));
+
 	triggers.push_back(new TriggerNode(
 		"no drink",
 		NextAction::array(0, new NextAction("conjure water", 16.0f), NULL)));
@@ -83,6 +87,10 @@ void MageBuffStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
     triggers.push_back(new TriggerNode(
         "arcane intellect on party",
         NextAction::array(0, new NextAction("arcane intellect on party", 20.0f), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "give refreshment",
+        NextAction::array(0, new NextAction("give refreshment", 15.0f), NULL)));
 
     triggers.push_back(new TriggerNode(
         "give water",

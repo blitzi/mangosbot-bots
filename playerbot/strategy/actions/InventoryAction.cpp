@@ -210,6 +210,13 @@ list<Item*> InventoryAction::parseItems(string text, IterateItemsMask mask, bool
         return result;
     }
 
+    if (text == "conjured refreshment")
+    {
+        FindFoodVisitor visitor(bot, 11, true);
+        IterateItems(&visitor, ITERATE_ITEMS_IN_BAGS);
+        found.insert(visitor.GetResult().begin(), visitor.GetResult().end());
+    }
+
     if (text == "food" || text == "conjured food")
     {
         FindFoodVisitor visitor(bot, 11, (text == "conjured food"));
@@ -267,7 +274,7 @@ list<Item*> InventoryAction::parseItems(string text, IterateItemsMask mask, bool
     {
         FindRecipeVisitor visitor(bot);
         IterateItems(&visitor, ITERATE_ITEMS_IN_BAGS);
-        found.insert(visitor.GetResult().begin(), visitor.GetResult().end());        
+        found.insert(visitor.GetResult().begin(), visitor.GetResult().end());
     }
 
     if (text == "quest")

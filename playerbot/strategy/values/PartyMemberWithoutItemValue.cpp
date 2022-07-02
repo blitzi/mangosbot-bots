@@ -103,6 +103,33 @@ public:
 
 };
 
+class PlayerWithoutRefreshmentPredicate : public PlayerWithoutItemPredicate
+{
+public:
+    PlayerWithoutRefreshmentPredicate(PlayerbotAI* ai) : PlayerWithoutItemPredicate(ai, "conjured refreshment") {}
+
+public:
+    virtual bool Check(Unit* unit)
+    {
+        if (!PlayerWithoutItemPredicate::Check(unit))
+            return false;
+
+        Player* member = dynamic_cast<Player*>(unit);
+        if (!member)
+            return false;
+
+        uint8 cls = member->getClass();
+        return cls == CLASS_DRUID ||
+            cls == CLASS_HUNTER ||
+            cls == CLASS_PALADIN ||
+            cls == CLASS_PRIEST ||
+            cls == CLASS_SHAMAN ||
+            cls == CLASS_WARLOCK;
+    }
+
+};
+
+
 FindPlayerPredicate* PartyMemberWithoutFoodValue::CreatePredicate()
 {
     return new PlayerWithoutFoodPredicate(ai);
@@ -111,4 +138,9 @@ FindPlayerPredicate* PartyMemberWithoutFoodValue::CreatePredicate()
 FindPlayerPredicate* PartyMemberWithoutWaterValue::CreatePredicate()
 {
     return new PlayerWithoutWaterPredicate(ai);
+}
+
+FindPlayerPredicate* PartyMemberWithoutRefreshmentValue::CreatePredicate()
+{
+    return new PlayerWithoutRefreshmentPredicate(ai);
 }

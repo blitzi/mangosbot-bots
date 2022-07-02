@@ -31,4 +31,11 @@ namespace ai
         virtual Unit* GetTarget();
     };
 
+    class GiveRefreshmentAction : public GiveItemAction
+    {
+    public:
+        GiveRefreshmentAction(PlayerbotAI* ai) : GiveItemAction(ai, "give refreshment", "conjured refreshment") {}
+        virtual Unit* GetTarget();
+    };
+
 }

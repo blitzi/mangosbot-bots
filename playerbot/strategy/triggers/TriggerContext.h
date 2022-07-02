@@ -79,7 +79,7 @@ namespace ai
             creators["range aoe"] = &TriggerContext::RangeAoe;
             creators["light aoe"] = &TriggerContext::LightAoe;
             creators["medium aoe"] = &TriggerContext::MediumAoe;
-            creators["high aoe"] = &TriggerContext::HighAoe;            
+            creators["high aoe"] = &TriggerContext::HighAoe;
 
             creators["enemy out of melee"] = &TriggerContext::EnemyOutOfMelee;
             creators["enemy out of spell"] = &TriggerContext::EnemyOutOfSpell;
@@ -102,6 +102,7 @@ namespace ai
             creators["no possible grind target"] = &TriggerContext::no_possible_grind_target;
             creators["possible adds"] = &TriggerContext::possible_adds;
 
+            creators["no refreshment"] = &TriggerContext::no_refreshment;
             creators["no drink"] = &TriggerContext::no_drink;
             creators["no food"] = &TriggerContext::no_food;
 
@@ -137,6 +138,7 @@ namespace ai
 
             creators["give food"] = &TriggerContext::give_food;
             creators["give water"] = &TriggerContext::give_water;
+            creators["give refreshment"] = &TriggerContext::give_refreshment;
 
             creators["bg waiting"] = &TriggerContext::bg_waiting;
             creators["bg active"] = &TriggerContext::bg_active;
@@ -183,6 +185,7 @@ namespace ai
         static Trigger* player_is_in_battleground_no_flag(PlayerbotAI *ai) { return new PlayerIsInBattlegroundWithoutFlag(ai); }
         static Trigger* give_food(PlayerbotAI* ai) { return new GiveFoodTrigger(ai); }
         static Trigger* give_water(PlayerbotAI* ai) { return new GiveWaterTrigger(ai); }
+        static Trigger* give_refreshment(PlayerbotAI* ai) { return new GiveRefreshmentTrigger(ai); }
         static Trigger* no_rti(PlayerbotAI* ai) { return new NoRtiTrigger(ai); }
         static Trigger* _return(PlayerbotAI* ai) { return new ReturnTrigger(ai); }
         static Trigger* sit(PlayerbotAI* ai) { return new SitTrigger(ai); }
@@ -190,7 +193,7 @@ namespace ai
         static Trigger* near_rpg_target(PlayerbotAI* ai) { return new NearRpgTargetTrigger(ai); }
         static Trigger* no_rpg_target(PlayerbotAI* ai) { return new NoRpgTargetTrigger(ai); }
         static Trigger* far_from_travel_target(PlayerbotAI* ai) { return new FarFromTravelTargetTrigger(ai); }
-        static Trigger* no_travel_target(PlayerbotAI* ai) { return new NoTravelTargetTrigger(ai); }		
+        static Trigger* no_travel_target(PlayerbotAI* ai) { return new NoTravelTargetTrigger(ai); }
         static Trigger* collision(PlayerbotAI* ai) { return new CollisionTrigger(ai); }
         static Trigger* lfg_proposal_active(PlayerbotAI* ai) { return new LfgProposalActiveTrigger(ai); }
         static Trigger* unknown_dungeon(PlayerbotAI* ai) { return new UnknownDungeonTrigger(ai); }
@@ -215,10 +218,11 @@ namespace ai
         static Trigger* outnumbered(PlayerbotAI* ai) { return new OutNumberedTrigger(ai); }
         static Trigger* no_drink(PlayerbotAI* ai) { return new NoDrinkTrigger(ai); }
         static Trigger* no_food(PlayerbotAI* ai) { return new NoFoodTrigger(ai); }
+        static Trigger* no_refreshment(PlayerbotAI* ai) { return new NoRefreshmentTrigger(ai); }
         static Trigger* RangeAoe(PlayerbotAI* ai) { return new RangeAoeTrigger(ai); }
         static Trigger* LightAoe(PlayerbotAI* ai) { return new LightAoeTrigger(ai); }
         static Trigger* MediumAoe(PlayerbotAI* ai) { return new MediumAoeTrigger(ai); }
-        static Trigger* HighAoe(PlayerbotAI* ai) { return new HighAoeTrigger(ai); }        
+        static Trigger* HighAoe(PlayerbotAI* ai) { return new HighAoeTrigger(ai); }
         static Trigger* LoseAggro(PlayerbotAI* ai) { return new LoseAggroTrigger(ai); }
         static Trigger* HasAggro(PlayerbotAI* ai) { return new HasAggroTrigger(ai); }
         static Trigger* HasAreaDebuff(PlayerbotAI* ai) { return new HasAreaDebuffTrigger(ai); }
@@ -278,12 +282,12 @@ namespace ai
         static Trigger* falling_far(PlayerbotAI* ai) { return new IsFallingFarTrigger(ai); }
         static Trigger* movement_stuck(PlayerbotAI* ai) { return new MovementStuckTrigger(ai); }
         static Trigger* location_stuck(PlayerbotAI* ai) { return new LocationStuckTrigger(ai); }
-        static Trigger* player_wants_in_bg(PlayerbotAI* ai) { return new PlayerWantsInBattlegroundTrigger(ai); } 
-        static Trigger* use_trinket(PlayerbotAI* ai) { return new UseTrinketTrigger(ai); } 
+        static Trigger* player_wants_in_bg(PlayerbotAI* ai) { return new PlayerWantsInBattlegroundTrigger(ai); }
+        static Trigger* use_trinket(PlayerbotAI* ai) { return new UseTrinketTrigger(ai); }
         static Trigger* damage_stop(PlayerbotAI* ai) { return new DamageStopTrigger(ai); }
 
         static Trigger* petition_signed(PlayerbotAI* ai) { return new PetitionTurnInTrigger(ai); }
-        static Trigger* buy_tabard(PlayerbotAI* ai) { return new BuyTabardTrigger(ai); }        
+        static Trigger* buy_tabard(PlayerbotAI* ai) { return new BuyTabardTrigger(ai); }
         static Trigger* leave_large_guild(PlayerbotAI* ai) { return new LeaveLargeGuildTrigger(ai); }
     };
 };

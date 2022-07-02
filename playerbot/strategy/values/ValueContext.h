@@ -203,7 +203,7 @@ namespace ai
             creators["snare target"] = &ValueContext::snare_target;
             creators["formation"] = &ValueContext::formation;
             creators["stance"] = &ValueContext::stance;
-            creators["item usage"] = &ValueContext::item_usage;            
+            creators["item usage"] = &ValueContext::item_usage;
             creators["speed"] = &ValueContext::speed;
             creators["last said"] = &ValueContext::last_said;
             creators["last emote"] = &ValueContext::last_emote;
@@ -226,6 +226,7 @@ namespace ai
             creators["party member without item"] = &ValueContext::party_member_without_item;
             creators["party member without food"] = &ValueContext::party_member_without_food;
             creators["party member without water"] = &ValueContext::party_member_without_water;
+            creators["party member without refreshment"] = &ValueContext::party_member_without_refreshment;
             creators["death count"] = &ValueContext::death_count;
 
             creators["bg type"] = &ValueContext::bg_type;
@@ -238,19 +239,19 @@ namespace ai
             creators["home bind"] = &ValueContext::home_bind;
             creators["last long move"] = &ValueContext::last_long_move;
 
-            
+
             creators["free quest log slots"] = &ValueContext::free_quest_log_slots;
             creators["dialog status"] = &ValueContext::dialog_status;
             creators["dialog status quest"] = &ValueContext::dialog_status_quest;
             creators["can accept quest npc"] = &ValueContext::can_accept_quest_npc;
             creators["can accept quest low level npc"] = &ValueContext::can_accept_quest_low_level_npc;
             creators["can turn in quest npc"] = &ValueContext::can_turn_in_quest_npc;
-            
+
             creators["money needed for"] = &ValueContext::money_needed_for;
             creators["total money needed for"] = &ValueContext::total_money_needed_for;
-            creators["free money for"] = &ValueContext::free_money_for;            
+            creators["free money for"] = &ValueContext::free_money_for;
             creators["should get money"] = &ValueContext::should_get_money;
-            
+
             creators["should home bind"] = &ValueContext::should_home_bind;
             creators["should repair"] = &ValueContext::should_repair;
             creators["can repair"] = &ValueContext::can_repair;
@@ -281,6 +282,7 @@ namespace ai
         static UntypedValue* bg_role(PlayerbotAI* ai) { return new BgRoleValue(ai); }
         static UntypedValue* arena_type(PlayerbotAI* ai) { return new ArenaTypeValue(ai); }
         static UntypedValue* bg_type(PlayerbotAI* ai) { return new BgTypeValue(ai); }
+        static UntypedValue* party_member_without_refreshment(PlayerbotAI* ai) { return new PartyMemberWithoutRefreshmentValue(ai); }
         static UntypedValue* party_member_without_water(PlayerbotAI* ai) { return new PartyMemberWithoutWaterValue(ai); }
         static UntypedValue* party_member_without_food(PlayerbotAI* ai) { return new PartyMemberWithoutFoodValue(ai); }
         static UntypedValue* party_member_without_item(PlayerbotAI* ai) { return new PartyMemberWithoutItemValue(ai); }
@@ -293,7 +295,7 @@ namespace ai
         static UntypedValue* collision(PlayerbotAI* ai) { return new CollisionValue(ai); }
         static UntypedValue* already_seen_players(PlayerbotAI* ai) { return new AlreadySeenPlayersValue(ai); }
         static UntypedValue* new_player_nearby(PlayerbotAI* ai) { return new NewPlayerNearbyValue(ai); }
-        static UntypedValue* item_usage(PlayerbotAI* ai) { return new ItemUsageValue(ai); }        
+        static UntypedValue* item_usage(PlayerbotAI* ai) { return new ItemUsageValue(ai); }
         static UntypedValue* formation(PlayerbotAI* ai) { return new FormationValue(ai); }
         static UntypedValue* stance(PlayerbotAI* ai) { return new StanceValue(ai); }
         static UntypedValue* mana_save_level(PlayerbotAI* ai) { return new ManaSaveLevelValue(ai); }
@@ -447,7 +449,7 @@ namespace ai
         static UntypedValue* group_and(PlayerbotAI* ai) { return new GroupBoolANDValue(ai); }
         static UntypedValue* group_or(PlayerbotAI* ai) { return new GroupBoolORValue(ai); }
 
-        static UntypedValue* petition_signs(PlayerbotAI* ai) { return new PetitionSignsValue(ai); }        
+        static UntypedValue* petition_signs(PlayerbotAI* ai) { return new PetitionSignsValue(ai); }
 
         static UntypedValue* experience(PlayerbotAI* ai) { return new ExperienceValue(ai); }
         static UntypedValue* go_target_reached(PlayerbotAI* ai) { return new GoTargetReachedValue(ai); }
