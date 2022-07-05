@@ -145,6 +145,7 @@ namespace ai
                 creators["turn undead"] = &TriggerFactoryInternal::turn_undead;
                 creators["avenging wrath"] = &TriggerFactoryInternal::avenging_wrath;
                 creators["beacon of light on tank"] = &TriggerFactoryInternal::beacon_of_light_on_tank;
+                creators["sacred shield on tank"] = &TriggerFactoryInternal::sacred_shield_on_tank;
             }
 
         private:
@@ -183,6 +184,7 @@ namespace ai
             static Trigger* hammer_of_justice_on_snare_target(PlayerbotAI* ai) { return new HammerOfJusticeSnareTrigger(ai); }
             static Trigger* avenging_wrath(PlayerbotAI* ai) { return new AvengingWrathTrigger(ai); }
             static Trigger* beacon_of_light_on_tank(PlayerbotAI* ai) { return new BeaconofLightOnTankTrigger(ai); }
+            static Trigger* sacred_shield_on_tank(PlayerbotAI* ai) { return new SacredShieldOnTankTrigger(ai); }
         };
     };
 };
@@ -267,6 +269,8 @@ namespace ai
                 creators["holy shock"] = &AiObjectContextInternal::holy_shock;
                 creators["holy shock on party"] = &AiObjectContextInternal::holy_shock_hands_on_party;
                 creators["divine plea"] = &AiObjectContextInternal::divine_plea;
+                creators["sacred shield"] = &AiObjectContextInternal::sacred_shield;
+                creators["divine illumination"] = &AiObjectContextInternal::divine_illumination;
             }
 
         private:            
@@ -339,6 +343,8 @@ namespace ai
             static Action* holy_shock(PlayerbotAI* ai) { return new CastHolyShockAction(ai); }
             static Action* holy_shock_hands_on_party(PlayerbotAI* ai) { return new CastHolyShockOnPartyAction(ai); }
             static Action* divine_plea(PlayerbotAI* ai) { return new CastDivinePleaAction(ai); }
+            static Action* sacred_shield(PlayerbotAI* ai) { return new CastSacredShieldAction(ai); }
+            static Action* divine_illumination(PlayerbotAI* ai) { return new CastDivineIlluminationAction(ai); }
         };
     };
 };

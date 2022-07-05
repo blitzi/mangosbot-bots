@@ -184,4 +184,22 @@ namespace ai
                 ;
         }
     };
+
+    class SacredShieldOnTankTrigger : public BuffOnTankTrigger {
+    public:
+        SacredShieldOnTankTrigger(PlayerbotAI* ai) : BuffOnTankTrigger(ai, "sacred shield", 1) {}
+
+        virtual bool IsActive() {
+            return BuffOnTankTrigger::IsActive() &&
+                GetTarget() &&
+                !ai->HasAura("sacred shield", GetTarget()) &&
+#ifdef MANGOS
+                (ai->GetBot()->IsInSameGroupWith((Player*)GetTarget()) || ai->GetBot()->IsInSameRaidWith((Player*)GetTarget())) &&
+#endif
+#ifdef CMANGOS
+                (ai->GetBot()->IsInGroup((Player*)GetTarget(), true) || ai->GetBot()->IsInGroup((Player*)GetTarget()))
+#endif               
+                ;
+        }
+    };
 }

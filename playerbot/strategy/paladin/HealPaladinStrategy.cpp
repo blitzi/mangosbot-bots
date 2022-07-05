@@ -9,11 +9,6 @@ HealPaladinStrategy::HealPaladinStrategy(PlayerbotAI* ai) : GenericPaladinStrate
 {
 }
 
-NextAction** HealPaladinStrategy::getDefaultActions()
-{
-    return NextAction::array(0, new NextAction("melee", ACTION_NORMAL), NULL);
-}
-
 void HealPaladinStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
     GenericPaladinStrategy::InitTriggers(triggers);
@@ -40,5 +35,19 @@ void HealPaladinStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 
     triggers.push_back(new TriggerNode(
         "beacon of light on tank",
-        NextAction::array(0, new NextAction("beacon of light on party", ACTION_HIGH), NULL)));
+        NextAction::array(0, new NextAction("beacon of light on party", ACTION_HIGH + 1), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "sacred shield on tank",
+        NextAction::array(0, new NextAction("sacred shield", ACTION_HIGH), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "low mana",
+        NextAction::array(0, new NextAction("divine illumination", ACTION_HIGH + 1), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "party member low health",
+        NextAction::array(0, new NextAction("divine favor", ACTION_CRITICAL_HEAL + 1), new NextAction("holy shock on party", ACTION_CRITICAL_HEAL + 1), NULL)));
+
+
 }
