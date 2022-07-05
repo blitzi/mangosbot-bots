@@ -110,10 +110,14 @@ namespace ai
 		CastWrathAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "wrath") {}
 	};
 
-	class CastStarfallAction : public CastRangeSpellAction
+	class CastStarfallAction : public CastBuffSpellAction
 	{
 	public:
-		CastStarfallAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "starfall") {}
+		CastStarfallAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "starfall") {}
+		virtual bool isUseful()
+		{
+			return sServerFacade.IsDistanceLessOrEqualThan(AI_VALUE2(float, "distance", GetTargetName()), 25.0f);
+		}
 	};
 
 	class CastHurricaneAction : public CastRangeSpellAction
@@ -201,10 +205,10 @@ namespace ai
         virtual NextAction** getAlternatives();
     };
 
-    class CastBarskinAction : public CastBuffSpellAction
+    class CastBarkskinAction : public CastBuffSpellAction
     {
     public:
-        CastBarskinAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "barskin") {}
+        CastBarkskinAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "barkskin") {}
     };
 
     class CastInnervateAction : public CastRangeSpellAction

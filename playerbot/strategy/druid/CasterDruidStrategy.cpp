@@ -16,7 +16,6 @@ public:
         creators["entangling roots"] = &entangling_roots;
         creators["entangling roots on cc"] = &entangling_roots_on_cc;
         creators["wrath"] = &wrath;
-        creators["starfall"] = &starfall;
         creators["insect swarm"] = &insect_swarm;
         creators["moonfire"] = &moonfire;
         creators["starfire"] = &starfire;
@@ -57,13 +56,7 @@ private:
             /*A*/ NULL,
             /*C*/ NULL);
     }
-    static ActionNode* starfall(PlayerbotAI* ai)
-    {
-        return new ActionNode ("starfall",
-            /*P*/ NextAction::array(0, new NextAction("moonkin form"), NULL),
-            /*A*/ NextAction::array(0, new NextAction("hurricane"), NULL),
-            /*C*/ NULL);
-    }
+
     static ActionNode* insect_swarm(PlayerbotAI* ai)
     {
         return new ActionNode ("insect swarm",
@@ -154,7 +147,12 @@ void CasterDruidAoeStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
 	triggers.push_back(new TriggerNode(
 		"high aoe",
-		NextAction::array(0, new NextAction("starfall", ACTION_HIGH + 1), NULL)));
+		NextAction::array(0, new NextAction("hurricane", ACTION_HIGH), NULL)));
+
+    // maybe allow the caster to only perform starfall on less thread, since starfall and hurrican generates a lot of thread!
+    triggers.push_back(new TriggerNode(
+        "high aoe",
+        NextAction::array(0, new NextAction("starfall", ACTION_HIGH + 1), NULL)));
 }
 
 void CasterDruidDebuffStrategy::InitTriggers(std::list<TriggerNode*> &triggers)

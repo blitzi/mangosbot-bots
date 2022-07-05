@@ -418,6 +418,28 @@ namespace ai
         Trigger* rs;
     };
 
+    class OrTrigger : public Trigger
+    {
+    public:
+        OrTrigger(PlayerbotAI* ai, Trigger* ls, Trigger* rs) : Trigger(ai)
+        {
+            this->ls = ls;
+            this->rs = rs;
+        }
+        virtual ~OrTrigger()
+        {
+            delete ls;
+            delete rs;
+        }
+    public:
+        virtual bool IsActive();
+        virtual string getName();
+
+    protected:
+        Trigger* ls;
+        Trigger* rs;
+    };
+
     class SnareTargetTrigger : public DebuffTrigger
     {
     public:
