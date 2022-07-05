@@ -33,7 +33,6 @@ namespace ai
     class CastHealingTouchAction : public CastHealingSpellAction {
     public:
         CastHealingTouchAction(PlayerbotAI* ai) : CastHealingSpellAction(ai, "healing touch") {}
-
     };
 
     class CastRejuvenationOnPartyAction : public HealPartyMemberAction
@@ -230,4 +229,62 @@ namespace ai
     public:
         CastNaturesSwiftnessAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "nature's swiftness") {}
     };
+
+	class CastSwiftmendAction : public CastHealingSpellAction {
+	public:
+		CastSwiftmendAction(PlayerbotAI* ai) : CastHealingSpellAction(ai, "swiftmend") {}
+	};
+
+	class CastSwiftmendOnPartyAction : public HealPartyMemberAction {
+	public:
+		CastSwiftmendOnPartyAction(PlayerbotAI* ai) : HealPartyMemberAction(ai, "swiftmend") {}
+	};
+
+	class CastLifeBloomAction : public CastHealingSpellAction {
+	public:
+		CastLifeBloomAction(PlayerbotAI* ai) : CastHealingSpellAction(ai, "lifebloom") {}
+	};
+
+	class CastLifeBloomOnPartyAction : public HealPartyMemberAction {
+	public:
+		CastLifeBloomOnPartyAction(PlayerbotAI* ai) : HealPartyMemberAction(ai, "lifebloom") {}
+	};
+
+	class CastNourishAction : public CastHealingSpellAction {
+	public:
+		CastNourishAction(PlayerbotAI* ai) : CastHealingSpellAction(ai, "nourish") {}
+	};
+
+	class CastNourishOnPartyAction : public HealPartyMemberAction {
+	public:
+		CastNourishOnPartyAction(PlayerbotAI* ai) : HealPartyMemberAction(ai, "nourish") {}
+	};
+
+	class CastWildGrowthAction : public CastHealingSpellAction {
+	public:
+		CastWildGrowthAction(PlayerbotAI* ai) : CastHealingSpellAction(ai, "wild growth") {}
+	};
+
+	class CastWildGrowthOnPartyAction : public HealPartyMemberAction {
+	public:
+		CastWildGrowthOnPartyAction(PlayerbotAI* ai) : HealPartyMemberAction(ai, "wild growth") {}
+	};
+
+	class CastForceOfNatureAction : public CastRangeSpellAction
+	{
+	public:
+		CastForceOfNatureAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "force of nature") {}
+	};
+
+	class CastCycloneAction : public CastRangeSpellAction
+	{
+	public:
+		CastCycloneAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "cyclone") {}
+	};
+
+	class CastTyphoonAction : public CastRangeSpellAction
+	{
+	public:
+		CastTyphoonAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "typhoon") {}
+	};
 }
