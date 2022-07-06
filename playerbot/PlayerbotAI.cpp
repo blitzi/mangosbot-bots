@@ -915,6 +915,26 @@ bool PlayerbotAI::IsRanged(Player* player)
     return true;
 }
 
+bool PlayerbotAI::IsMainTank(Player* player)
+{
+	Group* group = bot->GetGroup();
+	Player* firstTank = NULL;
+
+	if (group)
+	{
+		Group::MemberSlotList const& groupSlot = group->GetMemberSlots();
+		for (Group::member_citerator itr = groupSlot.begin(); itr != groupSlot.end(); itr++)
+		{
+			Player* member = sObjectMgr.GetPlayer(itr->guid);
+
+			if (IsTank(member))
+				return player == member;
+		}
+	}
+
+	return IsTank(player);
+}
+
 bool PlayerbotAI::IsTank(Player* player)
 {
     if (!player->GetObjectGuid().IsPlayer())
@@ -925,7 +945,7 @@ bool PlayerbotAI::IsTank(Player* player)
         return botAi->ContainsStrategy(STRATEGY_TYPE_TANK);
 
     if(player->getClass() == CLASS_DRUID)
-        return HasAnyAuraOf(player, "cat form", "bear form", "dire bear form", NULL);
+        return HasAnyAuraOf(player, "bear form", "dire bear form", NULL);
 
 	if (player->getClass() == CLASS_DEATH_KNIGHT)
 		return HasAura("frost presence", player);

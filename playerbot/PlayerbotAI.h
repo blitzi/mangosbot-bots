@@ -263,6 +263,7 @@ public:
     void ReInitCurrentEngine();
     void Reset(bool full = false);
     bool IsTank(Player* player);
+    bool IsMainTank(Player* player);
     bool IsHeal(Player* player);
     bool IsRanged(Player* player);
     Creature* GetCreature(ObjectGuid guid);
