@@ -112,6 +112,8 @@ namespace ai
                 creators["silence"] = &TriggerFactoryInternal::silence;
                 creators["silence on enemy healer"] = &TriggerFactoryInternal::silence_on_enemy_healer;
                 creators["shadowfiend"] = &TriggerFactoryInternal::shadowfiend;
+                creators["mind blast"] = &TriggerFactoryInternal::mind_blast;
+                creators["mind flay"] = &TriggerFactoryInternal::mind_flay;
             }
 
         private:
@@ -149,6 +151,8 @@ namespace ai
             static Trigger* prayer_of_fortitude_on_party(PlayerbotAI* ai) { return new PrayerOfFortitudeTrigger(ai); }
             static Trigger* prayer_of_spirit_on_party(PlayerbotAI* ai) { return new PrayerOfSpiritTrigger(ai); }
             static Trigger* prayer_of_mending_on_tank(PlayerbotAI* ai) { return new PrayerOfMendingOnTankTrigger(ai); }
+            static Trigger* mind_blast(PlayerbotAI* ai) { return new SpellCanBeCastTrigger(ai, "mind blast"); }
+            static Trigger* mind_flay(PlayerbotAI* ai) { return new SpellCanBeCastTrigger(ai, "mind flay"); }
         };
     };
 };

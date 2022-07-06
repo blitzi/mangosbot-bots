@@ -80,7 +80,12 @@ namespace ai
 
     // shadow talents
     SPELL_ACTION(CastMindFlayAction, "mind flay");
+    SPELL_ACTION(CastMindSearAction, "mind sear");
+#ifndef MANGOSBOT_TWO
+    BUFF_ACTION(CastVampiricEmbraceAction, "vampiric embrace");
+#else
     DEBUFF_ACTION(CastVampiricEmbraceAction, "vampiric embrace");
+#endif
     BUFF_ACTION(CastShadowformAction, "shadowform");
     SPELL_ACTION(CastSilenceAction, "silence");
     ENEMY_HEALER_ACTION(CastSilenceOnEnemyHealerAction, "silence");
