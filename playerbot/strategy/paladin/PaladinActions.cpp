@@ -21,6 +21,7 @@ string GetActualBlessingOfWisdom(Unit* target)
     switch (target->getClass())
     {
     case CLASS_WARRIOR:
+    case CLASS_DEATH_KNIGHT:
     case CLASS_ROGUE:
         return "blessing of might";
     }

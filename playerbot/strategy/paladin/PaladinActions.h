@@ -477,10 +477,21 @@ namespace ai
         CastTurnUndeadAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "turn undead") {}
         virtual Value<Unit*>* GetTargetValue() { return context->GetValue<Unit*>("cc target", GetName()); }
     };
+	
+	class CastDivineIlluminationAction : public CastBuffSpellAction
+    {
+    public:
+		CastDivineIlluminationAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "divine illumination") {}
+    };
 
     class CastBeaconOfLightOnPartyAction : public BuffOnPartyAction {
     public:
         CastBeaconOfLightOnPartyAction(PlayerbotAI* ai) : BuffOnPartyAction(ai, "beacon of light") {}
+    };
+
+    class CastSacredShieldAction : public BuffOnPartyAction {
+    public:
+		CastSacredShieldAction(PlayerbotAI* ai) : BuffOnPartyAction(ai, "sacred shield") {}
     };
 
     PROTECT_ACTION(CastBlessingOfProtectionProtectAction, "blessing of protection");
