@@ -239,7 +239,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             if (tab == 1)
                 engine->addStrategies("tank", "tank assist", "bthreat", "cure", "barmor", "close", "cc", NULL);
 			else if(tab == 0)
-                engine->addStrategies("heal", "bmana", "dps assist", "cure", "flee", "barmor", NULL);
+                engine->addStrategies("heal", "bmana", "dps assist", "cure", "flee", "barmor", "ranged", NULL);
             else
                 engine->addStrategies("dps", "bdps", "dps assist", "cure", "baoe", "close", "cc", NULL);
 
