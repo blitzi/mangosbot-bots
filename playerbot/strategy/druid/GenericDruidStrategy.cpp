@@ -96,25 +96,25 @@ void GenericDruidStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
     CombatStrategy::InitTriggers(triggers);
 
-    triggers.push_back(new TriggerNode(
+    /*triggers.push_back(new TriggerNode(
         "low health",
         NextAction::array(0, new NextAction("regrowth", ACTION_MEDIUM_HEAL + 2), NULL)));
 
     triggers.push_back(new TriggerNode(
         "party member low health",
-        NextAction::array(0, new NextAction("regrowth on party", ACTION_MEDIUM_HEAL + 1), NULL)));
+        NextAction::array(0, new NextAction("regrowth on party", ACTION_MEDIUM_HEAL + 1), NULL)));*/
 
     triggers.push_back(new TriggerNode(
         "medium health",
         NextAction::array(0, new NextAction("barkskin", ACTION_EMERGENCY + 1), NULL)));
 
-    triggers.push_back(new TriggerNode(
+    /*triggers.push_back(new TriggerNode(
         "critical health",
         NextAction::array(0, new NextAction("regrowth", ACTION_CRITICAL_HEAL + 2), new NextAction("healing touch", ACTION_CRITICAL_HEAL + 2), NULL)));
 
     triggers.push_back(new TriggerNode(
         "party member critical health",
-        NextAction::array(0,  new NextAction("regrowth on party", ACTION_CRITICAL_HEAL + 1), new NextAction("healing touch on party", ACTION_CRITICAL_HEAL + 1), NULL)));
+        NextAction::array(0,  new NextAction("regrowth on party", ACTION_CRITICAL_HEAL + 1), new NextAction("healing touch on party", ACTION_CRITICAL_HEAL + 1), NULL)));*/
 
 	triggers.push_back(new TriggerNode(
 		"party member dead",
@@ -138,9 +138,15 @@ void DruidCureStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 
 void DruidBoostStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
+    // TODO: maybe remove this and control it more explcitly
     triggers.push_back(new TriggerNode(
         "nature's swiftness",
         NextAction::array(0, new NextAction("nature's swiftness", ACTION_HIGH + 9), NULL)));
+
+    // TODO: talk with robi, if this should be a caster form only skill & maybe not used, since it will taunt
+    triggers.push_back(new TriggerNode(
+        "force of nature",
+        NextAction::array(0, new NextAction("force of nature", ACTION_HIGH + 10), NULL)));
 }
 
 void DruidCcStrategy::InitTriggers(std::list<TriggerNode*> &triggers)

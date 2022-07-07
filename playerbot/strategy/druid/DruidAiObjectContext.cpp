@@ -106,6 +106,11 @@ namespace ai
                 creators["eclipse (lunar)"] = &TriggerFactoryInternal::eclipse_lunar;
                 creators["bash on enemy healer"] = &TriggerFactoryInternal::bash_on_enemy_healer;
                 creators["nature's swiftness"] = &TriggerFactoryInternal::natures_swiftness;
+                creators["force of nature"] = &TriggerFactoryInternal::force_of_nature;
+                creators["nourish"] = &TriggerFactoryInternal::nourish;
+                creators["nourish on party"] = &TriggerFactoryInternal::nourish_on_party;
+                creators["swiftmend"] = &TriggerFactoryInternal::swiftmend;
+                creators["swiftmend on party"] = &TriggerFactoryInternal::swiftmend_on_party;
             }
 
         private:
@@ -134,6 +139,11 @@ namespace ai
             static Trigger* tree_form(PlayerbotAI* ai) { return new TreeFormTrigger(ai); }
             static Trigger* bash_on_enemy_healer(PlayerbotAI* ai) { return new BashInterruptEnemyHealerSpellTrigger(ai); }
             static Trigger* omen_of_clarity(PlayerbotAI* ai) { return new OmenOfClarityTrigger(ai); }
+            static Trigger* force_of_nature(PlayerbotAI* ai) { return new ForceOfNatureTrigger(ai); }
+            static Trigger* nourish(PlayerbotAI* ai) { return new NourishAndMediumHealthTrigger(ai); }
+            static Trigger* nourish_on_party(PlayerbotAI* ai) { return new NourishOnPartyAndMediumHealthTrigger(ai); }
+            static Trigger* swiftmend(PlayerbotAI* ai) { return new SwiftmendAndLowHealthTrigger(ai); }
+            static Trigger* swiftmend_on_party(PlayerbotAI* ai) { return new SwiftmendOnPartyAndLowHealthTrigger(ai); }
         };
     };
 };

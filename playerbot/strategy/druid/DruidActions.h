@@ -7,6 +7,38 @@
 
 namespace ai
 {
+	class CastHealingWithHotSpellAction : public CastRangeSpellAction
+	{
+	public:
+		CastHealingWithHotSpellAction(PlayerbotAI* ai, string spell, uint8 estAmount = 15.0f) : CastRangeSpellAction(ai, spell)
+		{
+			this->estAmount = estAmount;
+			range = ai->GetRange("spell");
+		}
+		virtual string GetTargetName() { return "self target"; }
+		virtual ActionThreatType getThreatType() { return ACTION_THREAT_AOE; }
+
+		virtual bool isUseful()
+		{
+			// we ignore the give aura here, since it is still a valid healing effect - the hot is just sugar
+			return GetTarget() && (GetTarget() != nullptr) && (GetTarget() != NULL) && CastRangeSpellAction::isUseful();
+		}
+
+
+	protected:
+		uint8 estAmount;
+	};
+
+	class HealWithHotPartyMemberAction : public CastHealingWithHotSpellAction, public PartyMemberActionNameSupport
+	{
+	public:
+		HealWithHotPartyMemberAction(PlayerbotAI* ai, string spell, uint8 estAmount = 15.0f) :
+			CastHealingWithHotSpellAction(ai, spell, estAmount), PartyMemberActionNameSupport(spell) {}
+
+		virtual string GetTargetName() { return "party member to heal"; }
+		virtual string getName() { return PartyMemberActionNameSupport::getName(); }
+	};
+
 	class CastFaerieFireAction : public CastDebuffSpellAction
 	{
 	public:
@@ -24,9 +56,9 @@ namespace ai
 		CastRejuvenationAction(PlayerbotAI* ai) : CastHealingSpellAction(ai, "rejuvenation") {}
 	};
 
-	class CastRegrowthAction : public CastHealingSpellAction {
+	class CastRegrowthAction : public CastHealingWithHotSpellAction {
 	public:
-		CastRegrowthAction(PlayerbotAI* ai) : CastHealingSpellAction(ai, "regrowth") {}
+		CastRegrowthAction(PlayerbotAI* ai) : CastHealingWithHotSpellAction(ai, "regrowth") {}
 
 	};
 
@@ -41,10 +73,10 @@ namespace ai
         CastRejuvenationOnPartyAction(PlayerbotAI* ai) : HealPartyMemberAction(ai, "rejuvenation") {}
     };
 
-    class CastRegrowthOnPartyAction : public HealPartyMemberAction
+    class CastRegrowthOnPartyAction : public HealWithHotPartyMemberAction
     {
     public:
-        CastRegrowthOnPartyAction(PlayerbotAI* ai) : HealPartyMemberAction(ai, "regrowth") {}
+        CastRegrowthOnPartyAction(PlayerbotAI* ai) : HealWithHotPartyMemberAction(ai, "regrowth") {}
     };
 
     class CastHealingTouchOnPartyAction : public HealPartyMemberAction
@@ -58,9 +90,9 @@ namespace ai
 	public:
 		CastReviveAction(PlayerbotAI* ai) : ResurrectPartyMemberAction(ai, "revive") {}
 
-		virtual NextAction** getPrerequisites() {
+		/*virtual NextAction** getPrerequisites() {
 			return NextAction::merge( NextAction::array(0, new NextAction("caster form"), NULL), ResurrectPartyMemberAction::getPrerequisites());
-		}
+		}*/
 	};
 
 	class CastRebirthAction : public ResurrectPartyMemberAction
@@ -68,9 +100,9 @@ namespace ai
 	public:
 		CastRebirthAction(PlayerbotAI* ai) : ResurrectPartyMemberAction(ai, "rebirth") {}
 
-		virtual NextAction** getPrerequisites() {
+		/*virtual NextAction** getPrerequisites() {
 			return NextAction::merge( NextAction::array(0, new NextAction("caster form"), NULL), ResurrectPartyMemberAction::getPrerequisites());
-		}
+		}*/
 	};
 
 	class CastMarkOfTheWildAction : public CastBuffSpellAction {
@@ -250,25 +282,11 @@ namespace ai
 		CastLifeBloomOnPartyAction(PlayerbotAI* ai) : HealPartyMemberAction(ai, "lifebloom") {}
 	};
 
-	class CastNourishAction : public CastHealingSpellAction {
-	public:
-		CastNourishAction(PlayerbotAI* ai) : CastHealingSpellAction(ai, "nourish") {}
-	};
+	HEAL_ACTION(CastNourishAction, "nourish");
+	HEAL_PARTY_ACTION(CastNourishOnPartyAction, "nourish");
 
-	class CastNourishOnPartyAction : public HealPartyMemberAction {
-	public:
-		CastNourishOnPartyAction(PlayerbotAI* ai) : HealPartyMemberAction(ai, "nourish") {}
-	};
-
-	class CastWildGrowthAction : public CastHealingSpellAction {
-	public:
-		CastWildGrowthAction(PlayerbotAI* ai) : CastHealingSpellAction(ai, "wild growth") {}
-	};
-
-	class CastWildGrowthOnPartyAction : public HealPartyMemberAction {
-	public:
-		CastWildGrowthOnPartyAction(PlayerbotAI* ai) : HealPartyMemberAction(ai, "wild growth") {}
-	};
+	HEAL_ACTION(CastWildGrowthAction, "wild growth");
+	HEAL_PARTY_ACTION(CastWildGrowthOnPartyAction, "wild growth");
 
 	class CastForceOfNatureAction : public CastRangeSpellAction
 	{
@@ -276,15 +294,6 @@ namespace ai
 		CastForceOfNatureAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "force of nature") {}
 	};
 
-	class CastCycloneAction : public CastRangeSpellAction
-	{
-	public:
-		CastCycloneAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "cyclone") {}
-	};
-
-	class CastTyphoonAction : public CastRangeSpellAction
-	{
-	public:
-		CastTyphoonAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "typhoon") {}
-	};
+	CC_ACTION(CastCycloneAction, "cyclone");
+	SPELL_ACTION(CastTyphoonAction, "typhoon");
 }
