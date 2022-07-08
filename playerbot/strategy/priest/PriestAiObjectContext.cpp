@@ -112,6 +112,8 @@ namespace ai
                 creators["silence"] = &TriggerFactoryInternal::silence;
                 creators["silence on enemy healer"] = &TriggerFactoryInternal::silence_on_enemy_healer;
                 creators["shadowfiend"] = &TriggerFactoryInternal::shadowfiend;
+                creators["mind blast"] = &TriggerFactoryInternal::mind_blast;
+                creators["mind flay"] = &TriggerFactoryInternal::mind_flay;
             }
 
         private:
@@ -149,6 +151,8 @@ namespace ai
             static Trigger* prayer_of_fortitude_on_party(PlayerbotAI* ai) { return new PrayerOfFortitudeTrigger(ai); }
             static Trigger* prayer_of_spirit_on_party(PlayerbotAI* ai) { return new PrayerOfSpiritTrigger(ai); }
             static Trigger* prayer_of_mending_on_tank(PlayerbotAI* ai) { return new PrayerOfMendingOnTankTrigger(ai); }
+            static Trigger* mind_blast(PlayerbotAI* ai) { return new SpellCanBeCastTrigger(ai, "mind blast"); }
+            static Trigger* mind_flay(PlayerbotAI* ai) { return new SpellCanBeCastTrigger(ai, "mind flay"); }
         };
     };
 };
@@ -173,6 +177,7 @@ namespace ai
                 creators["shadow word: pain on attacker"] = &AiObjectContextInternal::shadow_word_pain_on_attacker;
                 creators["devouring plague"] = &AiObjectContextInternal::devouring_plague;
                 creators["mind flay"] = &AiObjectContextInternal::mind_flay;
+                creators["mind sear"] = &AiObjectContextInternal::mind_sear;
                 creators["holy fire"] = &AiObjectContextInternal::holy_fire;
                 creators["smite"] = &AiObjectContextInternal::smite;
                 creators["mind blast"] = &AiObjectContextInternal::mind_blast;
@@ -288,6 +293,7 @@ namespace ai
             static Action* shadow_word_pain_on_attacker(PlayerbotAI* ai) { return new CastPowerWordPainOnAttackerAction(ai); }
             static Action* devouring_plague(PlayerbotAI* ai) { return new CastDevouringPlagueAction(ai); }
             static Action* mind_flay(PlayerbotAI* ai) { return new CastMindFlayAction(ai); }
+            static Action* mind_sear(PlayerbotAI* ai) { return new CastMindSearAction(ai); }
             static Action* holy_fire(PlayerbotAI* ai) { return new CastHolyFireAction(ai); }
             static Action* smite(PlayerbotAI* ai) { return new CastSmiteAction(ai); }
             static Action* mind_blast(PlayerbotAI* ai) { return new CastMindBlastAction(ai); }
