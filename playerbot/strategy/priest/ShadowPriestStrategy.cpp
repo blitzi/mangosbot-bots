@@ -69,24 +69,13 @@ void ShadowPriestStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 
 void ShadowPriestAoeStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
-#ifndef MANGOSBOT_TWO
     triggers.push_back(new TriggerNode(
-        "vampiric touch aoe",
-        NextAction::array(0, new NextAction("vampiric touch", ACTION_NORMAL + 4), NULL)));
+        "medium aoe",
+        NextAction::array(0, new NextAction("mind sear", ACTION_HIGH), NULL)));
 
-    triggers.push_back(new TriggerNode(
-        "devouring plague aoe",
-        NextAction::array(0, new NextAction("devouring plague", ACTION_NORMAL + 3), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "mind sear",
-        NextAction::array(0, new NextAction("mind sear", ACTION_NORMAL + 2), NULL)));
-#else
     triggers.push_back(new TriggerNode(
         "shadow word: pain on attacker",
-        NextAction::array(0, new NextAction("shadow word: pain on attacker", 11.0f), NULL)));
-#endif
-    
+        NextAction::array(0, new NextAction("shadow word: pain on attacker", 11.0f), NULL)));   
 }
 
 void ShadowPriestDebuffStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
