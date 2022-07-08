@@ -937,7 +937,7 @@ bool PlayerbotAI::IsMainTank(Player* player)
 
 bool PlayerbotAI::IsTank(Player* player)
 {
-    if (!player->GetObjectGuid().IsPlayer())
+    if (!player || !player->GetObjectGuid().IsPlayer())
         return false;
 
     PlayerbotAI* botAi = player->GetPlayerbotAI();
