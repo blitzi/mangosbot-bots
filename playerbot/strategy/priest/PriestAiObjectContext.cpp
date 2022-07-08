@@ -177,6 +177,7 @@ namespace ai
                 creators["shadow word: pain on attacker"] = &AiObjectContextInternal::shadow_word_pain_on_attacker;
                 creators["devouring plague"] = &AiObjectContextInternal::devouring_plague;
                 creators["mind flay"] = &AiObjectContextInternal::mind_flay;
+                creators["mind sear"] = &AiObjectContextInternal::mind_sear;
                 creators["holy fire"] = &AiObjectContextInternal::holy_fire;
                 creators["smite"] = &AiObjectContextInternal::smite;
                 creators["mind blast"] = &AiObjectContextInternal::mind_blast;
@@ -292,6 +293,7 @@ namespace ai
             static Action* shadow_word_pain_on_attacker(PlayerbotAI* ai) { return new CastPowerWordPainOnAttackerAction(ai); }
             static Action* devouring_plague(PlayerbotAI* ai) { return new CastDevouringPlagueAction(ai); }
             static Action* mind_flay(PlayerbotAI* ai) { return new CastMindFlayAction(ai); }
+            static Action* mind_sear(PlayerbotAI* ai) { return new CastMindSearAction(ai); }
             static Action* holy_fire(PlayerbotAI* ai) { return new CastHolyFireAction(ai); }
             static Action* smite(PlayerbotAI* ai) { return new CastSmiteAction(ai); }
             static Action* mind_blast(PlayerbotAI* ai) { return new CastMindBlastAction(ai); }

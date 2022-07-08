@@ -123,6 +123,16 @@ void PriestBuffStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
     triggers.push_back(new TriggerNode(
         "shadowguard",
         NextAction::array(0, new NextAction("shadowguard", 10.0f), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "shadowform",
+        NextAction::array(0, new NextAction("shadowform", ACTION_HIGH + 1), NULL)));
+
+#ifndef MANGOSBOT_TWO
+    triggers.push_back(new TriggerNode(
+        "vampiric embrace",
+        NextAction::array(0, new NextAction("vampiric embrace", ACTION_HIGH), NULL)));
+#endif
 }
 
 void PriestShadowResistanceStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
