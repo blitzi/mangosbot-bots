@@ -220,4 +220,11 @@ namespace ai {
     public:
         SwiftmendOnPartyAndLowHealthTrigger(PlayerbotAI* ai) : AndTrigger(ai, new SwiftmendOnPartyTrigger(ai), new PartyMemberLowHealthTrigger(ai)) {}
     };
+
+    BUFF_PARTY_TRIGGER(RejuvenationHotOnPartyTrigger, "rejuvenation");
+
+    class RejuvenationHotOnTankTrigger : public BuffOnTankTrigger {
+    public:
+        RejuvenationHotOnTankTrigger(PlayerbotAI* ai) : BuffOnTankTrigger(ai, "rejuvenation") {}
+    };
 }
