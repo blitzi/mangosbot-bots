@@ -94,6 +94,63 @@ void GenericDruidNonCombatStrategy::InitTriggers(std::list<TriggerNode*> &trigge
     triggers.push_back(new TriggerNode(
        "often",
        NextAction::array(0, new NextAction("apply oil", 1.0f), NULL)));
+
+
+    // healing
+    {
+        triggers.push_back(new TriggerNode(
+            "party member almost full health",
+            NextAction::array(0, new NextAction("rejuvenation on party", ACTION_LIGHT_HEAL + 1), NULL)));
+
+        // rejuv ourself on any dmg
+        triggers.push_back(new TriggerNode(
+            "almost full health",
+            NextAction::array(0, new NextAction("rejuvenation", ACTION_LIGHT_HEAL + 2), NULL)));
+
+        triggers.push_back(new TriggerNode(
+            "party member medium health",
+            NextAction::array(0, new NextAction("regrowth on party", ACTION_LIGHT_HEAL + 3), NULL)));
+
+        triggers.push_back(new TriggerNode(
+            "medium health",
+            NextAction::array(0, new NextAction("regrowth", ACTION_LIGHT_HEAL + 4), NULL)));
+
+        triggers.push_back(new TriggerNode(
+            "party member medium health",
+            NextAction::array(0, new NextAction("healing touch on party", ACTION_LIGHT_HEAL + 3), NULL)));
+
+        triggers.push_back(new TriggerNode(
+            "medium health",
+            NextAction::array(0, new NextAction("healing touch", ACTION_LIGHT_HEAL + 4), NULL)));
+
+        triggers.push_back(new TriggerNode(
+            "medium aoe heal",
+            NextAction::array(0, new NextAction("wild growth", ACTION_LIGHT_HEAL + 5), NULL)));
+
+        triggers.push_back(new TriggerNode(
+            "party member low health",
+            NextAction::array(0, new NextAction("healing touch on party", ACTION_LIGHT_HEAL + 7), new NextAction("regrowth on party", ACTION_LIGHT_HEAL + 6), NULL)));
+
+        triggers.push_back(new TriggerNode(
+            "low health",
+            NextAction::array(0, new NextAction("healing touch", ACTION_LIGHT_HEAL + 9), new NextAction("regrowth", ACTION_LIGHT_HEAL + 8), NULL)));
+
+        triggers.push_back(new TriggerNode(
+            "low aoe heal",
+            NextAction::array(0, new NextAction("wild growth", ACTION_LIGHT_HEAL + 10), NULL)));
+
+        triggers.push_back(new TriggerNode(
+            "party member critical health",
+            NextAction::array(0, new NextAction("healing touch on party", ACTION_MEDIUM_HEAL + 7), new NextAction("regrowth on party", ACTION_MEDIUM_HEAL + 6), NULL)));
+
+        triggers.push_back(new TriggerNode(
+            "critical health",
+            NextAction::array(0, new NextAction("healing touch", ACTION_MEDIUM_HEAL + 9), new NextAction("regrowth", ACTION_MEDIUM_HEAL + 8), NULL)));
+
+        triggers.push_back(new TriggerNode(
+            "critical aoe heal",
+            NextAction::array(0, new NextAction("tranquility", ACTION_MEDIUM_HEAL + 10), NULL)));
+    }
 }
 
 GenericDruidBuffStrategy::GenericDruidBuffStrategy(PlayerbotAI* ai) : NonCombatStrategy(ai)

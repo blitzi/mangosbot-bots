@@ -107,10 +107,6 @@ namespace ai
                 creators["bash on enemy healer"] = &TriggerFactoryInternal::bash_on_enemy_healer;
                 creators["nature's swiftness"] = &TriggerFactoryInternal::natures_swiftness;
                 creators["force of nature"] = &TriggerFactoryInternal::force_of_nature;
-                creators["nourish"] = &TriggerFactoryInternal::nourish;
-                creators["nourish on party"] = &TriggerFactoryInternal::nourish_on_party;
-                creators["swiftmend"] = &TriggerFactoryInternal::swiftmend;
-                creators["swiftmend on party"] = &TriggerFactoryInternal::swiftmend_on_party;
                 creators["rejuvenation hot on party"] = &TriggerFactoryInternal::rejuvenation_hot_on_party;
                 creators["rejuvenation hot on tank"] = &TriggerFactoryInternal::rejuvenation_hot_on_tank;
             }
@@ -142,10 +138,6 @@ namespace ai
             static Trigger* bash_on_enemy_healer(PlayerbotAI* ai) { return new BashInterruptEnemyHealerSpellTrigger(ai); }
             static Trigger* omen_of_clarity(PlayerbotAI* ai) { return new OmenOfClarityTrigger(ai); }
             static Trigger* force_of_nature(PlayerbotAI* ai) { return new ForceOfNatureTrigger(ai); }
-            static Trigger* nourish(PlayerbotAI* ai) { return new NourishAndMediumHealthTrigger(ai); }
-            static Trigger* nourish_on_party(PlayerbotAI* ai) { return new NourishOnPartyAndMediumHealthTrigger(ai); }
-            static Trigger* swiftmend(PlayerbotAI* ai) { return new SwiftmendAndLowHealthTrigger(ai); }
-            static Trigger* swiftmend_on_party(PlayerbotAI* ai) { return new SwiftmendOnPartyAndLowHealthTrigger(ai); }
             static Trigger* rejuvenation_hot_on_party(PlayerbotAI* ai) { return new RejuvenationHotOnPartyTrigger(ai); }
             static Trigger* rejuvenation_hot_on_tank(PlayerbotAI* ai) { return new RejuvenationHotOnTankTrigger(ai); }
         };
@@ -213,19 +205,23 @@ namespace ai
                 creators["mark of the wild on party"] = &AiObjectContextInternal::mark_of_the_wild_on_party;
                 creators["regrowth"] = &AiObjectContextInternal::regrowth;
                 creators["regrowth on party"] = &AiObjectContextInternal::regrowth_on_party;
+                creators["refresh regrowth"] = &AiObjectContextInternal::refresh_regrowth;
+                creators["refresh regrowth on party"] = &AiObjectContextInternal::refresh_regrowth_on_party;
                 creators["rejuvenation"] = &AiObjectContextInternal::rejuvenation;
                 creators["rejuvenation on party"] = &AiObjectContextInternal::rejuvenation_on_party;
                 creators["rejuvenation hot on party"] = &AiObjectContextInternal::rejuvenation_hot_on_party;
                 creators["healing touch"] = &AiObjectContextInternal::healing_touch;
                 creators["healing touch on party"] = &AiObjectContextInternal::healing_touch_on_party;
+                creators["instant healing touch"] = &AiObjectContextInternal::instant_healing_touch;
+                creators["instant healing touch on party"] = &AiObjectContextInternal::instant_healing_touch_on_party;
                 creators["swiftmend"] = &AiObjectContextInternal::swiftmend;
                 creators["swiftmend on party"] = &AiObjectContextInternal::swiftmend_on_party;
                 creators["nourish"] = &AiObjectContextInternal::nourish;
                 creators["nourish on party"] = &AiObjectContextInternal::nourish_on_party;
                 creators["wild growth"] = &AiObjectContextInternal::wild_growth;
-                creators["wild growth on party"] = &AiObjectContextInternal::wild_growth_on_party;
                 creators["lifebloom"] = &AiObjectContextInternal::lifebloom;
                 creators["lifebloom on party"] = &AiObjectContextInternal::lifebloom_on_party;
+                creators["instant lifebloom"] = &AiObjectContextInternal::instant_lifebloom;
                 creators["rebirth"] = &AiObjectContextInternal::rebirth;
                 creators["revive"] = &AiObjectContextInternal::revive;
                 creators["barkskin"] = &AiObjectContextInternal::barkskin;
@@ -305,18 +301,22 @@ namespace ai
             static Action* regrowth(PlayerbotAI* ai) { return new CastRegrowthAction(ai); }
             static Action* rejuvenation(PlayerbotAI* ai) { return new CastRejuvenationAction(ai); }
             static Action* healing_touch(PlayerbotAI* ai) { return new CastHealingTouchAction(ai); }
+            static Action* instant_healing_touch(PlayerbotAI* ai) { return new CastInstantHealingTouchAction(ai); }
             static Action* swiftmend(PlayerbotAI* ai) { return new CastSwiftmendAction(ai); }
             static Action* swiftmend_on_party(PlayerbotAI* ai) { return new CastSwiftmendOnPartyAction(ai); }
             static Action* lifebloom(PlayerbotAI* ai) { return new CastLifeBloomAction(ai); }
             static Action* lifebloom_on_party(PlayerbotAI* ai) { return new CastLifeBloomOnPartyAction(ai); }
+            static Action* instant_lifebloom(PlayerbotAI* ai) { return new CastInstantLifeBloomAction(ai); }
             static Action* nourish(PlayerbotAI* ai) { return new CastNourishAction(ai); }
             static Action* nourish_on_party(PlayerbotAI* ai) { return new CastNourishOnPartyAction(ai); }
             static Action* wild_growth(PlayerbotAI* ai) { return new CastWildGrowthAction(ai); }
-            static Action* wild_growth_on_party(PlayerbotAI* ai) { return new CastWildGrowthOnPartyAction(ai); }
             static Action* regrowth_on_party(PlayerbotAI* ai) { return new CastRegrowthOnPartyAction(ai); }
+            static Action* refresh_regrowth(PlayerbotAI* ai) { return new RefreshRegrowthAction(ai); }
+            static Action* refresh_regrowth_on_party(PlayerbotAI* ai) { return new RefreshRegrowthOnPartyAction(ai); }
             static Action* rejuvenation_on_party(PlayerbotAI* ai) { return new CastRejuvenationOnPartyAction(ai); }
             static Action* rejuvenation_hot_on_party(PlayerbotAI* ai) { return new CastRejuvenationHotOnPartyAction(ai); }
             static Action* healing_touch_on_party(PlayerbotAI* ai) { return new CastHealingTouchOnPartyAction(ai); }
+            static Action* instant_healing_touch_on_party(PlayerbotAI* ai) { return new CastInstantHealingTouchOnPartyAction(ai); }
             static Action* rebirth(PlayerbotAI* ai) { return new CastRebirthAction(ai); }
             static Action* revive(PlayerbotAI* ai) { return new CastReviveAction(ai); }
             static Action* barkskin(PlayerbotAI* ai) { return new CastBarkskinAction(ai); }

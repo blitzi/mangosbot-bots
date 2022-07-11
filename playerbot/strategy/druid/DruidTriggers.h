@@ -187,40 +187,6 @@ namespace ai {
         virtual bool IsActive() { return BuffOnPartyTrigger::IsActive() && ai->HasAnyAuraOf(GetTarget(), "rejuvenation", "regrowth", "lifebloom", "wild growth", NULL); }
     };
 
-    class NourishAndMediumHealthTrigger : public AndTrigger {
-    public:
-        NourishAndMediumHealthTrigger(PlayerbotAI* ai) : AndTrigger(ai, new NourishTrigger(ai), new MediumHealthTrigger(ai)) {}
-    };
-
-    class NourishOnPartyAndMediumHealthTrigger : public AndTrigger {
-    public:
-        NourishOnPartyAndMediumHealthTrigger(PlayerbotAI* ai) : AndTrigger(ai, new NourishOnPartyTrigger(ai), new PartyMemberMediumHealthTrigger(ai)) {}
-    };
-
-    class SwiftmendTrigger : public BuffTrigger {
-    public:
-        SwiftmendTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "swiftmend") {}
-
-        virtual bool IsActive() { return ai->HasAnyAuraOf(bot, "rejuvenation", "regrowth", NULL); }
-    };
-
-    class SwiftmendOnPartyTrigger : public BuffOnPartyTrigger {
-    public:
-        SwiftmendOnPartyTrigger(PlayerbotAI* ai) : BuffOnPartyTrigger(ai, "switfmend") {}
-
-        virtual bool IsActive() { return ai->HasAnyAuraOf(GetTarget(), "rejuvenation", "regrowth", NULL); }
-    };
-
-    class SwiftmendAndLowHealthTrigger : public AndTrigger {
-    public:
-        SwiftmendAndLowHealthTrigger(PlayerbotAI* ai) : AndTrigger(ai, new SwiftmendTrigger(ai), new LowHealthTrigger(ai)) {}
-    };
-
-    class SwiftmendOnPartyAndLowHealthTrigger : public AndTrigger {
-    public:
-        SwiftmendOnPartyAndLowHealthTrigger(PlayerbotAI* ai) : AndTrigger(ai, new SwiftmendOnPartyTrigger(ai), new PartyMemberLowHealthTrigger(ai)) {}
-    };
-
     BUFF_PARTY_TRIGGER(RejuvenationHotOnPartyTrigger, "rejuvenation");
 
     class RejuvenationHotOnTankTrigger : public BuffOnTankTrigger {

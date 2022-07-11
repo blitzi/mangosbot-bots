@@ -7,33 +7,11 @@
 
 namespace ai
 {
-	class CastHealingWithHotSpellAction : public CastRangeSpellAction
+	class HealWithHotPartyMemberAction : public CastRangeSpellAction, public PartyMemberActionNameSupport
 	{
 	public:
-		CastHealingWithHotSpellAction(PlayerbotAI* ai, string spell, uint8 estAmount = 15.0f) : CastRangeSpellAction(ai, spell)
-		{
-			this->estAmount = estAmount;
-			range = ai->GetRange("spell");
-		}
-		virtual string GetTargetName() { return "self target"; }
-		virtual ActionThreatType getThreatType() { return ACTION_THREAT_AOE; }
-
-		virtual bool isUseful()
-		{
-			// we ignore the give aura here, since it is still a valid healing effect - the hot is just sugar
-			return GetTarget() && (GetTarget() != nullptr) && (GetTarget() != NULL) && CastRangeSpellAction::isUseful();
-		}
-
-
-	protected:
-		uint8 estAmount;
-	};
-
-	class HealWithHotPartyMemberAction : public CastHealingWithHotSpellAction, public PartyMemberActionNameSupport
-	{
-	public:
-		HealWithHotPartyMemberAction(PlayerbotAI* ai, string spell, uint8 estAmount = 15.0f) :
-			CastHealingWithHotSpellAction(ai, spell, estAmount), PartyMemberActionNameSupport(spell) {}
+		HealWithHotPartyMemberAction(PlayerbotAI* ai, string spell) :
+			CastRangeSpellAction(ai, spell), PartyMemberActionNameSupport(spell) {}
 
 		virtual string GetTargetName() { return "party member to heal"; }
 		virtual string getName() { return PartyMemberActionNameSupport::getName(); }
@@ -56,10 +34,25 @@ namespace ai
 		CastRejuvenationAction(PlayerbotAI* ai) : CastHealingSpellAction(ai, "rejuvenation") {}
 	};
 
-	class CastRegrowthAction : public CastHealingWithHotSpellAction {
+	class CastRegrowthAction : public CastRangeSpellAction {
 	public:
-		CastRegrowthAction(PlayerbotAI* ai) : CastHealingWithHotSpellAction(ai, "regrowth") {}
+		CastRegrowthAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "regrowth") {}
+	};
 
+	class CastRegrowthOnPartyAction : public HealWithHotPartyMemberAction
+	{
+	public:
+		CastRegrowthOnPartyAction(PlayerbotAI* ai) : HealWithHotPartyMemberAction(ai, "regrowth") {}
+	};
+	class RefreshRegrowthAction : public CastHealingSpellAction {
+	public:
+		RefreshRegrowthAction(PlayerbotAI* ai) : CastHealingSpellAction(ai, "regrowth") {}
+	};
+
+	class RefreshRegrowthOnPartyAction : public HealPartyMemberAction
+	{
+	public:
+		RefreshRegrowthOnPartyAction(PlayerbotAI* ai) : HealPartyMemberAction(ai, "regrowth") {}
 	};
 
     class CastHealingTouchAction : public CastHealingSpellAction {
@@ -73,11 +66,7 @@ namespace ai
         CastRejuvenationOnPartyAction(PlayerbotAI* ai) : HealPartyMemberAction(ai, "rejuvenation") {}
     };
 
-    class CastRegrowthOnPartyAction : public HealWithHotPartyMemberAction
-    {
-    public:
-        CastRegrowthOnPartyAction(PlayerbotAI* ai) : HealWithHotPartyMemberAction(ai, "regrowth") {}
-    };
+
 
     class CastHealingTouchOnPartyAction : public HealPartyMemberAction
     {
@@ -265,11 +254,13 @@ namespace ai
 	class CastSwiftmendAction : public CastHealingSpellAction {
 	public:
 		CastSwiftmendAction(PlayerbotAI* ai) : CastHealingSpellAction(ai, "swiftmend") {}
+		virtual bool isUseful() { return CastHealingSpellAction::isUseful() && ai->HasAnyAuraOf(GetTarget(), "rejuvenation", "regrowth", NULL); }
 	};
 
 	class CastSwiftmendOnPartyAction : public HealPartyMemberAction {
 	public:
 		CastSwiftmendOnPartyAction(PlayerbotAI* ai) : HealPartyMemberAction(ai, "swiftmend") {}
+		virtual bool isUseful() { return HealPartyMemberAction::isUseful() && ai->HasAnyAuraOf(GetTarget(), "rejuvenation", "regrowth", NULL); }
 	};
 
 	class CastLifeBloomAction : public CastHealingSpellAction {
@@ -284,11 +275,38 @@ namespace ai
 
 	BUFF_PARTY_ACTION(CastRejuvenationHotOnPartyAction, "rejuvenation");
 
-	HEAL_ACTION(CastNourishAction, "nourish");
-	HEAL_PARTY_ACTION(CastNourishOnPartyAction, "nourish");
+	class CastNourishAction : public CastHealingSpellAction {
+	public:
+		CastNourishAction(PlayerbotAI* ai) : CastHealingSpellAction(ai, "nourish") {}
+		virtual bool isUseful() { return CastHealingSpellAction::isUseful() && ai->HasAnyAuraOf(GetTarget(), "rejuvenation", "regrowth", "lifebloom", "wild growth", NULL); }
+	};
+	class CastNourishOnPartyAction : public HealPartyMemberAction {
+	public:
+		CastNourishOnPartyAction(PlayerbotAI* ai) : HealPartyMemberAction(ai, "nourish") {}
+		virtual bool isUseful() { return HealPartyMemberAction::isUseful() && ai->HasAnyAuraOf(GetTarget(), "rejuvenation", "regrowth", "lifebloom", "wild growth", NULL); }
+	};
 
-	HEAL_ACTION(CastWildGrowthAction, "wild growth");
-	HEAL_PARTY_ACTION(CastWildGrowthOnPartyAction, "wild growth");
+	class CastInstantHealingTouchAction : public CastHealingSpellAction {
+	public:
+		CastInstantHealingTouchAction(PlayerbotAI* ai) : CastHealingSpellAction(ai, "healing touch") {}
+		virtual bool isUseful() { return CastHealingSpellAction::isUseful() && ai->CanCastSpellInstant(spell, GetTarget());
+		}
+	};
+	class CastInstantHealingTouchOnPartyAction : public HealPartyMemberAction {
+	public:
+		CastInstantHealingTouchOnPartyAction(PlayerbotAI* ai) : HealPartyMemberAction(ai, "healing touch") {}
+		virtual bool isUseful() { return HealPartyMemberAction::isUseful() && ai->CanCastSpellInstant(spell, GetTarget()); }
+	};
+
+	class CastInstantLifeBloomAction : public CastRangeSpellAction {
+	public:
+		CastInstantLifeBloomAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "lifebloom") {}
+		virtual bool isUseful() {
+			return CastRangeSpellAction::isUseful() && ai->CanCastSpellInstant(spell, GetTarget());
+		}
+	};
+
+	AOE_HEAL_ACTION(CastWildGrowthAction, "wild growth");
 
 	class CastForceOfNatureAction : public CastRangeSpellAction
 	{
