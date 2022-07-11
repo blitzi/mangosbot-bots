@@ -222,6 +222,7 @@ namespace ai
                 creators["lifebloom"] = &AiObjectContextInternal::lifebloom;
                 creators["lifebloom on party"] = &AiObjectContextInternal::lifebloom_on_party;
                 creators["instant lifebloom"] = &AiObjectContextInternal::instant_lifebloom;
+                creators["instant lifebloom on party"] = &AiObjectContextInternal::instant_lifebloom_on_party;
                 creators["rebirth"] = &AiObjectContextInternal::rebirth;
                 creators["revive"] = &AiObjectContextInternal::revive;
                 creators["barkskin"] = &AiObjectContextInternal::barkskin;
@@ -307,6 +308,7 @@ namespace ai
             static Action* lifebloom(PlayerbotAI* ai) { return new CastLifeBloomAction(ai); }
             static Action* lifebloom_on_party(PlayerbotAI* ai) { return new CastLifeBloomOnPartyAction(ai); }
             static Action* instant_lifebloom(PlayerbotAI* ai) { return new CastInstantLifeBloomAction(ai); }
+            static Action* instant_lifebloom_on_party(PlayerbotAI* ai) { return new CastInstantLifeBloomOnPartyAction(ai); }
             static Action* nourish(PlayerbotAI* ai) { return new CastNourishAction(ai); }
             static Action* nourish_on_party(PlayerbotAI* ai) { return new CastNourishOnPartyAction(ai); }
             static Action* wild_growth(PlayerbotAI* ai) { return new CastWildGrowthAction(ai); }

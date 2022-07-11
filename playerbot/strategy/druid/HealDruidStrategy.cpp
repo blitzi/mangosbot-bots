@@ -70,12 +70,12 @@ void HealDruidStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 
         // rejuv on any bit of dmg applied to party member
         triggers.push_back(new TriggerNode(
-            "party member almost full health",
+            "party member lost any health",
             NextAction::array(0, new NextAction("rejuvenation on party", ACTION_LIGHT_HEAL + 1), NULL)));
 
         // rejuv ourself on any dmg
         triggers.push_back(new TriggerNode(
-            "almost full health",
+            "lost any health",
             NextAction::array(0, new NextAction("rejuvenation", ACTION_LIGHT_HEAL + 2), NULL)));
     }
 
@@ -105,19 +105,10 @@ void HealDruidStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
         triggers.push_back(new TriggerNode(
             "medium health",
             NextAction::array(0, new NextAction("refresh regrowth", ACTION_MEDIUM_HEAL + 6), NULL)));
-
-        triggers.push_back(new TriggerNode(
-            "medium health",
-            NextAction::array(0, new NextAction("instant lifebloom", ACTION_MEDIUM_HEAL + 7), NULL)));
     }
 
     // critical section
     {
-        // cast wildgrowth when: in a party & whenever available & anyone lost any portion of hp
-        triggers.push_back(new TriggerNode(
-            "almost full aoe heal",
-            NextAction::array(0, new NextAction("wild growth", ACTION_CRITICAL_HEAL), NULL)));
-
         // add swiftmend, whenever anyone is at medium health and has a druid (regrowth, rejuv, wildgrowth)
         triggers.push_back(new TriggerNode(
             "party member low health",
@@ -143,13 +134,19 @@ void HealDruidStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
             "critical health",
             NextAction::array(0, new NextAction("swiftmend", ACTION_CRITICAL_HEAL + 8), NULL)));
 
+        // cast wildgrowth when: in a party & whenever available & anyone lost any portion of hp
         triggers.push_back(new TriggerNode(
-            "party member critical health",
-            NextAction::array(0, new NextAction("instant healing touch on party", ACTION_CRITICAL_HEAL + 9), NULL)));
-
+            "almost full aoe heal",
+            NextAction::array(0, new NextAction("wild growth", ACTION_CRITICAL_HEAL + 15), NULL)));
         triggers.push_back(new TriggerNode(
-            "critical health",
-            NextAction::array(0, new NextAction("instant healing touch", ACTION_CRITICAL_HEAL + 10), NULL)));
+            "medium aoe heal",
+            NextAction::array(0, new NextAction("wild growth", ACTION_CRITICAL_HEAL + 16), NULL)));
+        triggers.push_back(new TriggerNode(
+            "low aoe heal",
+            NextAction::array(0, new NextAction("wild growth", ACTION_CRITICAL_HEAL + 17), NULL)));
+        triggers.push_back(new TriggerNode(
+            "critical aoe heal",
+            NextAction::array(0, new NextAction("wild growth", ACTION_CRITICAL_HEAL + 18), NULL)));
     }
 
     // emergencies
@@ -158,6 +155,23 @@ void HealDruidStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
         triggers.push_back(new TriggerNode(
             "critical aoe heal",
             NextAction::array(0, new NextAction("tranquility", ACTION_EMERGENCY), NULL)));
+
+        triggers.push_back(new TriggerNode(
+            "medium health",
+            NextAction::array(0, new NextAction("instant lifebloom", ACTION_EMERGENCY + 1), NULL)));
+
+        triggers.push_back(new TriggerNode(
+            "party member medium health",
+            NextAction::array(0, new NextAction("instant lifebloom on party", ACTION_EMERGENCY + 2), NULL)));
+
+        triggers.push_back(new TriggerNode(
+            "party member critical health",
+            NextAction::array(0, new NextAction("instant healing touch on party", ACTION_EMERGENCY + 3), NULL)));
+
+        triggers.push_back(new TriggerNode(
+            "critical health",
+            NextAction::array(0, new NextAction("instant healing touch", ACTION_EMERGENCY + 4), NULL)));
+
 
         triggers.push_back(new TriggerNode(
             "tree form",

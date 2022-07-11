@@ -81,6 +81,13 @@ namespace ai
             LowHealthTrigger(ai, "almost full health", sPlayerbotAIConfig.almostFullHealth, sPlayerbotAIConfig.mediumHealth) {}
     };
 
+    class LostAnyHealthTrigger : public LowHealthTrigger
+    {
+    public:
+        LostAnyHealthTrigger(PlayerbotAI* ai) :
+            LowHealthTrigger(ai, "lost any health", 98.0f, 0.0f) {}
+    };
+
     class PartyMemberLowHealthTrigger : public HealthInRangeTrigger
     {
     public:
@@ -109,6 +116,13 @@ namespace ai
     public:
         PartyMemberAlmostFullHealthTrigger(PlayerbotAI* ai) :
             PartyMemberLowHealthTrigger(ai, "party member almost full health", sPlayerbotAIConfig.almostFullHealth,sPlayerbotAIConfig.mediumHealth) {}
+    };
+
+    class PartyMemberLostAnyHealthTrigger : public PartyMemberLowHealthTrigger
+    {
+    public:
+        PartyMemberLostAnyHealthTrigger(PlayerbotAI* ai) :
+            PartyMemberLowHealthTrigger(ai, "party member lost any health", 98.0f, 0.0f) {}
     };
 
     class PartyMemberToCancelHealthTrigger : public PartyMemberLowHealthTrigger

@@ -305,6 +305,16 @@ namespace ai
 			return CastRangeSpellAction::isUseful() && ai->CanCastSpellInstant(spell, GetTarget());
 		}
 	};
+	class CastInstantLifeBloomOnPartyAction : public CastRangeSpellAction, public PartyMemberActionNameSupport {
+	public:
+		CastInstantLifeBloomOnPartyAction(PlayerbotAI* ai)
+			: CastRangeSpellAction(ai, "lifebloom"), PartyMemberActionNameSupport("lifebloom") {}
+		virtual string GetTargetName() { return "party member to heal"; }
+		virtual string getName() { return PartyMemberActionNameSupport::getName(); }
+		virtual bool isUseful() {
+			return CastRangeSpellAction::isUseful() && ai->CanCastSpellInstant(spell, GetTarget());
+		}
+	};
 
 	AOE_HEAL_ACTION(CastWildGrowthAction, "wild growth");
 
