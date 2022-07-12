@@ -187,6 +187,12 @@ bool SpellCanBeCastTrigger::IsActive()
     return target && ai->CanCastSpell(spell, target);
 }
 
+bool BuffCanBeCastTrigger::IsActive()
+{
+    Unit* target = GetTarget();
+    return target && ai->CanCastSpell(spell, target);
+}
+
 bool SpellCanBeCastInstantTrigger::IsActive()
 {
     Unit* target = GetTarget();

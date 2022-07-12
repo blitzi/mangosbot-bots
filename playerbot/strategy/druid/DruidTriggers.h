@@ -187,10 +187,50 @@ namespace ai {
         virtual bool IsActive() { return BuffOnPartyTrigger::IsActive() && ai->HasAnyAuraOf(GetTarget(), "rejuvenation", "regrowth", "lifebloom", "wild growth", NULL); }
     };
 
-    BUFF_PARTY_TRIGGER(RejuvenationHotOnPartyTrigger, "rejuvenation");
+    class RejuvenationHotOnPartyTrigger : public BuffOnPartyTrigger {
+    public:
+        RejuvenationHotOnPartyTrigger(PlayerbotAI* ai) : BuffOnPartyTrigger(ai, "rejuvenation") {}
+    };
 
     class RejuvenationHotOnTankTrigger : public BuffOnTankTrigger {
     public:
         RejuvenationHotOnTankTrigger(PlayerbotAI* ai) : BuffOnTankTrigger(ai, "rejuvenation") {}
+    };
+
+    class ClearCastingTrigger : public HasAuraTrigger {
+    public:
+        ClearCastingTrigger(PlayerbotAI* ai) : HasAuraTrigger(ai, "Clearcasting") {}
+    };
+
+    class LowOrCriticalHealthAndClearCastingTrigger : public AndTrigger {
+    public:
+        LowOrCriticalHealthAndClearCastingTrigger(PlayerbotAI* ai)
+            : AndTrigger(ai, new ClearCastingTrigger(ai), new LowOrCriticalHealthTrigger(ai)) {}
+        virtual bool IsActive() {
+            auto result = AndTrigger::IsActive();
+            return result;
+        }
+    };
+
+    class PartyMemberLowOrCriticalHealthAndClearCastingTrigger : public AndTrigger {
+    public:
+        PartyMemberLowOrCriticalHealthAndClearCastingTrigger(PlayerbotAI* ai)
+            : AndTrigger(ai, new ClearCastingTrigger(ai), new PartyMemberLowOrCriticalHealthTrigger(ai)) {}
+        virtual bool IsActive() {
+            auto result = AndTrigger::IsActive();
+            return result;
+        }
+    };
+
+    class LowOrCriticalHealthAndAndNaturesSwiftnessTrigger : public AndTrigger {
+    public:
+        LowOrCriticalHealthAndAndNaturesSwiftnessTrigger(PlayerbotAI* ai)
+            : AndTrigger(ai, new BuffCanBeCastTrigger(ai, "nature's swiftness"), new LowOrCriticalHealthTrigger(ai)) {}
+    };
+
+    class PartyMemberLowOrCriticalHealthAndNaturesSwiftnessTrigger : public AndTrigger {
+    public:
+        PartyMemberLowOrCriticalHealthAndNaturesSwiftnessTrigger(PlayerbotAI* ai)
+            : AndTrigger(ai, new BuffCanBeCastTrigger(ai, "nature's swiftness"), new PartyMemberLowOrCriticalHealthTrigger(ai)) {}
     };
 }

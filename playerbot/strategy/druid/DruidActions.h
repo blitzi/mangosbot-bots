@@ -249,6 +249,9 @@ namespace ai
     {
     public:
         CastNaturesSwiftnessAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "nature's swiftness") {}
+		virtual bool Execute(Event event) {
+			return CastBuffSpellAction::Execute(event);
+		}
     };
 
 	class CastSwiftmendAction : public CastHealingSpellAction {
@@ -284,36 +287,6 @@ namespace ai
 	public:
 		CastNourishOnPartyAction(PlayerbotAI* ai) : HealPartyMemberAction(ai, "nourish") {}
 		virtual bool isUseful() { return HealPartyMemberAction::isUseful() && ai->HasAnyAuraOf(GetTarget(), "rejuvenation", "regrowth", "lifebloom", "wild growth", NULL); }
-	};
-
-	class CastInstantHealingTouchAction : public CastHealingSpellAction {
-	public:
-		CastInstantHealingTouchAction(PlayerbotAI* ai) : CastHealingSpellAction(ai, "healing touch") {}
-		virtual bool isUseful() { return CastHealingSpellAction::isUseful() && ai->CanCastSpellInstant(spell, GetTarget());
-		}
-	};
-	class CastInstantHealingTouchOnPartyAction : public HealPartyMemberAction {
-	public:
-		CastInstantHealingTouchOnPartyAction(PlayerbotAI* ai) : HealPartyMemberAction(ai, "healing touch") {}
-		virtual bool isUseful() { return HealPartyMemberAction::isUseful() && ai->CanCastSpellInstant(spell, GetTarget()); }
-	};
-
-	class CastInstantLifeBloomAction : public CastRangeSpellAction {
-	public:
-		CastInstantLifeBloomAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "lifebloom") {}
-		virtual bool isUseful() {
-			return CastRangeSpellAction::isUseful() && ai->CanCastSpellInstant(spell, GetTarget());
-		}
-	};
-	class CastInstantLifeBloomOnPartyAction : public CastRangeSpellAction, public PartyMemberActionNameSupport {
-	public:
-		CastInstantLifeBloomOnPartyAction(PlayerbotAI* ai)
-			: CastRangeSpellAction(ai, "lifebloom"), PartyMemberActionNameSupport("lifebloom") {}
-		virtual string GetTargetName() { return "party member to heal"; }
-		virtual string getName() { return PartyMemberActionNameSupport::getName(); }
-		virtual bool isUseful() {
-			return CastRangeSpellAction::isUseful() && ai->CanCastSpellInstant(spell, GetTarget());
-		}
 	};
 
 	AOE_HEAL_ACTION(CastWildGrowthAction, "wild growth");

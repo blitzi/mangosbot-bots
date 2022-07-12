@@ -28,12 +28,13 @@ HealDruidStrategy::HealDruidStrategy(PlayerbotAI* ai) : GenericDruidStrategy(ai)
 *  (DONE) - use 'regrowth' when no regrowth buff is applied and you or anyone hast lost any spell
 *  (DONE) - use 'regrowth', when nourish is not working and heal + restart hot
 *  (DONE) - use 'nourish', when hp has been lost "a bit more than almost full" AND an auro of type lifebloom, rejuvenation, regrowth or wild growth is active
-*  (DONE) - use 'barkskin' when on medium hp, or when a huge thread cast like 'tranquily' is about to be used
+*  (DONE) - use 'barkskin' when on medium hp
+*  (TODO) - use 'barkskin' when a huge thread cast like 'tranquily' is about to be used
 *  (DONE) - use 'swiftmend' when someon is at low hp
 *  (DONE) - use 'healing touch' ONLY, when it can be casted instantly and someone is at least at medium health
 *  (DONE) - use 'tranquility' only, when whole party (group or raid) is at low hp
 *  (DONE) - use 'nature's swiftness' when someone is at critical health combined with 'healing touch'
-*  (DONE) - use 'lifebloom', when 'cleacasting' is available, and noone is lower than medium health (regain mana later)
+*  (TODO) - use 'lifebloom', when 'cleacasting' is available, and noone is lower than medium health (regain mana later)
 *  (TODO) - use 'lifebloom' on maintank on big encounters and stack it to 3 (+ holding it when it is nearly about to end) OR get mana back and end
 *  (DONE) - use 'innervate' when on low mana
 *  (TODO) - use 'innervate' when someone else by importance is at low mana (main healer?)
@@ -59,6 +60,18 @@ void HealDruidStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
         triggers.push_back(new TriggerNode(
             "party member to heal out of spell range",
             NextAction::array(0, new NextAction("reach party member to heal", ACTION_CRITICAL_HEAL + 1), NULL)));
+
+        triggers.push_back(new TriggerNode(
+            "medium health",
+            NextAction::array(0, new NextAction("barkskin", ACTION_EMERGENCY + 10), NULL)));
+
+        triggers.push_back(new TriggerNode(
+            "low mana",
+            NextAction::array(0, new NextAction("innervate", ACTION_EMERGENCY + 15), NULL)));
+
+        triggers.push_back(new TriggerNode(
+            "tree form",
+            NextAction::array(0, new NextAction("tree form", ACTION_EMERGENCY + 20), NULL)));
     }
 
     // low section
@@ -111,28 +124,20 @@ void HealDruidStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
     {
         // add swiftmend, whenever anyone is at medium health and has a druid (regrowth, rejuv, wildgrowth)
         triggers.push_back(new TriggerNode(
-            "party member low health",
+            "party member low or critical health",
             NextAction::array(0, new NextAction("swiftmend on party", ACTION_CRITICAL_HEAL + 1), NULL)));
 
         triggers.push_back(new TriggerNode(
-            "low health",
+            "low or critical health",
             NextAction::array(0, new NextAction("swiftmend", ACTION_CRITICAL_HEAL + 2), NULL)));
 
         triggers.push_back(new TriggerNode(
-            "party member critical health",
+            "party member low or critical health and natures swiftness",
             NextAction::array(0, new NextAction("nature's swiftness", ACTION_CRITICAL_HEAL + 4), new NextAction("healing touch on party", ACTION_CRITICAL_HEAL + 3), NULL)));
 
         triggers.push_back(new TriggerNode(
-            "critical health",
+            "low or critical health and natures swiftness",
             NextAction::array(0, new NextAction("nature's swiftness", ACTION_CRITICAL_HEAL + 6), new NextAction("healing touch", ACTION_CRITICAL_HEAL + 5), NULL)));
-
-        triggers.push_back(new TriggerNode(
-            "party member critical health",
-            NextAction::array(0, new NextAction("swiftmend on party", ACTION_CRITICAL_HEAL + 7), NULL)));
-
-        triggers.push_back(new TriggerNode(
-            "critical health",
-            NextAction::array(0, new NextAction("swiftmend", ACTION_CRITICAL_HEAL + 8), NULL)));
 
         // cast wildgrowth when: in a party & whenever available & anyone lost any portion of hp
         triggers.push_back(new TriggerNode(
@@ -156,33 +161,16 @@ void HealDruidStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
             "critical aoe heal",
             NextAction::array(0, new NextAction("tranquility", ACTION_EMERGENCY), NULL)));
 
-        triggers.push_back(new TriggerNode(
-            "medium health",
-            NextAction::array(0, new NextAction("instant lifebloom", ACTION_EMERGENCY + 1), NULL)));
+        //triggers.push_back(new TriggerNode(
+        //    "clearcasting",
+        //    NextAction::array(0, new NextAction("lifebloom", ACTION_EMERGENCY + 2), NULL)));
 
         triggers.push_back(new TriggerNode(
-            "party member medium health",
-            NextAction::array(0, new NextAction("instant lifebloom on party", ACTION_EMERGENCY + 2), NULL)));
+            "party member low or critical health and clearcasting",
+            NextAction::array(0, new NextAction("healing touch on party", ACTION_EMERGENCY + 3), NULL)));
 
         triggers.push_back(new TriggerNode(
-            "party member critical health",
-            NextAction::array(0, new NextAction("instant healing touch on party", ACTION_EMERGENCY + 3), NULL)));
-
-        triggers.push_back(new TriggerNode(
-            "critical health",
-            NextAction::array(0, new NextAction("instant healing touch", ACTION_EMERGENCY + 4), NULL)));
-
-
-        triggers.push_back(new TriggerNode(
-            "tree form",
-            NextAction::array(0, new NextAction("tree form", ACTION_EMERGENCY + 10), NULL)));
-
-        triggers.push_back(new TriggerNode(
-            "medium health",
-            NextAction::array(0, new NextAction("barkskin", ACTION_EMERGENCY + 11), NULL)));
-
-        triggers.push_back(new TriggerNode(
-            "low mana",
-            NextAction::array(0, new NextAction("innervate", ACTION_EMERGENCY + 15), NULL)));
+            "low or critical health and clearcasting",
+            NextAction::array(0, new NextAction("healing touch", ACTION_EMERGENCY + 4), NULL)));
     }
 }

@@ -116,13 +116,13 @@ void CasterDruidStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
         NextAction::array(0, new NextAction("rejuvenation on party", ACTION_LIGHT_HEAL + 1), NULL)));
 
 
-	triggers.push_back(new TriggerNode(
-		"insect swarm",
-		NextAction::array(0, new NextAction("insect swarm", ACTION_NORMAL + 5), NULL)));
+    triggers.push_back(new TriggerNode(
+        "insect swarm",
+        NextAction::array(0, new NextAction("insect swarm", ACTION_NORMAL + 5), NULL)));
 
-	triggers.push_back(new TriggerNode(
-		"moonfire",
-		NextAction::array(0, new NextAction("moonfire", ACTION_NORMAL + 4), NULL)));
+    triggers.push_back(new TriggerNode(
+        "moonfire",
+        NextAction::array(0, new NextAction("moonfire", ACTION_NORMAL + 4), NULL)));
 
     triggers.push_back(new TriggerNode(
         "eclipse (solar)",
@@ -136,18 +136,20 @@ void CasterDruidStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
         "moonfire",
         NextAction::array(0, new NextAction("moonfire", ACTION_NORMAL + 4), NULL)));
 
-
-
-	triggers.push_back(new TriggerNode(
+    triggers.push_back(new TriggerNode(
         "critical health",
-		NextAction::array(0, new NextAction("nature's grasp", ACTION_EMERGENCY), NULL)));
+        NextAction::array(0, new NextAction("nature's grasp", ACTION_EMERGENCY), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "enemy is close",
+        NextAction::array(0, new NextAction("typhoon", 30.0f), NULL)));
 }
 
 void CasterDruidAoeStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
-	triggers.push_back(new TriggerNode(
-		"high aoe",
-		NextAction::array(0, new NextAction("hurricane", ACTION_HIGH), NULL)));
+    triggers.push_back(new TriggerNode(
+        "high aoe",
+        NextAction::array(0, new NextAction("hurricane", ACTION_HIGH), NULL)));
 
     // maybe allow the caster to only perform starfall on less thread, since starfall and hurrican generates a lot of thread!
     triggers.push_back(new TriggerNode(

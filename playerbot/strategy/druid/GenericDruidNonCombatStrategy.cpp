@@ -128,24 +128,16 @@ void GenericDruidNonCombatStrategy::InitTriggers(std::list<TriggerNode*> &trigge
             NextAction::array(0, new NextAction("wild growth", ACTION_LIGHT_HEAL + 5), NULL)));
 
         triggers.push_back(new TriggerNode(
-            "party member low health",
+            "party member low or critical health",
             NextAction::array(0, new NextAction("healing touch on party", ACTION_LIGHT_HEAL + 7), new NextAction("regrowth on party", ACTION_LIGHT_HEAL + 6), NULL)));
 
         triggers.push_back(new TriggerNode(
-            "low health",
+            "low or critical health",
             NextAction::array(0, new NextAction("healing touch", ACTION_LIGHT_HEAL + 9), new NextAction("regrowth", ACTION_LIGHT_HEAL + 8), NULL)));
 
         triggers.push_back(new TriggerNode(
             "low aoe heal",
             NextAction::array(0, new NextAction("wild growth", ACTION_LIGHT_HEAL + 10), NULL)));
-
-        triggers.push_back(new TriggerNode(
-            "party member critical health",
-            NextAction::array(0, new NextAction("healing touch on party", ACTION_MEDIUM_HEAL + 7), new NextAction("regrowth on party", ACTION_MEDIUM_HEAL + 6), NULL)));
-
-        triggers.push_back(new TriggerNode(
-            "critical health",
-            NextAction::array(0, new NextAction("healing touch", ACTION_MEDIUM_HEAL + 9), new NextAction("regrowth", ACTION_MEDIUM_HEAL + 8), NULL)));
 
         triggers.push_back(new TriggerNode(
             "critical aoe heal",

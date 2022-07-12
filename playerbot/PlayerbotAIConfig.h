@@ -41,7 +41,7 @@ public:
     float sightDistance, spellDistance, reactDistance, grindDistance, lootDistance, shootDistance,
         fleeDistance, tooCloseDistance, meleeDistance, followDistance, whisperDistance, contactDistance,
         aoeRadius, rpgDistance, targetPosRecalcDistance, farDistance, healDistance, aggroDistance, stanceDistance, forceFollowDistance;
-    uint32 criticalHealth, lowHealth, mediumHealth, almostFullHealth;
+    uint32 criticalHealth, lowHealth, mediumHealth, almostFullHealth, lostAnyHealth;
     uint32 lowMana, mediumMana;
 
     uint32 openGoSpell;

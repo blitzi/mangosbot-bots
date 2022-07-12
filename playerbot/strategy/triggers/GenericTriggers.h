@@ -272,6 +272,13 @@ namespace ai
         virtual Value<Unit*>* GetTargetValue();
     };
 
+    class BuffCanBeCastTrigger : public BuffTrigger
+    {
+    public:
+        BuffCanBeCastTrigger(PlayerbotAI* ai, string spell, int checkInterval = 1, bool checkIsOwner = false)
+            : BuffTrigger(ai, spell, checkInterval, checkIsOwner) {}
+        virtual bool IsActive();
+    };
 
     class ProtectPartyMemberTrigger : public Trigger
     {

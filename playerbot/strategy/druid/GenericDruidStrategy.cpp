@@ -138,10 +138,10 @@ void DruidCureStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 
 void DruidBoostStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
-    // TODO: maybe remove this and control it more explcitly
-    triggers.push_back(new TriggerNode(
-        "nature's swiftness",
-        NextAction::array(0, new NextAction("nature's swiftness", ACTION_HIGH + 9), NULL)));
+    //// removed this, since we want to contrl the swiftness in healing druid variant
+    //triggers.push_back(new TriggerNode(
+    //    "nature's swiftness",
+    //    NextAction::array(0, new NextAction("nature's swiftness", ACTION_HIGH + 9), NULL)));
 
     // TODO: talk with robi, if this should be a caster form only skill & maybe not used, since it will taunt
     triggers.push_back(new TriggerNode(
