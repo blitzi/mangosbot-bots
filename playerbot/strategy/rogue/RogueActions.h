@@ -121,7 +121,7 @@ namespace ai
 		CastAdrenalineRushAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "adrenaline rush") {}
 	};
 
-	class CastKillingSpreeAction : public CastBuffSpellAction
+	class CastKillingSpreeAction : public CastBuffSpellAction // range 10y
 	{
 	public:
 		CastKillingSpreeAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "killing spree") {}
@@ -133,4 +133,16 @@ namespace ai
         CastKickOnEnemyHealerAction(PlayerbotAI* ai) : CastSpellOnEnemyHealerAction(ai, "kick") {}
     };
 
+    class CastTricksOfTheTradeOnPartyAction : public BuffOnPartyAction {
+    public:
+        CastTricksOfTheTradeOnPartyAction(PlayerbotAI* ai) : BuffOnPartyAction(ai, "tricks of the trade") {}
+    };
+
+    class CastCloakOfShadowsAction : public CastBuffSpellAction
+    {
+    public:
+        CastCloakOfShadowsAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "cloak of shadows") {}
+    };
+
+    MELEE_ACTION(CastFanOfKnivesAction, "fan of knives");
 }

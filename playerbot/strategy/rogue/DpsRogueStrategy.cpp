@@ -5,88 +5,14 @@
 
 using namespace ai;
 
-class DpsRogueStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
-{
-public:
-    DpsRogueStrategyActionNodeFactory()
-    {
-        creators["riposte"] = &riposte;
-        creators["mutilate"] = &mutilate;
-        creators["sinister strike"] = &sinister_strike;
-        creators["kick"] = &kick;
-        creators["kidney shot"] = &kidney_shot;
-        creators["rupture"] = &rupture;
-        creators["backstab"] = &backstab;
-    }
-private:
-    static ActionNode* riposte(PlayerbotAI* ai)
-    {
-        return new ActionNode ("riposte",
-            /*P*/ NULL,
-            /*A*/ NextAction::array(0, new NextAction("mutilate"), NULL),
-            /*C*/ NULL);
-    }
-    static ActionNode* mutilate(PlayerbotAI* ai)
-    {
-        return new ActionNode ("mutilate",
-            /*P*/ NULL,
-            /*A*/ NextAction::array(0, new NextAction("backstab"), NULL),
-            /*C*/ NULL);
-    }
-    static ActionNode* sinister_strike(PlayerbotAI* ai)
-    {
-        return new ActionNode ("sinister strike",
-            /*P*/ NULL,
-            /*A*/ NextAction::array(0, new NextAction("melee"), NULL),
-            /*C*/ NULL);
-    }
-    static ActionNode* kick(PlayerbotAI* ai)
-    {
-        return new ActionNode ("kick",
-            /*P*/ NULL,
-            /*A*/ NextAction::array(0, new NextAction("kidney shot"), NULL),
-            /*C*/ NULL);
-    }
-    static ActionNode* kidney_shot(PlayerbotAI* ai)
-    {
-        return new ActionNode ("kidney shot",
-            /*P*/ NULL,
-            /*A*/ NULL,
-            /*C*/ NULL);
-    }
-    static ActionNode* rupture(PlayerbotAI* ai)
-    {
-        return new ActionNode ("rupture",
-            /*P*/ NULL,
-            /*A*/ NextAction::array(0, new NextAction("eviscerate"), NULL),
-            /*C*/ NULL);
-    }
-    static ActionNode* backstab(PlayerbotAI* ai)
-    {
-        return new ActionNode ("backstab",
-            /*P*/ NULL,
-            /*A*/ NULL,
-            /*C*/ NULL);
-    }
-};
 
-DpsRogueStrategy::DpsRogueStrategy(PlayerbotAI* ai) : CombatStrategy(ai)
+GenericRogueStrategy::GenericRogueStrategy(PlayerbotAI* ai) : CombatStrategy(ai)
 {
-    actionNodeFactories.Add(new DpsRogueStrategyActionNodeFactory());
 }
 
-NextAction** DpsRogueStrategy::getDefaultActions()
-{
-    return NextAction::array(0, new NextAction("riposte", ACTION_NORMAL), NULL);
-}
-
-void DpsRogueStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
+void GenericRogueStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
     CombatStrategy::InitTriggers(triggers);
-
-    triggers.push_back(new TriggerNode(
-        "combo points available",
-        NextAction::array(0, new NextAction("rupture", ACTION_HIGH + 2), NULL)));
 
 	triggers.push_back(new TriggerNode(
 		"medium threat",
@@ -109,10 +35,6 @@ void DpsRogueStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 		NextAction::array(0, new NextAction("kick on enemy healer", ACTION_INTERRUPT + 1), NULL)));
 
     triggers.push_back(new TriggerNode(
-        "behind target",
-        NextAction::array(0, new NextAction("mutilate", ACTION_HIGH + 2), NULL)));
-
-    triggers.push_back(new TriggerNode(
         "player has flag",
         NextAction::array(0, new NextAction("sprint", ACTION_EMERGENCY + 2), NULL)));
 
@@ -131,6 +53,37 @@ void DpsRogueStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
     triggers.push_back(new TriggerNode(
         "sprint",
         NextAction::array(0, new NextAction("sprint", ACTION_INTERRUPT), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "tricks of the trade on tank",
+        NextAction::array(0, new NextAction("tricks of the trade", ACTION_HIGH), NULL)));
+
+
+}
+
+DpsRogueStrategy::DpsRogueStrategy(PlayerbotAI* ai) : GenericRogueStrategy(ai)
+{
+}
+
+void DpsRogueStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
+{
+    GenericRogueStrategy::InitTriggers(triggers);
+
+    triggers.push_back(new TriggerNode(
+        "slice and dice",
+        NextAction::array(0, new NextAction("slice and dice", ACTION_HIGH + 5), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "rupture",
+        NextAction::array(0, new NextAction("rupture", ACTION_HIGH + 4), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "eviscerate",
+        NextAction::array(0, new NextAction("eviscerate", ACTION_HIGH + 3), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "sinister strike",
+        NextAction::array(0, new NextAction("sinister strike", ACTION_NORMAL + 5), NULL)));
 }
 
 class StealthedRogueStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
@@ -251,8 +204,8 @@ void StealthStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 void RogueAoeStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
     triggers.push_back(new TriggerNode(
-        "light aoe",
-        NextAction::array(0, new NextAction("blade flurry", ACTION_HIGH), NULL)));
+        "medium aoe",
+        NextAction::array(0, new NextAction("adrenalin rush", ACTION_HIGH), new NextAction("fan of knives", ACTION_HIGH), NULL)));
 }
 
 void RogueBoostStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
@@ -268,3 +221,65 @@ void RogueCcStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
         "sap",
         NextAction::array(0, new NextAction("stealth", ACTION_INTERRUPT), new NextAction("sap", ACTION_INTERRUPT), NULL)));
 }
+
+// Assassination
+AssassinationRogueStrategy::AssassinationRogueStrategy(PlayerbotAI* ai) : GenericRogueStrategy(ai)
+{
+}
+
+void AssassinationRogueStrategy::InitTriggers(std::list<TriggerNode*>& triggers)
+{
+    GenericRogueStrategy::InitTriggers(triggers);
+
+    triggers.push_back(new TriggerNode(
+        "combo points available",
+        NextAction::array(0, new NextAction("rupture", ACTION_HIGH + 2), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "behind target",
+        NextAction::array(0, new NextAction("mutilate", ACTION_HIGH + 2), NULL)));   
+    
+    triggers.push_back(new TriggerNode(
+        "mutilate",
+        NextAction::array(0, new NextAction("mutilate", ACTION_HIGH + 2), NULL)));
+}
+
+// Combat
+CombatRogueStrategy::CombatRogueStrategy(PlayerbotAI* ai) : GenericRogueStrategy(ai)
+{
+}
+
+void CombatRogueStrategy::InitTriggers(std::list<TriggerNode*>& triggers)
+{
+    GenericRogueStrategy::InitTriggers(triggers);
+
+    triggers.push_back(new TriggerNode(
+        "blade flurry",
+        NextAction::array(0, new NextAction("blade flurry", ACTION_NORMAL + 8), new NextAction("killing spree", ACTION_NORMAL + 7), NULL)));
+    /*
+    triggers.push_back(new TriggerNode(
+        "killing spree",
+        NextAction::array(0, new NextAction("killing spree", ACTION_NORMAL + 7), NULL)));
+        */
+    triggers.push_back(new TriggerNode(
+        "adrenaline rush",
+        NextAction::array(0, new NextAction("adrenaline rush", ACTION_NORMAL + 6), new NextAction("sinister strike", ACTION_NORMAL + 5), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "slice and dice",
+        NextAction::array(0, new NextAction("slice and dice", ACTION_HIGH + 5), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "rupture",
+        NextAction::array(0, new NextAction("rupture", ACTION_HIGH + 4), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "eviscerate",
+        NextAction::array(0, new NextAction("eviscerate", ACTION_HIGH + 3), NULL)));
+
+    triggers.push_back(new TriggerNode(
+        "sinister strike",
+        NextAction::array(0, new NextAction("sinister strike", ACTION_NORMAL + 5), NULL)));
+}
+
+// TODO subtlety

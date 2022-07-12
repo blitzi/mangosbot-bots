@@ -5,7 +5,17 @@
 
 namespace ai
 {
-    class DpsRogueStrategy : public CombatStrategy
+    class GenericRogueStrategy : public CombatStrategy
+    {
+    public:
+        GenericRogueStrategy(PlayerbotAI* ai);
+
+    public:
+        virtual void InitTriggers(std::list<TriggerNode*>& triggers);
+        virtual string getName() { return "generic"; }
+    };
+
+    class DpsRogueStrategy : public GenericRogueStrategy
     {
     public:
         DpsRogueStrategy(PlayerbotAI* ai);
@@ -13,7 +23,27 @@ namespace ai
     public:
         virtual void InitTriggers(std::list<TriggerNode*> &triggers);
         virtual string getName() { return "dps"; }
-        virtual NextAction** getDefaultActions();
+    };
+
+
+    class AssassinationRogueStrategy : public GenericRogueStrategy
+    {
+    public:
+        AssassinationRogueStrategy(PlayerbotAI* ai);
+
+    public:
+        virtual void InitTriggers(std::list<TriggerNode*>& triggers);
+        virtual string getName() { return "assassin"; }
+    };
+
+    class CombatRogueStrategy : public GenericRogueStrategy
+    {
+    public:
+        CombatRogueStrategy(PlayerbotAI* ai);
+
+    public:
+        virtual void InitTriggers(std::list<TriggerNode*>& triggers);
+        virtual string getName() { return "combat"; }
     };
 
     class StealthedRogueStrategy : public Strategy

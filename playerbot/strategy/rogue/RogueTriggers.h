@@ -14,12 +14,13 @@ namespace ai
     {
     public:
         SliceAndDiceTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "slice and dice") {}
+        virtual bool IsActive();
     };
 
-    class AdrenalineRushTrigger : public BoostBuffTrigger
+    class RogueBoostBuffTrigger : public BoostBuffTrigger
     {
     public:
-        AdrenalineRushTrigger(PlayerbotAI* ai) : BoostBuffTrigger(ai, "adrenaline rush", 200.0f) {}
+        RogueBoostBuffTrigger(PlayerbotAI* ai, string spellName) : BoostBuffTrigger(ai, spellName, 200.0f) {}
         virtual bool IsPossible()
         {
             return !ai->HasAura("stealth", bot);
@@ -30,6 +31,38 @@ namespace ai
     {
     public:
         RuptureTrigger(PlayerbotAI* ai) : DebuffTrigger(ai, "rupture") {}
+        virtual bool IsActive();
+    };
+
+    class EviscerateTrigger : public SpellTrigger
+    {
+    public:
+        EviscerateTrigger(PlayerbotAI* ai) : SpellTrigger(ai, "eviscerate") {}
+        virtual bool IsActive();
+    };
+
+    class TricksOfTheTradeOnTankTrigger : public BuffOnTankTrigger {
+    public:
+        TricksOfTheTradeOnTankTrigger(PlayerbotAI* ai) : BuffOnTankTrigger(ai, "tricks of the trade", 1) {}
+
+        virtual bool IsActive() {
+            return BuffOnTankTrigger::IsActive() &&
+                GetTarget() &&
+                !ai->HasAura("tricks of the trade", GetTarget()) &&
+#ifdef MANGOS
+                (ai->GetBot()->IsInSameGroupWith((Player*)GetTarget()) || ai->GetBot()->IsInSameRaidWith((Player*)GetTarget())) &&
+#endif
+#ifdef CMANGOS
+                (ai->GetBot()->IsInGroup((Player*)GetTarget(), true) || ai->GetBot()->IsInGroup((Player*)GetTarget()))
+#endif               
+                ;
+        }
+    };
+
+    class CloakOfShadowsTrigger : public NeedCureTrigger
+    {
+    public:
+        CloakOfShadowsTrigger(PlayerbotAI* ai) : NeedCureTrigger(ai, "cloak of shadows", DISPEL_ALL) {}
     };
 
     class ExposeArmorTrigger : public DebuffTrigger
