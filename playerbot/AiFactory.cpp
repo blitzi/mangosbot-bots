@@ -258,13 +258,13 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
                 engine->addStrategies("caster", "cure", "caster aoe", "threat", "flee", "dps assist", "ranged", NULL);
                 if (player->GetLevel() > 19)
                     engine->addStrategy("caster debuff");
-                if (player->GetGroup() == nullptr)
+                if (!player->GetGroup())
                     engine->addStrategy("cc");
             }
             else if (tab == 2)
             {
                 engine->addStrategies("heal", "cure", "flee", "dps assist", "ranged", NULL);
-                if (player->GetGroup() == nullptr)
+                if (!player->GetGroup())
                     engine->addStrategy("cc");
             }
             else

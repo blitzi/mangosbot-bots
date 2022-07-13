@@ -134,10 +134,6 @@ namespace ai
 	{
 	public:
 		CastStarfallAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "starfall") {}
-		virtual bool isUseful()
-		{
-			return sServerFacade.IsDistanceLessOrEqualThan(AI_VALUE2(float, "distance", GetTargetName()), 25.0f);
-		}
 	};
 
 	class CastHurricaneAction : public CastRangeSpellAction
