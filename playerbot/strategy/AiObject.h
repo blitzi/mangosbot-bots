@@ -279,6 +279,13 @@ class clazz : public super \
         clazz(PlayerbotAI* ai) : CastSpellAction(ai, spell) {} \
     }
 
+#define RANGEDSPELL_ACTION(clazz, spell) \
+    class clazz : public CastRangeSpellAction \
+    { \
+    public: \
+        clazz(PlayerbotAI* ai) : CastRangeSpellAction(ai, spell) {} \
+    }
+
 #define SPELL_ACTION_U(clazz, spell, useful) \
     class clazz : public CastSpellAction \
     { \

@@ -12,7 +12,7 @@ namespace ai
     BUFF_ACTION(CastInnerFireAction, "inner fire");
     CURE_ACTION(CastDispelMagicAction, "dispel magic");
     CURE_PARTY_ACTION(CastDispelMagicOnPartyAction, "dispel magic", DISPEL_MAGIC);
-    SPELL_ACTION(CastDispelMagicOnTargetAction, "dispel magic");
+    RANGEDSPELL_ACTION(CastDispelMagicOnTargetAction, "dispel magic");
     CC_ACTION(CastShackleUndeadAction, "shackle undead");
     SPELL_ACTION_U(CastManaBurnAction, "mana burn", AI_VALUE2(float, "mana", "self target") < 50 && AI_VALUE2(float, "mana", "current target") >= 20);
     BUFF_ACTION(CastLevitateAction, "levitate");
@@ -52,7 +52,7 @@ namespace ai
     AOE_HEAL_ACTION(CastLightwellAction, "lightwell");
     AOE_HEAL_ACTION(CastCircleOfHealingAction, "circle of healing");
 
-    SPELL_ACTION(CastSmiteAction, "smite");
+    RANGEDSPELL_ACTION(CastSmiteAction, "smite");
     SPELL_ACTION(CastHolyNovaAction, "holy nova");
 
     RESS_ACTION(CastResurrectionAction, "resurrection");
@@ -67,8 +67,8 @@ namespace ai
     // shadow
     DEBUFF_ACTION(CastPowerWordPainAction, "shadow word: pain");
     DEBUFF_ENEMY_ACTION(CastPowerWordPainOnAttackerAction, "shadow word: pain");
-    SPELL_ACTION(CastMindBlastAction, "mind blast");
-    SPELL_ACTION(CastPsychicScreamAction, "psychic scream");
+    RANGEDSPELL_ACTION(CastMindBlastAction, "mind blast");
+    RANGEDSPELL_ACTION(CastPsychicScreamAction, "psychic scream");
     DEBUFF_ACTION(CastMindSootheAction, "mind soothe");
     BUFF_ACTION_U(CastFadeAction, "fade", bot->GetGroup());
     BUFF_ACTION(CastShadowProtectionAction, "shadow protection");
@@ -76,18 +76,18 @@ namespace ai
     BUFF_PARTY_ACTION(CastPrayerOfShadowProtectionAction, "prayer of shadow protection");
     // shadow 2.4.3
     BUFF_ACTION(CastShadowfiendAction, "shadowfiend");
-    SPELL_ACTION(CastShadowWordDeathAction, "shadow word: death");
+    RANGEDSPELL_ACTION(CastShadowWordDeathAction, "shadow word: death");
 
     // shadow talents
-    SPELL_ACTION(CastMindFlayAction, "mind flay");
-    SPELL_ACTION(CastMindSearAction, "mind sear");
-#ifndef MANGOSBOT_TWO
+    RANGEDSPELL_ACTION(CastMindFlayAction, "mind flay");
+    RANGEDSPELL_ACTION(CastMindSearAction, "mind sear");
+#ifdef MANGOSBOT_TWO
     BUFF_ACTION(CastVampiricEmbraceAction, "vampiric embrace");
 #else
     DEBUFF_ACTION(CastVampiricEmbraceAction, "vampiric embrace");
 #endif
     BUFF_ACTION(CastShadowformAction, "shadowform");
-    SPELL_ACTION(CastSilenceAction, "silence");
+    RANGEDSPELL_ACTION(CastSilenceAction, "silence");
     ENEMY_HEALER_ACTION(CastSilenceOnEnemyHealerAction, "silence");
     // shadow talents 2.4.3
     DEBUFF_ACTION(CastVampiricTouchAction, "vampiric touch");

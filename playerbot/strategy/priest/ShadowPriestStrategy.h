@@ -9,7 +9,7 @@ namespace ai
     public:
         ShadowPriestStrategy(PlayerbotAI* ai);
 
-    public:
+        virtual NextAction** getDefaultActions();
         virtual void InitTriggers(std::list<TriggerNode*> &triggers);
         virtual string getName() { return "shadow"; }
         virtual int GetType() { return STRATEGY_TYPE_DPS|STRATEGY_TYPE_RANGED; }

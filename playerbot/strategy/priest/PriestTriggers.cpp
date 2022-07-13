@@ -21,7 +21,7 @@ bool ShadowfiendTrigger::IsActive()
     return BoostBuffTrigger::IsActive() && bot->IsSpellReady(34433);
 }
 
-#ifndef MANGOSBOT_TWO
+#ifdef MANGOSBOT_TWO
 bool VampiricEmbraceTrigger::IsActive()
 {
     Unit* target = GetTarget();
