@@ -272,6 +272,13 @@ namespace ai
         virtual Value<Unit*>* GetTargetValue();
     };
 
+    class BuffCanBeCastTrigger : public BuffTrigger
+    {
+    public:
+        BuffCanBeCastTrigger(PlayerbotAI* ai, string spell, int checkInterval = 1, bool checkIsOwner = false)
+            : BuffTrigger(ai, spell, checkInterval, checkIsOwner) {}
+        virtual bool IsActive();
+    };
 
     class ProtectPartyMemberTrigger : public Trigger
     {
@@ -405,6 +412,28 @@ namespace ai
             this->rs = rs;
         }
         virtual ~AndTrigger()
+        {
+            delete ls;
+            delete rs;
+        }
+    public:
+        virtual bool IsActive();
+        virtual string getName();
+
+    protected:
+        Trigger* ls;
+        Trigger* rs;
+    };
+
+    class OrTrigger : public Trigger
+    {
+    public:
+        OrTrigger(PlayerbotAI* ai, Trigger* ls, Trigger* rs) : Trigger(ai)
+        {
+            this->ls = ls;
+            this->rs = rs;
+        }
+        virtual ~OrTrigger()
         {
             delete ls;
             delete rs;

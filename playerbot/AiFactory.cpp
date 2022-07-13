@@ -239,7 +239,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             if (tab == 1)
                 engine->addStrategies("tank", "tank assist", "bthreat", "cure", "barmor", "close", "cc", NULL);
 			else if(tab == 0)
-                engine->addStrategies("heal", "bmana", "dps assist", "cure", "flee", "barmor", NULL);
+                engine->addStrategies("heal", "bmana", "dps assist", "cure", "flee", "barmor", "ranged", NULL);
             else
                 engine->addStrategies("dps", "bdps", "dps assist", "cure", "baoe", "close", "cc", NULL);
 
@@ -255,12 +255,18 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
         case CLASS_DRUID:
             if (tab == 0)
             {
-                engine->addStrategies("caster", "cure", "caster aoe", "threat", "flee", "dps assist", "ranged", "cc", NULL);
+                engine->addStrategies("caster", "cure", "caster aoe", "threat", "flee", "dps assist", "ranged", NULL);
                 if (player->GetLevel() > 19)
                     engine->addStrategy("caster debuff");
+                if (!player->GetGroup())
+                    engine->addStrategy("cc");
             }
             else if (tab == 2)
-                engine->addStrategies("heal", "cure", "flee", "dps assist", "ranged", "cc", NULL);
+            {
+                engine->addStrategies("heal", "cure", "flee", "dps assist", "ranged", NULL);
+                if (!player->GetGroup())
+                    engine->addStrategy("cc");
+            }
             else
             {
                 engine->removeStrategy("ranged");
@@ -307,7 +313,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             engine->addStrategy("flee");
             engine->addStrategy("boost");
 
-            
+
             if (player->getClass() == CLASS_DRUID && tab == 2)
             {
                 engine->addStrategies("caster", "caster aoe", NULL);
@@ -383,7 +389,7 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
 
         if (player->getClass() == CLASS_DRUID && tab == 1)
             engine->addStrategies("behind", "dps", NULL);
-        
+
         if (player->getClass() == CLASS_ROGUE)
             engine->addStrategies("behind", "stealth", NULL);
     }
@@ -472,7 +478,7 @@ void AiFactory::AddDefaultNonCombatStrategies(Player* player, PlayerbotAI* const
     }
 
     if ((facade->IsRealPlayer() || sRandomPlayerbotMgr.IsRandomBot(player)) && !player->InBattleGround())
-    {   
+    {
         if (!player->GetGroup() || player->GetGroup()->GetLeaderGuid() == player->GetObjectGuid())
         {
             // let 50% of random not grouped (or grp leader) bots help other players
