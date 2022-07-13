@@ -68,7 +68,7 @@ namespace ai
     DEBUFF_ACTION(CastPowerWordPainAction, "shadow word: pain");
     DEBUFF_ENEMY_ACTION(CastPowerWordPainOnAttackerAction, "shadow word: pain");
     RANGEDSPELL_ACTION(CastMindBlastAction, "mind blast");
-    RANGEDSPELL_ACTION(CastPsychicScreamAction, "psychic scream");
+    SPELL_ACTION(CastPsychicScreamAction, "psychic scream");
     DEBUFF_ACTION(CastMindSootheAction, "mind soothe");
     BUFF_ACTION_U(CastFadeAction, "fade", bot->GetGroup());
     BUFF_ACTION(CastShadowProtectionAction, "shadow protection");

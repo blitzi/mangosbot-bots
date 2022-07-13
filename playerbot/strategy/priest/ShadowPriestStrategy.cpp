@@ -18,8 +18,7 @@ NextAction** ShadowPriestStrategy::getDefaultActions()
 
 void ShadowPriestStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
-    //GenericPriestStrategy::InitTriggers(triggers);
-    CombatStrategy::InitTriggers(triggers);
+    GenericPriestStrategy::InitTriggers(triggers);
 
     triggers.push_back(new TriggerNode(
         "shadowform",
