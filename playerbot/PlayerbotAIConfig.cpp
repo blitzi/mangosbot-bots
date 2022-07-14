@@ -106,6 +106,7 @@ bool PlayerbotAIConfig::Initialize()
     lowHealth = config.GetIntDefault("AiPlayerbot.LowHealth", 50);
     mediumHealth = config.GetIntDefault("AiPlayerbot.MediumHealth", 70);
     almostFullHealth = config.GetIntDefault("AiPlayerbot.AlmostFullHealth", 85);
+    lostAnyHealth = config.GetIntDefault("AiPlayerbot.LostAnyHealth", 98);
     lowMana = config.GetIntDefault("AiPlayerbot.LowMana", 15);
     mediumMana = config.GetIntDefault("AiPlayerbot.MediumMana", 40);
 
@@ -169,7 +170,7 @@ bool PlayerbotAIConfig::Initialize()
     sLog.outString("          Loading TalentSpecs          ");
     sLog.outString("---------------------------------------");
     sLog.outString();
-    
+
     for (uint32 cls = 1; cls < MAX_CLASSES; ++cls)
     {
         classSpecs[cls] = ClassSpecs(1 << (cls - 1));
@@ -244,7 +245,7 @@ bool PlayerbotAIConfig::Initialize()
     LoadListString<list<string>>(config.GetStringDefault("AiPlayerbot.AllowedLogFiles", ""), allowedLogFiles);
 
     worldBuffs.clear();
-    
+
     for (uint32 factionId = 0; factionId < 3; factionId++)
     {
         for (uint32 classId = 0; classId < MAX_CLASSES; classId++)
@@ -528,7 +529,7 @@ bool PlayerbotAIConfig::openLog(string fileName, char const* mode)
 {
     if (!hasLog(fileName))
         return false;
-     
+
     auto logFileIt = logFiles.find(fileName);
     if (logFileIt == logFiles.end())
     {
@@ -555,7 +556,7 @@ bool PlayerbotAIConfig::openLog(string fileName, char const* mode)
 
     logFileIt->second.first = file;
     logFileIt->second.second = fileOpen;
-    
+
     return true;
 }
 

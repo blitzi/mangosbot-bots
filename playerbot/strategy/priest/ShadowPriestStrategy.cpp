@@ -21,14 +21,10 @@ void ShadowPriestStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
     GenericPriestStrategy::InitTriggers(triggers);
 
     triggers.push_back(new TriggerNode(
-        "enemy out of spell",
-        NextAction::array(0, new NextAction("reach spell", ACTION_MOVE + 9), NULL)));
-
-    triggers.push_back(new TriggerNode(
         "shadowform",
         NextAction::array(0, new NextAction("shadowform", ACTION_HIGH + 1), NULL)));
 
-#ifndef MANGOSBOT_TWO
+#ifdef MANGOSBOT_TWO
     triggers.push_back(new TriggerNode(
         "vampiric embrace",
         NextAction::array(0, new NextAction("vampiric embrace", ACTION_HIGH), NULL)));
@@ -39,11 +35,11 @@ void ShadowPriestStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 
     triggers.push_back(new TriggerNode(
         "mind blast",
-        NextAction::array(0, new NextAction("inner focus", ACTION_NORMAL + 4), new NextAction("mind blast", ACTION_NORMAL + 4), NULL)));
+        NextAction::array(0, new NextAction("inner focus", ACTION_NORMAL + 8), new NextAction("mind blast", ACTION_NORMAL + 8), NULL)));
 
     triggers.push_back(new TriggerNode(
         "mind flay",
-        NextAction::array(0, new NextAction("mind flay", ACTION_NORMAL + 1), NULL)));
+        NextAction::array(0, new NextAction("mind flay", ACTION_NORMAL + 5), NULL)));
     
     triggers.push_back(new TriggerNode(
         "silence",
@@ -70,7 +66,7 @@ void ShadowPriestStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 void ShadowPriestAoeStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
     triggers.push_back(new TriggerNode(
-        "medium aoe",
+        "high aoe",
         NextAction::array(0, new NextAction("mind sear", ACTION_HIGH), NULL)));
 
     triggers.push_back(new TriggerNode(
@@ -82,15 +78,15 @@ void ShadowPriestDebuffStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
     triggers.push_back(new TriggerNode(
         "vampiric touch",
-        NextAction::array(0, new NextAction("vampiric touch", ACTION_NORMAL + 5), NULL)));
+        NextAction::array(0, new NextAction("vampiric touch", ACTION_NORMAL + 9), NULL)));
 
     triggers.push_back(new TriggerNode(
         "devouring plague",
-        NextAction::array(0, new NextAction("devouring plague", ACTION_NORMAL + 3), NULL)));
+        NextAction::array(0, new NextAction("devouring plague", ACTION_NORMAL + 7), NULL)));
 
     triggers.push_back(new TriggerNode(
         "shadow word: pain",
-        NextAction::array(0, new NextAction("shadow word: pain", ACTION_NORMAL + 2), NULL)));
+        NextAction::array(0, new NextAction("shadow word: pain", ACTION_NORMAL + 6), NULL)));
 
     triggers.push_back(new TriggerNode(
         "feedback",

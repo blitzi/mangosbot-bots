@@ -69,7 +69,7 @@ bool OutNumberedTrigger::IsActive()
     uint32 friendPower = 200, foePower = 0;
     for (auto &attacker : ai->GetAiObjectContext()->GetValue<list<ObjectGuid> >("attackers")->Get())
     {
-     
+
         Creature* creature = ai->GetCreature(attacker);
         if (!creature)
             continue;
@@ -172,7 +172,7 @@ bool DebuffImmediateTrigger::IsActive()
 
     bool isNoDebuffActive = ai->HasAura(spell, target, false, false, 0);
     bool isMyDebuffActive = ai->HasAura(spell, target, false, true, 1);
-    
+
     return ai->CanCastSpell(spell, GetTarget()) && isNoDebuffActive || isMyDebuffActive;
 }
 
@@ -182,6 +182,12 @@ bool SpellTrigger::IsActive()
 }
 
 bool SpellCanBeCastTrigger::IsActive()
+{
+    Unit* target = GetTarget();
+    return target && ai->CanCastSpell(spell, target);
+}
+
+bool BuffCanBeCastTrigger::IsActive()
 {
     Unit* target = GetTarget();
     return target && ai->CanCastSpell(spell, target);
@@ -213,6 +219,19 @@ string AndTrigger::getName()
 {
     std::string name(ls->GetName());
     name = name + " and ";
+    name = name + rs->GetName();
+    return name;
+}
+
+bool OrTrigger::IsActive()
+{
+    return ls->IsActive() || rs->IsActive();
+}
+
+string OrTrigger::getName()
+{
+    std::string name(ls->GetName());
+    name = name + " or ";
     name = name + rs->GetName();
     return name;
 }
@@ -366,7 +385,7 @@ bool NotDpsTargetActiveTrigger::IsActive()
     Unit* dps = AI_VALUE(Unit*, "dps target");
     Unit* target = AI_VALUE(Unit*, "current target");
     Unit* enemy = AI_VALUE(Unit*, "enemy player target");
-    
+
     // do not switch if enemy target
     if (target && target == enemy && sServerFacade.IsAlive(target))
         return false;

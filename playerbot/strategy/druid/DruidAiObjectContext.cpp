@@ -106,6 +106,14 @@ namespace ai
                 creators["eclipse (lunar)"] = &TriggerFactoryInternal::eclipse_lunar;
                 creators["bash on enemy healer"] = &TriggerFactoryInternal::bash_on_enemy_healer;
                 creators["nature's swiftness"] = &TriggerFactoryInternal::natures_swiftness;
+                creators["force of nature"] = &TriggerFactoryInternal::force_of_nature;
+                creators["rejuvenation hot on party"] = &TriggerFactoryInternal::rejuvenation_hot_on_party;
+                creators["rejuvenation hot on tank"] = &TriggerFactoryInternal::rejuvenation_hot_on_tank;
+                creators["clearcasting"] = &TriggerFactoryInternal::clearcasting;
+                creators["low or critical health and clearcasting"] = &TriggerFactoryInternal::low_or_critical_health_and_clearcasting;
+                creators["party member low or critical health and clearcasting"] = &TriggerFactoryInternal::party_member_low_or_critical_health_and_clearcasting;
+                creators["low or critical health and natures swiftness"] = &TriggerFactoryInternal::low_or_critical_health_and_natures_swiftness;
+                creators["party member low or critical health and natures swiftness"] = &TriggerFactoryInternal::party_member_low_or_critical_health_and_natures_swiftness;
             }
 
         private:
@@ -134,6 +142,14 @@ namespace ai
             static Trigger* tree_form(PlayerbotAI* ai) { return new TreeFormTrigger(ai); }
             static Trigger* bash_on_enemy_healer(PlayerbotAI* ai) { return new BashInterruptEnemyHealerSpellTrigger(ai); }
             static Trigger* omen_of_clarity(PlayerbotAI* ai) { return new OmenOfClarityTrigger(ai); }
+            static Trigger* force_of_nature(PlayerbotAI* ai) { return new ForceOfNatureTrigger(ai); }
+            static Trigger* rejuvenation_hot_on_party(PlayerbotAI* ai) { return new RejuvenationHotOnPartyTrigger(ai); }
+            static Trigger* rejuvenation_hot_on_tank(PlayerbotAI* ai) { return new RejuvenationHotOnTankTrigger(ai); }
+            static Trigger* clearcasting(PlayerbotAI* ai) { return new ClearCastingTrigger(ai); }
+            static Trigger* low_or_critical_health_and_clearcasting(PlayerbotAI* ai) { return new LowOrCriticalHealthAndClearCastingTrigger(ai); }
+            static Trigger* party_member_low_or_critical_health_and_clearcasting(PlayerbotAI* ai) { return new PartyMemberLowOrCriticalHealthAndClearCastingTrigger(ai); }
+            static Trigger* low_or_critical_health_and_natures_swiftness(PlayerbotAI* ai) { return new LowOrCriticalHealthAndAndNaturesSwiftnessTrigger(ai); }
+            static Trigger* party_member_low_or_critical_health_and_natures_swiftness(PlayerbotAI* ai) { return new PartyMemberLowOrCriticalHealthAndNaturesSwiftnessTrigger(ai); }
         };
     };
 };
@@ -198,14 +214,24 @@ namespace ai
                 creators["mark of the wild"] = &AiObjectContextInternal::mark_of_the_wild;
                 creators["mark of the wild on party"] = &AiObjectContextInternal::mark_of_the_wild_on_party;
                 creators["regrowth"] = &AiObjectContextInternal::regrowth;
-                creators["rejuvenation"] = &AiObjectContextInternal::rejuvenation;
-                creators["healing touch"] = &AiObjectContextInternal::healing_touch;
                 creators["regrowth on party"] = &AiObjectContextInternal::regrowth_on_party;
+                creators["refresh regrowth"] = &AiObjectContextInternal::refresh_regrowth;
+                creators["refresh regrowth on party"] = &AiObjectContextInternal::refresh_regrowth_on_party;
+                creators["rejuvenation"] = &AiObjectContextInternal::rejuvenation;
                 creators["rejuvenation on party"] = &AiObjectContextInternal::rejuvenation_on_party;
+                creators["rejuvenation hot on party"] = &AiObjectContextInternal::rejuvenation_hot_on_party;
+                creators["healing touch"] = &AiObjectContextInternal::healing_touch;
                 creators["healing touch on party"] = &AiObjectContextInternal::healing_touch_on_party;
+                creators["swiftmend"] = &AiObjectContextInternal::swiftmend;
+                creators["swiftmend on party"] = &AiObjectContextInternal::swiftmend_on_party;
+                creators["nourish"] = &AiObjectContextInternal::nourish;
+                creators["nourish on party"] = &AiObjectContextInternal::nourish_on_party;
+                creators["wild growth"] = &AiObjectContextInternal::wild_growth;
+                creators["lifebloom"] = &AiObjectContextInternal::lifebloom;
+                creators["lifebloom on party"] = &AiObjectContextInternal::lifebloom_on_party;
                 creators["rebirth"] = &AiObjectContextInternal::rebirth;
                 creators["revive"] = &AiObjectContextInternal::revive;
-                creators["barskin"] = &AiObjectContextInternal::barskin;
+                creators["barkskin"] = &AiObjectContextInternal::barkskin;
                 creators["lacerate"] = &AiObjectContextInternal::lacerate;
                 creators["hurricane"] = &AiObjectContextInternal::hurricane;
                 creators["innervate"] = &AiObjectContextInternal::innervate;
@@ -213,6 +239,9 @@ namespace ai
                 creators["bash on enemy healer"] = &AiObjectContextInternal::bash_on_enemy_healer;
                 creators["omen of clarity"] = &AiObjectContextInternal::omen_of_clarity;
                 creators["nature's swiftness"] = &AiObjectContextInternal::natures_swiftness;
+                creators["typhoon"] = &AiObjectContextInternal::typhoon;
+                creators["force of nature"] = &AiObjectContextInternal::force_of_nature;
+                creators["cyclone"] = &AiObjectContextInternal::cyclone;
                 creators["prowl"] = &AiObjectContextInternal::prowl;
                 creators["dash"] = &AiObjectContextInternal::dash;
                 creators["shred"] = &AiObjectContextInternal::shred;
@@ -279,16 +308,29 @@ namespace ai
             static Action* regrowth(PlayerbotAI* ai) { return new CastRegrowthAction(ai); }
             static Action* rejuvenation(PlayerbotAI* ai) { return new CastRejuvenationAction(ai); }
             static Action* healing_touch(PlayerbotAI* ai) { return new CastHealingTouchAction(ai); }
+            static Action* swiftmend(PlayerbotAI* ai) { return new CastSwiftmendAction(ai); }
+            static Action* swiftmend_on_party(PlayerbotAI* ai) { return new CastSwiftmendOnPartyAction(ai); }
+            static Action* lifebloom(PlayerbotAI* ai) { return new CastLifeBloomAction(ai); }
+            static Action* lifebloom_on_party(PlayerbotAI* ai) { return new CastLifeBloomOnPartyAction(ai); }
+            static Action* nourish(PlayerbotAI* ai) { return new CastNourishAction(ai); }
+            static Action* nourish_on_party(PlayerbotAI* ai) { return new CastNourishOnPartyAction(ai); }
+            static Action* wild_growth(PlayerbotAI* ai) { return new CastWildGrowthAction(ai); }
             static Action* regrowth_on_party(PlayerbotAI* ai) { return new CastRegrowthOnPartyAction(ai); }
+            static Action* refresh_regrowth(PlayerbotAI* ai) { return new RefreshRegrowthAction(ai); }
+            static Action* refresh_regrowth_on_party(PlayerbotAI* ai) { return new RefreshRegrowthOnPartyAction(ai); }
             static Action* rejuvenation_on_party(PlayerbotAI* ai) { return new CastRejuvenationOnPartyAction(ai); }
+            static Action* rejuvenation_hot_on_party(PlayerbotAI* ai) { return new CastRejuvenationHotOnPartyAction(ai); }
             static Action* healing_touch_on_party(PlayerbotAI* ai) { return new CastHealingTouchOnPartyAction(ai); }
             static Action* rebirth(PlayerbotAI* ai) { return new CastRebirthAction(ai); }
             static Action* revive(PlayerbotAI* ai) { return new CastReviveAction(ai); }
-            static Action* barskin(PlayerbotAI* ai) { return new CastBarskinAction(ai); }
+            static Action* barkskin(PlayerbotAI* ai) { return new CastBarkskinAction(ai); }
             static Action* lacerate(PlayerbotAI* ai) { return new CastLacerateAction(ai); }
             static Action* hurricane(PlayerbotAI* ai) { return new CastHurricaneAction(ai); }
             static Action* innervate(PlayerbotAI* ai) { return new CastInnervateAction(ai); }
             static Action* bash_on_enemy_healer(PlayerbotAI* ai) { return new CastBashOnEnemyHealerAction(ai); }
+            static Action* typhoon(PlayerbotAI* ai) { return new CastTyphoonAction(ai); }
+            static Action* force_of_nature(PlayerbotAI* ai) { return new CastForceOfNatureAction(ai); }
+            static Action* cyclone(PlayerbotAI* ai) { return new CastCycloneAction(ai); }
         };
     };
 };

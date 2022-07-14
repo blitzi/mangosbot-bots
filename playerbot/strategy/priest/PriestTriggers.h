@@ -8,7 +8,7 @@ namespace ai
     DEBUFF_TRIGGER(PowerWordPainTrigger, "shadow word: pain");
     DEBUFF_ENEMY_TRIGGER(PowerWordPainOnAttackerTrigger, "shadow word: pain");
     DEBUFF_TRIGGER(VampiricTouchTrigger, "vampiric touch");
-#ifndef MANGOSBOT_TWO
+#ifdef MANGOSBOT_TWO
     BUFF_TRIGGER_A(VampiricEmbraceTrigger, "vampiric embrace");
 #else
     DEBUFF_TRIGGER(VampiricEmbraceTrigger, "vampiric embrace");

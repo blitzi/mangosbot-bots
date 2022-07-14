@@ -35,6 +35,8 @@ namespace ai
             creators["low health"] = &TriggerContext::LowHealth;
             creators["medium health"] = &TriggerContext::MediumHealth;
             creators["almost full health"] = &TriggerContext::AlmostFullHealth;
+            creators["lost any health"] = &TriggerContext::LostAnyHealth;
+            creators["low or critical health"] = &TriggerContext::LowOrCriticalHealth;
 
             creators["low mana"] = &TriggerContext::LowMana;
             creators["medium mana"] = &TriggerContext::MediumMana;
@@ -46,6 +48,8 @@ namespace ai
             creators["party member medium health"] = &TriggerContext::PartyMemberMediumHealth;
             creators["party member almost full health"] = &TriggerContext::PartyMemberAlmostFullHealth;
             creators["party member to cancel health"] = &TriggerContext::PartyMemberToCancelHealth;
+            creators["party member lost any health"] = &TriggerContext::PartyMemberLostAnyHealth;
+            creators["party member low or critical health"] = &TriggerContext::PartyMemberLowOrCriticalHealth;
 
             creators["use trinket"] = &TriggerContext::use_trinket;
             creators["damage stop"] = &TriggerContext::damage_stop;
@@ -231,6 +235,8 @@ namespace ai
         static Trigger* AlmostFullHealth(PlayerbotAI* ai) { return new AlmostFullHealthTrigger(ai); }
         static Trigger* CriticalHealth(PlayerbotAI* ai) { return new CriticalHealthTrigger(ai); }
         static Trigger* TargetCriticalHealth(PlayerbotAI* ai) { return new TargetCriticalHealthTrigger(ai); }
+        static Trigger* LowOrCriticalHealth(PlayerbotAI* ai) { return new LowOrCriticalHealthTrigger(ai); }
+        static Trigger* LostAnyHealth(PlayerbotAI* ai) { return new LostAnyHealthTrigger(ai); }
         static Trigger* LowMana(PlayerbotAI* ai) { return new LowManaTrigger(ai); }
         static Trigger* MediumMana(PlayerbotAI* ai) { return new MediumManaTrigger(ai); }
         static Trigger* HighMana(PlayerbotAI* ai) { return new HighManaTrigger(ai); }
@@ -271,6 +277,8 @@ namespace ai
         static Trigger* PartyMemberAlmostFullHealth(PlayerbotAI* ai) { return new PartyMemberAlmostFullHealthTrigger(ai); }
         static Trigger* PartyMemberToCancelHealth(PlayerbotAI* ai) { return new PartyMemberToCancelHealthTrigger(ai); }
         static Trigger* PartyMemberCriticalHealth(PlayerbotAI* ai) { return new PartyMemberCriticalHealthTrigger(ai); }
+        static Trigger* PartyMemberLowOrCriticalHealth(PlayerbotAI* ai) { return new PartyMemberLowOrCriticalHealthTrigger(ai); }
+        static Trigger* PartyMemberLostAnyHealth(PlayerbotAI* ai) { return new PartyMemberLostAnyHealthTrigger(ai); }
         static Trigger* PartyMemberHasAggro(PlayerbotAI* ai) { return new PartyMemberHasAggroTrigger(ai); }
         static Trigger* protect_party_member(PlayerbotAI* ai) { return new ProtectPartyMemberTrigger(ai); }
         static Trigger* no_pet(PlayerbotAI* ai) { return new NoPetTrigger(ai); }
