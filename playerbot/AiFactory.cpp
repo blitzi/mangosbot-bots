@@ -279,12 +279,13 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
                 engine->addStrategy("dps debuff");
             break;
         case CLASS_ROGUE:
+            engine->addStrategies("boost", "threat", "dps assist", "aoe", "close", "cc", "behind", NULL);
             if (tab == 0)
-                engine->addStrategies("assassin", "threat", "dps assist", "aoe", "close", "cc", "behind", NULL);
+                engine->addStrategies("assassin", NULL);
             else if (tab == 1)
-                engine->addStrategies("combat", "threat", "dps assist", "aoe", "close", "cc", "behind", NULL);
+                engine->addStrategies("combat", NULL);
             else
-                engine->addStrategies("subtlety", "threat", "dps assist", "aoe", "close", "cc", "behind", NULL);
+                engine->addStrategies("subtlety", NULL);
 
             if (player->GetLevel() < 15)
                 engine->addStrategies("dps", NULL);

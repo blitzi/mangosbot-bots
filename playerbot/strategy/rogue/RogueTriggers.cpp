@@ -16,12 +16,13 @@ bool RuptureTrigger::IsActive()
 {
 	Unit* target = GetTarget();
 	bool hasComboPoints = AI_VALUE2(uint8, "combo", "current target") >= 5;// amount;
-	return hasComboPoints && DebuffTrigger::IsActive();// && !ai->HasAura(spell, target);
+	return hasComboPoints && DebuffTrigger::IsActive();
 }
 
 bool EviscerateTrigger::IsActive()
 {
 	Unit* target = GetTarget();
 	bool hasComboPoints = AI_VALUE2(uint8, "combo", "current target") >= 5;// amount;
-	return hasComboPoints && SpellTrigger::IsActive();// && !ai->HasAura(spell, target);
+	return hasComboPoints && SpellTrigger::IsActive();
 }
+
