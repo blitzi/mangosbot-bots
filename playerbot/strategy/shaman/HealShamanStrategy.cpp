@@ -59,32 +59,53 @@ void HealShamanStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
         "wrath of air totem",
         NextAction::array(0, new NextAction("wrath of air totem", 20.0f), NULL)));   
 
-    triggers.push_back(new TriggerNode(
-        "party member medium health",
-        NextAction::array(0, new NextAction("lesser healing wave on party", 25.0f), NULL)));
-
+	//AOE heals
     triggers.push_back(new TriggerNode(
         "almost full aoe heal",
-        NextAction::array(0, new NextAction("chain heal", 20.0f), NULL)));
+        NextAction::array(0, new NextAction("chain heal", ACTION_LIGHT_HEAL), NULL)));
 
     triggers.push_back(new TriggerNode(
         "medium aoe heal",
-        NextAction::array(0, new NextAction("chain heal", 27.0f), NULL)));
+        NextAction::array(0, new NextAction("chain heal", ACTION_MEDIUM_HEAL), NULL)));
 
     triggers.push_back(new TriggerNode(
         "low aoe heal",
-        NextAction::array(0, new NextAction("chain heal", 30.0f), NULL)));
+        NextAction::array(0, new NextAction("chain heal", ACTION_MEDIUM_HEAL + 5), NULL)));
 
     triggers.push_back(new TriggerNode(
         "critical aoe heal",
-        NextAction::array(0, new NextAction("chain heal", ACTION_CRITICAL_HEAL), NULL)));
+        NextAction::array(0, new NextAction("chain heal", ACTION_CRITICAL_HEAL + 10), NULL)));
 
-    triggers.push_back(new TriggerNode(
-        "almost full health",
-        NextAction::array(0, new NextAction("lesser healing wave", 18.0f), NULL)));
+	//Group and Self Heals
+	triggers.push_back(new TriggerNode(
+		"almost full health",
+		NextAction::array(0, new NextAction("lesser healing wave", 18.0f), NULL)));
 
-    triggers.push_back(new TriggerNode(
-        "party member almost full health",
-        NextAction::array(0, new NextAction("lesser healing wave on party", 17.0f), NULL)));
+	triggers.push_back(new TriggerNode(
+		"party member almost full health",
+		NextAction::array(0, new NextAction("lesser healing wave on party", 17.0f), NULL)));
 
+	triggers.push_back(new TriggerNode(
+		"medium health",
+		NextAction::array(0, new NextAction("healing wave", 31.0f), NULL)));
+
+	triggers.push_back(new TriggerNode(
+		"party member medium health",
+		NextAction::array(0, new NextAction("healing wave on party", 30.0f), NULL)));
+
+	triggers.push_back(new TriggerNode(
+		"low or critical health",
+		NextAction::array(0, new NextAction("riptide", 101), NULL)));
+
+	triggers.push_back(new TriggerNode(
+		"party member low or critical health",
+		NextAction::array(0, new NextAction("riptide on party", 100), NULL)));
+
+	triggers.push_back(new TriggerNode(
+		"low or critical health",
+		NextAction::array(0, new NextAction("lesser healing wave", ACTION_CRITICAL_HEAL + 2), NULL)));
+
+	triggers.push_back(new TriggerNode(
+		"party member low or critical health",
+		NextAction::array(0, new NextAction("lesser healing wave on party", ACTION_CRITICAL_HEAL + 1), NULL)));
 }

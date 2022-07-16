@@ -15,10 +15,6 @@ public:
         creators["windfury weapon"] = &windfury_weapon;
         creators["lesser healing wave"] = &lesser_healing_wave;
         creators["lesser healing wave on party"] = &lesser_healing_wave_on_party;
-        creators["riptide"] = &riptide;
-        creators["critical riptide"] = &critical_riptide;
-        creators["riptide on party"] = &riptide_on_party;
-        creators["critical riptide on party"] = &critical_riptide_on_party;
         creators["earth shock"] = &earth_shock;
         creators["mana spring totem"] = &mana_spring_totem;
         creators["healing stream totem"] = &healing_stream_totem;
@@ -67,35 +63,6 @@ private:
             /*A*/ NextAction::array(0, new NextAction("healing wave on party"), NULL),
             /*C*/ NULL);
     }
-    static ActionNode* riptide(PlayerbotAI* ai)
-    {
-        return new ActionNode ("riptide",
-            /*P*/ NULL,
-            /*A*/ NextAction::array(0, new NextAction("healing wave"), NULL),
-            /*C*/ NULL);
-    }
-	static ActionNode* critical_riptide(PlayerbotAI* ai)
-	{
-		return new ActionNode("riptide",
-			/*P*/ NULL,
-			/*A*/ NextAction::array(0, new NextAction("lesser healing wave"), NULL),
-			/*C*/ NULL);
-	}
-    static ActionNode* riptide_on_party(PlayerbotAI* ai)
-    {
-        return new ActionNode ("riptide on party",
-            /*P*/ NULL,
-            /*A*/ NextAction::array(0, new NextAction("healing wave on party"), NULL),
-            /*C*/ NULL);
-    }
-	static ActionNode* critical_riptide_on_party(PlayerbotAI* ai)
-	{
-		return new ActionNode("riptide on party",
-			/*P*/ NULL,
-			/*A*/ NextAction::array(0, new NextAction("lesser healing wave on party"), NULL),
-			/*C*/ NULL);
-	}
-
     static ActionNode* healing_stream_totem(PlayerbotAI* ai)
     {
         return new ActionNode("healing stream totem",
@@ -125,22 +92,6 @@ void GenericShamanStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 	triggers.push_back(new TriggerNode(
         "purge",
 		NextAction::array(0, new NextAction("purge", ACTION_DISPEL), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "low health",
-        NextAction::array(0, new NextAction("riptide", ACTION_CRITICAL_HEAL + 2), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "party member low health",
-        NextAction::array(0, new NextAction("riptide on party", ACTION_CRITICAL_HEAL + 1), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "critical health",
-        NextAction::array(0, new NextAction("critical riptide", ACTION_CRITICAL_HEAL + 4), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "party member critical health",
-        NextAction::array(0, new NextAction("critical riptide on party", ACTION_CRITICAL_HEAL + 3), NULL)));
 
     triggers.push_back(new TriggerNode(
         "critical aoe heal",
@@ -184,7 +135,7 @@ void GenericShamanStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 
     triggers.push_back(new TriggerNode(
         "medium aoe",
-        NextAction::array(0, new NextAction("healing stream totem", ACTION_LIGHT_HEAL), NULL)));	
+        NextAction::array(0, new NextAction("healing stream totem", ACTION_LIGHT_HEAL), NULL)));
 
     triggers.push_back(new TriggerNode(
         "mana spring totem",
