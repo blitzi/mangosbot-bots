@@ -15,10 +15,8 @@ public:
         creators["windfury weapon"] = &windfury_weapon;
         creators["lesser healing wave"] = &lesser_healing_wave;
         creators["lesser healing wave on party"] = &lesser_healing_wave_on_party;
-        creators["chain heal"] = &chain_heal;
         creators["riptide"] = &riptide;
         creators["critical riptide"] = &critical_riptide;
-        creators["chain heal on party"] = &chain_heal_on_party;
         creators["riptide on party"] = &riptide_on_party;
         creators["critical riptide on party"] = &critical_riptide_on_party;
         creators["earth shock"] = &earth_shock;
@@ -69,13 +67,6 @@ private:
             /*A*/ NextAction::array(0, new NextAction("healing wave on party"), NULL),
             /*C*/ NULL);
     }
-    static ActionNode* chain_heal(PlayerbotAI* ai)
-    {
-        return new ActionNode ("chain heal",
-            /*P*/ NULL,
-            /*A*/ NextAction::array(0, new NextAction("lesser healing wave"), NULL),
-            /*C*/ NULL);
-    }
     static ActionNode* riptide(PlayerbotAI* ai)
     {
         return new ActionNode ("riptide",
@@ -90,13 +81,6 @@ private:
 			/*A*/ NextAction::array(0, new NextAction("lesser healing wave"), NULL),
 			/*C*/ NULL);
 	}
-    static ActionNode* chain_heal_on_party(PlayerbotAI* ai)
-    {
-        return new ActionNode ("chain heal on party",
-            /*P*/ NULL,
-            /*A*/ NextAction::array(0, new NextAction("lesser healing wave on party"), NULL),
-            /*C*/ NULL);
-    }
     static ActionNode* riptide_on_party(PlayerbotAI* ai)
     {
         return new ActionNode ("riptide on party",
