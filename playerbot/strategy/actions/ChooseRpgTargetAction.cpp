@@ -333,7 +333,7 @@ bool ChooseRpgTargetAction::isFollowValid(Player* bot, WorldLocation location)
     if (!master || bot == master)
         return true;
 
-    if (!ai->HasStrategy("follow", BOT_STATE_NON_COMBAT))
+    if (!ai->HasStrategy("follow"))
         return true;
 
     if (sqrt(bot->GetDistance(master)) > sPlayerbotAIConfig.rpgDistance * 2)

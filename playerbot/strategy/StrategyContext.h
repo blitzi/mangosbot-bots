@@ -35,7 +35,6 @@
 #include "generic/RpgStrategy.h"
 #include "generic/TravelStrategy.h"
 #include "generic/RTSCStrategy.h"
-#include "generic/ForceFollowStrategy.h"
 #include "generic/DebugStrategy.h"
 #include "generic/BattlegroundStrategy.h"
 #include "generic/LfgStrategy.h"
@@ -178,7 +177,6 @@ namespace ai
             creators["runaway"] = &MovementStrategyContext::runaway;
             creators["flee from adds"] = &MovementStrategyContext::flee_from_adds;
             creators["guard"] = &MovementStrategyContext::guard;
-            creators["force follow"] = &MovementStrategyContext::force_follow;
         }
 
     private:
@@ -187,7 +185,6 @@ namespace ai
         static Strategy* stay(PlayerbotAI* ai) { return new StayStrategy(ai); }
         static Strategy* runaway(PlayerbotAI* ai) { return new RunawayStrategy(ai); }
         static Strategy* flee_from_adds(PlayerbotAI* ai) { return new FleeFromAddsStrategy(ai); }
-        static Strategy* force_follow(PlayerbotAI* ai) { return new ForceFollowStrategy(ai); }
     };
 
     class AssistStrategyContext : public NamedObjectContext<Strategy>

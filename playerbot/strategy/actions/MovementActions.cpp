@@ -25,7 +25,6 @@ void MovementAction::CreateWp(Player* wpOwner, float x, float y, float z, float 
     //if(!important)
     //    delay *= 0.25;
 
-
     Creature* wpCreature = wpOwner->SummonCreature(entry, x, y, z - 1, o, TEMPSPAWN_TIMED_DESPAWN, delay);
     ai->AddAura(wpCreature, 246);
 
@@ -802,60 +801,6 @@ bool MovementAction::Follow(Unit* target, float distance, float angle)
         //ai->TellError("No need to follow");
         return false;
     }
-
-    /*
-    if (!bot->InBattleGround() 
-     && sServerFacade.IsDistanceLessOrEqualThan(sServerFacade.GetDistance2d(bot, target->GetPositionX(), target->GetPositionY()), sPlayerbotAIConfig.sightDistance)
-     && abs(bot->GetPositionZ() - target->GetPositionZ()) >= sPlayerbotAIConfig.spellDistance
-     && ai->HasRealPlayerMaster()
-     && (target->GetMapId() && bot->GetMapId() != target->GetMapId()))
-    {
-        bot->StopMoving();
-        mm.Clear();
-        float x = bot->GetPositionX(), y = bot->GetPositionY(), z = target->GetPositionZ();
-        if (target->GetMapId() && bot->GetMapId() != target->GetMapId())
-        {
-#ifdef MANGOSBOT_ZERO
-            if ((target->GetMap() && target->GetMap()->IsBattleGround()) || (bot->GetMap() && bot->GetMap()->IsBattleGround()))
-#else
-            if ((target->GetMap() && target->GetMap()->IsBattleGroundOrArena()) || (bot->GetMap() && bot->GetMap()->IsBattleGroundOrArena()))
-#endif
-                return false;
-
-            bot->TeleportTo(target->GetMapId(), x, y, z, bot->GetOrientation());
-        }
-        else
-        {
-            bot->Relocate(x, y, z, bot->GetOrientation());
-        }
-        AI_VALUE(LastMovement&, "last movement").Set(target);
-        ClearIdleState();
-        return true;
-    }
-
-    if (!IsMovingAllowed(target)
-        && ai->HasRealPlayerMaster())
-    {
-#ifdef MANGOSBOT_ZERO
-        if ((target->GetMap() && target->GetMap()->IsBattleGround()) || (bot->GetMap() && bot->GetMap()->IsBattleGround()))
-#else
-        if((target->GetMap() && target->GetMap()->IsBattleGroundOrArena()) || (bot->GetMap() && bot->GetMap()->IsBattleGroundOrArena()))
-#endif
-            return false;
-
-        if (sServerFacade.UnitIsDead(bot) && sServerFacade.IsAlive(ai->GetMaster()))
-        {
-            bot->ResurrectPlayer(1.0f, false);
-            ai->TellMasterNoFacing("I live, again!");
-        }
-        else
-            ai->TellError("I am stuck while following");
-
-        bot->CombatStop(true);
-        bot->TeleportTo(target->GetMapId(), target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation());
-        return false;
-    }
-    */
 
     //Move to target corpse if alive.
     if (!target->IsAlive() && bot->IsAlive() && target->GetObjectGuid().IsPlayer())

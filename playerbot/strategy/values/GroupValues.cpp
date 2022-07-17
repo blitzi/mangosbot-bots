@@ -10,7 +10,7 @@ bool IsFollowingPartyValue::Calculate()
     if (ai->GetGroupMaster() == bot)
         return true;
 
-    if (ai->HasStrategy("follow", BOT_STATE_NON_COMBAT))
+    if (ai->HasStrategy("follow"))
         return true;
 
     return false;

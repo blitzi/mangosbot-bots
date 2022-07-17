@@ -31,7 +31,7 @@ bool MoveToTravelTargetAction::Execute(Event event)
             if (!member->IsMoving())
                 continue;
 
-            if (member->GetPlayerbotAI() && !member->GetPlayerbotAI()->HasStrategy("follow", BOT_STATE_NON_COMBAT))
+            if (member->GetPlayerbotAI() && !member->GetPlayerbotAI()->HasStrategy("follow"))
                 continue;
 
             WorldPosition memberPos(member);

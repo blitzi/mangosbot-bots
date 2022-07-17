@@ -25,6 +25,7 @@ namespace ai
             creators["collision"] = &TriggerContext::collision;
 
             creators["timer"] = &TriggerContext::Timer;
+            creators["update"] = &TriggerContext::Update;
             creators["random"] = &TriggerContext::Random;
             creators["seldom"] = &TriggerContext::seldom;
             creators["often"] = &TriggerContext::often;
@@ -115,8 +116,7 @@ namespace ai
             creators["behind target"] = &TriggerContext::behind_target;
             creators["not behind target"] = &TriggerContext::not_behind_target;
             creators["not facing target"] = &TriggerContext::not_facing_target;
-            creators["far from master"] = &TriggerContext::far_from_master;
-            creators["force follow too far"] = &TriggerContext::force_follow_too_far;
+            creators["far from master"] = &TriggerContext::far_from_master;            
             creators["far from loot target"] = &TriggerContext::far_from_loot_target;
             creators["can loot"] = &TriggerContext::can_loot;
             creators["swimming"] = &TriggerContext::swimming;
@@ -213,8 +213,7 @@ namespace ai
         static Trigger* possible_adds(PlayerbotAI* ai) { return new PossibleAddsTrigger(ai); }
         static Trigger* can_loot(PlayerbotAI* ai) { return new CanLootTrigger(ai); }
         static Trigger* far_from_loot_target(PlayerbotAI* ai) { return new FarFromCurrentLootTrigger(ai); }
-        static Trigger* far_from_master(PlayerbotAI* ai) { return new FarFromMasterTrigger(ai); }
-        static Trigger* force_follow_too_far(PlayerbotAI* ai) { return new ForceFollowTooFarTrigger(ai); }
+        static Trigger* far_from_master(PlayerbotAI* ai) { return new FarFromMasterTrigger(ai); }        
         static Trigger* behind_target(PlayerbotAI* ai) { return new IsBehindTargetTrigger(ai); }
         static Trigger* not_behind_target(PlayerbotAI* ai) { return new IsNotBehindTargetTrigger(ai); }
         static Trigger* not_facing_target(PlayerbotAI* ai) { return new IsNotFacingTargetTrigger(ai); }
@@ -251,6 +250,7 @@ namespace ai
         static Trigger* NoAttackers(PlayerbotAI* ai) { return new NoAttackersTrigger(ai); }
         static Trigger* TankAssist(PlayerbotAI* ai) { return new TankAssistTrigger(ai); }
         static Trigger* Timer(PlayerbotAI* ai) { return new TimerTrigger(ai); }
+        static Trigger* Update(PlayerbotAI* ai) { return new UpdateTrigger(ai); }
         static Trigger* NoTarget(PlayerbotAI* ai) { return new NoTargetTrigger(ai); }
         static Trigger* TargetInSight(PlayerbotAI* ai) { return new TargetInSightTrigger(ai); }
         static Trigger* not_dps_target_active(PlayerbotAI* ai) { return new NotDpsTargetActiveTrigger(ai); }

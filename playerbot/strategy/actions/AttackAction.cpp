@@ -133,18 +133,16 @@ bool AttackAction::Attack(Unit* target)
 
     if (bot->Attack(target, !ai->IsRanged(bot) || (sServerFacade.GetDistance2d(bot, target) <= sPlayerbotAIConfig.tooCloseDistance)))
     {
-        ai->ChangeEngine(BOT_STATE_COMBAT);
+		ai->ChangeStrategy("-follow");
+		ai->ChangeEngine(BOT_STATE_COMBAT);
 
         float distance = ai->IsRanged(bot) ? ai->GetRange("spell") : 0;        
         Stance* stance = context->GetValue<Stance*>("stance")->Get();
 
-        if (!ai->HasStrategy("force follow"))
-        {
-            if (stance && stance->GetName() != "near")
-                return MoveToStance(target);
-            else
-                return ChaseTo(target, distance);
-        }
+        if (stance && stance->GetName() != "near")
+            return MoveToStance(target);
+        else
+            return ChaseTo(target, distance);
     }
     
     if(!bot->GetVictim())

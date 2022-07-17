@@ -29,9 +29,9 @@ bool FollowChatShortcutAction::Execute(Event event)
     if (!master)
         return false;
 
-    ai->Reset();
-    ai->ChangeStrategy("+follow,-passive", BOT_STATE_NON_COMBAT);
-    ai->ChangeStrategy("-follow,-passive", BOT_STATE_COMBAT);
+	bot->GetMotionMaster()->Clear();
+	bot->CastStop();
+    ai->ChangeStrategy("+follow,-passive");
 
     ai->TellMaster("Following");
     return true;
@@ -43,10 +43,10 @@ bool StayChatShortcutAction::Execute(Event event)
     if (!master)
         return false;
 
-    SetReturnPosition(bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ());
-
-	ai->Reset();
+	bot->GetMotionMaster()->Clear();
 	ai->ChangeStrategy("-follow");
+
+    SetReturnPosition(bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ());
 
     ai->TellMaster("Staying");
 
@@ -60,8 +60,8 @@ bool FleeChatShortcutAction::Execute(Event event)
         return false;
 
     ai->Reset();
-    ai->ChangeStrategy("+follow,+passive", BOT_STATE_NON_COMBAT);
-    ai->ChangeStrategy("+follow,+passive", BOT_STATE_COMBAT);
+    ai->ChangeStrategy("+follow,+passive");
+
     ResetReturnPosition();
     if (bot->GetMapId() != master->GetMapId() || bot->GetDistance(master) > sPlayerbotAIConfig.sightDistance)
     {

@@ -582,15 +582,8 @@ void PlayerbotAI::DoNextAction()
         aiObjectContext->GetValue<Unit*>("current target")->Set(NULL);
     }
 
-    // if in combat but stick with old data - clear targets
-    if (currentEngine == engines[BOT_STATE_NON_COMBAT] && sServerFacade.IsInCombat(bot))
-    {
-        if (aiObjectContext->GetValue<Unit*>("current target")->Get() != NULL ||
-            aiObjectContext->GetValue<ObjectGuid>("pull target")->Get() != ObjectGuid() || aiObjectContext->GetValue<Unit*>("dps target")->Get() != NULL)
-        {
-            Reset();
-        }
-    }
+    if (currentEngine != engines[BOT_STATE_COMBAT] && sServerFacade.IsInCombat(bot))
+		ChangeEngine(BOT_STATE_COMBAT);
 
     bool minimal = !AllowActivity();
 

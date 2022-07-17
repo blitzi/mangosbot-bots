@@ -55,7 +55,7 @@ bool RpgAction::Execute(Event event)
     {
         sServerFacade.SetFacingTo(bot, wo, true);
 
-        if (!ai->HasStrategy("follow", BOT_STATE_NON_COMBAT))
+        if (!ai->HasStrategy("follow"))
         {            
             return true;
         }

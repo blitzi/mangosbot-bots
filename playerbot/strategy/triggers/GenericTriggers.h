@@ -568,6 +568,18 @@ namespace ai
         time_t lastCheck;
     };
 
+	class UpdateTrigger : public Trigger
+	{
+	public:
+		UpdateTrigger(PlayerbotAI* ai) : Trigger(ai, "update", 0) {}
+
+	public:
+		virtual bool IsActive()
+		{
+			return true;
+		}
+	};
+
     class TankAssistTrigger : public NoAttackersTrigger
     {
     public:

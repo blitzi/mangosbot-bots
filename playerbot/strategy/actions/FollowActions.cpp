@@ -14,14 +14,6 @@ bool FollowAction::Execute(Event event)
     string target = formation->GetTargetName();
     bool moved = false;
 
-    if (ai->HasStrategy("force follow"))
-    {
-        Unit* target = AI_VALUE(Unit*, "master target");
-
-        if(target)
-            return Follow(target);
-    }
-
     if (!target.empty())
     {
         moved = Follow(AI_VALUE(Unit*, target));
@@ -131,7 +123,7 @@ bool FleeToMasterAction::isUseful()
     if (target && ai->GetGroupMaster()->HasTarget(target->GetObjectGuid()))
         return false;
 
-    if (!ai->HasStrategy("follow", BOT_STATE_NON_COMBAT))
+    if (!ai->HasStrategy("follow"))
         return false;
 
     Unit* fTarget = AI_VALUE(Unit*, "master target");
@@ -141,4 +133,3 @@ bool FleeToMasterAction::isUseful()
 
     return true;
 }
-

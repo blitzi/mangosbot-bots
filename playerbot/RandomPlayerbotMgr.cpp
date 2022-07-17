@@ -757,7 +757,7 @@ void RandomPlayerbotMgr::CheckLfgQueue()
 			
         if (data.GetState() != LFG_STATE_NONE)
         {
-            isLFG = true;				
+            isLFG = true;
             if (data.GetState() != LFG_STATE_NONE && data.GetState() < LFG_STATE_DUNGEON)
             {
 				LfgDungeonSet const dList = data.GetListedDungeonSet();

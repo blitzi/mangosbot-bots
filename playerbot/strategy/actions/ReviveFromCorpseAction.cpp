@@ -18,10 +18,10 @@ bool ReviveFromCorpseAction::Execute(Event event)
     {
         if (sServerFacade.IsDistanceLessThan(AI_VALUE2(float, "distance", "master target"), sPlayerbotAIConfig.farDistance))
         {
-            if (!ai->HasStrategy("follow", BOT_STATE_NON_COMBAT))
+            if (!ai->HasStrategy("follow"))
             {
                 ai->TellMasterNoFacing("Welcome back!");
-                ai->ChangeStrategy("+follow,-stay", BOT_STATE_NON_COMBAT);
+                ai->ChangeStrategy("+follow,-stay");
                 return true;
             }
         }
@@ -177,7 +177,7 @@ WorldSafeLocsEntry const* SpiritHealerAction::GetGrave(bool startZone)
     if (!startZone && ClosestGrave)
         return ClosestGrave;
 
-    if (ai->HasStrategy("follow", BOT_STATE_NON_COMBAT))
+    if (ai->HasStrategy("follow"))
     {
         Player* master = ai->GetGroupMaster();
 

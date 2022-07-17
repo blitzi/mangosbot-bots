@@ -14,11 +14,12 @@ namespace ai
         void SetReturnPosition(float x, float y, float z);
     };
 
-    class FollowChatShortcutAction : public MovementAction
+    class FollowChatShortcutAction : public Action
     {
     public:
-        FollowChatShortcutAction(PlayerbotAI* ai) : MovementAction(ai, "follow chat shortcut") {}
+        FollowChatShortcutAction(PlayerbotAI* ai) : Action(ai, "follow chat shortcut") {}
         virtual bool Execute(Event event);
+		virtual bool IgnoresCasting() { return true; }
     };
 
     class StayChatShortcutAction : public ReturnPositionResetAction
@@ -26,6 +27,7 @@ namespace ai
     public:
         StayChatShortcutAction(PlayerbotAI* ai) : ReturnPositionResetAction(ai, "stay chat shortcut") {}
         virtual bool Execute(Event event);
+		virtual bool IgnoresCasting() { return true; }
     };
 
     class FleeChatShortcutAction : public ReturnPositionResetAction
