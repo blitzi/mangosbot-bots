@@ -1614,7 +1614,7 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
 	bot->SetSelectionGuid(target->GetObjectGuid());
 
     WorldObject* faceTo = target;
-    if (!sServerFacade.IsInFront(bot, faceTo, sPlayerbotAIConfig.sightDistance, CAST_ANGLE_IN_FRONT))
+    if ((pSpellInfo->FacingCasterFlags & SPELL_FACING_FLAG_INFRONT) && !sServerFacade.IsInFront(bot, faceTo, sPlayerbotAIConfig.sightDistance, CAST_ANGLE_IN_FRONT))
     {
         if (!sServerFacade.isMoving(bot)) sServerFacade.SetFacingTo(bot, faceTo);
         failWithDelay = true;
