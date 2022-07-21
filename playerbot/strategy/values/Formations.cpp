@@ -27,6 +27,10 @@ WorldLocation MoveAheadFormation::GetLocation()
         return WorldLocation();
 
     WorldLocation loc = GetLocationInternal();
+
+	if (bot->GetMapId() != master->GetMapId())
+		return loc;
+
     if (Formation::IsNullLocation(loc))
         return loc;
 
@@ -34,12 +38,13 @@ WorldLocation MoveAheadFormation::GetLocation()
     float y = loc.coord_y;
     float z = loc.coord_z;
 
-    if (sServerFacade.isMoving(master)) {
+    if (sServerFacade.isMoving(master)) 
+	{
         float ori = master->GetOrientation();
         float x1 = x + sPlayerbotAIConfig.tooCloseDistance * cos(ori);
         float y1 = y + sPlayerbotAIConfig.tooCloseDistance * sin(ori);
 #ifdef MANGOSBOT_TWO
-        float ground = master->GetMap()->GetHeight(master->GetPhaseMask(), x1, y1, z);
+        float ground = master->GetMap()->GetHeight(bot->GetPhaseMask(), x1, y1, z);
 #else
         float ground = master->GetMap()->GetHeight(x1, y1, z);
 #endif
