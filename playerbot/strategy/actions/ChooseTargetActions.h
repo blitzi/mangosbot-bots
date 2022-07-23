@@ -33,6 +33,36 @@ namespace ai
             return true;
         }
     };
+	
+	class ActivateCombatState : public Action
+    {
+    public:
+		ActivateCombatState(PlayerbotAI* ai) : Action(ai, "activate combat state") {}
+
+        virtual string GetTargetName() { return "self target"; }
+        virtual bool isUseful() { return true; }
+
+		virtual bool isPossible()
+		{
+			return GetTarget() && ai->GetCurrentState() == BOT_STATE_NON_COMBAT;
+		}
+
+		virtual bool Execute(Event event)
+		{
+			Unit* target = GetTarget();
+
+			ObjectGuid guid = target->GetObjectGuid();
+			bot->SetSelectionGuid(target->GetObjectGuid());
+
+			Unit* oldTarget = context->GetValue<Unit*>("current target")->Get();
+			context->GetValue<Unit*>("old target")->Set(oldTarget);
+			context->GetValue<Unit*>("current target")->Set(target);
+
+			ai->ChangeEngine(BOT_STATE_COMBAT);
+
+			return true;
+		}
+    };
 
     class TankAssistAction : public AttackAction
     {
@@ -118,10 +148,27 @@ namespace ai
         }
     };
 
+	class LeaveCombatState : public Action
+	{
+	public:
+		LeaveCombatState(PlayerbotAI* ai) : Action(ai, "leave combat state") {}
+
+		virtual bool IgnoresCasting() { return true; }
+
+		virtual bool Execute(Event event)
+		{
+			ai->ChangeEngine(BOT_STATE_NON_COMBAT);
+
+			return true;
+		}
+	};
+
     class DropTargetAction : public Action
     {
     public:
         DropTargetAction(PlayerbotAI* ai) : Action(ai, "drop target") {}
+
+		virtual bool IgnoresCasting() { return true; }
 
         virtual bool Execute(Event event)
         {
@@ -144,7 +191,6 @@ namespace ai
             context->GetValue<Unit*>("current target")->Set(NULL);
             bot->SetSelectionGuid(ObjectGuid());
             bot->GetMotionMaster()->Clear();
-            ai->ChangeEngine(BOT_STATE_NON_COMBAT);
             ai->InterruptSpell();
             bot->AttackStop();
             Pet* pet = bot->GetPet();

@@ -9,6 +9,10 @@ void DpsAssistStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
     triggers.push_back(new TriggerNode(
         "not dps target active",
         NextAction::array(0, new NextAction("dps assist", 50.0f), NULL)));
+
+	triggers.push_back(new TriggerNode(
+		"group member in combat",
+		NextAction::array(0, new NextAction("activate combat state", 40.0f), NULL)));
 }
 
 void DpsAoeStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
@@ -17,6 +21,3 @@ void DpsAoeStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
         "not dps aoe target active",
         NextAction::array(0, new NextAction("dps aoe", 50.0f), NULL)));
 }
-
-
-

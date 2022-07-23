@@ -549,6 +549,7 @@ void PlayerbotAI::ChangeEngine(BotState type)
 
 void PlayerbotAI::DoNextAction()
 {
+	Player* master = GetMaster();
     // change engine if just died
     if (currentEngine != engines[BOT_STATE_DEAD] && !sServerFacade.IsAlive(bot))
     {
@@ -557,7 +558,6 @@ void PlayerbotAI::DoNextAction()
         bot->GetMotionMaster()->MoveIdle();
 
         //Death Count to prevent skeleton piles
-        Player* master = GetMaster();
         if (!HasActivePlayerMaster())
         {
             uint32 dCount = aiObjectContext->GetValue<uint32>("death count")->Get();
@@ -582,7 +582,8 @@ void PlayerbotAI::DoNextAction()
         aiObjectContext->GetValue<Unit*>("current target")->Set(NULL);
     }
 
-    if (currentEngine != engines[BOT_STATE_COMBAT] && sServerFacade.IsInCombat(bot))
+	//switch to combat state if the bot is in combat and has a target
+    if (currentEngine != engines[BOT_STATE_COMBAT] && (sServerFacade.IsInCombat(bot) && aiObjectContext->GetValue<Unit*>("current target")))
 		ChangeEngine(BOT_STATE_COMBAT);
 
     bool minimal = !AllowActivity();
@@ -881,7 +882,6 @@ void PlayerbotAI::ResetStrategies(bool load)
     AiFactory::AddDefaultCombatStrategies(bot, this, engines[BOT_STATE_COMBAT]);
     AiFactory::AddDefaultNonCombatStrategies(bot, this, engines[BOT_STATE_NON_COMBAT]);
     AiFactory::AddDefaultDeadStrategies(bot, this, engines[BOT_STATE_DEAD]);
-    //if (load) sPlayerbotDbStore.Load(this);
 }
 
 bool PlayerbotAI::IsRanged(Player* player)

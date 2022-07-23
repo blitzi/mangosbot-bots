@@ -393,6 +393,16 @@ bool NotDpsTargetActiveTrigger::IsActive()
     return dps && target != dps;
 }
 
+bool GroupMemberInCombatTrigger::IsActive()
+{
+	return AI_VALUE(Unit*, "group member in combat");
+}
+
+bool NoGroupMemberInCombatTrigger::IsActive()
+{
+	return !GroupMemberInCombatTrigger::IsActive();
+}
+
 bool NotDpsAoeTargetActiveTrigger::IsActive()
 {
     Unit* dps = AI_VALUE(Unit*, "dps aoe target");

@@ -19,7 +19,6 @@ namespace ai
         virtual string getName() { return "follow"; }
         virtual void InitTriggers(std::list<TriggerNode*> &triggers);
 		virtual void InitMultipliers(std::list<Multiplier*>& multipliers);
-
     };
 
 }

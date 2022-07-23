@@ -72,6 +72,8 @@ namespace ai
             creators["no target"] = &TriggerContext::NoTarget;
             creators["target in sight"] = &TriggerContext::TargetInSight;
             creators["not dps target active"] = &TriggerContext::not_dps_target_active;
+            creators["no group member in combat"] = &TriggerContext::NoGroupMemberInCombat;
+            creators["group member in combat"] = &TriggerContext::GroupMemberInCombat;
             creators["not dps aoe target active"] = &TriggerContext::not_dps_aoe_target_active;
             creators["has nearest adds"] = &TriggerContext::has_nearest_adds;
             creators["enemy player near"] = &TriggerContext::enemy_player_near;
@@ -254,6 +256,8 @@ namespace ai
         static Trigger* NoTarget(PlayerbotAI* ai) { return new NoTargetTrigger(ai); }
         static Trigger* TargetInSight(PlayerbotAI* ai) { return new TargetInSightTrigger(ai); }
         static Trigger* not_dps_target_active(PlayerbotAI* ai) { return new NotDpsTargetActiveTrigger(ai); }
+        static Trigger* GroupMemberInCombat(PlayerbotAI* ai) { return new GroupMemberInCombatTrigger(ai); }
+        static Trigger* NoGroupMemberInCombat(PlayerbotAI* ai) { return new NoGroupMemberInCombatTrigger(ai); }
         static Trigger* not_dps_aoe_target_active(PlayerbotAI* ai) { return new NotDpsAoeTargetActiveTrigger(ai); }
         static Trigger* has_nearest_adds(PlayerbotAI* ai) { return new HasNearestAddsTrigger(ai); }
         static Trigger* enemy_player_near(PlayerbotAI* ai) { return new EnemyPlayerNear(ai); }

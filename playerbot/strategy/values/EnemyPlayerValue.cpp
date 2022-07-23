@@ -162,3 +162,21 @@ Unit* EnemyPlayerValue::Calculate()
 
     return nullptr;
 }
+
+Unit* GroupMemberInCombat::Calculate()
+{
+	Group* group = bot->GetGroup();
+
+	if (!group)
+		return nullptr;
+
+	for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
+	{
+		if (Player* member = itr->getSource())
+		{
+			if (sServerFacade.IsInCombat(member))
+				return member;
+		}
+	}
+	return nullptr;
+}

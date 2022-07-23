@@ -29,7 +29,6 @@ namespace ai
     public:
         static bool IsPossibleTarget(Unit* attacker, Player *bot);
         static bool IsRti(Unit* enemy, Player* bot);
-        static bool IsValidTarget(Unit* attacker, Player *bot);
     };
 
     class PossibleAddsValue : public BoolCalculatedValue

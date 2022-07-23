@@ -93,6 +93,7 @@ namespace ai
             creators["drink"] = &ActionContext::drink;
             creators["tank assist"] = &ActionContext::tank_assist;
             creators["dps assist"] = &ActionContext::dps_assist;
+            creators["activate combat state"] = &ActionContext::activate_combat_state;
             creators["dps aoe"] = &ActionContext::dps_aoe;
             creators["attack rti target"] = &ActionContext::attack_rti_target;
             creators["loot"] = &ActionContext::loot;
@@ -118,6 +119,7 @@ namespace ai
             creators["set facing"] = &ActionContext::set_facing;
             creators["set behind"] = &ActionContext::set_behind;
             creators["attack duel opponent"] = &ActionContext::attack_duel_opponent;
+            creators["leave combat state"] = &ActionContext::leave_combat_state;
             creators["drop target"] = &ActionContext::drop_target;
             creators["check mail"] = &ActionContext::check_mail;
             creators["say"] = &ActionContext::say;
@@ -201,6 +203,7 @@ namespace ai
         static Action* try_emergency(PlayerbotAI* ai) { return new TryEmergencyAction(ai); }
         static Action* apply_stone(PlayerbotAI* ai) { return new ImbueWithStoneAction(ai); }
         static Action* check_mail(PlayerbotAI* ai) { return new CheckMailAction(ai); }
+        static Action* leave_combat_state(PlayerbotAI* ai) { return new LeaveCombatState(ai); }
         static Action* drop_target(PlayerbotAI* ai) { return new DropTargetAction(ai); }
         static Action* attack_duel_opponent(PlayerbotAI* ai) { return new AttackDuelOpponentAction(ai); }
         static Action* guard(PlayerbotAI* ai) { return new GuardAction(ai); }
@@ -242,6 +245,7 @@ namespace ai
         static Action* loot(PlayerbotAI* ai) { return new LootAction(ai); }
         static Action* release_loot(PlayerbotAI* ai) { return new ReleaseLootAction(ai); }
         static Action* dps_assist(PlayerbotAI* ai) { return new DpsAssistAction(ai); }
+        static Action* activate_combat_state(PlayerbotAI* ai) { return new ActivateCombatState(ai); }
         static Action* dps_aoe(PlayerbotAI* ai) { return new DpsAoeAction(ai); }
         static Action* attack_rti_target(PlayerbotAI* ai) { return new AttackRtiTargetAction(ai); }
         static Action* tank_assist(PlayerbotAI* ai) { return new TankAssistAction(ai); }

@@ -14,13 +14,17 @@ void CombatStrategy::InitTriggers(list<TriggerNode*> &triggers)
         "invalid target",
         NextAction::array(0, new NextAction("drop target", 55), NULL)));
 
+	triggers.push_back(new TriggerNode(
+		"no group member in combat",
+		NextAction::array(0, new NextAction("leave combat state", 54), NULL)));
+
     triggers.push_back(new TriggerNode(
         "mounted",
-        NextAction::array(0, new NextAction("check mount state", 54), NULL)));
+        NextAction::array(0, new NextAction("check mount state", 53), NULL)));
 
     triggers.push_back(new TriggerNode(
         "out of react range",
-        NextAction::array(0, new NextAction("flee to master", 55), NULL)));
+        NextAction::array(0, new NextAction("flee to master", 52), NULL)));
 
     triggers.push_back(new TriggerNode(
         "party member to cancel health",

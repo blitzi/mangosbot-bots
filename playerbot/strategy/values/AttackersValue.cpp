@@ -127,7 +127,7 @@ void AttackersValue::AddAttackersOf(Unit* pet, set<Unit*>& targets)
                     continue;
 
         targets.insert(unit);
-        unit->CallForAllControlledUnits(AddGuardiansHelper(units), CONTROLLED_PET | CONTROLLED_GUARDIANS | CONTROLLED_CHARM | CONTROLLED_MINIPET | CONTROLLED_TOTEMS);                
+        unit->CallForAllControlledUnits(AddGuardiansHelper(units), CONTROLLED_PET | CONTROLLED_GUARDIANS | CONTROLLED_CHARM | CONTROLLED_MINIPET | CONTROLLED_TOTEMS);
     }
 }
 
@@ -136,7 +136,7 @@ void AttackersValue::RemoveNonThreating(set<Unit*>& targets)
     for(set<Unit *>::iterator tIter = targets.begin(); tIter != targets.end();)
     {
         Unit* unit = *tIter;
-        if (!IsValidTarget(unit, bot))
+        if (!IsPossibleTarget(unit, bot))
         {
             set<Unit *>::iterator tIter2 = tIter;
             ++tIter;
@@ -251,8 +251,6 @@ void AttackersValue::RemoveNonRtiTargets(set<Unit*>& targets)
     }
 }
 
-
-
 bool AttackersValue::ListContainsElite(set<Unit*>& targets) const
 {
     for (auto t : targets)
@@ -265,7 +263,6 @@ bool AttackersValue::ListContainsElite(set<Unit*>& targets) const
 
     return false;
 }
-
 
 bool AttackersValue::ListContainsFocusTarget(set<Unit*>& targets) const
 {
@@ -319,17 +316,18 @@ bool AttackersValue::IsPossibleTarget(Unit *attacker, Player *bot)
     if (dmgStopTarget != NULL && (c == dmgStopTarget || bot == dmgStopTarget))
         return false;
 
-    bool basicConditions = attacker &&
-        attacker->IsInWorld() &&
-        attacker->GetMapId() == bot->GetMapId() &&
-        !sServerFacade.UnitIsDead(attacker) &&
-        !attacker->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING) &&
-        !attacker->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNINTERACTIBLE) &&
-        attacker->IsVisibleForOrDetect(bot, attacker, false) &&
-        !sServerFacade.IsFriendlyTo(attacker, bot) &&
-        bot->IsWithinDistInMap(attacker, sPlayerbotAIConfig.sightDistance) &&
-        !(sPlayerbotAIConfig.IsInPvpProhibitedZone(attacker->GetAreaId()) && (attacker->GetObjectGuid().IsPlayer() || attacker->GetObjectGuid().IsPet())) &&
-        (!c || !c->GetCombatManager().IsInEvadeMode());
+	bool basicConditions = attacker &&
+		attacker->IsInWorld() &&
+		attacker->GetMapId() == bot->GetMapId() &&
+		!sServerFacade.UnitIsDead(attacker) &&
+		!attacker->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING) &&
+		!attacker->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNINTERACTIBLE) &&
+		attacker->IsVisibleForOrDetect(bot, attacker, false) &&
+		!sServerFacade.IsFriendlyTo(attacker, bot) &&
+		bot->IsWithinDistInMap(attacker, sPlayerbotAIConfig.sightDistance) &&
+		!(sPlayerbotAIConfig.IsInPvpProhibitedZone(attacker->GetAreaId()) && (attacker->GetObjectGuid().IsPlayer() || attacker->GetObjectGuid().IsPet())) &&
+		(!c || !c->GetCombatManager().IsInEvadeMode()) &&
+		attacker->IsInCombat();
 
     bool rti = IsRti(attacker, bot);
   
@@ -352,11 +350,15 @@ bool AttackersValue::IsPossibleTarget(Unit *attacker, Player *bot)
     bool isRaid = sMapStore.LookupEntry(bot->GetMapId())->IsRaid();
     bool tankHasAggro = false;
     bool targetIsNonElite = isRaid ? false : (!c || !c->IsElite());//normal mobs in raids count as "elites"
+
+	if(c)
+		targetIsNonElite |= (bot->GetLevel() - c->GetLevel()) >= 5;//Mobs that are 5 levels below the bot are always non elite
+
     bool targetIsAlmostDead = false;//!c || c->GetHealthPercent() < 50;
     float highestThreat = 0;
-    float myThreat = 0;  
+    float myThreat = 0;
     float tankThreat = 0;
-    bool waitForTankAggro = true;    
+    bool waitForTankAggro = true;
     bool iAmTank = ai->IsTank(ai->GetBot());
     bool carefulTanking = ai->HasStrategy("careful tanking", BOT_STATE_COMBAT);
 
@@ -378,8 +380,8 @@ bool AttackersValue::IsPossibleTarget(Unit *attacker, Player *bot)
         myMaxDamage += maxSpellDmg;//fantasy aggro value for testing
         
         if (highestThreat > 0)
-        {			
-            float myAggroInPct = ((100.0f / highestThreat) * (myThreat + myMaxDamage));			
+        {
+            float myAggroInPct = ((100.0f / highestThreat) * (myThreat + myMaxDamage));
 
             if(carefulTanking)
                 waitForTankAggro = myAggroInPct > 90;
@@ -454,16 +456,6 @@ bool AttackersValue::IsRti(Unit* enemy, Player* bot)
     }
 
     return isRti;
-}
-
-bool AttackersValue::IsValidTarget(Unit *attacker, Player *bot)
-{
-    bool possibleTarget = IsPossibleTarget(attacker, bot);
-
-    return possibleTarget &&
-        (sServerFacade.GetThreatManager(attacker).getCurrentVictim() ||
-            attacker->GetGuidValue(UNIT_FIELD_TARGET) || attacker->GetObjectGuid().IsPlayer() || attacker->GetCreatureType() == CREATURE_TYPE_TOTEM ||
-            attacker->GetObjectGuid() == bot->GetPlayerbotAI()->GetAiObjectContext()->GetValue<ObjectGuid>("pull target")->Get());
 }
 
 bool PossibleAddsValue::Calculate()

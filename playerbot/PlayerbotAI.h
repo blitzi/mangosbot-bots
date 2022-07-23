@@ -341,6 +341,8 @@ public:
     static bool AddAura(Unit* unit, uint32 spellId);
     ReputationRank getReaction(FactionTemplateEntry const* factionTemplate) { return GetFactionReaction(bot->GetFactionTemplateEntry(), factionTemplate);}
 
+	BotState GetCurrentState() { return currentState; }
+
 private:
     void _fillGearScoreData(Player *player, Item* item, std::vector<uint32>* gearScore, uint32& twoHandScore);
     bool IsTellAllowed(PlayerbotSecurityLevel securityLevel = PLAYERBOT_SECURITY_ALLOW_ALL);

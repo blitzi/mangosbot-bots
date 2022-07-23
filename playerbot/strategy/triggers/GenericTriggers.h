@@ -663,6 +663,25 @@ namespace ai
         virtual bool IsActive();
     };
 
+
+	class GroupMemberInCombatTrigger : public Trigger
+	{
+	public:
+		GroupMemberInCombatTrigger(PlayerbotAI* ai, string name = "group member in combat") : Trigger(ai, name) {}
+
+	public:
+		virtual bool IsActive();
+	};
+
+	class NoGroupMemberInCombatTrigger : public GroupMemberInCombatTrigger
+	{
+	public:
+		NoGroupMemberInCombatTrigger(PlayerbotAI* ai) : GroupMemberInCombatTrigger(ai, "no group member in combat") {}
+
+	public:
+		virtual bool IsActive();
+	};
+
     class NotDpsAoeTargetActiveTrigger : public Trigger
     {
     public:

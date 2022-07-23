@@ -11,13 +11,14 @@ bool InvalidTargetValue::Calculate()
 {
     Unit* target = AI_VALUE(Unit*, qualifier);
     Unit* enemy = AI_VALUE(Unit*, "enemy player target");
-    if (target && enemy && target == enemy && sServerFacade.IsAlive(target))
-        return false;
+
+    if (target && enemy && target == enemy)
+        return !sServerFacade.IsAlive(target);
 
     if (target && qualifier == "current target")
     {
-        return !AttackersValue::IsValidTarget(target, bot);
+        return !AttackersValue::IsPossibleTarget(target, bot);
     }
 
-    return !target;
+    return false;
 }

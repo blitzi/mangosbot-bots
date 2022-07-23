@@ -38,5 +38,14 @@ namespace ai
 
             return 40.0f;
         }
+    }; 
+	
+	class GroupMemberInCombat : public UnitCalculatedValue
+    {
+    public:
+		GroupMemberInCombat(PlayerbotAI* ai) : UnitCalculatedValue(ai) {}
+
+        virtual Unit* Calculate();
+    private:
     };
 }

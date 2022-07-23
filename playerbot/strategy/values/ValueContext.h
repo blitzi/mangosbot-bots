@@ -127,6 +127,7 @@ namespace ai
             creators["dps stop target"] = &ValueContext::dps_stop_target;
             creators["least hp target"] = &ValueContext::least_hp_target;
             creators["enemy player target"] = &ValueContext::enemy_player_target;
+            creators["group member in combat"] = &ValueContext::group_member_in_combat;
             creators["cc target"] = &ValueContext::cc_target;
             creators["current cc target"] = &ValueContext::current_cc_target;
             creators["pet target"] = &ValueContext::pet_target;
@@ -384,6 +385,7 @@ namespace ai
         static UntypedValue* dps_stop_target(PlayerbotAI* ai) { return new DamageStopValue(ai); }
         static UntypedValue* least_hp_target(PlayerbotAI* ai) { return new LeastHpTargetValue(ai); }
         static UntypedValue* enemy_player_target(PlayerbotAI* ai) { return new EnemyPlayerValue(ai); }
+        static UntypedValue* group_member_in_combat(PlayerbotAI* ai) { return new GroupMemberInCombat(ai); }
         static UntypedValue* cc_target(PlayerbotAI* ai) { return new CcTargetValue(ai); }
         static UntypedValue* current_cc_target(PlayerbotAI* ai) { return new CurrentCcTargetValue(ai); }
         static UntypedValue* pet_target(PlayerbotAI* ai) { return new PetTargetValue(ai); }
