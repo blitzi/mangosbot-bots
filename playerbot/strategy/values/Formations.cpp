@@ -44,9 +44,9 @@ WorldLocation MoveAheadFormation::GetLocation()
         float x1 = x + sPlayerbotAIConfig.tooCloseDistance * cos(ori);
         float y1 = y + sPlayerbotAIConfig.tooCloseDistance * sin(ori);
 #ifdef MANGOSBOT_TWO
-        float ground = master->GetMap()->GetHeight(bot->GetPhaseMask(), x1, y1, z);
+        float ground = bot->GetMap()->GetHeight(bot->GetPhaseMask(), x1, y1, z);
 #else
-        float ground = master->GetMap()->GetHeight(x1, y1, z);
+        float ground = bot->GetMap()->GetHeight(x1, y1, z);
 #endif
         if (ground > INVALID_HEIGHT)
         {
@@ -55,9 +55,9 @@ WorldLocation MoveAheadFormation::GetLocation()
         }
     }
 #ifdef MANGOSBOT_TWO
-    float ground = master->GetMap()->GetHeight(master->GetPhaseMask(), x, y, z);
+    float ground = bot->GetMap()->GetHeight(bot->GetPhaseMask(), x, y, z);
 #else
-    float ground = master->GetMap()->GetHeight(x, y, z);
+    float ground = bot->GetMap()->GetHeight(x, y, z);
 #endif
     if (ground <= INVALID_HEIGHT)
         return Formation::NullLocation;
@@ -99,9 +99,9 @@ namespace ai
             float y = master->GetPositionY() + sin(angle) * range;
             float z = master->GetPositionZ();
 #ifdef MANGOSBOT_TWO
-            float ground = master->GetMap()->GetHeight(master->GetPhaseMask(), x, y, z);
+            float ground = bot->GetMap()->GetHeight(bot->GetPhaseMask(), x, y, z);
 #else
-            float ground = master->GetMap()->GetHeight(x, y, z);
+            float ground = bot->GetMap()->GetHeight(x, y, z);
 #endif
             if (ground <= INVALID_HEIGHT)
                 return Formation::NullLocation;
@@ -140,9 +140,9 @@ namespace ai
             float y = master->GetPositionY() + sin(angle) * range + dy;
             float z = master->GetPositionZ();
 #ifdef MANGOSBOT_TWO
-            float ground = master->GetMap()->GetHeight(master->GetPhaseMask(), x, y, z);
+            float ground = bot->GetMap()->GetHeight(bot->GetPhaseMask(), x, y, z);
 #else
-            float ground = master->GetMap()->GetHeight(x, y, z);
+            float ground = bot->GetMap()->GetHeight(x, y, z);
 #endif
             if (ground <= INVALID_HEIGHT)
                 return Formation::NullLocation;
@@ -198,9 +198,9 @@ namespace ai
             float y = target->GetPositionY() + sin(angle) * range;
             float z = target->GetPositionZ();
 #ifdef MANGOSBOT_TWO
-            float ground = target->GetMap()->GetHeight(target->GetPhaseMask(), x, y, z);
+            float ground = bot->GetMap()->GetHeight(bot->GetPhaseMask(), x, y, z);
 #else
-            float ground = target->GetMap()->GetHeight(x, y, z);
+            float ground = bot->GetMap()->GetHeight(x, y, z);
 #endif
             if (ground <= INVALID_HEIGHT)
                 return Formation::NullLocation;
@@ -337,9 +337,9 @@ namespace ai
             float y = master->GetPositionY() + sin(angle) * range + sin(followAngle) * followRange;
             float z = master->GetPositionZ();
 #ifdef MANGOSBOT_TWO
-            float ground = master->GetMap()->GetHeight(master->GetPhaseMask(), x, y, z);
+            float ground = bot->GetMap()->GetHeight(bot->GetPhaseMask(), x, y, z);
 #else
-            float ground = master->GetMap()->GetHeight(x, y, z);
+            float ground = bot->GetMap()->GetHeight(x, y, z);
 #endif
             if (ground <= INVALID_HEIGHT)
             {
@@ -350,9 +350,9 @@ namespace ai
                     y = master->GetPositionY() + sin(angle) * range + sin(followAngle) * followRange;
                     float dist = sServerFacade.GetDistance2d(bot, x, y);
 #ifdef MANGOSBOT_TWO
-                    float ground = master->GetMap()->GetHeight(master->GetPhaseMask(), x, y, z);
+                    float ground = bot->GetMap()->GetHeight(bot->GetPhaseMask(), x, y, z);
 #else
-                    float ground = master->GetMap()->GetHeight(x, y, z);
+                    float ground = bot->GetMap()->GetHeight(x, y, z);
 #endif
                     if (ground > INVALID_HEIGHT && (!minDist || minDist > dist))
                     {
