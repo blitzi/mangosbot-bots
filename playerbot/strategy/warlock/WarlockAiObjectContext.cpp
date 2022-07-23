@@ -29,11 +29,15 @@ namespace ai
                 creators["dps debuff"] = &warlock::StrategyFactoryInternal::dps_debuff;
                 creators["boost"] = &warlock::StrategyFactoryInternal::boost;
                 creators["cc"] = &warlock::StrategyFactoryInternal::cc;
-                creators["pet"] = &warlock::StrategyFactoryInternal::pet;
+                creators["pet_affliction"] = &warlock::StrategyFactoryInternal::pet_affliction;
+                creators["pet_deamon"] = &warlock::StrategyFactoryInternal::pet_deamon;
+                creators["pet_destro"] = &warlock::StrategyFactoryInternal::pet_destro;
             }
 
         private:
-            static Strategy* pet(PlayerbotAI* ai) { return new WarlockPetStrategy(ai); }
+            static Strategy* pet_affliction(PlayerbotAI* ai) { return new AfflictionWarlockPetStrategy(ai); }
+            static Strategy* pet_deamon(PlayerbotAI* ai) { return new DeamonWarlockPetStrategy(ai); }
+            static Strategy* pet_destro(PlayerbotAI* ai) { return new DestroWarlockPetStrategy(ai); }
             static Strategy* nc(PlayerbotAI* ai) { return new GenericWarlockNonCombatStrategy(ai); }
             static Strategy* aoe(PlayerbotAI* ai) { return new DpsAoeWarlockStrategy(ai); }
             static Strategy* dps_debuff(PlayerbotAI* ai) { return new DpsWarlockDebuffStrategy(ai); }
@@ -48,12 +52,14 @@ namespace ai
         public:
             CombatStrategyFactoryInternal() : NamedObjectContext<Strategy>(false, true)
             {
-                creators["dps"] = &warlock::CombatStrategyFactoryInternal::dps;
-                creators["tank"] = &warlock::CombatStrategyFactoryInternal::tank;
+                creators["affliction"] = &warlock::CombatStrategyFactoryInternal::affliction;
+                creators["deamon"] = &warlock::CombatStrategyFactoryInternal::deamon;
+                creators["destro"] = &warlock::CombatStrategyFactoryInternal::dps;
             }
 
         private:
-            static Strategy* tank(PlayerbotAI* ai) { return new TankWarlockStrategy(ai); }
+            static Strategy* deamon(PlayerbotAI* ai) { return new TankWarlockStrategy(ai); }
+            static Strategy* affliction(PlayerbotAI* ai) { return new AfflictionWarlockStrategy(ai); }
             static Strategy* dps(PlayerbotAI* ai) { return new DpsWarlockStrategy(ai); }
         };
     };
@@ -75,20 +81,31 @@ namespace ai
                 creators["no healthstone"] = &TriggerFactoryInternal::HasHealthstone;
                 creators["no firestone"] = &TriggerFactoryInternal::HasFirestone;
                 creators["no spellstone"] = &TriggerFactoryInternal::HasSpellstone;
+                creators["spellstone"] = &TriggerFactoryInternal::spellstone;
+             
                 creators["corruption"] = &TriggerFactoryInternal::corruption;
                 creators["corruption on attacker"] = &TriggerFactoryInternal::corruption_on_attacker;
                 creators["curse of agony"] = &TriggerFactoryInternal::curse_of_agony;
                 creators["curse of agony on attacker"] = &TriggerFactoryInternal::curse_of_agony_on_attacker;
                 creators["banish"] = &TriggerFactoryInternal::banish;
-                creators["spellstone"] = &TriggerFactoryInternal::spellstone;
                 creators["backlash"] = &TriggerFactoryInternal::backlash;
                 creators["fear"] = &TriggerFactoryInternal::fear;
                 creators["immolate"] = &TriggerFactoryInternal::immolate;
                 creators["amplify curse"] = &TriggerFactoryInternal::amplify_curse;
                 creators["siphon life"] = &TriggerFactoryInternal::siphon_life;
                 creators["siphon life on attacker"] = &TriggerFactoryInternal::siphon_life_on_attacker;
+                creators["improved shadow bolt"] = &TriggerFactoryInternal::improved_shadow_bolt;
+                creators["life tap glyph"] = &TriggerFactoryInternal::life_tap_glyph;
+                creators["unstable affliction"] = &TriggerFactoryInternal::unstable_affliction;
+                creators["haunt"] = &TriggerFactoryInternal::haunt;
+                creators["fel armor"] = &TriggerFactoryInternal::fel_armor;
+                creators["shadow bolt"] = &TriggerFactoryInternal::shadow_bolt;
 
-
+                creators["drain soul"] = &TriggerFactoryInternal::drain_soul;
+                /*
+                creators["spellstone"] = &TriggerFactoryInternal::hasSoulstone;*/
+                //creators["no soulstone"] = &TriggerFactoryInternal::hasSoulstone;
+                //creators["use soulstone"] = &TriggerFactoryInternal::use_soulstone;
             }
 
         private:
@@ -98,6 +115,7 @@ namespace ai
             static Trigger* HasHealthstone(PlayerbotAI* ai) { return new HasHealthstoneTrigger(ai); }
             static Trigger* HasFirestone(PlayerbotAI* ai) { return new HasFirestoneTrigger(ai); }
             static Trigger* HasSpellstone(PlayerbotAI* ai) { return new HasSpellstoneTrigger(ai); }
+            static Trigger* spellstone(PlayerbotAI* ai) { return new SpellstoneTrigger(ai); }
             static Trigger* corruption(PlayerbotAI* ai) { return new CorruptionTrigger(ai); }
             static Trigger* corruption_on_attacker(PlayerbotAI* ai) { return new CorruptionOnAttackerTrigger(ai); }
             static Trigger* siphon_life(PlayerbotAI* ai) { return new SiphonLifeTrigger(ai); }
@@ -105,11 +123,20 @@ namespace ai
             static Trigger* curse_of_agony(PlayerbotAI* ai) { return new CurseOfAgonyTrigger(ai); }
             static Trigger* curse_of_agony_on_attacker(PlayerbotAI* ai) { return new CastCurseOfAgonyOnAttackerTrigger(ai); }
             static Trigger* banish(PlayerbotAI* ai) { return new BanishTrigger(ai); }
-            static Trigger* spellstone(PlayerbotAI* ai) { return new SpellstoneTrigger(ai); }
             static Trigger* backlash(PlayerbotAI* ai) { return new BacklashTrigger(ai); }
             static Trigger* fear(PlayerbotAI* ai) { return new FearTrigger(ai); }
             static Trigger* immolate(PlayerbotAI* ai) { return new ImmolateTrigger(ai); }
 
+            static Trigger* unstable_affliction(PlayerbotAI* ai) { return new UnstableAfflictionTrigger(ai); }
+            static Trigger* haunt(PlayerbotAI* ai) { return new HauntTrigger(ai); }
+            static Trigger* fel_armor(PlayerbotAI* ai) { return new FelArmorTrigger(ai); }
+            static Trigger* shadow_bolt(PlayerbotAI* ai) { return new SpellCanBeCastTrigger(ai, "shadow bolt"); }
+            static Trigger* improved_shadow_bolt(PlayerbotAI* ai) { return new ImprovedShadowBoltTrigger(ai); }
+
+            static Trigger* hasSoulstone(PlayerbotAI* ai) { return new HasSoulstoneTrigger(ai); }
+            static Trigger* use_soulstone(PlayerbotAI* ai) { return new SoulstoneOnTankTrigger(ai); }
+            static Trigger* life_tap_glyph(PlayerbotAI* ai) { return new LifeTapBoostTrigger(ai); }
+            static Trigger* drain_soul(PlayerbotAI* ai) { return new DrainSoulTrigger(ai); }
         };
     };
 };
@@ -136,6 +163,8 @@ namespace ai
                 creators["summon succubus"] = &AiObjectContextInternal::summon_succubus;
                 creators["summon imp"] = &AiObjectContextInternal::summon_imp;
                 creators["summon felguard"] = &AiObjectContextInternal::summon_felguard;
+                creators["summon felhunter"] = &AiObjectContextInternal::summon_felhunter;
+
                 creators["immolate"] = &AiObjectContextInternal::immolate;
                 creators["corruption"] = &AiObjectContextInternal::corruption;
                 creators["corruption on attacker"] = &AiObjectContextInternal::corruption_on_attacker;
@@ -158,6 +187,14 @@ namespace ai
                 creators["incinirate"] = &AiObjectContextInternal::incinirate;
                 creators["conflagrate"] = &AiObjectContextInternal::conflagrate;
                 creators["amplify curse"] = &AiObjectContextInternal::amplify_curse;
+                creators["unstable affliction"] = &AiObjectContextInternal::unstable_affliction;
+                creators["haunt"] = &AiObjectContextInternal::haunt;
+
+                creators["soulshatter"] = &AiObjectContextInternal::soulshatter;
+                /*
+                creators["life tap level one"] = &AiObjectContextInternal::life_tap;*/
+                //creators["create soulstone"] = &AiObjectContextInternal::create_soulstone;
+                creators["use soulstone on master"] = &AiObjectContextInternal::use_soulstone;
             }
 
         private:
@@ -169,6 +206,9 @@ namespace ai
             static Action* immolate(PlayerbotAI* ai) { return new CastImmolateAction(ai); }
             static Action* summon_imp(PlayerbotAI* ai) { return new CastSummonImpAction(ai); }
             static Action* summon_succubus(PlayerbotAI* ai) { return new CastSummonSuccubusAction(ai); }
+            static Action* summon_voidwalker(PlayerbotAI* ai) { return new CastSummonVoidwalkerAction(ai); }
+            static Action* summon_felguard(PlayerbotAI* ai) { return new CastSummonFelguardAction(ai); }
+            static Action* summon_felhunter(PlayerbotAI* ai) { return new CastSummonFelhunterAction(ai); }
             static Action* fel_armor(PlayerbotAI* ai) { return new CastFelArmorAction(ai); }
             static Action* demon_armor(PlayerbotAI* ai) { return new CastDemonArmorAction(ai); }
             static Action* demon_skin(PlayerbotAI* ai) { return new CastDemonSkinAction(ai); }
@@ -176,8 +216,6 @@ namespace ai
             static Action* create_firestone(PlayerbotAI* ai) { return new CastCreateFirestoneAction(ai); }
             static Action* create_spellstone(PlayerbotAI* ai) { return new CastCreateSpellstoneAction(ai); }
             static Action* spellstone(PlayerbotAI* ai) { return new UseSpellItemAction(ai, "spellstone", true); }
-            static Action* summon_voidwalker(PlayerbotAI* ai) { return new CastSummonVoidwalkerAction(ai); }
-            static Action* summon_felguard(PlayerbotAI* ai) { return new CastSummonFelguardAction(ai); }
             static Action* corruption(PlayerbotAI* ai) { return new CastCorruptionAction(ai); }
             static Action* corruption_on_attacker(PlayerbotAI* ai) { return new CastCorruptionOnAttackerAction(ai); }
             static Action* siphon_life(PlayerbotAI* ai) { return new CastSiphonLifeAction(ai); }
@@ -194,7 +232,12 @@ namespace ai
             static Action* rain_of_fire(PlayerbotAI* ai) { return new CastRainOfFireAction(ai); }
             static Action* shadowfury(PlayerbotAI* ai) { return new CastShadowfuryAction(ai); }
             static Action* life_tap(PlayerbotAI* ai) { return new CastLifeTapAction(ai); }
+            static Action* haunt(PlayerbotAI* ai) { return new CastRangeSpellAction(ai, "haunt"); }
+            static Action* unstable_affliction(PlayerbotAI* ai) { return new CastRangeSpellAction(ai, "unstable affliction"); }
 
+            static Action* soulshatter(PlayerbotAI* ai) { return new CastSoulshatterAction(ai); }
+            static Action* create_soulstone(PlayerbotAI* ai) { return new CastCreateSoulstoneAction(ai); }
+            static Action* use_soulstone(PlayerbotAI* ai) { return new UseSoulStone(ai); }
         };
     };
 };

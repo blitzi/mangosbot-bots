@@ -291,15 +291,20 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
                 engine->addStrategies("dps", NULL);
             break;
         case CLASS_WARLOCK:
-            if (tab == 1)
-                engine->addStrategies("tank", "threat", NULL);
+            if (tab == 0)
+                engine->addStrategies("affliction", "pet_affliction", NULL);
+            else if (tab == 1)
+                engine->addStrategies("deamon", "pet_deamon", NULL);
             else
-                engine->addStrategies("dps", "threat", NULL);
+                engine->addStrategies("destro", "pet_destro", NULL);
 
-            if (player->GetLevel() > 19)
+            if (!player->GetGroup())
+                engine->addStrategy("cc");
+
+            if (player->GetLevel() > 19 && tab != 0)
                 engine->addStrategy("dps debuff");
 
-            engine->addStrategies("dps assist", "flee", "ranged", "cc", "pet", NULL);
+            engine->addStrategies("dps assist", "flee", "ranged", "threat", NULL);
             break;
 #ifdef MANGOSBOT_TWO
         case CLASS_DEATH_KNIGHT:

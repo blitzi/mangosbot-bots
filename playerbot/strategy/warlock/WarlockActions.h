@@ -1,25 +1,15 @@
 #pragma once
 
 #include "../actions/GenericActions.h"
+#include "../actions/UseItemAction.h"
 
 namespace ai
 {
-	class CastDemonSkinAction : public CastBuffSpellAction {
-	public:
-		CastDemonSkinAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "demon skin") {}
-	};
 
-	class CastDemonArmorAction : public CastBuffSpellAction
-	{
-	public:
-		CastDemonArmorAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "demon armor") {}
-	};
-
-	class CastFelArmorAction : public CastBuffSpellAction
-	{
-	public:
-		CastFelArmorAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "fel armor") {}
-	};
+    BUFF_ACTION(CastDemonSkinAction, "demon skin");
+    BUFF_ACTION(CastDemonArmorAction, "demon armor");
+    BUFF_ACTION(CastFelArmorAction, "fel armor");
+    BUFF_ACTION(CastSoulshatterAction, "soulshatter");
 
     BEGIN_RANGED_SPELL_ACTION(CastShadowBoltAction, "shadow bolt")
     END_SPELL_ACTION()
@@ -76,47 +66,17 @@ namespace ai
         CastCurseOfAgonyOnAttackerAction(PlayerbotAI* ai) : CastDebuffSpellOnAttackerAction(ai, "curse of agony") {}
     };
 
-	class CastSummonVoidwalkerAction : public CastBuffSpellAction
-	{
-	public:
-		CastSummonVoidwalkerAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "summon voidwalker") {}
-	};
+    BUFF_ACTION(CastSummonVoidwalkerAction, "summon voidwalker");
+    BUFF_ACTION(CastSummonFelguardAction, "summon felguard");
+    BUFF_ACTION(CastSummonImpAction, "summon imp");
+    BUFF_ACTION(CastSummonSuccubusAction, "summon succubus");
+    BUFF_ACTION(CastSummonFelhunterAction, "summon felhunter");
 
-	class CastSummonFelguardAction : public CastBuffSpellAction
-	{
-	public:
-		CastSummonFelguardAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "summon felguard") {}
-	};
+    BUFF_ACTION(CastCreateHealthstoneAction, "create healthstone");
+    BUFF_ACTION(CastCreateSoulstoneAction, "create soulstone");
+    BUFF_ACTION(CastCreateFirestoneAction, "create firestone");
+    BUFF_ACTION(CastCreateSpellstoneAction, "create spellstone");
 
-	class CastSummonImpAction : public CastBuffSpellAction
-	{
-	public:
-		CastSummonImpAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "summon imp") {}
-	};
-
-    class CastSummonSuccubusAction : public CastBuffSpellAction
-    {
-    public:
-        CastSummonSuccubusAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "summon succubus") {}
-    };
-
-	class CastCreateHealthstoneAction : public CastBuffSpellAction
-	{
-	public:
-		CastCreateHealthstoneAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "create healthstone") {}
-	};
-
-	class CastCreateFirestoneAction : public CastBuffSpellAction
-	{
-	public:
-		CastCreateFirestoneAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "create firestone") {}
-	};
-
-	class CastCreateSpellstoneAction : public CastBuffSpellAction
-	{
-	public:
-		CastCreateSpellstoneAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "create spellstone") {}
-	};
 
     class CastBanishAction : public CastBuffSpellAction
     {
@@ -204,4 +164,16 @@ namespace ai
         CastSiphonLifeOnAttackerAction(PlayerbotAI* ai) : CastDebuffSpellOnAttackerAction(ai, "siphon life") {}
     };
 
+
+
+    class UseSoulStone : public UseItemAction
+    {
+    public:
+        UseSoulStone(PlayerbotAI* ai) : UseItemAction(ai, "demonic soulstone", false) {}
+
+        //bool isUseful() { return !bot->IsInCombat() && !bot->InBattleGround(); }
+        virtual string GetTargetName() { return "tank target"; }
+
+        virtual bool Execute(Event event);
+    };
 }

@@ -14,13 +14,36 @@ namespace ai
         virtual void InitTriggers(std::list<TriggerNode*> &triggers);
     };
 
-    class WarlockPetStrategy : public Strategy
+    class WarlockPetStrategy : public NonCombatStrategy
+    {
+    private:
+        string bestPet;
+    public:
+        WarlockPetStrategy(PlayerbotAI* ai, string pet) : NonCombatStrategy(ai)
+        {
+            bestPet = "summon " + pet;
+        }
+        virtual void InitTriggers(std::list<TriggerNode*>& triggers);
+    };
+
+    class AfflictionWarlockPetStrategy : public WarlockPetStrategy
     {
     public:
-        WarlockPetStrategy(PlayerbotAI* ai) : Strategy(ai) {}
-        virtual string getName() { return "pet"; }
+        AfflictionWarlockPetStrategy(PlayerbotAI* ai) : WarlockPetStrategy(ai, "imp") {}
+        virtual string getName() { return "pet_affliction"; }
+    };
 
+    class DeamonWarlockPetStrategy : public WarlockPetStrategy
+    {
     public:
-        virtual void InitTriggers(std::list<TriggerNode*> &triggers);
+        DeamonWarlockPetStrategy(PlayerbotAI* ai) : WarlockPetStrategy(ai, "felguard") {}
+        virtual string getName() { return "pet_deamon"; }
+    };
+
+    class DestroWarlockPetStrategy : public WarlockPetStrategy
+    {
+    public:
+        DestroWarlockPetStrategy(PlayerbotAI* ai) : WarlockPetStrategy(ai, "succubus") {}
+        virtual string getName() { return "pet_destro"; }
     };
 }
