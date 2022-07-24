@@ -5,6 +5,16 @@
 
 namespace ai
 {
+    class AfflictionWarlockStrategy : public GenericWarlockStrategy
+    {
+    public:
+        AfflictionWarlockStrategy(PlayerbotAI* ai);
+        virtual string getName() { return "affliction"; }
+
+    public:
+        virtual void InitTriggers(std::list<TriggerNode*> &triggers);
+    };    
+    
     class DpsWarlockStrategy : public GenericWarlockStrategy
     {
     public:

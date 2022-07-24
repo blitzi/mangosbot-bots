@@ -3,12 +3,12 @@
 
 namespace ai
 {
-	class DemonArmorTrigger : public BuffTrigger
-	{
-	public:
-		DemonArmorTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "demon armor") {}
-		virtual bool IsActive();
-	};
+	//class DemonArmorTrigger : public BuffTrigger
+	//{
+	//public:
+	//	DemonArmorTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "demon armor") {}
+	//	virtual bool IsActive();
+	//};
 
     class SpellstoneTrigger : public BuffTrigger
     {
@@ -17,9 +17,56 @@ namespace ai
         virtual bool IsActive();
     };
 
+    class NoArmorTrigger : public BuffTrigger
+    {
+    public:
+        NoArmorTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "fel armor") {}
+        virtual bool IsActive();
+    };
+
     DEBUFF_TRIGGER(CurseOfAgonyTrigger, "curse of agony");
     DEBUFF_TRIGGER(CorruptionTrigger, "corruption");
     DEBUFF_TRIGGER(SiphonLifeTrigger, "siphon life");
+    DEBUFF_TRIGGER(UnstableAfflictionTrigger, "unstable affliction");
+    DEBUFF_TRIGGER(HauntTrigger, "haunt");
+
+    //BUFF_TRIGGER(FelArmorTrigger, "fel armor");
+
+    class SoulstoneOnTankTrigger : public BuffOnTankTrigger {
+    public:
+        SoulstoneOnTankTrigger(PlayerbotAI* ai) : BuffOnTankTrigger(ai, "soulstone resurrection", 1) {}
+
+        virtual bool IsActive() {
+            bool hasItem = AI_VALUE2(uint32, "item count", "demonic soulstone") > 0;
+            bool hasTarget = GetTarget();
+            //bool targetHasAura = !ai->HasAura("soulstone resurrection", GetTarget());
+            //bool isInGroup = (ai->GetBot()->IsInGroup((Player*)GetTarget(), true) || ai->GetBot()->IsInGroup((Player*)GetTarget()));
+            return hasItem &&//BuffOnTankTrigger::IsActive() &&
+                GetTarget() &&
+                !ai->HasAura("soulstone resurrection", GetTarget()) &&
+#ifdef MANGOS
+                (ai->GetBot()->IsInSameGroupWith((Player*)GetTarget()) || ai->GetBot()->IsInSameRaidWith((Player*)GetTarget())) &&
+#endif
+#ifdef CMANGOS
+                (ai->GetBot()->IsInGroup((Player*)GetTarget(), true) || ai->GetBot()->IsInGroup((Player*)GetTarget()))
+#endif               
+                ;
+        }
+    };
+
+    class ImprovedShadowBoltTrigger : public DebuffTrigger
+    {
+    public:
+        ImprovedShadowBoltTrigger(PlayerbotAI* ai) : DebuffTrigger(ai, "shadow bolt") {}
+        virtual bool IsActive()
+        {
+            // improved shadow bolt aura
+            if (!ai->HasAura(17800, GetTarget()))
+                return BuffTrigger::IsActive();
+
+            return false;
+        }
+    };
 
     class CorruptionOnAttackerTrigger : public DebuffOnAttackerTrigger
     {
@@ -59,6 +106,69 @@ namespace ai
         BanishTrigger(PlayerbotAI* ai) : HasCcTargetTrigger(ai, "banish") {}
     };
 
+
+    class FearTrigger : public HasCcTargetTrigger
+    {
+    public:
+        FearTrigger(PlayerbotAI* ai) : HasCcTargetTrigger(ai, "fear") {}
+    };
+
+    class AmplifyCurseTrigger : public BuffTrigger
+    {
+    public:
+        AmplifyCurseTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "amplify curse") {}
+    };
+
+    class LifeTapBoostTrigger : public BuffTrigger
+    {
+    public:
+        LifeTapBoostTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "life tap") {}
+        virtual bool IsActive()
+        {
+            // Glyph of Life tap
+            if (!ai->HasAura(63320, GetTarget()))
+                return SpellTrigger::IsActive();
+
+            return false;
+        }
+    };
+
+
+    class DrainSoulTrigger : public TargetLowHealthTrigger
+    {
+    public:
+        DrainSoulTrigger(PlayerbotAI* ai) : TargetLowHealthTrigger(ai, 25) {}
+    };
+
+
+
+    //class TargetLowHealthTrigger : public HealthInRangeTrigger {
+    //public:
+    //    TargetLowHealthTrigger(PlayerbotAI* ai, float value, float minValue = 0) :
+    //        HealthInRangeTrigger(ai, "target low health", value, minValue) {}
+    //    virtual string GetTargetName() { return "current target"; }
+    //};
+
+    //class TargetCriticalHealthTrigger : public TargetLowHealthTrigger
+    //{
+    //public:
+    //    TargetCriticalHealthTrigger(PlayerbotAI* ai) : TargetLowHealthTrigger(ai, 20) {}
+    //};
+    class SummonImpTrigger : public BuffTrigger
+    {
+    public:
+        SummonImpTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "summon imp", 30) {}
+        virtual bool IsActive() { return !AI_VALUE(Unit*, "pet target") && !AI_VALUE2(bool, "mounted", "self target"); }
+    };
+
+    // trigger with soul shards
+    class SummonDeamonTrigger : public BuffTrigger
+    {
+    public:
+        SummonDeamonTrigger(PlayerbotAI* ai, string spell) : BuffTrigger(ai, spell, 30) {}
+        virtual bool IsActive() { return !AI_VALUE(Unit*, "pet target") && !AI_VALUE2(bool, "mounted", "self target") && BuffTrigger::IsActive() && AI_VALUE2(uint32, "item count", "soul shard") > 0; }
+    };
+
     class WarlockConjuredItemTrigger : public ItemCountTrigger
     {
     public:
@@ -85,16 +195,15 @@ namespace ai
         HasHealthstoneTrigger(PlayerbotAI* ai) : WarlockConjuredItemTrigger(ai, "healthstone") {}
     };
 
-    class FearTrigger : public HasCcTargetTrigger
+    class HasSoulstoneTrigger : public WarlockConjuredItemTrigger
     {
     public:
-        FearTrigger(PlayerbotAI* ai) : HasCcTargetTrigger(ai, "fear") {}      
+        HasSoulstoneTrigger(PlayerbotAI* ai) : WarlockConjuredItemTrigger(ai, "demonic soulstone") {}
     };
 
-    class AmplifyCurseTrigger : public BuffTrigger
-    {
-    public:
-        AmplifyCurseTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "amplify curse") {}
-    };
-
+    //class NoRefreshmentTrigger : public Trigger {
+    //public:
+    //    NoRefreshmentTrigger(PlayerbotAI* ai) : Trigger(ai, "no refreshment trigger") {}
+    //    virtual bool IsActive() { return AI_VALUE2(list<Item*>, "inventory items", "conjured refreshment").empty(); }
+    //};
 }
