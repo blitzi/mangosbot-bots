@@ -240,8 +240,6 @@ void PlayerbotAI::HandleTeleportAck()
     if (IsRealPlayer())
         return;
 
-	bot->GetMotionMaster()->Clear(true);
-	bot->InterruptMoving(1);
 	if (bot->IsBeingTeleportedNear())
 	{
 		WorldPacket p = WorldPacket(MSG_MOVE_TELEPORT_ACK, 8 + 4 + 4);
@@ -294,7 +292,7 @@ void PlayerbotAI::Reset(bool full)
     
     aiObjectContext->GetValue<set<ObjectGuid>&>("ignore rpg target")->Get().clear();   
 
-    bot->GetMotionMaster()->Clear();
+	StopMoving();
 #ifdef MANGOS
     bot->m_taxi.ClearTaxiDestinations();
 #endif
@@ -553,8 +551,8 @@ void PlayerbotAI::DoNextAction()
     // change engine if just died
     if (currentEngine != engines[BOT_STATE_DEAD] && !sServerFacade.IsAlive(bot))
     {
-        bot->StopMoving();
-        bot->GetMotionMaster()->Clear();
+		StopMoving();
+
         bot->GetMotionMaster()->MoveIdle();
 
         //Death Count to prevent skeleton piles
@@ -581,10 +579,6 @@ void PlayerbotAI::DoNextAction()
         ChangeEngine(BOT_STATE_NON_COMBAT);
         aiObjectContext->GetValue<Unit*>("current target")->Set(NULL);
     }
-
-	//switch to combat state if the bot is in combat and has a target
-    if (currentEngine != engines[BOT_STATE_COMBAT] && (sServerFacade.IsInCombat(bot) && aiObjectContext->GetValue<Unit*>("current target")))
-		ChangeEngine(BOT_STATE_COMBAT);
 
     bool minimal = !AllowActivity();
 
@@ -1588,8 +1582,6 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
     aiObjectContext->GetValue<LastMovement&>("last movement")->Get().Set(NULL);
     aiObjectContext->GetValue<time_t>("stay time")->Set(0);
 
-    MotionMaster &mm = *bot->GetMotionMaster();
-
     if (bot->IsFlying() || bot->IsTaxiFlying())
         return false;
 
@@ -1680,8 +1672,7 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
 
     if (sServerFacade.isMoving(bot) && spell->GetCastTime())
     {
-        bot->StopMoving();
-        bot->GetMotionMaster()->Clear();
+		StopMoving();
 
         spell->cancel();
         //delete spell;
@@ -1755,8 +1746,6 @@ bool PlayerbotAI::CastSpell(uint32 spellId, float x, float y, float z, Item* ite
 
     aiObjectContext->GetValue<LastMovement&>("last movement")->Get().Set(NULL);
     aiObjectContext->GetValue<time_t>("stay time")->Set(0);
-
-    MotionMaster& mm = *bot->GetMotionMaster();
 
     if (bot->IsFlying() || bot->IsTaxiFlying())
         return false;
@@ -2623,7 +2612,6 @@ float PlayerbotAI::GetRange(string type)
     if (type == "spell") return sPlayerbotAIConfig.spellDistance;
     if (type == "shoot") return sPlayerbotAIConfig.shootDistance;
     if (type == "flee") return sPlayerbotAIConfig.fleeDistance;
-    if (type == "heal") return sPlayerbotAIConfig.healDistance;
     if (type == "stance") return sPlayerbotAIConfig.stanceDistance;
     return 0;
 }

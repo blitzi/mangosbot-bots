@@ -326,8 +326,7 @@ bool AttackersValue::IsPossibleTarget(Unit *attacker, Player *bot)
 		!sServerFacade.IsFriendlyTo(attacker, bot) &&
 		bot->IsWithinDistInMap(attacker, sPlayerbotAIConfig.sightDistance) &&
 		!(sPlayerbotAIConfig.IsInPvpProhibitedZone(attacker->GetAreaId()) && (attacker->GetObjectGuid().IsPlayer() || attacker->GetObjectGuid().IsPet())) &&
-		(!c || !c->GetCombatManager().IsInEvadeMode()) &&
-		attacker->IsInCombat();
+		(!c || !c->GetCombatManager().IsInEvadeMode());
 
     bool rti = IsRti(attacker, bot);
   

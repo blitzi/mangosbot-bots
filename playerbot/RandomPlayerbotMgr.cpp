@@ -985,7 +985,7 @@ void RandomPlayerbotMgr::RandomTeleport(Player* bot, vector<WorldLocation> &locs
             if (hearth)
                 bot->SetHomebindToLocation(loc, area->ID);
 
-            bot->GetMotionMaster()->Clear();
+			bot->GetPlayerbotAI()->StopMoving();
             bot->TeleportTo(loc.mapid, x, y, z, 0);
             bot->SendHeartBeat();
             bot->GetPlayerbotAI()->ResetStrategies();

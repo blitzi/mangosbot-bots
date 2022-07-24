@@ -343,6 +343,12 @@ public:
 
 	BotState GetCurrentState() { return currentState; }
 
+	void StopMoving() 
+	{
+		bot->InterruptMoving(true);
+		bot->GetMotionMaster()->Clear();
+	}
+
 private:
     void _fillGearScoreData(Player *player, Item* item, std::vector<uint32>* gearScore, uint32& twoHandScore);
     bool IsTellAllowed(PlayerbotSecurityLevel securityLevel = PLAYERBOT_SECURITY_ALLOW_ALL);

@@ -52,8 +52,8 @@ bool ReviveFromCorpseAction::Execute(Event event)
 
     sLog.outDetail("Bot #%d %s:%d <%s> revives at body", bot->GetGUIDLow(), bot->GetTeam() == ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName());
 
-    bot->GetMotionMaster()->Clear();
-    bot->StopMoving();
+	ai->StopMoving();
+
     WorldPacket packet(CMSG_RECLAIM_CORPSE);
     packet << bot->GetObjectGuid();
     bot->GetSession()->HandleReclaimCorpseOpcode(packet);

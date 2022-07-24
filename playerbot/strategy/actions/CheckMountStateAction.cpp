@@ -185,8 +185,7 @@ bool CheckMountStateAction::Mount()
 {
     if (sServerFacade.isMoving(bot))
     {
-        bot->StopMoving();
-        bot->GetMotionMaster()->Clear();
+		ai->StopMoving();
         bot->GetMotionMaster()->MoveIdle();
     }
 

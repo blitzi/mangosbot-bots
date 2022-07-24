@@ -131,24 +131,19 @@ bool AttackAction::Attack(Unit* target)
     if (IsMovingAllowed() && !sServerFacade.IsInFront(bot, target, sPlayerbotAIConfig.sightDistance, CAST_ANGLE_IN_FRONT))
         sServerFacade.SetFacingTo(bot, target);
 
-    if (bot->Attack(target, !ai->IsRanged(bot)))
-    {
-		ai->ChangeStrategy("-follow");
+	bool isRanged = ai->IsRanged(bot);
+	bool attacked = bot->Attack(target, !isRanged);
+
+	if (ai->GetCurrentState() != BOT_STATE_COMBAT)
+	{
+		ai->ChangeStrategy("-follow", BOT_STATE_COMBAT);
 		ai->ChangeEngine(BOT_STATE_COMBAT);
 
-        float distance = ai->IsRanged(bot) ? ai->GetRange("spell") : 0;
-        Stance* stance = context->GetValue<Stance*>("stance")->Get();
+		if (isRanged)
+			ai->StopMoving();
+	}
 
-        if (stance && stance->GetName() != "near")
-            return MoveToStance(target);
-        else
-            return ChaseTo(target, distance);
-    }
-    
-    if(!bot->GetVictim())
-        context->GetValue<Unit*>("current target")->Set(NULL);
-
-    return false;
+	return attacked;
 }
 
 bool AttackDuelOpponentAction::isUseful()

@@ -735,9 +735,9 @@ void MovementAction::UpdateMovementState()
 
                 z += CONTACT_DISTANCE;
                 bot->UpdateAllowedPositionZ(x, y, z);
-
-                bot->StopMoving();
-                bot->GetMotionMaster()->Clear();
+				
+				ai->StopMoving();
+                
                 bot->NearTeleportTo(x, y, z, bot->GetOrientation());
                 //bot->GetMotionMaster()->MovePoint(bot->GetMapId(), x, y, z, FORCED_MOVEMENT_RUN, false);
                 return;
@@ -776,8 +776,8 @@ void MovementAction::UpdateMovementState()
                     z += CONTACT_DISTANCE;
                     bot->UpdateAllowedPositionZ(x, y, z);
 
-                    bot->StopMoving();
-                    bot->GetMotionMaster()->Clear();
+					ai->StopMoving();
+                    
                     bot->NearTeleportTo(x, y, z, bot->GetOrientation());
                     //bot->GetMotionMaster()->MovePoint(bot->GetMapId(), x, y, z, FORCED_MOVEMENT_RUN, false);
                     return;
@@ -940,14 +940,14 @@ bool MovementAction::ChaseTo(WorldObject* obj, float distance, float angle)
         ai->InterruptSpell();
     }
 
-    bot->GetMotionMaster()->Clear();
-
     if (!ai->HasStrategy("dont move"))
     {
+		bot->GetMotionMaster()->Clear();
         bot->GetMotionMaster()->MoveChase((Unit*)obj, distance, angle);
+		return true;
     }
 
-    return true;
+	return false;
 }
 
 float MovementAction::MoveDelay(float distance)

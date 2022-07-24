@@ -400,7 +400,12 @@ bool GroupMemberInCombatTrigger::IsActive()
 
 bool NoGroupMemberInCombatTrigger::IsActive()
 {
-	return !GroupMemberInCombatTrigger::IsActive();
+	Unit* dps = AI_VALUE(Unit*, "dps target");
+	Unit* target = AI_VALUE(Unit*, "current target");
+
+	bool hasEnemyTarget = target && !sServerFacade.IsFriendlyTo(ai->GetBot(), target);
+
+	return !GroupMemberInCombatTrigger::IsActive() && !dps && !hasEnemyTarget;
 }
 
 bool NotDpsAoeTargetActiveTrigger::IsActive()
