@@ -14,24 +14,16 @@ void GenericWarlockNonCombatStrategy::InitTriggers(std::list<TriggerNode*> &trig
     NonCombatStrategy::InitTriggers(triggers);
 
     triggers.push_back(new TriggerNode(
-        "fel armor",
-        NextAction::array(0, new NextAction("fel armor", ACTION_HIGH), NULL)));
+        "no armor",
+        NextAction::array(0, new NextAction("fel armor", ACTION_HIGH), new NextAction("demon armor", ACTION_HIGH - 1), new NextAction("demon skin", ACTION_HIGH - 2), NULL)));
 
     triggers.push_back(new TriggerNode(
-        "demon armor",
-        NextAction::array(0, new NextAction("demon armor", ACTION_NORMAL + 1), NULL)));
+        "no spellstone",
+        NextAction::array(0, new NextAction("create spellstone", 5.0f), NULL)));
 
     triggers.push_back(new TriggerNode(
-        "demon skin",
-        NextAction::array(0, new NextAction("demon skin", ACTION_NORMAL), NULL)));
-
-    //triggers.push_back(new TriggerNode(
-    //    "no spellstone",
-    //    NextAction::array(0, new NextAction("create spellstone", 15.0f), NULL)));
-
-    //triggers.push_back(new TriggerNode(
-    //    "spellstone",
-    //    NextAction::array(0, new NextAction("spellstone", 14.0f), NULL)));
+        "spellstone",
+        NextAction::array(0, new NextAction("use spellstone", 4.0f), NULL)));
 
     //triggers.push_back(new TriggerNode(
     //    "no soulstone",
@@ -41,9 +33,9 @@ void GenericWarlockNonCombatStrategy::InitTriggers(std::list<TriggerNode*> &trig
     //    "use soulstone",
     //    NextAction::array(0, new NextAction("use soulstone on master", 11.0f), NULL)));
 
-    triggers.push_back(new TriggerNode(
-        "no healthstone",
-        NextAction::array(0, new NextAction("create healthstone", 13.0f), NULL)));
+    //triggers.push_back(new TriggerNode(
+    //    "no healthstone",
+    //    NextAction::array(0, new NextAction("create healthstone", 3.0f), NULL)));
 
 
     /*
@@ -59,5 +51,5 @@ void WarlockPetStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
     triggers.push_back(new TriggerNode(
         "no pet",
-        NextAction::array(0, new NextAction(bestPet, ACTION_HIGH), new NextAction("summon succubus", ACTION_NORMAL + 2), new NextAction("summon imp", ACTION_NORMAL + 1), NULL)));
+        NextAction::array(0, new NextAction("summon imp", ACTION_NORMAL + 1), NULL)));// new NextAction(bestPet, ACTION_HIGH), new NextAction("summon succubus", ACTION_NORMAL + 2), new NextAction("summon imp", ACTION_NORMAL + 1), NULL)));
 }

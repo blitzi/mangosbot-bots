@@ -20,7 +20,7 @@ namespace ai
 		CastDrainSoulAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "drain soul") {}
 		virtual bool isUseful()
 		{
-			return AI_VALUE2(uint32, "item count", "soul shard") < int(AI_VALUE(uint8, "bag space") * 0.2);
+            return AI_VALUE2(uint32, "item count", "soul shard") < 28;// int(AI_VALUE(uint8, "bag space") * 0.2);
 		}
 	};
 
@@ -73,7 +73,6 @@ namespace ai
     BUFF_ACTION(CastSummonFelhunterAction, "summon felhunter");
 
     BUFF_ACTION(CastCreateHealthstoneAction, "create healthstone");
-    BUFF_ACTION(CastCreateSoulstoneAction, "create soulstone");
     BUFF_ACTION(CastCreateFirestoneAction, "create firestone");
     BUFF_ACTION(CastCreateSpellstoneAction, "create spellstone");
 
@@ -144,6 +143,13 @@ namespace ai
         CastLifeTapAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "life tap") {}
         virtual string GetTargetName() { return "self target"; }
         virtual bool isUseful() { return AI_VALUE2(float, "health", "self target") > sPlayerbotAIConfig.lowHealth; }
+    };    
+    class CastLifeTap1Action: public CastRangeSpellAction
+    {
+    public:
+        CastLifeTap1Action(PlayerbotAI* ai) : CastRangeSpellAction(ai, "life tap rank 1") {}
+        virtual string GetTargetName() { return "self target"; }
+        virtual bool isUseful() { return AI_VALUE2(float, "health", "self target") > sPlayerbotAIConfig.lowHealth; }
     };
 
     class CastAmplifyCurseAction : public CastBuffSpellAction
@@ -164,16 +170,26 @@ namespace ai
         CastSiphonLifeOnAttackerAction(PlayerbotAI* ai) : CastDebuffSpellOnAttackerAction(ai, "siphon life") {}
     };
 
-
-
-    class UseSoulStone : public UseItemAction
+    class UseSpellStone : public Action
     {
     public:
-        UseSoulStone(PlayerbotAI* ai) : UseItemAction(ai, "demonic soulstone", false) {}
+        UseSpellStone(PlayerbotAI* ai) : Action(ai, "spellstone") {}
 
-        //bool isUseful() { return !bot->IsInCombat() && !bot->InBattleGround(); }
-        virtual string GetTargetName() { return "tank target"; }
+        bool isUseful() { return !ai->HasAura(55194, GetTarget()); }
+        virtual string GetTargetName() { return "self target"; }
 
         virtual bool Execute(Event event);
     };
+
+    //BUFF_ACTION(CastCreateSoulstoneAction, "create soulstone");
+    //class UseSoulStone : public UseItemAction
+    //{
+    //public:
+    //    UseSoulStone(PlayerbotAI* ai) : UseItemAction(ai, "soulstone", false) {}
+
+    //    //bool isUseful() { return !bot->IsInCombat() && !bot->InBattleGround(); }
+    //    virtual string GetTargetName() { return "tank target"; }
+
+    //    virtual bool Execute(Event event);
+    //};
 }

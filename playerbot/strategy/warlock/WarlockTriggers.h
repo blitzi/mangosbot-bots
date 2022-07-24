@@ -3,17 +3,24 @@
 
 namespace ai
 {
-	class DemonArmorTrigger : public BuffTrigger
-	{
-	public:
-		DemonArmorTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "demon armor") {}
-		virtual bool IsActive();
-	};
+	//class DemonArmorTrigger : public BuffTrigger
+	//{
+	//public:
+	//	DemonArmorTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "demon armor") {}
+	//	virtual bool IsActive();
+	//};
 
     class SpellstoneTrigger : public BuffTrigger
     {
     public:
         SpellstoneTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "spellstone") {}
+        virtual bool IsActive();
+    };
+
+    class NoArmorTrigger : public BuffTrigger
+    {
+    public:
+        NoArmorTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "fel armor") {}
         virtual bool IsActive();
     };
 
@@ -23,7 +30,7 @@ namespace ai
     DEBUFF_TRIGGER(UnstableAfflictionTrigger, "unstable affliction");
     DEBUFF_TRIGGER(HauntTrigger, "haunt");
 
-    BUFF_TRIGGER(FelArmorTrigger, "fel armor");
+    //BUFF_TRIGGER(FelArmorTrigger, "fel armor");
 
     class SoulstoneOnTankTrigger : public BuffOnTankTrigger {
     public:
@@ -119,8 +126,8 @@ namespace ai
         virtual bool IsActive()
         {
             // Glyph of Life tap
-            if (ai->HasAura(64248, GetTarget()))
-                return BuffTrigger::IsActive();
+            if (!ai->HasAura(63320, GetTarget()))
+                return SpellTrigger::IsActive();
 
             return false;
         }
@@ -194,4 +201,9 @@ namespace ai
         HasSoulstoneTrigger(PlayerbotAI* ai) : WarlockConjuredItemTrigger(ai, "demonic soulstone") {}
     };
 
+    //class NoRefreshmentTrigger : public Trigger {
+    //public:
+    //    NoRefreshmentTrigger(PlayerbotAI* ai) : Trigger(ai, "no refreshment trigger") {}
+    //    virtual bool IsActive() { return AI_VALUE2(list<Item*>, "inventory items", "conjured refreshment").empty(); }
+    //};
 }

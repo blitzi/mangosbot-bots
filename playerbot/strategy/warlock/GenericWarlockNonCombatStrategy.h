@@ -14,12 +14,12 @@ namespace ai
         virtual void InitTriggers(std::list<TriggerNode*> &triggers);
     };
 
-    class WarlockPetStrategy : public NonCombatStrategy
+    class WarlockPetStrategy : public Strategy
     {
     private:
         string bestPet;
     public:
-        WarlockPetStrategy(PlayerbotAI* ai, string pet) : NonCombatStrategy(ai)
+        WarlockPetStrategy(PlayerbotAI* ai, string pet) : Strategy(ai)
         {
             bestPet = "summon " + pet;
         }
@@ -30,7 +30,7 @@ namespace ai
     {
     public:
         AfflictionWarlockPetStrategy(PlayerbotAI* ai) : WarlockPetStrategy(ai, "imp") {}
-        virtual string getName() { return "pet_affliction"; }
+        virtual string getName() { return "pet"; }
     };
 
     class DeamonWarlockPetStrategy : public WarlockPetStrategy
