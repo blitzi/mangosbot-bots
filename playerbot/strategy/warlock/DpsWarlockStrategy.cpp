@@ -28,9 +28,9 @@ void AfflictionWarlockStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 
     // TODO
     // 0. livetap with glyphe ACTION_NORMAL + 9
-    triggers.push_back(new TriggerNode(
-        "life tap glyph",
-        NextAction::array(0, new NextAction("life tap rank one", rotationBaseValue + 9), NULL)));
+    //triggers.push_back(new TriggerNode(
+    //    "life tap glyph",
+    //    NextAction::array(0, new NextAction("life tap rank one", rotationBaseValue + 9), NULL)));
     
     // 1. first shadowbold for buff
 	triggers.push_back(new TriggerNode(
