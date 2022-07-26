@@ -88,7 +88,7 @@ CasterDruidStrategy::CasterDruidStrategy(PlayerbotAI* ai) : GenericDruidStrategy
 
 NextAction** CasterDruidStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("starfire", ACTION_NORMAL + 2), new NextAction("wrath", ACTION_NORMAL + 1), new NextAction("melee", ACTION_NORMAL), NULL);
+    return NextAction::array(0, new NextAction("starfire", ACTION_NORMAL + 2), new NextAction("wrath", ACTION_NORMAL + 1)/*, new NextAction("melee", ACTION_NORMAL)*/, NULL); // TODO: bring back melee when movement fix is in
 }
 
 void CasterDruidStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
@@ -114,7 +114,6 @@ void CasterDruidStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
     triggers.push_back(new TriggerNode(
         "party member almost full health",
         NextAction::array(0, new NextAction("rejuvenation on party", ACTION_LIGHT_HEAL + 1), NULL)));
-
 
     triggers.push_back(new TriggerNode(
         "insect swarm",

@@ -118,4 +118,6 @@ namespace ai
     public:
         ImprovedScorchTrigger(PlayerbotAI* ai) : DebuffTrigger(ai, "improved scorch") {}
     };
+
+    BUFF_TRIGGER(MirrorImageTrigger, "mirror image");
 }

@@ -113,6 +113,7 @@ namespace ai
                 creators["frost ward"] = &TriggerFactoryInternal::frost_ward;
                 creators["cast fireball"] = &TriggerFactoryInternal::cast_fireball;
                 creators["improved scorch"] = &TriggerFactoryInternal::improved_scorch;
+                creators["mirror image"] = &TriggerFactoryInternal::mirror_image;
             }
 
         private:
@@ -139,6 +140,7 @@ namespace ai
             static Trigger* counterspell_enemy_healer(PlayerbotAI* ai) { return new CounterspellEnemyHealerTrigger(ai); }
             static Trigger* cast_fireball(PlayerbotAI* ai) { return new SpellCanBeCastTrigger(ai, "fireball"); }
             static Trigger* improved_scorch(PlayerbotAI* ai) { return new ImprovedScorchTrigger(ai); }
+            static Trigger* mirror_image(PlayerbotAI* ai) { return new MirrorImageTrigger(ai); }
         };
     };
 };
@@ -195,6 +197,7 @@ namespace ai
                 creators["counterspell on enemy healer"] = &AiObjectContextInternal::counterspell_on_enemy_healer;
                 creators["fire ward"] = &AiObjectContextInternal::fire_ward;
                 creators["frost ward"] = &AiObjectContextInternal::frost_ward;
+                creators["mirror image"] = &AiObjectContextInternal::mirror_image;
             }
 
         private:
@@ -238,6 +241,7 @@ namespace ai
             static Action* invisibility(PlayerbotAI* ai) { return new CastInvisibilityAction(ai); }
             static Action* evocation(PlayerbotAI* ai) { return new CastEvocationAction(ai); }
             static Action* counterspell_on_enemy_healer(PlayerbotAI* ai) { return new CastCounterspellOnEnemyHealerAction(ai); }
+            static Action* mirror_image(PlayerbotAI* ai) { return new CastMirrorImageAction(ai); }
         };
     };
 };
