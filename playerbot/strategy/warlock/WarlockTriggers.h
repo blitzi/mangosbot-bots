@@ -125,11 +125,8 @@ namespace ai
         LifeTapBoostTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "life tap") {}
         virtual bool IsActive()
         {
-            // Glyph of Life tap
-            if (!ai->HasAura(63320, GetTarget()))
-                return SpellTrigger::IsActive();
-
-            return false;
+            // Glyph of Life tap                and glyphe effect
+            return ai->HasAura(63320, GetTarget()) && !ai->HasAura(63321, GetTarget()) && SpellTrigger::IsActive();
         }
     };
 
@@ -138,6 +135,10 @@ namespace ai
     {
     public:
         DrainSoulTrigger(PlayerbotAI* ai) : TargetLowHealthTrigger(ai, 25) {}
+        virtual bool IsActive()
+        {
+            return TargetLowHealthTrigger::IsActive() && AI_VALUE2(uint32, "item count", "soul shard") < 28;// int(AI_VALUE(uint8, "bag space") * 0.2);
+        }
     };
 
 

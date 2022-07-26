@@ -18,10 +18,10 @@ namespace ai
 	{
 	public:
 		CastDrainSoulAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "drain soul") {}
-		virtual bool isUseful()
-		{
-            return AI_VALUE2(uint32, "item count", "soul shard") < 28;// int(AI_VALUE(uint8, "bag space") * 0.2);
-		}
+		//virtual bool isUseful()
+		//{
+  //          return AI_VALUE2(uint32, "item count", "soul shard") < 28;// int(AI_VALUE(uint8, "bag space") * 0.2);
+		//}
 	};
 
 	class CastDrainManaAction : public CastRangeSpellAction

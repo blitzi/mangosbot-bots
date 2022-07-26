@@ -96,7 +96,7 @@ namespace ai
                 creators["siphon life"] = &TriggerFactoryInternal::siphon_life;
                 creators["siphon life on attacker"] = &TriggerFactoryInternal::siphon_life_on_attacker;
                 creators["improved shadow bolt"] = &TriggerFactoryInternal::improved_shadow_bolt;
-                //creators["life tap glyph"] = &TriggerFactoryInternal::life_tap_glyph;
+                creators["life tap glyph"] = &TriggerFactoryInternal::life_tap_glyph;
                 creators["unstable affliction"] = &TriggerFactoryInternal::unstable_affliction;
                 creators["haunt"] = &TriggerFactoryInternal::haunt;
                 //creators["fel armor"] = &TriggerFactoryInternal::fel_armor;
