@@ -240,4 +240,6 @@ namespace ai
     public:
         CastPresenceOfMindAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "presence of mind") {}
     };
+
+    BUFF_ACTION(CastMirrorImageAction, "mirror image");
 }
