@@ -25,13 +25,17 @@ void GenericWarlockNonCombatStrategy::InitTriggers(std::list<TriggerNode*> &trig
         "spellstone",
         NextAction::array(0, new NextAction("use spellstone", 4.0f), NULL)));
 
-    //triggers.push_back(new TriggerNode(
-    //    "no soulstone",
-    //    NextAction::array(0, new NextAction("create soulstone", 12.0f), NULL)));  
-    //
-    //triggers.push_back(new TriggerNode(
-    //    "use soulstone",
-    //    NextAction::array(0, new NextAction("use soulstone on master", 11.0f), NULL)));
+    triggers.push_back(new TriggerNode(
+        "no soulstone",
+        NextAction::array(0, new NextAction("create soulstone", 4.0f), NULL)));  
+    
+    triggers.push_back(new TriggerNode(
+        "use soulstone",
+        NextAction::array(0, new NextAction("use soulstone on master", 3.0f), NULL)));    
+    
+    triggers.push_back(new TriggerNode(
+        "remove soul shard",
+        NextAction::array(0, new NextAction("remove soul shard", 2.0f), NULL)));
 
     //triggers.push_back(new TriggerNode(
     //    "no healthstone",
@@ -51,5 +55,5 @@ void WarlockPetStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
     triggers.push_back(new TriggerNode(
         "no pet",
-        NextAction::array(0, new NextAction("summon imp", ACTION_NORMAL + 1), NULL)));// new NextAction(bestPet, ACTION_HIGH), new NextAction("summon succubus", ACTION_NORMAL + 2), new NextAction("summon imp", ACTION_NORMAL + 1), NULL)));
+        NextAction::array(0, new NextAction("summon felhunter", ACTION_NORMAL + 1), NULL)));// new NextAction(bestPet, ACTION_HIGH), new NextAction("summon succubus", ACTION_NORMAL + 2), new NextAction("summon imp", ACTION_NORMAL + 1), NULL)));
 }

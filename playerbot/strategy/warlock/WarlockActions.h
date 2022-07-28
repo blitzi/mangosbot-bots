@@ -18,10 +18,6 @@ namespace ai
 	{
 	public:
 		CastDrainSoulAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "drain soul") {}
-		virtual bool isUseful()
-		{
-            return AI_VALUE2(uint32, "item count", "soul shard") < 28;// int(AI_VALUE(uint8, "bag space") * 0.2);
-		}
 	};
 
 	class CastDrainManaAction : public CastRangeSpellAction
@@ -181,15 +177,22 @@ namespace ai
         virtual bool Execute(Event event);
     };
 
-    //BUFF_ACTION(CastCreateSoulstoneAction, "create soulstone");
-    //class UseSoulStone : public UseItemAction
-    //{
-    //public:
-    //    UseSoulStone(PlayerbotAI* ai) : UseItemAction(ai, "soulstone", false) {}
+    BUFF_ACTION(CastCreateSoulstoneAction, "create soulstone");
+    class UseSoulStone : public Action
+    {
+    public:
+        UseSoulStone(PlayerbotAI* ai) : Action(ai, "soulstone") {}
 
-    //    //bool isUseful() { return !bot->IsInCombat() && !bot->InBattleGround(); }
-    //    virtual string GetTargetName() { return "tank target"; }
+        bool isUseful() { return !bot->IsInCombat() && !bot->InBattleGround(); }
+        virtual bool Execute(Event event);
+    };
 
-    //    virtual bool Execute(Event event);
-    //};
+    class RemoveToManySoulShards : public Action
+    {
+    public:
+        RemoveToManySoulShards(PlayerbotAI* ai) : Action(ai, "soul shard") {}
+
+        bool isUseful() { return !bot->IsInCombat(); }
+        virtual bool Execute(Event event);
+    };
 }

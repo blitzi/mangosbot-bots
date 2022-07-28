@@ -6,16 +6,6 @@
 
 using namespace ai;
 
-ShadowPriestStrategy::ShadowPriestStrategy(PlayerbotAI* ai) : GenericPriestStrategy(ai)
-{
-    //actionNodeFactories.Add(new ShadowPriestStrategyActionNodeFactory());
-}
-
-NextAction** ShadowPriestStrategy::getDefaultActions()
-{
-    return NextAction::array(0, new NextAction("shoot", 7.0f), new NextAction("melee", 6.0f), NULL);
-}
-
 void ShadowPriestStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
     GenericPriestStrategy::InitTriggers(triggers);
