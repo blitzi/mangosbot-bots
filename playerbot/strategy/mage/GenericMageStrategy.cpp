@@ -170,6 +170,10 @@ void MageBoostStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
         "presence of mind",
         NextAction::array(0, new NextAction("presence of mind", 42.0f), NULL)));
 
+    triggers.push_back(new TriggerNode(
+        "mirror image",
+        NextAction::array(0, new NextAction("mirror image", 45.0f), NULL)));
+
 }
 
 void MageCcStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
