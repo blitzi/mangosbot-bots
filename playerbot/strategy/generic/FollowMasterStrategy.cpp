@@ -5,6 +5,8 @@
 #include "../actions/GenericSpellActions.h"
 #include "../actions/MovementActions.h"
 #include "../actions/ChooseTargetActions.h"
+#include <playerbot/strategy/actions/ReachTargetActions.h>
+#include <playerbot/strategy/actions/UseItemAction.h>
 
 using namespace ai;
 
@@ -13,17 +15,23 @@ float FollowMultiplier::GetValue(Action* action)
 	if (action == NULL) return 1.0f;
 
 	string name = action->GetName();
+	Unit* master = ai->GetMaster();
+
+	if (!master)
+		return 1.0f;
+
+	float distanceToMaster = sServerFacade.GetDistance2d(bot, master);
+	bool teamIsMoving = bot->IsMoving() || (master->IsMoving() && distanceToMaster > sPlayerbotAIConfig.followDistance);
 	
 	if (name == "set facing")
-		return bot->IsMoving() ? 0 : 1;
+		return teamIsMoving ? 0 : 1;
 
-	if (dynamic_cast<MovementAction*>(action))
-	{
-		if (name == "follow")
-			return bot->IsMoving() ? 0 : 1;
+	if (dynamic_cast<ReachTargetAction*>(action))
+		return 0;
+		//return teamIsMoving ? 0 : 1;
 
-		return dynamic_cast<AttackAction*>(action) ? 1 : 0;
-	}
+	if (name == "mount")
+		return 1.0f;
 
 	if (dynamic_cast<CastRangeSpellAction*>(action))
 	{
@@ -37,7 +45,7 @@ float FollowMultiplier::GetValue(Action* action)
 #endif
 		);
 	
-		return castTime == 0 ? 1 : (bot->IsMoving() ? 0 : 1);
+		return castTime == 0 ? 1 : (teamIsMoving ? 0 : 1);
 	}
 
 	return 1.0f;
@@ -48,10 +56,6 @@ void FollowMasterStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 	triggers.push_back(new TriggerNode(
 		"update",
 		NextAction::array(0, new NextAction("follow", 1), NULL)));
-
-    triggers.push_back(new TriggerNode(
-        "out of react range",
-        NextAction::array(0, new NextAction("flee to master", ACTION_HIGH), NULL)));
 }
 
 void FollowMasterStrategy::InitMultipliers(std::list<Multiplier*>& multipliers)

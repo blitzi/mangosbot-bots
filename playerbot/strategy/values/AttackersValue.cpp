@@ -417,13 +417,14 @@ bool AttackersValue::IsPossibleTarget(Unit *attacker, Player *bot)
         isMemberBotGroup = true;
 
     return basicConditions &&
+		(sServerFacade.GetThreatManager(attacker).getCurrentVictim() ||
+		 attacker->GetObjectGuid() == bot->GetPlayerbotAI()->GetAiObjectContext()->GetValue<ObjectGuid>("pull target")->Get()) &&
         !(attacker->IsStunned() && ai->HasAura("shackle undead", attacker)) &&
         !((attacker->IsPolymorphed() ||
-        bot->GetPlayerbotAI()->HasAura("sap", attacker) ||
-        sServerFacade.IsCharmed(attacker) ||
-        sServerFacade.IsFeared(attacker)) && !rti) &&
-        //!sServerFacade.IsInRoots(attacker) &&                
-        !(attacker->GetCreatureType() == CREATURE_TYPE_CRITTER) &&        
+		  bot->GetPlayerbotAI()->HasAura("sap", attacker) ||
+		  sServerFacade.IsCharmed(attacker) ||
+          sServerFacade.IsFeared(attacker)) && !rti) &&
+          !(attacker->GetCreatureType() == CREATURE_TYPE_CRITTER) &&
         (!groupHasTank || ((groupHasTank && !waitForTankAggro) || iAmTank || targetIsNonElite || targetIsAlmostDead)) &&
         (!c ||
             (

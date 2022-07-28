@@ -487,17 +487,15 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
     //Clean movement if not already moving the same way.
     if (mm.GetCurrent()->GetMovementGeneratorType() != POINT_MOTION_TYPE)
     {
-        bot->StopMoving();
-        mm.Clear();
-    }
+		ai->StopMoving();
+	}
     else
     {
         mm.GetDestination(x, y, z);
 
         if (movePosition.distance(WorldPosition(movePosition.getMapId(), x, y, z, 0)) > minDist)
         {
-            bot->StopMoving();
-            mm.Clear();
+			ai->StopMoving();
         }
     }
 
@@ -944,10 +942,9 @@ bool MovementAction::ChaseTo(WorldObject* obj, float distance, float angle)
     {
 		bot->GetMotionMaster()->Clear();
         bot->GetMotionMaster()->MoveChase((Unit*)obj, distance, angle);
-		return true;
     }
 
-	return false;
+	return bot->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE;
 }
 
 float MovementAction::MoveDelay(float distance)

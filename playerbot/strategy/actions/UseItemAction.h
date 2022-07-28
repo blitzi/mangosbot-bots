@@ -12,7 +12,7 @@ namespace ai
    public:
       virtual bool Execute(Event event);
       virtual bool isPossible();
-      virtual bool isCast() { return true; }
+	  virtual bool IsCast() { return true; }
 
    protected:
       bool UseItemAuto(Item* item);

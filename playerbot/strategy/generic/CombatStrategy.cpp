@@ -22,9 +22,9 @@ void CombatStrategy::InitTriggers(list<TriggerNode*> &triggers)
         "mounted",
         NextAction::array(0, new NextAction("check mount state", 53), NULL)));
 
-    triggers.push_back(new TriggerNode(
+    /*triggers.push_back(new TriggerNode(
         "out of react range",
-        NextAction::array(0, new NextAction("flee to master", 52), NULL)));
+        NextAction::array(0, new NextAction("flee to master", 52), NULL)));*/
 
     triggers.push_back(new TriggerNode(
         "party member to cancel health",

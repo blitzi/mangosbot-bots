@@ -128,8 +128,8 @@ bool AttackAction::Attack(Unit* target)
         ai->PlaySound(sounds[urand(0, sounds.size() - 1)]);
     }
 
-    if (IsMovingAllowed() && !sServerFacade.IsInFront(bot, target, sPlayerbotAIConfig.sightDistance, CAST_ANGLE_IN_FRONT))
-        sServerFacade.SetFacingTo(bot, target);
+    /*if (IsMovingAllowed() && !sServerFacade.IsInFront(bot, target, sPlayerbotAIConfig.sightDistance, CAST_ANGLE_IN_FRONT))
+        sServerFacade.SetFacingTo(bot, target);*/
 
 	bool isRanged = ai->IsRanged(bot);
 	bool attacked = bot->Attack(target, !isRanged);

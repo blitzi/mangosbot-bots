@@ -20,7 +20,7 @@ void LootNonCombatStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 
     triggers.push_back(new TriggerNode(
         "often",
-        NextAction::array(0, new NextAction("add all loot", 1.0f), NULL)));
+        NextAction::array(0, new NextAction("add all loot", 2.0f), NULL)));
 }
 
 void GatherStrategy::InitTriggers(std::list<TriggerNode*> &triggers)

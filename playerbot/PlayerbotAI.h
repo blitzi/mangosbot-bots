@@ -259,6 +259,7 @@ public:
     bool ContainsStrategy(StrategyType type);
     bool HasStrategy(string name, BotState type);
     bool HasStrategy(string name);
+    bool HasStrategyInAllEngines(string name);
     void ResetStrategies(bool load = true);
     void ReInitCurrentEngine();
     void Reset(bool full = false);
@@ -343,11 +344,7 @@ public:
 
 	BotState GetCurrentState() { return currentState; }
 
-	void StopMoving() 
-	{
-		bot->InterruptMoving(true);
-		bot->GetMotionMaster()->Clear();
-	}
+	void StopMoving();
 
 private:
     void _fillGearScoreData(Player *player, Item* item, std::vector<uint32>* gearScore, uint32& twoHandScore);

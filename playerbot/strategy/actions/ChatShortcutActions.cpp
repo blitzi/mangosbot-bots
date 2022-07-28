@@ -29,11 +29,15 @@ bool FollowChatShortcutAction::Execute(Event event)
     if (!master)
         return false;
 
-	ai->StopMoving();
-	bot->CastStop();
-    ai->ChangeStrategy("+follow");
+	if (!ai->HasStrategyInAllEngines("follow"))
+	{
+		ai->StopMoving();
+		bot->CastStop();
+		ai->ChangeStrategy("+follow");
 
-    ai->TellMaster("Following");
+		ai->TellMaster("Following");
+	}
+
     return true;
 }
 

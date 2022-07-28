@@ -5,6 +5,7 @@
 
 #include "AiFactory.h"
 
+#include "MotionGenerators/MovementGenerator.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 #include "CellImpl.h"
@@ -861,12 +862,24 @@ bool PlayerbotAI::HasStrategy(string name)
 {
 	for (int i = 0; i < BOT_STATE_MAX; i++)
 	{
-		return engines[i]->HasStrategy(name);
+		if(engines[i]->HasStrategy(name))
 			return true;
 	}
 
 	return false;
 }
+
+bool PlayerbotAI::HasStrategyInAllEngines(string name)
+{
+	for (int i = 0; i < BOT_STATE_MAX; i++)
+	{
+		if (!engines[i]->HasStrategy(name))
+			return false;
+	}
+
+	return true;
+}
+
 
 void PlayerbotAI::ResetStrategies(bool load)
 {
@@ -3136,4 +3149,43 @@ bool PlayerbotAI::IsDrinking()
 bool PlayerbotAI::IsCasting()
 {
     return bot->IsNonMeleeSpellCasted(false, false, true);
+}
+
+void PlayerbotAI::StopMoving()
+{
+	if (bot->IsTaxiFlying())
+		return;
+
+	if (!bot->GetMotionMaster()->empty())
+		if (MovementGenerator* movgen = bot->GetMotionMaster()->top())
+			movgen->Interrupt(*bot);
+
+	// remove movement flags, checked in bot->IsMoving()
+	if (bot->IsFalling())
+#ifdef MANGOSBOT_TWO
+		bot->m_movementInfo.RemoveMovementFlag(MovementFlags(movementFlagsMask & ~(MOVEFLAG_FALLING | MOVEFLAG_FALLINGFAR)));
+#else
+		bot->m_movementInfo.RemoveMovementFlag(MovementFlags(movementFlagsMask & ~(MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR)));
+#endif
+	else
+		bot->m_movementInfo.RemoveMovementFlag(movementFlagsMask);
+	// interrupt movement as much as we can...
+	bot->InterruptMoving(true);
+	bot->GetMotionMaster()->Clear();
+	MovementInfo mInfo = bot->m_movementInfo;
+	float x, y, z;
+	bot->GetPosition(x, y, z);
+	float o = bot->GetPosition().o;
+	mInfo.ChangePosition(x, y, z, o);
+	WorldPacket data(MSG_MOVE_STOP);
+#ifdef MANGOSBOT_TWO
+	data << bot->GetObjectGuid().WriteAsPacked();
+#endif
+	data << mInfo;
+	bot->GetSession()->HandleMovementOpcodes(data);
+
+	bot->m_movementInfo.RemoveMovementFlag(MovementFlags(MOVEFLAG_SPLINE_ENABLED | MOVEFLAG_FORWARD));
+	//bot->movespline->_Interrupt();
+
+	GetMoveTimer()->Reset(0);
 }

@@ -13,7 +13,8 @@ namespace ai
 
         virtual bool Execute(Event event);
         virtual bool isPossible() { return Action::isPossible(); }
-        virtual bool isUseful();        
+        virtual bool isUseful();     
+		virtual bool IsCast() { return true; }
 
     //private:
         bool Mount();
