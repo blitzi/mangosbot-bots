@@ -57,10 +57,9 @@ void AfflictionWarlockStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
         "shadow bold",
         NextAction::array(0, new NextAction("shadow bolt", rotationBaseValue + 3), NULL)));
 
-
     triggers.push_back(new TriggerNode(
     	"drain soul",
-    	NextAction::array(0, new NextAction("drain soul", rotationBaseValue + 10), NULL)));
+    	NextAction::array(0, new NextAction("drain soul", rotationBaseValue + 15), NULL)));
     /*triggers.push_back(new TriggerNode(
         "low hp drain soul",
         NextAction::array(0, new NextAction("drain soul", ACTION_HIGH), NULL)));*/
@@ -108,12 +107,12 @@ void DpsWarlockStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 // aoe
 void DpsAoeWarlockStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
-    /*triggers.push_back(new TriggerNode(
-        "medium aoe",
-        NextAction::array(0, new NextAction("rain of fire", ACTION_HIGH), NULL)));*/
+    //triggers.push_back(new TriggerNode(
+    //    "medium aoe",
+    //    NextAction::array(0, new NextAction("rain of fire", ACTION_HIGH), NULL)));
 
     triggers.push_back(new TriggerNode(
-        "low aoe",
+        "medium aoe",
         NextAction::array(0, new NextAction("seed of corruption", ACTION_HIGH +1), NULL)));
 
     //triggers.push_back(new TriggerNode(

@@ -21,9 +21,32 @@ bool SpellstoneTrigger::IsActive()
 	{
 		bool isEnchanted = weapon->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT) != 0;
 		return SpellTrigger::IsActive() &&
-			!isEnchanted && //!ai->HasAura(55194, target) && 
+			!isEnchanted &&
 			AI_VALUE2(uint32, "item count", getName()) > 0;
 	}
 	return false;
+}
 
+bool SoulstoneOnTankTrigger::IsActive() 
+{
+	bool hasItem = AI_VALUE2(uint32, "item count", "soulstone") > 0;
+	if (hasItem && GetTarget() && !ai->HasAura("soulstone resurrection", GetTarget()))
+	{
+		bool isInGroup = (ai->GetBot()->IsInGroup((Player*)GetTarget(), true) || ai->GetBot()->IsInGroup((Player*)GetTarget()));
+		return isInGroup;
+	}
+	return false;
+}
+
+bool DrainSoulTrigger::IsActive()
+{
+	bool isLowHealth = TargetLowHealthTrigger::IsActive();
+	bool hasLessItems = AI_VALUE2(uint32, "item count", "soul shard") < 28;// int(AI_VALUE(uint8, "bag space") * 0.2);
+	return isLowHealth && hasLessItems;
+}
+
+bool RemoveSoulShardTrigger::IsActive()
+{
+	// int(AI_VALUE(uint8, "bag space") * 0.2);
+	return AI_VALUE2(uint32, "item count", "soul shard") > 20;
 }

@@ -78,11 +78,16 @@ namespace ai
             {
                 creators["shadow trance"] = &TriggerFactoryInternal::shadow_trance;
                 //creators["demon armor"] = &TriggerFactoryInternal::demon_armor;
+                //creators["fel armor"] = &TriggerFactoryInternal::fel_armor;
                 creators["no healthstone"] = &TriggerFactoryInternal::HasHealthstone;
                 creators["no firestone"] = &TriggerFactoryInternal::HasFirestone;
                 creators["no spellstone"] = &TriggerFactoryInternal::HasSpellstone;
                 creators["spellstone"] = &TriggerFactoryInternal::spellstone;
                 creators["no armor"] = &TriggerFactoryInternal::no_armor;
+                creators["improved shadow bolt"] = &TriggerFactoryInternal::improved_shadow_bolt;
+                creators["life tap glyph"] = &TriggerFactoryInternal::life_tap_glyph;
+                creators["no soulstone"] = &TriggerFactoryInternal::hasSoulstone;
+                creators["use soulstone"] = &TriggerFactoryInternal::use_soulstone;
              
                 creators["corruption"] = &TriggerFactoryInternal::corruption;
                 creators["corruption on attacker"] = &TriggerFactoryInternal::corruption_on_attacker;
@@ -90,22 +95,21 @@ namespace ai
                 creators["curse of agony on attacker"] = &TriggerFactoryInternal::curse_of_agony_on_attacker;
                 creators["banish"] = &TriggerFactoryInternal::banish;
                 creators["backlash"] = &TriggerFactoryInternal::backlash;
-                creators["fear"] = &TriggerFactoryInternal::fear;
                 creators["immolate"] = &TriggerFactoryInternal::immolate;
-                creators["amplify curse"] = &TriggerFactoryInternal::amplify_curse;
-                creators["siphon life"] = &TriggerFactoryInternal::siphon_life;
-                creators["siphon life on attacker"] = &TriggerFactoryInternal::siphon_life_on_attacker;
-                creators["improved shadow bolt"] = &TriggerFactoryInternal::improved_shadow_bolt;
-                creators["life tap glyph"] = &TriggerFactoryInternal::life_tap_glyph;
                 creators["unstable affliction"] = &TriggerFactoryInternal::unstable_affliction;
                 creators["haunt"] = &TriggerFactoryInternal::haunt;
-                //creators["fel armor"] = &TriggerFactoryInternal::fel_armor;
                 creators["shadow bolt"] = &TriggerFactoryInternal::shadow_bolt;
 
+                creators["fear"] = &TriggerFactoryInternal::fear;
+                creators["siphon life"] = &TriggerFactoryInternal::siphon_life;
+                creators["siphon life on attacker"] = &TriggerFactoryInternal::siphon_life_on_attacker;
                 creators["drain soul"] = &TriggerFactoryInternal::drain_soul;
+#ifndef MANGOSBOT_TWO
+                creators["amplify curse"] = &TriggerFactoryInternal::amplify_curse;
+#endif
+                
+                creators["remove soul shard"] = &TriggerFactoryInternal::remove_soul_shard;
 
-                /*creators["no soulstone"] = &TriggerFactoryInternal::hasSoulstone;
-                creators["use soulstone"] = &TriggerFactoryInternal::use_soulstone;*/
             }
 
         private:
@@ -138,6 +142,7 @@ namespace ai
             static Trigger* use_soulstone(PlayerbotAI* ai) { return new SoulstoneOnTankTrigger(ai); }
             static Trigger* life_tap_glyph(PlayerbotAI* ai) { return new LifeTapBoostTrigger(ai); }
             static Trigger* drain_soul(PlayerbotAI* ai) { return new DrainSoulTrigger(ai); }
+            static Trigger* remove_soul_shard(PlayerbotAI* ai) { return new RemoveSoulShardTrigger(ai); }
         };
     };
 };
@@ -190,12 +195,13 @@ namespace ai
                 creators["amplify curse"] = &AiObjectContextInternal::amplify_curse;
                 creators["unstable affliction"] = &AiObjectContextInternal::unstable_affliction;
                 creators["haunt"] = &AiObjectContextInternal::haunt;
+                creators["remove soul shard"] = &AiObjectContextInternal::remove_soul_shard;
 
                 creators["soulshatter"] = &AiObjectContextInternal::soulshatter;
                 creators["life tap rank one"] = &AiObjectContextInternal::life_tap_rank_one;
                 
-                //creators["create soulstone"] = &AiObjectContextInternal::create_soulstone;
-                //creators["use soulstone on master"] = &AiObjectContextInternal::use_soulstone;
+                creators["create soulstone"] = &AiObjectContextInternal::create_soulstone;
+                creators["use soulstone on master"] = &AiObjectContextInternal::use_soulstone;
             }
 
         private:
@@ -238,8 +244,9 @@ namespace ai
 
             static Action* life_tap_rank_one(PlayerbotAI* ai) { return new CastLifeTap1Action(ai); }
             static Action* soulshatter(PlayerbotAI* ai) { return new CastSoulshatterAction(ai); }
-            //static Action* create_soulstone(PlayerbotAI* ai) { return new CastCreateSoulstoneAction(ai); }
-            //static Action* use_soulstone(PlayerbotAI* ai) { return new UseSoulStone(ai); }
+            static Action* create_soulstone(PlayerbotAI* ai) { return new CastCreateSoulstoneAction(ai); }
+            static Action* use_soulstone(PlayerbotAI* ai) { return new UseSoulStone(ai); }
+            static Action* remove_soul_shard(PlayerbotAI* ai) { return new RemoveToManySoulShards(ai); }
         };
     };
 };
