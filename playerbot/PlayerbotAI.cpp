@@ -266,7 +266,8 @@ void PlayerbotAI::Reset(bool full)
     if (bot->IsTaxiFlying())
         return;
 
-    currentEngine = engines[BOT_STATE_NON_COMBAT];
+	ChangeEngine(BOT_STATE_NON_COMBAT);
+
     whispers.clear();
 
     aiObjectContext->GetValue<Unit*>("old target")->Set(NULL);
