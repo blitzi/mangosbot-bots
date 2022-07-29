@@ -19,7 +19,7 @@ namespace ai
     BUFF_ACTION(CastDivineSpiritAction, "divine spirit");
     BUFF_PARTY_ACTION(CastDivineSpiritOnPartyAction, "divine spirit");
     BUFF_PARTY_ACTION(CastPrayerOfSpiritOnPartyAction, "prayer of spirit");
-    BUFF_PARTY_ACTION(CastPrayerOfMendingOnPartyAction, "prayer of mending");
+    BUFF_TANK_ACTION(CastPrayerOfMendingOnTankAction, "prayer of mending");
 
     //disc 2.4.3
     SPELL_ACTION(CastMassDispelAction, "mass dispel");

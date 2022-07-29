@@ -51,11 +51,7 @@ namespace ai
         CastEarthShieldAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "earth shield") {}
     };
 
-    class CastEarthShieldOnPartyAction : public BuffOnPartyAction
-    {
-    public:
-        CastEarthShieldOnPartyAction(PlayerbotAI* ai) : BuffOnPartyAction(ai, "earth shield") {}
-    };
+	BUFF_TANK_ACTION(CastEarthShieldOnTankAction, "earth shield");
 
     class CastWaterShieldAction : public CastBuffSpellAction {
     public:

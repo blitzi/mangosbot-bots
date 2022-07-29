@@ -225,7 +225,7 @@ namespace ai
                 creators["healing wave on party"] = &AiObjectContextInternal::healing_wave_on_party;
                 creators["lesser healing wave on party"] = &AiObjectContextInternal::lesser_healing_wave_on_party;
                 creators["earth shield"] = &AiObjectContextInternal::earth_shield;
-                creators["earth shield on party"] = &AiObjectContextInternal::earth_shield_on_party;
+                creators["earth shield on party"] = &AiObjectContextInternal::earth_shield_on_tank;
                 creators["chain heal"] = &AiObjectContextInternal::chain_heal;
                 creators["riptide"] = &AiObjectContextInternal::riptide;
                 creators["riptide on party"] = &AiObjectContextInternal::riptide_on_party;
@@ -307,7 +307,7 @@ namespace ai
             static Action* healing_wave_on_party(PlayerbotAI* ai) { return new CastHealingWaveOnPartyAction(ai); }
             static Action* lesser_healing_wave_on_party(PlayerbotAI* ai) { return new CastLesserHealingWaveOnPartyAction(ai); }
             static Action* earth_shield(PlayerbotAI* ai) { return new CastEarthShieldAction(ai); }
-            static Action* earth_shield_on_party(PlayerbotAI* ai) { return new CastEarthShieldOnPartyAction(ai); }
+            static Action* earth_shield_on_tank(PlayerbotAI* ai) { return new CastEarthShieldOnTankAction(ai); }
             static Action* chain_heal(PlayerbotAI* ai) { return new CastChainHealAction(ai); }
             static Action* riptide(PlayerbotAI* ai) { return new CastRiptideAction(ai); }
             static Action* riptide_on_party(PlayerbotAI* ai) { return new CastRiptideOnPartyAction(ai); }

@@ -345,6 +345,13 @@ class clazz : public super \
         clazz(PlayerbotAI* ai) : BuffOnPartyAction(ai, spell) {} \
     }
 
+#define BUFF_TANK_ACTION(clazz, spell) \
+    class clazz : public BuffOnTankAction \
+    { \
+    public: \
+        clazz(PlayerbotAI* ai) : BuffOnTankAction(ai, spell) {} \
+    }
+
 #define CURE_ACTION(clazz, spell) \
     class clazz : public CastCureSpellAction \
     { \

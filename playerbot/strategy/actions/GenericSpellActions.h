@@ -279,10 +279,19 @@ namespace ai
     public:
         BuffOnPartyAction(PlayerbotAI* ai, string spell) :
             CastBuffSpellAction(ai, spell), PartyMemberActionNameSupport(spell) {}
-    public:
+
         virtual Value<Unit*>* GetTargetValue();
         virtual string getName() { return PartyMemberActionNameSupport::getName(); }
     };
+
+	class BuffOnTankAction : public BuffOnPartyAction
+	{
+	public:
+		BuffOnTankAction(PlayerbotAI* ai, string spell) :
+			BuffOnPartyAction(ai, spell) {}
+
+		virtual Value<Unit*>* GetTargetValue();
+	};
 
     //---------------------------------------------------------------------------------------------------------------------
 

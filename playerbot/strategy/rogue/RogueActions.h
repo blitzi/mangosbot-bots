@@ -133,10 +133,8 @@ namespace ai
         CastKickOnEnemyHealerAction(PlayerbotAI* ai) : CastSpellOnEnemyHealerAction(ai, "kick") {}
     };
 
-    class CastTricksOfTheTradeOnPartyAction : public BuffOnPartyAction {
-    public:
-        CastTricksOfTheTradeOnPartyAction(PlayerbotAI* ai) : BuffOnPartyAction(ai, "tricks of the trade") {}
-    };
+
+	BUFF_TANK_ACTION(CastTricksOfTheTradeOnPartyAction, "tricks of the trade");
 
     class CastCloakOfShadowsAction : public CastCureSpellAction
     {

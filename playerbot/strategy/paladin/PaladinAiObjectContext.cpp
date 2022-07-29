@@ -339,11 +339,11 @@ namespace ai
             static Action* fire_resistance_aura(PlayerbotAI* ai) { return new CastFireResistanceAuraAction(ai); }
             static Action* hammer_of_justice_on_enemy_healer(PlayerbotAI* ai) { return new CastHammerOfJusticeOnEnemyHealerAction(ai); }
             static Action* hammer_of_justice_on_snare_target(PlayerbotAI* ai) { return new CastHammerOfJusticeSnareAction(ai); }
-            static Action* beacon_of_light_on_party(PlayerbotAI* ai) { return new CastBeaconOfLightOnPartyAction(ai); }
+            static Action* beacon_of_light_on_party(PlayerbotAI* ai) { return new CastBeaconOfLightOnTankAction(ai); }
             static Action* holy_shock(PlayerbotAI* ai) { return new CastHolyShockAction(ai); }
             static Action* holy_shock_hands_on_party(PlayerbotAI* ai) { return new CastHolyShockOnPartyAction(ai); }
             static Action* divine_plea(PlayerbotAI* ai) { return new CastDivinePleaAction(ai); }
-            static Action* sacred_shield(PlayerbotAI* ai) { return new CastSacredShieldAction(ai); }
+            static Action* sacred_shield(PlayerbotAI* ai) { return new CastSacredShieldOnTankAction(ai); }
             static Action* divine_illumination(PlayerbotAI* ai) { return new CastDivineIlluminationAction(ai); }
         };
     };

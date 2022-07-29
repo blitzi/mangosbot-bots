@@ -219,7 +219,7 @@ namespace ai
                 creators["refresh regrowth on party"] = &AiObjectContextInternal::refresh_regrowth_on_party;
                 creators["rejuvenation"] = &AiObjectContextInternal::rejuvenation;
                 creators["rejuvenation on party"] = &AiObjectContextInternal::rejuvenation_on_party;
-                creators["rejuvenation hot on party"] = &AiObjectContextInternal::rejuvenation_hot_on_party;
+                creators["rejuvenation hot on party"] = &AiObjectContextInternal::rejuvenation_hot_on_tank;
                 creators["healing touch"] = &AiObjectContextInternal::healing_touch;
                 creators["healing touch on party"] = &AiObjectContextInternal::healing_touch_on_party;
                 creators["swiftmend"] = &AiObjectContextInternal::swiftmend;
@@ -319,7 +319,7 @@ namespace ai
             static Action* refresh_regrowth(PlayerbotAI* ai) { return new RefreshRegrowthAction(ai); }
             static Action* refresh_regrowth_on_party(PlayerbotAI* ai) { return new RefreshRegrowthOnPartyAction(ai); }
             static Action* rejuvenation_on_party(PlayerbotAI* ai) { return new CastRejuvenationOnPartyAction(ai); }
-            static Action* rejuvenation_hot_on_party(PlayerbotAI* ai) { return new CastRejuvenationHotOnPartyAction(ai); }
+            static Action* rejuvenation_hot_on_tank(PlayerbotAI* ai) { return new CastRejuvenationHotOnTankAction(ai); }
             static Action* healing_touch_on_party(PlayerbotAI* ai) { return new CastHealingTouchOnPartyAction(ai); }
             static Action* rebirth(PlayerbotAI* ai) { return new CastRebirthAction(ai); }
             static Action* revive(PlayerbotAI* ai) { return new CastReviveAction(ai); }

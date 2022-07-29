@@ -272,7 +272,7 @@ namespace ai
 		CastLifeBloomOnPartyAction(PlayerbotAI* ai) : HealPartyMemberAction(ai, "lifebloom") {}
 	};
 
-	BUFF_PARTY_ACTION(CastRejuvenationHotOnPartyAction, "rejuvenation");
+	BUFF_TANK_ACTION(CastRejuvenationHotOnTankAction, "rejuvenation");
 
 	class CastNourishAction : public CastHealingSpellAction {
 	public:

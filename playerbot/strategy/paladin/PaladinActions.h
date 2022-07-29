@@ -484,15 +484,8 @@ namespace ai
 		CastDivineIlluminationAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "divine illumination") {}
     };
 
-    class CastBeaconOfLightOnPartyAction : public BuffOnPartyAction {
-    public:
-        CastBeaconOfLightOnPartyAction(PlayerbotAI* ai) : BuffOnPartyAction(ai, "beacon of light") {}
-    };
-
-    class CastSacredShieldAction : public BuffOnPartyAction {
-    public:
-		CastSacredShieldAction(PlayerbotAI* ai) : BuffOnPartyAction(ai, "sacred shield") {}
-    };
+	BUFF_TANK_ACTION(CastBeaconOfLightOnTankAction, "beacon of light");
+	BUFF_TANK_ACTION(CastSacredShieldOnTankAction, "sacred shield");
 
     PROTECT_ACTION(CastBlessingOfProtectionProtectAction, "blessing of protection");
 }
