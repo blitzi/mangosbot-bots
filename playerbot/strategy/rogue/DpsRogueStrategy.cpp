@@ -56,7 +56,7 @@ void GenericRogueStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 
     triggers.push_back(new TriggerNode(
         "tricks of the trade on tank",
-        NextAction::array(0, new NextAction("tricks of the trade on tank", ACTION_HIGH), NULL)));
+        NextAction::array(0, new NextAction("tricks of the trade", ACTION_HIGH), NULL)));
 
 
 }

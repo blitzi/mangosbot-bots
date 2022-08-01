@@ -81,7 +81,7 @@ namespace ai
                 creators["blade flurry"] = &TriggerFactoryInternal::blade_flurry;
                 creators["cloak of shadows"] = &TriggerFactoryInternal::cloak_of_shadows;
                 
-                //creators["tricks of the trade on tank"] = &TriggerFactoryInternal::tricks_of_the_trade_on_tank;
+                creators["tricks of the trade on tank"] = &TriggerFactoryInternal::tricks_of_the_trade_on_tank;
                 creators["fan of knives"] = &TriggerFactoryInternal::fan_of_knives;
             }
 
@@ -104,7 +104,7 @@ namespace ai
             static Trigger* blade_flurry(PlayerbotAI* ai) { return new RogueBoostBuffTrigger(ai, "blade flurry"); }
             static Trigger* cloak_of_shadows(PlayerbotAI* ai) { return new CloakOfShadowsTrigger(ai); }
 
-            //static Trigger* tricks_of_the_trade_on_tank(PlayerbotAI* ai) { return new TricksOfTheTradeOnTankTrigger(ai); }
+            static Trigger* tricks_of_the_trade_on_tank(PlayerbotAI* ai) { return new TricksOfTheTradeOnTankTrigger(ai); }
             static Trigger* fan_of_knives(PlayerbotAI* ai) { return new SpellCanBeCastTrigger(ai, "fan of knives"); }
         };
     };
@@ -150,7 +150,7 @@ namespace ai
                 creators["killing spree"] = &AiObjectContextInternal::killing_spree;
                 creators["cloak of shadows"] = &AiObjectContextInternal::cloak_of_shadows;
 
-                //creators["tricks of the trade on tank"] = &AiObjectContextInternal::tricks_of_the_trade_on_tank;
+                creators["tricks of the trade"] = &AiObjectContextInternal::tricks_of_the_trade_on_tank;
                 creators["fan of knives"] = &AiObjectContextInternal::fan_of_knives;
             }
 
@@ -183,7 +183,7 @@ namespace ai
             static Action* killing_spree(PlayerbotAI* ai) { return new CastKillingSpreeAction(ai); }
             static Action* cloak_of_shadows(PlayerbotAI* ai) { return new CastCloakOfShadowsAction(ai); }
 
-            //static Action* tricks_of_the_trade_on_tank(PlayerbotAI* ai) { return new CastTricksOfTheTradeOnPartyAction(ai); }
+            static Action* tricks_of_the_trade_on_tank(PlayerbotAI* ai) { return new CastTricksOfTheTradeOnPartyAction(ai); }
             static Action* fan_of_knives(PlayerbotAI* ai) { return new CastFanOfKnivesAction(ai); }
         };
     };

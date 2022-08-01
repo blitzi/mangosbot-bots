@@ -48,7 +48,7 @@ namespace ai
         virtual bool IsActive() {
             return BuffOnTankTrigger::IsActive() &&
                 GetTarget() &&
-                !ai->HasAura("tricks of the trade", GetTarget()) &&
+                !ai->HasAura("tricks of the trade", ai->GetBot()) &&
 #ifdef MANGOS
                 (ai->GetBot()->IsInSameGroupWith((Player*)GetTarget()) || ai->GetBot()->IsInSameRaidWith((Player*)GetTarget())) &&
 #endif
