@@ -111,11 +111,16 @@ namespace ai
         }
     };
 
-    class DrainSoulTrigger : public TargetLowHealthTrigger
+    class DrainSoulTrigger : public ValueInRangeTrigger
     {
     public:
-        DrainSoulTrigger(PlayerbotAI* ai) : TargetLowHealthTrigger(ai, 25) {}
+        DrainSoulTrigger(PlayerbotAI* ai) : ValueInRangeTrigger(ai, "target low health", 25, 0) {}
         virtual bool IsActive();
+        virtual string GetTargetName() { return "current target"; }
+        virtual float GetValue()
+        {
+            return AI_VALUE2(float, "health", GetTargetName());
+        }
     };
 
     class RemoveSoulShardTrigger : public Trigger

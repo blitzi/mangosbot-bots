@@ -40,13 +40,14 @@ bool SoulstoneOnTankTrigger::IsActive()
 
 bool DrainSoulTrigger::IsActive()
 {
-	bool isLowHealth = TargetLowHealthTrigger::IsActive();
+	bool isLowHealth = ValueInRangeTrigger::IsActive();
 	bool hasLessItems = AI_VALUE2(uint32, "item count", "soul shard") < 28;// int(AI_VALUE(uint8, "bag space") * 0.2);
-	return isLowHealth && hasLessItems;
+	return isLowHealth && hasLessItems && !AI_VALUE2(bool, "dead", GetTargetName());
 }
 
 bool RemoveSoulShardTrigger::IsActive()
 {
 	// int(AI_VALUE(uint8, "bag space") * 0.2);
+	uint32 count = AI_VALUE2(uint32, "item count", "soul shard");
 	return AI_VALUE2(uint32, "item count", "soul shard") > 20;
 }
