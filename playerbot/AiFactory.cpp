@@ -186,7 +186,8 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
 
     if (!player->InBattleGround())
     {
-        engine->addStrategies("racials", "chat", "default", "potions", "cast time", "conserve mana", "duel", NULL);
+        // removed "conserve mana", "cast time" -> prevent side effects
+        engine->addStrategies("racials", "chat", "default", "potions", "duel", NULL);
     }
 
     switch (player->getClass())
@@ -392,7 +393,8 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
             engine->removeStrategy("ranged");
         }
 #endif
-        engine->addStrategies("boost", "racials", "chat", "default", "aoe", "potions", "conserve mana", "cast time", "dps assist", NULL);
+        // removed "conserve mana", "cast time" -> prevent side effects
+        engine->addStrategies("boost", "racials", "chat", "default", "aoe", "potions", "dps assist", NULL);
         engine->removeStrategy("custom::say");
         engine->removeStrategy("flee");
         engine->removeStrategy("threat");
