@@ -152,7 +152,7 @@ namespace ai
             static Trigger* prayer_of_spirit_on_party(PlayerbotAI* ai) { return new PrayerOfSpiritTrigger(ai); }
             static Trigger* prayer_of_mending_on_tank(PlayerbotAI* ai) { return new PrayerOfMendingOnTankTrigger(ai); }
             static Trigger* mind_blast(PlayerbotAI* ai) { return new SpellCanBeCastTrigger(ai, "mind blast"); }
-            static Trigger* mind_flay(PlayerbotAI* ai) { return new SpellCanBeCastTrigger(ai, "mind flay"); }
+            static Trigger* mind_flay(PlayerbotAI* ai) { return new MindFlayTrigger(ai); }
         };
     };
 };

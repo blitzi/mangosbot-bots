@@ -129,4 +129,13 @@ namespace ai
             return PartyMemberLowHealthTrigger::IsActive() && AI_VALUE2(float, "health", "self target") < sPlayerbotAIConfig.mediumHealth;
         }
     };
+
+    class MindFlayTrigger : public SpellCanBeCastTrigger {
+    public:
+        MindFlayTrigger(PlayerbotAI* ai) : SpellCanBeCastTrigger(ai, "mind flay") {}
+        virtual bool IsActive()
+        {
+            return GetTarget();// SpellCanBeCastTrigger::IsActive();
+        }
+    };
 }

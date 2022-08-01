@@ -79,7 +79,7 @@ namespace ai
     RANGEDSPELL_ACTION(CastShadowWordDeathAction, "shadow word: death");
 
     // shadow talents
-    RANGEDSPELL_ACTION(CastMindFlayAction, "mind flay");
+    //RANGEDSPELL_ACTION(CastMindFlayAction, "mind flay");
     RANGEDSPELL_ACTION(CastMindSearAction, "mind sear");
 #ifdef MANGOSBOT_TWO
     BUFF_ACTION(CastVampiricEmbraceAction, "vampiric embrace");
@@ -116,5 +116,12 @@ namespace ai
             ai->RemoveAura("shadowform");
             return true;
         }
+    };
+
+    class CastMindFlayAction : public CastRangeSpellAction
+    {
+    public:
+        CastMindFlayAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "mind flay") {}
+        virtual bool isPossible() { return true; }
     };
 }

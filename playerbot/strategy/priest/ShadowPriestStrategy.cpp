@@ -39,11 +39,6 @@ void ShadowPriestStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
         "silence on enemy healer",
         NextAction::array(0, new NextAction("silence on enemy healer", ACTION_INTERRUPT), NULL)));
 
-    // TBD
-    //triggers.push_back(new TriggerNode(
-    //    "shadowfiend",
-    //    NextAction::array(0, new NextAction("shadowfiend", ACTION_HIGH), NULL)));
-
     triggers.push_back(new TriggerNode(
         "medium mana",
         NextAction::array(0, new NextAction("shadowfiend", ACTION_HIGH), NULL)));
@@ -59,9 +54,11 @@ void ShadowPriestAoeStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
         "high aoe",
         NextAction::array(0, new NextAction("mind sear", ACTION_HIGH), NULL)));
 
+#ifndef MANGOSBOT_TWO
     triggers.push_back(new TriggerNode(
         "shadow word: pain on attacker",
         NextAction::array(0, new NextAction("shadow word: pain on attacker", 11.0f), NULL)));   
+#endif
 }
 
 void ShadowPriestDebuffStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
@@ -78,6 +75,7 @@ void ShadowPriestDebuffStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
         "shadow word: pain",
         NextAction::array(0, new NextAction("shadow word: pain", ACTION_NORMAL + 6), NULL)));
 
+#ifndef MANGOSBOT_TWO
     triggers.push_back(new TriggerNode(
         "feedback",
         NextAction::array(0, new NextAction("feedback", ACTION_HIGH), NULL)));
@@ -85,4 +83,5 @@ void ShadowPriestDebuffStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
     triggers.push_back(new TriggerNode(
         "hex of weakness",
         NextAction::array(0, new NextAction("hex of weakness", ACTION_NORMAL), NULL)));
+#endif
 }
