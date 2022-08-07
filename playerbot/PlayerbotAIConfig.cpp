@@ -123,7 +123,7 @@ bool PlayerbotAIConfig::Initialize()
 	LoadList<list<uint32> >(config.GetStringDefault("AiPlayerbot.PvpProhibitedZoneIds", "2255,656,2361,2362,2363,976,35,2268,3425,392,541,1446"), pvpProhibitedZoneIds);
     LoadList<list<uint32> >(config.GetStringDefault("AiPlayerbot.RandomBotQuestIds", "7848,3802,5505,6502,7761"), randomBotQuestIds);
     LoadList<list<uint32> >(config.GetStringDefault("AiPlayerbot.DamageStopSpellIds", "69051,69172"), damageStopSpellIds);
-    LoadList<list<uint32> >(config.GetStringDefault("AiPlayerbot.damageFocusGUIDs", "17096"), damageFocusGUIDs);
+    LoadList<list<uint32> >(config.GetStringDefault("AiPlayerbot.damageFocusGUIDs", "17096,36619,38233,38459,38460,38711,38712,38970,38971,38972,38973,38974,38975"), damageFocusGUIDs);
 
 
     botAutologin = config.GetBoolDefault("AiPlayerbot.BotAutologin", false);

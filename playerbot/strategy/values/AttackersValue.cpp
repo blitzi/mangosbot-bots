@@ -215,11 +215,11 @@ void AttackersValue::RemoveNonFocusTargets(set<Unit*>& targets)
         Unit* unit = *tIter;
         Creature* c = dynamic_cast<Creature*>(unit);
 
-        if (c)
+        if (c && c->IsAlive())
         {
-            std::list<uint32>::iterator findIter = std::find(sPlayerbotAIConfig.damageFocusGUIDs.begin(), sPlayerbotAIConfig.damageFocusGUIDs.end(), c->GetDbGuid());
+            std::list<uint32>::iterator findIter = std::find(sPlayerbotAIConfig.damageFocusGUIDs.begin(), sPlayerbotAIConfig.damageFocusGUIDs.end(), c->GetDbEntry());
 
-            if (findIter != sPlayerbotAIConfig.damageFocusGUIDs.end())
+            if (findIter == sPlayerbotAIConfig.damageFocusGUIDs.end())
             {
                 set<Unit*>::iterator tIter2 = tIter;
                 ++tIter;
@@ -270,9 +270,10 @@ bool AttackersValue::ListContainsFocusTarget(set<Unit*>& targets) const
     {
         Creature* c = dynamic_cast<Creature*>(t);
 
-        if (c)
+        if (c && c->IsAlive())
         {
-            std::list<uint32>::iterator findIter = std::find(sPlayerbotAIConfig.damageFocusGUIDs.begin(), sPlayerbotAIConfig.damageFocusGUIDs.end(), c->GetDbGuid());
+			uint32 monsterGUID = c->GetDbEntry();
+            std::list<uint32>::iterator findIter = std::find(sPlayerbotAIConfig.damageFocusGUIDs.begin(), sPlayerbotAIConfig.damageFocusGUIDs.end(), monsterGUID);
             
             if (findIter != sPlayerbotAIConfig.damageFocusGUIDs.end())
                 return true;
@@ -330,9 +331,9 @@ bool AttackersValue::IsPossibleTarget(Unit *attacker, Player *bot)
 
     bool rti = IsRti(attacker, bot);
   
-    if (c)
+    if (c &&  c->IsAlive())
     {
-        std::list<uint32>::iterator findIter = std::find(sPlayerbotAIConfig.damageFocusGUIDs.begin(), sPlayerbotAIConfig.damageFocusGUIDs.end(), c->GetDbGuid());
+        std::list<uint32>::iterator findIter = std::find(sPlayerbotAIConfig.damageFocusGUIDs.begin(), sPlayerbotAIConfig.damageFocusGUIDs.end(), c->GetDbEntry());
 
         if (findIter != sPlayerbotAIConfig.damageFocusGUIDs.end())
             return basicConditions;
