@@ -11,11 +11,11 @@ namespace ai
         Stance(PlayerbotAI* ai, string name) : Formation (ai, name) {}
 
     protected:
-        virtual Unit* GetTarget();
         virtual WorldLocation GetLocationInternal() = 0;
         virtual WorldLocation GetNearLocation(float angle, float distance);
 
     public:
+        virtual Unit* GetTarget();
         virtual WorldLocation GetLocation();
         virtual string GetTargetName() { return "current target"; }
         virtual float GetMaxDistance() { return sPlayerbotAIConfig.contactDistance; }

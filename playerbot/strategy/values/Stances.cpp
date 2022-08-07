@@ -4,16 +4,23 @@
 
 #include "../../ServerFacade.h"
 #include "Arrow.h"
+#include "RtiTargetValue.h"
 
 using namespace ai;
 
 Unit* Stance::GetTarget()
 {
+	Unit* starTarget = AI_VALUE(Unit*, "star target");
+	if (starTarget) 
+		return starTarget;
+
     Unit *target = AI_VALUE(Unit*, GetTargetName());
-    if (target) return target;
+    if (target)
+		return target;
 
     ObjectGuid pullTarget = context->GetValue<ObjectGuid>("pull target")->Get();
-    if (pullTarget) ai->GetUnit(pullTarget);
+    if (pullTarget)
+		return ai->GetUnit(pullTarget);
 
     return NULL;
 }

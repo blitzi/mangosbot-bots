@@ -49,7 +49,7 @@ namespace ai
 		virtual bool Execute(Event event)
 		{
 			ai->ChangeEngine(BOT_STATE_COMBAT);
-			ai->ChangeStrategy("-follow", BOT_STATE_COMBAT);
+			ai->ChangeStrategy("-follow,+stance", BOT_STATE_COMBAT);
 
 			return true;
 		}

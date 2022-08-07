@@ -23,26 +23,19 @@ namespace ai
                 return false;
 
             float distance = ai->IsRanged(bot) ? ai->GetRange("spell") : 0;
-            Stance* stance = context->GetValue<Stance*>("stance")->Get();
-
-            if (stance && stance->GetName() != "near")
-                return MoveToStance(target);
+            if (distance < max(5.0f, bot->GetCombinedCombatReach(target, true)))
+            {
+                return ChaseTo(target, 0.0f, GetFollowAngle());
+            }
             else
             {
-                if (distance < max(5.0f, bot->GetCombinedCombatReach(target, true)))
-                {
-                    return ChaseTo(target, 0.0f, GetFollowAngle());
-                }
-                else
-                {
-                    bool inLos = bot->IsWithinLOSInMap(target);
-                    bool isFriend = sServerFacade.IsFriendlyTo(bot, target);
-                    float meleeDist = inLos ? distance - sPlayerbotAIConfig.contactDistance : isFriend ? distance / 2 : distance - sPlayerbotAIConfig.contactDistance;
-                    float distance = ai->IsRanged(bot) ? ai->GetRange("spell") : meleeDist;
+                bool inLos = bot->IsWithinLOSInMap(target);
+                bool isFriend = sServerFacade.IsFriendlyTo(bot, target);
+                float meleeDist = inLos ? distance - sPlayerbotAIConfig.contactDistance : isFriend ? distance / 2 : distance - sPlayerbotAIConfig.contactDistance;
+                float distance = ai->IsRanged(bot) ? ai->GetRange("spell") : meleeDist;
 
-                    return ChaseTo(target, distance, bot->GetAngle(target));
-                }
-            }                  
+                return ChaseTo(target, distance, bot->GetAngle(target));
+            }
         }
         virtual bool isUseful()
 		{
@@ -52,15 +45,6 @@ namespace ai
 				return false;
 
             Unit* target = AI_VALUE(Unit*, GetTargetName());
-            Stance* stance = context->GetValue<Stance*>("stance")->Get();
-
-            if (target && stance && stance->GetName() != "near")
-            {
-                WorldLocation location;
-                WorldLocation loc = stance->GetLocation();
-                bot->GetPosition(location);
-                return !Formation::IsSameLocation(location, loc);
-            }
 
             if (target)
             {

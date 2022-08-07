@@ -46,6 +46,20 @@ Unit* DpsTargetValue::Calculate()
     return TargetValue::FindTarget(&strategy);
 }
 
+Unit* StarTargetValue::Calculate()
+{
+	Group* group = ai->GetBot()->GetGroup();
+
+	if (!group)
+		return NULL;
+
+	ObjectGuid guid = group->GetTargetIcon(0);
+	if (!guid)
+		return NULL;
+
+	return ai->GetUnit(ObjectGuid(guid));
+}
+
 class FindMaxHpTargetStrategy : public FindTargetStrategy
 {
 public:

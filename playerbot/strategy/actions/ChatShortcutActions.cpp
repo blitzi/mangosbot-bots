@@ -33,7 +33,7 @@ bool FollowChatShortcutAction::Execute(Event event)
 	{
 		ai->StopMoving();
 		bot->CastStop();
-		ai->ChangeStrategy("+follow");
+		ai->ChangeStrategy("+follow,-stance");
 
 		ai->TellMaster("Following");
 	}
@@ -48,7 +48,7 @@ bool StayChatShortcutAction::Execute(Event event)
         return false;
 
 	ai->StopMoving();
-	ai->ChangeStrategy("-follow");
+	ai->ChangeStrategy("-follow,+stance");
 
     SetReturnPosition(bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ());
 

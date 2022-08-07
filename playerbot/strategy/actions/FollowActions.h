@@ -12,7 +12,6 @@ namespace ai
         virtual bool isUseful();
         virtual bool CanDeadFollow(Unit* target);
 		virtual bool IgnoresCasting() { return true; }
-
 	};
 
     class FleeToMasterAction : public FollowAction {
@@ -22,4 +21,13 @@ namespace ai
         virtual bool Execute(Event event);
         virtual bool isUseful();
     };
+
+	class ReachStanceAction : public MovementAction {
+	public:
+		ReachStanceAction(PlayerbotAI* ai, string name = "reach stance") : MovementAction(ai, name) {}
+		virtual bool Execute(Event event);
+		virtual bool isUseful();
+		virtual bool IgnoresCasting() { return true; }
+
+	};
 }

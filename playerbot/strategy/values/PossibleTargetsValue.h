@@ -22,5 +22,8 @@ namespace ai
 	public:
         AllTargetsValue(PlayerbotAI* ai, float range = sPlayerbotAIConfig.sightDistance) :
             PossibleTargetsValue(ai, "all targets", range, true) {}
+
+	protected:
+		virtual bool AcceptUnit(Unit* unit) { return true; }
 	};
 }

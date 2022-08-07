@@ -4,6 +4,7 @@
 #include "../../PlayerbotAIConfig.h"
 #include "../../ServerFacade.h"
 #include "../values/Formations.h"
+#include <playerbot/strategy/values/Stances.h>
 
 using namespace ai;
 
@@ -132,4 +133,39 @@ bool FleeToMasterAction::isUseful()
         return false;
 
     return true;
+}
+
+bool ReachStanceAction::Execute(Event event)
+{
+	Stance* stance = context->GetValue<Stance*>("stance")->Get();
+
+	if (!stance)
+		return false;
+
+	Unit* target = stance->GetTarget();
+
+	if (target && stance->GetName() != "near")
+		return MoveToStance(target);
+
+	return false;
+}
+
+bool ReachStanceAction::isUseful()
+{
+	Stance* stance = context->GetValue<Stance*>("stance")->Get();
+
+	if (!stance)
+		return false;
+
+	Unit* target = stance->GetTarget();
+
+	if (target && target != bot && stance->GetName() != "near")
+	{
+		WorldLocation location;
+		WorldLocation loc = stance->GetLocation();
+		bot->GetPosition(location);
+		return !Formation::IsSameLocation(location, loc);
+	}
+
+	return false;
 }

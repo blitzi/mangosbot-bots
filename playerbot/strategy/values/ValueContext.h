@@ -123,6 +123,7 @@ namespace ai
             creators["line target"] = &ValueContext::line_target;
             creators["tank target"] = &ValueContext::tank_target;
             creators["dps target"] = &ValueContext::dps_target;
+            creators["star target"] = &ValueContext::star_target;
             creators["dps aoe target"] = &ValueContext::dps_aoe_target;
             creators["dps stop target"] = &ValueContext::dps_stop_target;
             creators["least hp target"] = &ValueContext::least_hp_target;
@@ -381,6 +382,7 @@ namespace ai
         static UntypedValue* line_target(PlayerbotAI* ai) { return new LineTargetValue(ai); }
         static UntypedValue* tank_target(PlayerbotAI* ai) { return new TankTargetValue(ai); }
         static UntypedValue* dps_target(PlayerbotAI* ai) { return new DpsTargetValue(ai); }
+        static UntypedValue* star_target(PlayerbotAI* ai) { return new StarTargetValue(ai); }
         static UntypedValue* dps_aoe_target(PlayerbotAI* ai) { return new DpsAoeTargetValue(ai); }
         static UntypedValue* dps_stop_target(PlayerbotAI* ai) { return new DamageStopValue(ai); }
         static UntypedValue* least_hp_target(PlayerbotAI* ai) { return new LeastHpTargetValue(ai); }

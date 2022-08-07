@@ -609,16 +609,11 @@ bool MovementAction::MoveToStance(Unit* target)
     if (Formation::IsSameLocation(location, loc))
         return false;
 
-    if (!sServerFacade.IsFriendlyTo(bot, target))
-    {
-        tx = loc.coord_x;
-        ty = loc.coord_y;
-        tz = loc.coord_z;
-        
-        return MoveTo(target->GetMapId(), tx, ty, tz);        
-    }
+    tx = loc.coord_x;
+    ty = loc.coord_y;
+    tz = loc.coord_z;
 
-    return false;
+    return MoveTo(target->GetMapId(), tx, ty, tz);
 }
 
 float MovementAction::GetFollowAngle()

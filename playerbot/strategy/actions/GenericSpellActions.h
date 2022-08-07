@@ -187,18 +187,18 @@ namespace ai
         virtual bool IgnoresCasting() { return true; }
         virtual bool Execute(Event event)
         {
-            Unit* target = GetTargetValue()->Get();
+			Unit* dpsStop = AI_VALUE(Unit*, "dps stop target");
 
-            if (target)
+            if (dpsStop)
             {
-                ostringstream o; o << "damage stop for " << target->GetName();
+                ostringstream o; o << "damage stop for " << dpsStop->GetName();
                 ai->TellMaster(o.str());
                 ai->GetBot()->CastStop();
+				ai->GetBot()->AttackStop(true, true);
 
                 ai->GetAiObjectContext()->GetValue<Unit*>("current target")->Set(NULL);
                 ai->GetAiObjectContext()->GetValue<Unit*>("enemy player target")->Set(NULL);
 				ai->GetAiObjectContext()->GetValue<ObjectGuid>("pull target")->Set(ObjectGuid());
-                ai->ChangeEngine(BOT_STATE_NON_COMBAT);
                 return true;
             }
 
@@ -208,7 +208,8 @@ namespace ai
         virtual bool isUseful()
         {
             Unit* target = GetTargetValue()->Get();
-            return target;
+			Unit* dpsStop = AI_VALUE(Unit*, "dps stop target");
+            return target && target == dpsStop;
         }
     };
 

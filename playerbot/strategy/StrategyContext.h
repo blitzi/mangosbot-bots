@@ -177,6 +177,7 @@ namespace ai
             creators["runaway"] = &MovementStrategyContext::runaway;
             creators["flee from adds"] = &MovementStrategyContext::flee_from_adds;
             creators["guard"] = &MovementStrategyContext::guard;
+            creators["stance"] = &MovementStrategyContext::stance;
         }
 
     private:
@@ -185,6 +186,7 @@ namespace ai
         static Strategy* stay(PlayerbotAI* ai) { return new StayStrategy(ai); }
         static Strategy* runaway(PlayerbotAI* ai) { return new RunawayStrategy(ai); }
         static Strategy* flee_from_adds(PlayerbotAI* ai) { return new FleeFromAddsStrategy(ai); }
+        static Strategy* stance(PlayerbotAI* ai) { return new StanceStrategy(ai); }
     };
 
     class AssistStrategyContext : public NamedObjectContext<Strategy>

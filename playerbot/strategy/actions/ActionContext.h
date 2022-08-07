@@ -103,6 +103,7 @@ namespace ai
             creators["release loot"] = &ActionContext::release_loot;
             creators["follow"] = &ActionContext::follow;
             creators["flee to master"] = &ActionContext::flee_to_master;
+            creators["reach stance"] = &ActionContext::reach_stance;
             creators["runaway"] = &ActionContext::runaway;
             creators["attack anything"] = &ActionContext::attack_anything;
             creators["attack least hp target"] = &ActionContext::attack_least_hp_target;
@@ -239,6 +240,7 @@ namespace ai
         static Action* runaway(PlayerbotAI* ai) { return new RunAwayAction(ai); }
         static Action* follow(PlayerbotAI* ai) { return new FollowAction(ai); }
         static Action* flee_to_master(PlayerbotAI* ai) { return new FleeToMasterAction(ai); }
+        static Action* reach_stance(PlayerbotAI* ai) { return new ReachStanceAction(ai); }
         static Action* add_gathering_loot(PlayerbotAI* ai) { return new AddGatheringLootAction(ai); }
         static Action* add_loot(PlayerbotAI* ai) { return new AddLootAction(ai); }
         static Action* add_all_loot(PlayerbotAI* ai) { return new AddAllLootAction(ai); }
