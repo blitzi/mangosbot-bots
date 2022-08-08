@@ -218,4 +218,15 @@ namespace ai {
         PartyMemberLowOrCriticalHealthAndNaturesSwiftnessTrigger(PlayerbotAI* ai)
             : AndTrigger(ai, new BuffCanBeCastTrigger(ai, "nature's swiftness"), new PartyMemberLowOrCriticalHealthTrigger(ai)) {}
     };
+
+    class EnemyIsCloseAndTyphoonReadyTrigger : public AndTrigger {
+    public:
+        EnemyIsCloseAndTyphoonReadyTrigger(PlayerbotAI* ai)
+            : AndTrigger(ai, new EnemyIsCloseTrigger(ai), new SpellCanBeCastTrigger(ai, "typhoon")) {}
+
+        bool IsActive() {
+            bool result = AndTrigger::IsActive();
+            return result;
+        }
+    };
 }

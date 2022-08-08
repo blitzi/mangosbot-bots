@@ -114,6 +114,8 @@ namespace ai
                 creators["party member low or critical health and clearcasting"] = &TriggerFactoryInternal::party_member_low_or_critical_health_and_clearcasting;
                 creators["low or critical health and natures swiftness"] = &TriggerFactoryInternal::low_or_critical_health_and_natures_swiftness;
                 creators["party member low or critical health and natures swiftness"] = &TriggerFactoryInternal::party_member_low_or_critical_health_and_natures_swiftness;
+                creators["enemy is close and typhoon ready"] = &TriggerFactoryInternal::enemy_is_close_and_typhoon_ready;
+
             }
 
         private:
@@ -150,6 +152,8 @@ namespace ai
             static Trigger* party_member_low_or_critical_health_and_clearcasting(PlayerbotAI* ai) { return new PartyMemberLowOrCriticalHealthAndClearCastingTrigger(ai); }
             static Trigger* low_or_critical_health_and_natures_swiftness(PlayerbotAI* ai) { return new LowOrCriticalHealthAndAndNaturesSwiftnessTrigger(ai); }
             static Trigger* party_member_low_or_critical_health_and_natures_swiftness(PlayerbotAI* ai) { return new PartyMemberLowOrCriticalHealthAndNaturesSwiftnessTrigger(ai); }
+            static Trigger* enemy_is_close_and_typhoon_ready(PlayerbotAI* ai) { return new EnemyIsCloseAndTyphoonReadyTrigger(ai); }
+
         };
     };
 };

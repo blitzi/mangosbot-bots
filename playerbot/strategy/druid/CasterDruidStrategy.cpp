@@ -139,9 +139,9 @@ void CasterDruidStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
         "critical health",
         NextAction::array(0, new NextAction("nature's grasp", ACTION_EMERGENCY), NULL)));
 
-    triggers.push_back(new TriggerNode(
-        "enemy is close",
-        NextAction::array(0, new NextAction("typhoon", 30.0f), NULL)));
+    /*triggers.push_back(new TriggerNode(
+        "enemy is close and typhoon ready",
+        NextAction::array(0, new NextAction("typhoon", 30.0f), NULL)));*/
 }
 
 void CasterDruidAoeStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
