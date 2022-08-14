@@ -10,6 +10,11 @@ GenericRogueStrategy::GenericRogueStrategy(PlayerbotAI* ai) : CombatStrategy(ai)
 {
 }
 
+NextAction** GenericRogueStrategy::getDefaultActions()
+{
+	return NextAction::array(0, new NextAction("melee", ACTION_NORMAL), NULL);
+}
+
 void GenericRogueStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
     CombatStrategy::InitTriggers(triggers);

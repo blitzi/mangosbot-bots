@@ -53,17 +53,25 @@ namespace ai
     class CheckStealthAction : public Action {
     public:
         CheckStealthAction(PlayerbotAI* ai) : Action(ai, "check stealth") {}
-        virtual bool isPossible() { return true; }
+		virtual bool isPossible() { return true; }
         virtual bool Execute(Event event) {
             if (ai->HasAura("stealth", bot))
             {
-                ai->ChangeStrategy("-dps,+stealthed", BOT_STATE_COMBAT);
+				if (!ai->HasStrategy("stealthed", BOT_STATE_COMBAT))
+				{
+					ai->ChangeStrategy("-dps,+stealthed", BOT_STATE_COMBAT);
+					return true;
+				}
             }
             else
             {
-                ai->ChangeStrategy("+dps,-stealthed", BOT_STATE_COMBAT);
+				if (ai->HasStrategy("stealthed", BOT_STATE_COMBAT))
+				{
+					ai->ChangeStrategy("+dps,-stealthed", BOT_STATE_COMBAT);
+					return true;
+				}
             }
-            return true;
+            return false;
         }
     };
 

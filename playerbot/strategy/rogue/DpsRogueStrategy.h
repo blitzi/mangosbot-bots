@@ -13,6 +13,7 @@ namespace ai
     public:
         virtual void InitTriggers(std::list<TriggerNode*>& triggers);
         virtual string getName() { return "generic"; }
+		virtual NextAction** getDefaultActions();
     };
 
     class DpsRogueStrategy : public GenericRogueStrategy
