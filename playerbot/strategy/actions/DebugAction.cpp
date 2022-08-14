@@ -50,12 +50,6 @@ bool DebugAction::Execute(Event event)
         }
         return i == 0;
     }
-    else if (text.find("printmap") != std::string::npos)
-    {
-        sTravelNodeMap.printMap();
-        sTravelNodeMap.printNodeStore();
-        return true;
-    }
     else if (text.find("travel ") != std::string::npos)
     {
         WorldPosition botPos = WorldPosition(bot);
@@ -258,7 +252,6 @@ bool DebugAction::Execute(Event event)
     }
     else if (text.find("save node") != std::string::npos)
     {
-        sTravelNodeMap.printNodeStore();
         sTravelNodeMap.saveNodeStore();
         return true;
     }

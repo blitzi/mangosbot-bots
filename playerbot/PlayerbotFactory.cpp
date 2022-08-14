@@ -47,6 +47,9 @@ uint32 PlayerbotFactory::tradeSkills[] =
 	,
 	SKILL_JEWELCRAFTING
 #endif
+#ifdef MANGOSBOT_TWO
+	,SKILL_INSCRIPTION
+#endif
 };
 
 list<uint32> PlayerbotFactory::classQuestIds;
@@ -54,28 +57,6 @@ list<uint32> PlayerbotFactory::specialQuestIds;
 
 void PlayerbotFactory::Init()
 {
-	if (sPlayerbotAIConfig.randomBotPreQuests) {
-		ObjectMgr::QuestMap const& questTemplates = sObjectMgr.GetQuestTemplates();
-		for (ObjectMgr::QuestMap::const_iterator i = questTemplates.begin(); i != questTemplates.end(); ++i)
-		{
-			uint32 questId = i->first;
-			Quest const *quest = i->second;
-
-			if (!quest->GetRequiredClasses() || quest->IsRepeatable() || quest->GetMinLevel() < 10)
-				continue;
-
-			AddPrevQuests(questId, classQuestIds);
-			classQuestIds.remove(questId);
-			classQuestIds.push_back(questId);
-		}
-        for (list<uint32>::iterator i = sPlayerbotAIConfig.randomBotQuestIds.begin(); i != sPlayerbotAIConfig.randomBotQuestIds.end(); ++i)
-        {
-            uint32 questId = *i;
-            AddPrevQuests(questId, specialQuestIds);
-            specialQuestIds.remove(questId);
-            specialQuestIds.push_back(questId);
-        }
-	}
 }
 
 void PlayerbotFactory::Prepare()
@@ -106,18 +87,6 @@ void PlayerbotFactory::Prepare()
         bot->ResurrectPlayer(1.0f, false);
 
     bot->CombatStop(true);
-    if (sPlayerbotAIConfig.disableRandomLevels)
-    {
-        if (bot->GetLevel() < sPlayerbotAIConfig.randombotStartingLevel)
-        {
-            bot->SetLevel(sPlayerbotAIConfig.randombotStartingLevel);
-        }
-    }
-
-    if (!sPlayerbotAIConfig.disableRandomLevels)
-    {
-        bot->SetLevel(level);
-    }
 
     if (!sPlayerbotAIConfig.randomBotShowHelmet)
     {
@@ -1142,7 +1111,7 @@ void PlayerbotFactory::EnchantItem(Item* item)
 bool PlayerbotFactory::CanEquipUnseenItem(uint8 slot, uint16 &dest, uint32 item)
 {
     dest = 0;
-    Item *pItem = Item::CreateItem(item, 1, bot);
+    Item *pItem = RandomPlayerbotMgr::CreateTempItem(item, 1, bot);
     if (pItem)
     {
         InventoryResult result = bot->CanEquipItem(slot, dest, pItem, true, false);

@@ -307,9 +307,9 @@ bool AttackersValue::ListContainsRti(set<Unit*>& targets) const
     return false;
 }
 
-bool AttackersValue::IsPossibleTarget(Unit *attacker, Player *bot)
+bool AttackersValue::IsPossibleTarget(Unit *target, Player *bot)
 {
-    Creature *c = dynamic_cast<Creature*>(attacker);
+    Creature *c = dynamic_cast<Creature*>(target);
     Group* group = bot->GetGroup();
 
     Unit* dmgStopTarget = bot->GetPlayerbotAI()->GetAiObjectContext()->GetValue<Unit*>("dps stop target")->Get();
@@ -317,19 +317,19 @@ bool AttackersValue::IsPossibleTarget(Unit *attacker, Player *bot)
     if (dmgStopTarget != NULL && (c == dmgStopTarget || bot == dmgStopTarget))
         return false;
 
-	bool basicConditions = attacker &&
-		attacker->IsInWorld() &&
-		attacker->GetMapId() == bot->GetMapId() &&
-		!sServerFacade.UnitIsDead(attacker) &&
-		!attacker->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING) &&
-		!attacker->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNINTERACTIBLE) &&
-		attacker->IsVisibleForOrDetect(bot, attacker, false) &&
-		!sServerFacade.IsFriendlyTo(attacker, bot) &&
-		bot->IsWithinDistInMap(attacker, sPlayerbotAIConfig.sightDistance) &&
-		!(sPlayerbotAIConfig.IsInPvpProhibitedZone(attacker->GetAreaId()) && (attacker->GetObjectGuid().IsPlayer() || attacker->GetObjectGuid().IsPet())) &&
+	bool basicConditions = target &&
+		target->IsInWorld() &&
+		target->GetMapId() == bot->GetMapId() &&
+		!sServerFacade.UnitIsDead(target) &&
+		!target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SPAWNING) &&
+		!target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNINTERACTIBLE) &&
+		target->IsVisibleForOrDetect(bot, target, false) &&
+		!sServerFacade.IsFriendlyTo(target, bot) &&
+		bot->IsWithinDistInMap(target, sPlayerbotAIConfig.sightDistance) &&
+		!(sPlayerbotAIConfig.IsInPvpProhibitedZone(target->GetAreaId()) && (target->GetObjectGuid().IsPlayer() || target->GetObjectGuid().IsPet())) &&
 		(!c || !c->GetCombatManager().IsInEvadeMode());
 
-    bool rti = IsRti(attacker, bot);
+    bool rti = IsRti(target, bot);
   
     if (c &&  c->IsAlive())
     {
@@ -342,7 +342,7 @@ bool AttackersValue::IsPossibleTarget(Unit *attacker, Player *bot)
     if (rti)
         return basicConditions;
 
-    if (!group && bot->GetPet() && bot->GetPet()->IsAttackedBy(attacker))
+    if (bot->IsAttackedBy(target) || (bot->GetPet() && bot->GetPet()->IsAttackedBy(target)))
         return basicConditions;
 
     PlayerbotAI* ai = bot->GetPlayerbotAI();
@@ -362,10 +362,10 @@ bool AttackersValue::IsPossibleTarget(Unit *attacker, Player *bot)
     bool iAmTank = ai->IsTank(ai->GetBot());
     bool carefulTanking = ai->HasStrategy("careful tanking", BOT_STATE_COMBAT);
 
-    if (attacker)
+    if (target)
     {
-        highestThreat = attacker->getThreatManager().GetHighestThreat();
-        myThreat = attacker->getThreatManager().getThreat(bot);
+        highestThreat = target->getThreatManager().GetHighestThreat();
+        myThreat = target->getThreatManager().getThreat(bot);
         float myMaxDamage = bot->GetFloatValue(UNIT_FIELD_MAXDAMAGE) * (carefulTanking ? 3.0f : 1.5f);
         uint32 maxSpellDmg = 0;
 
@@ -410,38 +410,43 @@ bool AttackersValue::IsPossibleTarget(Unit *attacker, Player *bot)
     bool groupHasTank = tanks > 0;
 
     bool leaderHasThreat = false;
-    if (attacker && bot->GetGroup() && ai->GetMaster())
-        leaderHasThreat = attacker->getThreatManager().getThreat(ai->GetMaster());
+    if (target && bot->GetGroup() && ai->GetMaster())
+        leaderHasThreat = target->getThreatManager().getThreat(ai->GetMaster());
 
     bool isMemberBotGroup = false;
     if (bot->GetGroup() && ai->GetMaster() && ai->GetMaster()->GetPlayerbotAI() && !ai->GetMaster()->GetPlayerbotAI()->IsRealPlayer())
         isMemberBotGroup = true;
 
-    return basicConditions &&
-		(sServerFacade.GetThreatManager(attacker).getCurrentVictim() ||
-		 attacker->GetObjectGuid() == bot->GetPlayerbotAI()->GetAiObjectContext()->GetValue<ObjectGuid>("pull target")->Get()) &&
-        !(attacker->IsStunned() && ai->HasAura("shackle undead", attacker)) &&
-        !((attacker->IsPolymorphed() ||
-		  bot->GetPlayerbotAI()->HasAura("sap", attacker) ||
-		  sServerFacade.IsCharmed(attacker) ||
-          sServerFacade.IsFeared(attacker)) && !rti) &&
-          !(attacker->GetCreatureType() == CREATURE_TYPE_CRITTER) &&
-        (!groupHasTank || ((groupHasTank && !waitForTankAggro) || iAmTank || targetIsNonElite || targetIsAlmostDead)) &&
-        (!c ||
-            (
-#ifdef CMANGOS          
-                (!isMemberBotGroup && ai->HasStrategy("attack tagged", BOT_STATE_NON_COMBAT)) || leaderHasThreat ||
-                
-                (c->IsTappedBy(bot) || (!c->HasLootRecipient() && (!c->GetVictim() || c->GetVictim() && ((bot->IsInGroup(c->GetVictim())) || (ai->GetMaster() &&
-                c->GetVictim() == ai->GetMaster())))))
+	bool basicConditionsSolo = basicConditions &&
+		!(target->GetCreatureType() == CREATURE_TYPE_CRITTER) &&
+		!(target->IsStunned() && ai->HasAura("shackle undead", target)) &&
+		!((target->IsPolymorphed() ||
+			bot->GetPlayerbotAI()->HasAura("sap", target) ||
+			sServerFacade.IsCharmed(target) ||
+			sServerFacade.IsFeared(target)) && !rti) &&
+		(!c ||
+			(
+#ifdef CMANGOS
+			(!isMemberBotGroup && ai->HasStrategy("attack tagged", BOT_STATE_NON_COMBAT)) || leaderHasThreat ||
+				(c->IsTappedBy(bot) || (!c->HasLootRecipient() && (!c->GetVictim() || c->GetVictim() && ((bot->IsInGroup(c->GetVictim())) || (ai->GetMaster() &&
+					c->GetVictim() == ai->GetMaster())))))
 #endif
 #ifndef MANGOSBOT_TWO
 #ifdef MANGOS
-                !attacker->HasFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_TAPPED) || bot->IsTappedByMeOrMyGroup(c)
+				!attacker->HasFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_TAPPED) || bot->IsTappedByMeOrMyGroup(c)
 #endif
 #endif
-                 )            
-            );
+		));
+
+		if (!group)
+			return basicConditionsSolo;
+		else
+		{
+			return basicConditionsSolo &&
+				(!groupHasTank || ((groupHasTank && !waitForTankAggro) || iAmTank || targetIsNonElite || targetIsAlmostDead));
+		}
+
+		return false;
 }
 
 bool AttackersValue::IsRti(Unit* enemy, Player* bot)

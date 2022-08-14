@@ -180,22 +180,30 @@ bool RandomPlayerbotFactory::CreateRandomBot(uint8 cls)
 #else
 	uint8 facialHair = 0;
 #endif
-	//TODO vector crash on cmangos TWO when creating one of the first bot characters, need a fix
 
+	//TODO vector crash on cmangos TWO when creating one of the first bot characters, need a fix
 	WorldSession* session = new WorldSession(accountId, NULL, SEC_PLAYER,
 
-#ifndef MANGOSBOT_ZERO
-		2,
+#ifdef MANGOSBOT_TWO
+		2, 0, LOCALE_enUS, "", 0, 0, false);
 #endif
-        0, LOCALE_enUS
-        , "", 0, 0, false
-    );
-
 #ifdef MANGOSBOT_ONE
-    session->SetNoAnticheat();
+	2, 0, LOCALE_enUS, "", 0, 0, false);
 #endif
+#ifdef MANGOSBOT_ZERO
+	0, LOCALE_enUS, "", 0);
+#endif
+
+    session->SetNoAnticheat();
 
     Player *player = new Player(session);
+
+	if (!player || !session)
+	{
+		sLog.outError("BOTS: Unable to create session or player for random acc %d - name: \"%s\"; race: %u; class: %u", accountId, name.c_str(), race, cls);
+		return false;
+	}
+
 	if (!player->Create(sObjectMgr.GeneratePlayerLowGuid(), name, race, cls, gender,
 	        face.second, // skinColor,
 	        face.first,
@@ -213,6 +221,7 @@ bool RandomPlayerbotFactory::CreateRandomBot(uint8 cls)
 
     player->setCinematic(2);
     player->SetAtLoginFlag(AT_LOGIN_NONE);
+	player->SaveToDB();
 
     sObjectAccessor.AddObject(player);
 
@@ -430,7 +439,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
 
         int count = sAccountMgr.GetCharactersCount(accountId);
 #ifdef MANGOSBOT_TWO
-        if (count >= 10)
+        if (count >= 9)
 #else
 		if (count >= 9)
 #endif
@@ -443,7 +452,7 @@ void RandomPlayerbotFactory::CreateRandomBots()
         for (uint8 cls = CLASS_WARRIOR; cls < MAX_CLASSES; ++cls)
         {
 #ifdef MANGOSBOT_TWO
-            if (cls != 10)
+            if (cls != 10 && cls != 6)//Disable dks for now
 #else
             if (cls != 10 && cls != 6)
 #endif

@@ -880,7 +880,6 @@ bool ChooseTravelTargetAction::isUseful()
     if (AI_VALUE2(bool, "group or", "should sell,can sell"))
         return true;
 
-
     return !GetTarget();
 }
 

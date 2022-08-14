@@ -1494,7 +1494,6 @@ void TravelNodeMap::manageNodes(Unit* bot, bool mapFull)
 
     if (m_nMapMtx.try_lock())
     {
-
         TravelNode* startNode;
         TravelNode* newNode;
 
@@ -1531,16 +1530,10 @@ void TravelNodeMap::manageNodes(Unit* bot, bool mapFull)
 
         }
 
-        if (rePrint && (mapFull || !urand(0, 20)))
-            printMap();
-
         m_nMapMtx.unlock();
     }
 
     sTravelNodeMap.m_nMapMtx.lock_shared();
-
-    if (!rePrint && mapFull)
-        printMap();
 
     m_nMapMtx.unlock_shared();
 }
@@ -2142,111 +2135,6 @@ void TravelNodeMap::generateAll()
         hasToFullGen = false;
         hasToSave = true;
     }
-}
-
-void TravelNodeMap::printMap()
-{
-    if (!sPlayerbotAIConfig.hasLog("travelNodes.csv") && !sPlayerbotAIConfig.hasLog("travelPaths.csv"))
-        return;
-
-    printf("\r [Qgis] \r\x3D");
-    fflush(stdout);
-
-    sPlayerbotAIConfig.openLog("travelNodes.csv", "w");
-    sPlayerbotAIConfig.openLog("travelPaths.csv", "w");
-
-    vector<TravelNode*> anodes = getNodes();
-
-    uint32 nr = 0;
-
-    for (auto& node : anodes)
-    {
-        node->print(false);
-    }
-}
-
-void TravelNodeMap::printNodeStore()
-{
-    string nodeStore = "TravelNodeStore.h";
-
-    if (!sPlayerbotAIConfig.hasLog(nodeStore))
-        return;
-
-    printf("\r [Map] \r\x3D");
-    fflush(stdout);
-
-    sPlayerbotAIConfig.openLog(nodeStore, "w");
-
-    std::unordered_map<TravelNode*, uint32> saveNodes;
-
-    vector<TravelNode*> anodes = getNodes();
-
-    sPlayerbotAIConfig.log(nodeStore, "#pragma once");
-    sPlayerbotAIConfig.log(nodeStore, "#include \"TravelMgr.h\"");
-    sPlayerbotAIConfig.log(nodeStore, "namespace ai");
-    sPlayerbotAIConfig.log(nodeStore, "    {");
-    sPlayerbotAIConfig.log(nodeStore, "    class TravelNodeStore");
-    sPlayerbotAIConfig.log(nodeStore, "    {");
-    sPlayerbotAIConfig.log(nodeStore, "    public:");
-    sPlayerbotAIConfig.log(nodeStore, "    static void loadNodes()");
-    sPlayerbotAIConfig.log(nodeStore, "    {");
-    sPlayerbotAIConfig.log(nodeStore, "        TravelNode** nodes = new TravelNode*[%d];", anodes.size());
-
-    for (uint32 i = 0; i < anodes.size(); i++)
-    {
-        TravelNode* node = anodes[i];
-
-        ostringstream out;
-
-        string name = node->getName();
-        name.erase(remove(name.begin(), name.end(), '\"'), name.end());
-
-        //        struct addNode {uint32 node; WorldPosition point; string name; bool isPortal; bool isTransport; uint32 transportId; };
-        out << std::fixed << std::setprecision(2) << "        addNodes.push_back(addNode{" << i << ",";
-        out << "WorldPosition(" << node->getMapId() << ", " << node->getX() << "f, " << node->getY() << "f, " << node->getZ() << "f, " << node->getO() << "f),";
-        out << "\"" << name << "\"";
-        if (node->isTransport())
-            out << "," << (node->isTransport() ? "true" : "false") << "," << node->getTransportId();
-        out << "});";
-
-        /*
-                out << std::fixed << std::setprecision(2) << "        nodes[" << i << "] = sTravelNodeMap.addNode(&WorldPosition(" << node->getMapId() << "," << node->getX() << "f," << node->getY() << "f," << node->getZ() << "f,"<< node->getO() <<"f), \""
-                    << name << "\", " << (node->isImportant() ? "true" : "false") << ", true";
-                if (node->isTransport())
-                    out << "," << (node->isTransport() ? "true" : "false") << "," << node->getTransportId();
-
-                out << ");";
-                */
-        sPlayerbotAIConfig.log(nodeStore, out.str().c_str());
-
-        saveNodes.insert(make_pair(node, i));
-    }
-
-    for (uint32 i = 0; i < anodes.size(); i++)
-    {
-        TravelNode* node = anodes[i];
-
-        for (auto& Link : *node->getLinks())
-        {
-            ostringstream out;
-
-            //        struct linkNode { uint32 node1; uint32 node2; float distance; float extraCost; bool isPortal; bool isTransport; uint32 maxLevelMob; uint32 maxLevelAlliance; uint32 maxLevelHorde; float swimDistance; };
-
-            out << std::fixed << std::setprecision(2) << "        linkNodes3.push_back(linkNode3{" << i << "," << saveNodes.find(Link.first)->second << ",";
-            out << Link.second->print() << "});";
-
-            //out << std::fixed << std::setprecision(1) << "        nodes[" << i << "]->setPathTo(nodes[" << saveNodes.find(Link.first)->second << "],TravelNodePath(";
-            //out << Link.second->print() << "), true);";
-            sPlayerbotAIConfig.log(nodeStore, out.str().c_str());
-        }
-    }
-
-    sPlayerbotAIConfig.log(nodeStore, "	}");
-    sPlayerbotAIConfig.log(nodeStore, "};");
-    sPlayerbotAIConfig.log(nodeStore, "}");
-
-    printf("\r [Done] \r\x3D");
-    fflush(stdout);
 }
 
 void TravelNodeMap::saveNodeStore()

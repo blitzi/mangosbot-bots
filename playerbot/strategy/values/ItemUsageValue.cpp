@@ -88,7 +88,7 @@ ItemUsage ItemUsageValue::Calculate()
     //create virtual item if the item does not exist (e.g. for quest rewards)
     if (found.size() == 0)
     {
-        Item* item = Item::CreateItem(proto->ItemId, 1, bot);
+        Item* item = RandomPlayerbotMgr::CreateTempItem(proto->ItemId, 1, bot);
 
         if (!item)
             return ITEM_USAGE_NONE;

@@ -59,7 +59,7 @@ public:
     float randomGearLoweringChance;
     float randomBotMaxLevelChance;
     float randomBotRpgChance;
-    uint32 minRandomBots, maxRandomBots;
+    uint32 numRandomBots;
     uint32 randomBotUpdateInterval, randomBotCountChangeMinInterval, randomBotCountChangeMaxInterval;
     uint32 minRandomBotInWorldTime, maxRandomBotInWorldTime;
     uint32 minRandomBotRandomizeTime, maxRandomBotRandomizeTime;
@@ -78,7 +78,6 @@ public:
     bool summonAtInnkeepersEnabled;
     std::string combatStrategies, nonCombatStrategies;
     std::string randomBotCombatStrategies, randomBotNonCombatStrategies;
-    uint32 randomBotMinLevel, randomBotMaxLevel;
     float randomChangeMultiplier;
     uint32 specProbability[MAX_CLASSES][10];
     string premadeLevelSpec[MAX_CLASSES][10][91]; //lvl 10 - 100
@@ -101,11 +100,9 @@ public:
     bool randomBotShowCloak;
     bool disableRandomLevels;
     bool gearscorecheck;
-	bool randomBotPreQuests;
     uint32 playerbotsXPrate;
     uint32 botActiveAlone;
     uint32 minEnchantingBotLevel;
-    uint32 randombotStartingLevel;
     bool randomBotSayWithoutMaster;
     bool randomBotGroupNearby;
     bool randomBotRandomPassword;
@@ -128,9 +125,6 @@ public:
     std::string autoPickTalents;
     bool autoLearnTrainerSpells;
     bool autoLearnQuestSpells;
-    bool autoDoQuests;
-    bool syncLevelWithPlayers;
-    uint32 tweakValue; //Debugging config
 
     std::mutex m_logMtx;
 

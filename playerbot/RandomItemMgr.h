@@ -70,7 +70,6 @@ class RandomItemMgr
 
 	public:
         void Init();
-        void InitAfterAhBot();
         static bool HandleConsoleCommand(ChatHandler* handler, char const* args);
         RandomItemList Query(uint32 level, RandomItemType type, RandomItemPredicate* predicate);
         RandomItemList Query(uint32 level, uint8 clazz, uint8 slot, uint32 quality);
@@ -85,8 +84,6 @@ class RandomItemMgr
         float GetItemRarity(uint32 itemId);
 
     private:
-        void BuildRandomItemCache();
-        void BuildEquipCache();
         void BuildAmmoCache();
         void BuildFoodCache();
         void BuildPotionCache();

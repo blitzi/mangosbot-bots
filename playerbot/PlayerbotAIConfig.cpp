@@ -128,8 +128,7 @@ bool PlayerbotAIConfig::Initialize()
 
     botAutologin = config.GetBoolDefault("AiPlayerbot.BotAutologin", false);
     randomBotAutologin = config.GetBoolDefault("AiPlayerbot.RandomBotAutologin", true);
-    minRandomBots = config.GetIntDefault("AiPlayerbot.MinRandomBots", 800);
-    maxRandomBots = config.GetIntDefault("AiPlayerbot.MaxRandomBots", 800);
+	numRandomBots = config.GetIntDefault("AiPlayerbot.NumRandomBots", 800);
     randomBotUpdateInterval = config.GetIntDefault("AiPlayerbot.RandomBotUpdateInterval", 60);
     randomBotCountChangeMinInterval = config.GetIntDefault("AiPlayerbot.RandomBotCountChangeMinInterval", 1 * 60);
     randomBotCountChangeMaxInterval = config.GetIntDefault("AiPlayerbot.RandomBotCountChangeMaxInterval", 2 * 120);
@@ -145,8 +144,6 @@ bool PlayerbotAIConfig::Initialize()
     logValuesPerTick = config.GetBoolDefault("AiPlayerbot.LogValuesPerTick", false);
     fleeingEnabled = config.GetBoolDefault("AiPlayerbot.FleeingEnabled", false);
     summonAtInnkeepersEnabled = config.GetBoolDefault("AiPlayerbot.SummonAtInnkeepersEnabled", true);
-    randomBotMinLevel = config.GetIntDefault("AiPlayerbot.RandomBotMinLevel", 1);
-    randomBotMaxLevel = config.GetIntDefault("AiPlayerbot.RandomBotMaxLevel", 1);
     randomBotLoginAtStartup = config.GetBoolDefault("AiPlayerbot.RandomBotLoginAtStartup", true);
     randomBotTeleLevel = config.GetIntDefault("AiPlayerbot.RandomBotTeleLevel", 10);
     openGoSpell = config.GetIntDefault("AiPlayerbot.OpenGoSpell", 6477);
@@ -283,16 +280,13 @@ bool PlayerbotAIConfig::Initialize()
 
 	//SPP switches
     enableGreet = config.GetBoolDefault("AiPlayerbot.EnableGreet", false);
-	disableRandomLevels = config.GetBoolDefault("AiPlayerbot.DisableRandomLevels", false);
     randomBotRandomPassword = config.GetBoolDefault("AiPlayerbot.RandomBotRandomPassword", false);
     playerbotsXPrate = config.GetIntDefault("AiPlayerbot.KillXPRate", 1);
     botActiveAlone = config.GetIntDefault("AiPlayerbot.botActiveAlone", 100); //hidden config
     RandombotsWalkingRPG = config.GetBoolDefault("AiPlayerbot.RandombotsWalkingRPG", false);
     RandombotsWalkingRPGInDoors = config.GetBoolDefault("AiPlayerbot.RandombotsWalkingRPG.InDoors", false);
     minEnchantingBotLevel = config.GetIntDefault("AiPlayerbot.minEnchantingBotLevel", 60);
-    randombotStartingLevel = config.GetIntDefault("AiPlayerbot.randombotStartingLevel", 5);
     gearscorecheck = config.GetBoolDefault("AiPlayerbot.GearScoreCheck", false);
-	randomBotPreQuests = config.GetBoolDefault("AiPlayerbot.PreQuests", true);
     randomBotSayWithoutMaster = config.GetBoolDefault("AiPlayerbot.RandomBotSayWithoutMaster", false);
     randomBotGroupNearby = config.GetBoolDefault("AiPlayerbot.RandomBotGroupNearby", false);
 
@@ -305,9 +299,6 @@ bool PlayerbotAIConfig::Initialize()
     autoPickTalents = config.GetStringDefault("AiPlayerbot.AutoPickTalents", "no");
     autoLearnTrainerSpells = config.GetBoolDefault("AiPlayerbot.AutoLearnTrainerSpells", false);
     autoLearnQuestSpells = config.GetBoolDefault("AiPlayerbot.AutoLearnQuestSpells", false);
-    autoDoQuests = config.GetBoolDefault("AiPlayerbot.AutoDoQuests", false);
-    syncLevelWithPlayers = config.GetBoolDefault("AiPlayerbot.SyncLevelWithPlayers", false);
-    tweakValue = config.GetIntDefault("AiPlayerbot.TweakValue", 0);
 
     selfBotLevel = config.GetIntDefault("AiPlayerbot.SelfBotLevel", 1);
 
@@ -324,16 +315,8 @@ bool PlayerbotAIConfig::Initialize()
 
     sRandomItemMgr.Init();
 
-	sLog.outString("Init Auctionbot...");
-
-    auctionbot.Init();
-    sRandomItemMgr.InitAfterAhBot();
-
-    if (sPlayerbotAIConfig.autoDoQuests)
-    {
-        sLog.outString("Loading Quest Detail Data...");
-        sTravelMgr.LoadQuestTravelTable();
-    }
+    sLog.outString("Loading Travel Detail Data...");
+    sTravelMgr.LoadTravelTable();
 
     if (sPlayerbotAIConfig.randomBotJoinBG)
         sRandomPlayerbotMgr.LoadBattleMastersCache();

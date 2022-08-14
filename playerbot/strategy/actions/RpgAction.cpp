@@ -43,7 +43,7 @@ bool RpgAction::Execute(Event event)
         entry = -((int32)wo->GetEntry());
 
     if (sServerFacade.isMoving(bot))
-        return true;
+        return false;
 
     if (bot->GetMapId() != wo->GetMapId())
     {
@@ -52,14 +52,7 @@ bool RpgAction::Execute(Event event)
     }
 
     if (!sServerFacade.IsInFront(bot, wo, sPlayerbotAIConfig.sightDistance, CAST_ANGLE_IN_FRONT) && !bot->IsTaxiFlying() && !bot->IsFlying())
-    {
         sServerFacade.SetFacingTo(bot, wo, true);
-
-        if (!ai->HasStrategy("follow"))
-        {            
-            return true;
-        }
-    }
 
     if (unit && !bot->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_NONE))
     {

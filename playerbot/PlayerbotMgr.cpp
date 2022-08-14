@@ -162,9 +162,10 @@ void PlayerbotHolder::OnBotLogin(Player * const bot)
 {
 	PlayerbotAI* ai = new PlayerbotAI(bot);
 	bot->SetPlayerbotAI(ai);
-	OnBotLoginInternal(bot);
 
     playerBots[bot->GetObjectGuid().GetRawValue()] = bot;
+
+	OnBotLoginInternal(bot);
 
     Player* master = ai->GetMaster();
 

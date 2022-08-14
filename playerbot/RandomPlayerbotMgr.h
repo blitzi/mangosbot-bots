@@ -46,7 +46,6 @@ class RandomPlayerbotMgr : public PlayerbotHolder
         static bool HandlePlayerbotConsoleCommand(ChatHandler* handler, char const* args);
         bool IsRandomBot(Player* bot);
         bool IsRandomBot(uint32 bot);
-        void RandomizeFirst(Player* bot);
         void IncreaseLevel(Player* bot);
         void ScheduleTeleport(uint32 bot, uint32 time = 0);
         void ScheduleChangeStrategy(uint32 bot, uint32 time = 0);
@@ -90,6 +89,10 @@ class RandomPlayerbotMgr : public PlayerbotHolder
         void CheckBgQueue();
         void CheckLfgQueue();
         void CheckPlayers();
+		static Item* CreateTempItem(uint32 item, uint32 count, Player const* player, uint32 randomPropertyId = 0);
+		Player* GetHighestPlayerBot() const;
+		Player* GetLowestPlayerBot() const;
+		void TryAddRandomBot();
 
         map<Team, map<BattleGroundTypeId, list<uint32> > > getBattleMastersCache() { return BattleMastersCache; }
 
@@ -106,7 +109,7 @@ class RandomPlayerbotMgr : public PlayerbotHolder
         time_t BgCheckTimer;
         time_t LfgCheckTimer;
         time_t PlayersCheckTimer;
-        uint32 AddRandomBots();
+        uint32 AddRandomBots(int minLevel, int maxLevel, int num);
         bool ProcessBot(uint32 bot);
         void RandomTeleport(Player* bot);
         void RandomTeleport(Player* bot, vector<WorldLocation> &locs, bool hearth = false);
@@ -125,7 +128,6 @@ class RandomPlayerbotMgr : public PlayerbotHolder
         BarGoLink* loginProgressBar;
         list<uint32> currentBots;
         uint32 bgBotsCount;
-        uint32 playersLevel = sPlayerbotAIConfig.randombotStartingLevel;
 };
 
 #define sRandomPlayerbotMgr RandomPlayerbotMgr::instance()

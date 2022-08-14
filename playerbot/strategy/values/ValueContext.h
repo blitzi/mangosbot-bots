@@ -254,6 +254,7 @@ namespace ai
             creators["free money for"] = &ValueContext::free_money_for;
             creators["should get money"] = &ValueContext::should_get_money;
 
+			creators["can move around"] = &ValueContext::can_move_around;
             creators["should home bind"] = &ValueContext::should_home_bind;
             creators["should repair"] = &ValueContext::should_repair;
             creators["can repair"] = &ValueContext::can_repair;
@@ -263,6 +264,7 @@ namespace ai
             creators["can fight equal"] = &ValueContext::can_fight_equal;
             creators["can fight boss"] = &ValueContext::can_fight_boss;
 
+			creators["group members"] = &ValueContext::group_members;
             creators["following party"] = &ValueContext::following_party;
             creators["near leader"] = &ValueContext::near_leader;
 
@@ -270,6 +272,7 @@ namespace ai
             creators["or"] = &ValueContext::or_value;
             creators["group and"] = &ValueContext::group_and;
             creators["group or"] = &ValueContext::group_or;
+            creators["group ready"] = &ValueContext::group_ready;
 
             creators["petition signs"] = &ValueContext::petition_signs;
 
@@ -437,6 +440,7 @@ namespace ai
         static UntypedValue* free_money_for(PlayerbotAI* ai) { return new FreeMoneyForValue(ai); }
         static UntypedValue* should_get_money(PlayerbotAI* ai) { return new ShouldGetMoneyValue(ai); }
 
+		static UntypedValue* can_move_around(PlayerbotAI* ai) { return new CanMoveAroundValue(ai); }
         static UntypedValue* should_home_bind(PlayerbotAI* ai) { return new ShouldHomeBindValue(ai); }
         static UntypedValue* should_repair(PlayerbotAI* ai) { return new ShouldRepairValue(ai); }
         static UntypedValue* can_repair(PlayerbotAI* ai) { return new CanRepairValue(ai); }
@@ -446,12 +450,15 @@ namespace ai
         static UntypedValue* can_fight_equal(PlayerbotAI* ai) { return new CanFightEqualValue(ai); }
         static UntypedValue* can_fight_boss(PlayerbotAI* ai) { return new CanFightBossValue(ai); }
 
+		static UntypedValue* group_members(PlayerbotAI* ai) { return new GroupMembersValue(ai); }
         static UntypedValue* following_party(PlayerbotAI* ai) { return new IsFollowingPartyValue(ai); }
         static UntypedValue* near_leader(PlayerbotAI* ai) { return new IsNearLeaderValue(ai); }
         static UntypedValue* and_value(PlayerbotAI* ai) { return new BoolANDValue(ai); }
         static UntypedValue* or_value(PlayerbotAI* ai) { return new BoolORValue(ai); }
         static UntypedValue* group_and(PlayerbotAI* ai) { return new GroupBoolANDValue(ai); }
         static UntypedValue* group_or(PlayerbotAI* ai) { return new GroupBoolORValue(ai); }
+		static UntypedValue* group_ready(PlayerbotAI* ai) { return new GroupReadyValue(ai); }
+
 
         static UntypedValue* petition_signs(PlayerbotAI* ai) { return new PetitionSignsValue(ai); }
 

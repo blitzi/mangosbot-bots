@@ -46,10 +46,10 @@ bool TravelAction::Execute(Event event)
         if (newTarget->IsInCombat())
             continue;
 
-        if (sServerFacade.IsHostileTo(bot, newTarget))
-            context->GetValue<ObjectGuid>("pull target")->Set(newTarget->GetObjectGuid());
-        else
+        if (sServerFacade.IsFriendlyTo(bot, newTarget))
             context->GetValue<ObjectGuid>("rpg target")->Set(newTarget->GetObjectGuid());
+        else
+            context->GetValue<ObjectGuid>("pull target")->Set(newTarget->GetObjectGuid());
 
         break;
     }

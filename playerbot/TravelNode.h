@@ -383,9 +383,6 @@ enum class TravelNodePathType : uint8
 
         void generateAll();
 
-        void printMap();
-        
-        void printNodeStore();
         void saveNodeStore();
         void loadNodeStore();
 

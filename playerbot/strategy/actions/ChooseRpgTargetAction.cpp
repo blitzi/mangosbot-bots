@@ -187,7 +187,7 @@ bool ChooseRpgTargetAction::Execute(Event event)
             entry = -((int32)go->GetEntry());
 
         if (!ignoreList.empty()
-            && ignoreList.find(guid) != ignoreList.end())    
+            && ignoreList.find(guid) != ignoreList.end())
             continue;
 
         int priority = 0;
@@ -197,7 +197,8 @@ bool ChooseRpgTargetAction::Execute(Event event)
             if (!isFollowValid(bot, unit))
                 continue;
 
-            if (travelTarget && travelTarget->getDestination()->getEntry() == unit->GetEntry())
+            if (travelTarget && travelTarget->getDestination() &&
+				travelTarget->getDestination()->getEntry() == unit->GetEntry())
                 priority = 110;
             if (unit->isVendor() && AI_VALUE2(bool, "group or", "should sell,can sell"))
                 priority = 100;
@@ -285,16 +286,21 @@ bool ChooseRpgTargetAction::Execute(Event event)
 
 bool ChooseRpgTargetAction::isUseful()
 {
-    if (context->GetValue<TravelTarget*>("travel target")->Get()->isTraveling())
-        return false;
+	if (AI_VALUE(ObjectGuid, "rpg target"))
+		return false;
 
-    if (bot->IsMoving())
-        return false;
+	TravelTarget* travelTarget = AI_VALUE(TravelTarget*, "travel target");
 
-    return
-        !sServerFacade.IsInCombat(bot, true)
-        && !context->GetValue<ObjectGuid>("rpg target")->Get()      
-        && !context->GetValue <list<ObjectGuid>>("possible rpg targets")->Get().empty();
+	if (travelTarget->isTraveling() && isFollowValid(bot, *travelTarget->getPosition()))
+		return false;
+
+	if (AI_VALUE(list<ObjectGuid>, "possible rpg targets").empty())
+		return false;
+
+	if (!AI_VALUE(bool, "can move around"))
+		return false;
+
+	return true;
 }
 
 bool ChooseRpgTargetAction::isFollowValid(Player* bot, WorldObject* target)
@@ -307,52 +313,56 @@ bool ChooseRpgTargetAction::isFollowValid(Player* bot, WorldObject* target)
     return isFollowValid(bot, location);
 }
 
-bool ChooseRpgTargetAction::isFollowValid(Player* bot, WorldLocation location)
+bool ChooseRpgTargetAction::isFollowValid(Player* bot, WorldPosition pos)
 {
-    PlayerbotAI* ai = bot->GetPlayerbotAI();
-    Player* master = ai->GetGroupMaster();
-    Player* realMaster = ai->GetMaster();
-    AiObjectContext* context = ai->GetAiObjectContext();
+	PlayerbotAI* ai = bot->GetPlayerbotAI();
+	Player* master = ai->GetGroupMaster();
+	Player* realMaster = ai->GetMaster();
+	AiObjectContext* context = ai->GetAiObjectContext();
 
-    bool inDungeon = false;
+	bool inDungeon = false;
 
-    if (ai->HasActivePlayerMaster())
-    {
-        if (realMaster->IsInWorld() &&
-            realMaster->GetMap()->IsDungeon() &&
-            bot->GetMapId() == realMaster->GetMapId())
-            inDungeon = true;
+	if (ai->HasActivePlayerMaster())
+	{
+		if (realMaster->IsInWorld() &&
+			realMaster->GetMap()->IsDungeon() &&
+			bot->GetMapId() == realMaster->GetMapId())
+			inDungeon = true;
 
-        if (realMaster &&
-            realMaster->IsInWorld() &&
-            realMaster->GetMap()->IsDungeon() &&
-            (realMaster->GetMapId() != location.mapid))
-            return false;
-    }
+		if (realMaster &&
+			realMaster->IsInWorld() &&
+			realMaster->GetMap()->IsDungeon() &&
+			(realMaster->GetMapId() != pos.getMapId()))
+			return false;
+	}
 
-    if (!master || bot == master)
-        return true;
+	if (!master || bot == master)
+		return true;
 
-    if (!ai->HasStrategy("follow"))
-        return true;
+	if (!ai->HasStrategy("follow", BOT_STATE_NON_COMBAT))
+		return true;
 
-    if (sqrt(bot->GetDistance(master)) > sPlayerbotAIConfig.rpgDistance * 2)
-        return false;
+	if (sqrt(bot->GetDistance(master)) > sPlayerbotAIConfig.rpgDistance * 2)
+		return false;
 
-    Formation* formation = AI_VALUE(Formation*, "formation");
-    float distance = master->GetDistance2d(location.coord_x, location.coord_y);
+	Formation* formation = AI_VALUE(Formation*, "formation");
+	float distance = sqrt(master->GetDistance2d(pos.getX(), pos.getY(), DIST_CALC_NONE));
 
-    if (!ai->HasActivePlayerMaster() && distance < 50.0f)
-        return true;
+	if (!ai->HasActivePlayerMaster() && distance < 50.0f)
+	{
+		Player* player = master;
+		if (!master->IsMoving() || AI_VALUE(WorldPosition, "last long move").distance(pos) < sPlayerbotAIConfig.reactDistance)
+			return true;
+	}
 
-    if (inDungeon && (realMaster == master) && distance > 5.0f)
-        return false;
+	if ((inDungeon || !master->GetRestType()) && (realMaster == master) && distance > 5.0f)
+		return false;
 
-    if (!master->IsMoving() && distance < 25.0f)
-        return true;
+	if (!master->IsMoving() && distance < 25.0f)
+		return true;
 
-    if (distance < formation->GetMaxDistance())
-        return true;
+	if (distance < formation->GetMaxDistance())
+		return true;
 
-    return false;
+	return false;
 }

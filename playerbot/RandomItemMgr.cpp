@@ -125,17 +125,10 @@ RandomItemMgr::RandomItemMgr()
 
 void RandomItemMgr::Init()
 {
-    BuildEquipCache();
     BuildAmmoCache();
     BuildPotionCache();
     BuildFoodCache();
     BuildTradeCache();
-}
-
-void RandomItemMgr::InitAfterAhBot()
-{
-    BuildRandomItemCache();
-    //BuildRarityCache();
 }
 
 RandomItemMgr::~RandomItemMgr()
@@ -176,91 +169,6 @@ RandomItemList RandomItemMgr::Query(uint32 level, RandomItemType type, RandomIte
     }
 
     return result;
-}
-
-void RandomItemMgr::BuildRandomItemCache()
-{
-    QueryResult* results = PlayerbotDatabase.PQuery("select lvl, type, item from ai_playerbot_rnditem_cache");
-    if (results)
-    {
-        sLog.outString("Loading random item cache");
-        int count = 0;
-        do
-        {
-            Field* fields = results->Fetch();
-            uint32 level = fields[0].GetUInt32();
-            uint32 type = fields[1].GetUInt32();
-            uint32 itemId = fields[2].GetUInt32();
-
-            RandomItemType rit = (RandomItemType)type;
-            randomItemCache[level][rit].push_back(itemId);
-            count++;
-
-        } while (results->NextRow());
-        delete results;
-        sLog.outString("Equipment cache loaded from %d records", count);
-    }
-    else
-    {
-        sLog.outString("Building random item cache from %u items", sItemStorage.GetMaxEntry());
-        for (uint32 itemId = 0; itemId < sItemStorage.GetMaxEntry(); ++itemId)
-        {
-            ItemPrototype const* proto = sObjectMgr.GetItemPrototype(itemId);
-            if (!proto)
-                continue;
-
-            if (proto->Duration & 0x80000000)
-                continue;
-
-            if (sAhBotConfig.ignoreItemIds.find(proto->ItemId) != sAhBotConfig.ignoreItemIds.end())
-                continue;
-
-            if (strstri(proto->Name1, "qa") || strstri(proto->Name1, "test") || strstri(proto->Name1, "deprecated"))
-                continue;
-
-            if (!proto->ItemLevel/* || (proto->RequiredLevel && proto->RequiredLevel > sAhBotConfig.maxRequiredLevel) || proto->ItemLevel > sAhBotConfig.maxItemLevel*/)
-                continue;
-
-            if (!auctionbot.GetSellPrice(proto))
-                continue;
-
-            uint32 level = proto->ItemLevel;
-            for (uint32 type = RANDOM_ITEM_GUILD_TASK; type <= RANDOM_ITEM_GUILD_TASK_REWARD_TRADE_RARE; type++)
-            {
-                RandomItemType rit = (RandomItemType)type;
-                if (predicates[rit] && !predicates[rit]->Apply(proto))
-                    continue;
-
-                randomItemCache[level / 10][rit].push_back(itemId);
-                PlayerbotDatabase.PExecute("insert into ai_playerbot_rnditem_cache (lvl, type, item) values (%u, %u, %u)",
-                        level / 10, type, itemId);
-            }
-        }
-
-        uint32 maxLevel = sPlayerbotAIConfig.randomBotMaxLevel;
-        if (maxLevel > sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
-            maxLevel = sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL);
-        for (int level = 0; level < maxLevel / 10; level++)
-        {
-            for (uint32 type = RANDOM_ITEM_GUILD_TASK; type <= RANDOM_ITEM_GUILD_TASK_REWARD_TRADE_RARE; type++)
-            {
-                RandomItemList list = randomItemCache[level][(RandomItemType)type];
-                sLog.outDetail("    Level %d..%d Type %d - %zu random items cached",
-                        level * 10, level * 10 + 9,
-                        type,
-                        list.size());
-                for (RandomItemList::iterator i = list.begin(); i != list.end(); ++i)
-                {
-                    uint32 itemId = *i;
-                    ItemPrototype const* proto = sObjectMgr.GetItemPrototype(itemId);
-                    if (!proto)
-                        continue;
-
-                    sLog.outDetail("        [%d] %s", itemId, proto->Name1);
-                }
-            }
-        }
-    }
 }
 
 uint32 RandomItemMgr::GetRandomItem(uint32 level, RandomItemType type, RandomItemPredicate* predicate)
@@ -505,108 +413,6 @@ bool RandomItemMgr::CanEquipWeapon(uint8 clazz, ItemPrototype const* proto)
     return true;
 }
 
-
-void RandomItemMgr::BuildEquipCache()
-{
-    uint32 maxLevel = sPlayerbotAIConfig.randomBotMaxLevel;
-    if (maxLevel > sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
-        maxLevel = sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL);
-
-    QueryResult* results = PlayerbotDatabase.PQuery("select clazz, lvl, slot, quality, item from ai_playerbot_equip_cache");
-    if (results)
-    {
-        sLog.outString("Loading equipment cache for %d classes, %d levels, %d slots, %d quality from %d items",
-                MAX_CLASSES, maxLevel, EQUIPMENT_SLOT_END, ITEM_QUALITY_ARTIFACT, sItemStorage.GetMaxEntry());
-        int count = 0;
-        do
-        {
-            Field* fields = results->Fetch();
-            uint32 clazz = fields[0].GetUInt32();
-            uint32 level = fields[1].GetUInt32();
-            uint32 slot = fields[2].GetUInt32();
-            uint32 quality = fields[3].GetUInt32();
-            uint32 itemId = fields[4].GetUInt32();
-
-            BotEquipKey key(level, clazz, slot, quality);
-            equipCache[key].push_back(itemId);
-            count++;
-
-        } while (results->NextRow());
-        delete results;
-        sLog.outString("Equipment cache loaded from %d records", count);
-    }
-    else
-    {
-        uint64 total = MAX_CLASSES * maxLevel * EQUIPMENT_SLOT_END * ITEM_QUALITY_ARTIFACT;
-        sLog.outString("Building equipment cache for %d classes, %d levels, %d slots, %d quality from %d items (%zu total)",
-                MAX_CLASSES, maxLevel, EQUIPMENT_SLOT_END, ITEM_QUALITY_ARTIFACT, sItemStorage.GetMaxEntry(), total);
-
-        BarGoLink bar(total);
-        for (uint8 clazz = CLASS_WARRIOR; clazz < MAX_CLASSES; ++clazz)
-        {
-            // skip nonexistent classes
-            if (!((1 << (clazz - 1)) & CLASSMASK_ALL_PLAYABLE) || !sChrClassesStore.LookupEntry(clazz))
-                continue;
-
-            for (uint32 level = 1; level <= maxLevel; ++level)
-            {
-                for (uint8 slot = 0; slot < EQUIPMENT_SLOT_END; ++slot)
-                {
-                    for (uint32 quality = ITEM_QUALITY_POOR; quality <= ITEM_QUALITY_ARTIFACT; ++quality)
-                    {
-                        BotEquipKey key(level, clazz, slot, quality);
-
-                        RandomItemList items;
-                        for (uint32 itemId = 0; itemId < sItemStorage.GetMaxEntry(); ++itemId)
-                        {
-                            ItemPrototype const* proto = sObjectMgr.GetItemPrototype(itemId);
-                            if (!proto)
-                                continue;
-
-                            if (proto->Class != ITEM_CLASS_WEAPON &&
-                                proto->Class != ITEM_CLASS_ARMOR &&
-                                proto->Class != ITEM_CLASS_CONTAINER &&
-                                proto->Class != ITEM_CLASS_PROJECTILE)
-                                continue;
-
-                            if (!CanEquipItem(key, proto))
-                                continue;
-
-                            if (proto->Class == ITEM_CLASS_ARMOR && (
-                                slot == EQUIPMENT_SLOT_HEAD ||
-                                slot == EQUIPMENT_SLOT_SHOULDERS ||
-                                slot == EQUIPMENT_SLOT_CHEST ||
-                                slot == EQUIPMENT_SLOT_WAIST ||
-                                slot == EQUIPMENT_SLOT_LEGS ||
-                                slot == EQUIPMENT_SLOT_FEET ||
-                                slot == EQUIPMENT_SLOT_WRISTS ||
-                                slot == EQUIPMENT_SLOT_HANDS) && !CanEquipArmor(key.clazz, key.level, proto))
-                                    continue;
-
-                            if (proto->Class == ITEM_CLASS_WEAPON && !CanEquipWeapon(key.clazz, proto))
-                                continue;
-
-                            if (slot == EQUIPMENT_SLOT_OFFHAND && key.clazz == CLASS_ROGUE && proto->Class != ITEM_CLASS_WEAPON)
-                                continue;
-
-                            items.push_back(itemId);
-
-                            PlayerbotDatabase.PExecute("insert into ai_playerbot_equip_cache (clazz, lvl, slot, quality, item) values (%u, %u, %u, %u, %u)",
-                                    clazz, level, slot, quality, itemId);
-                        }
-
-                        equipCache[key] = items;
-                        bar.step();
-                        sLog.outDetail("Equipment cache for class: %d, level %d, slot %d, quality %d: %zu items",
-                                clazz, level, slot, quality, items.size());
-                    }
-                }
-            }
-        }
-        sLog.outString("Equipment cache saved to DB");
-    }
-}
-
 RandomItemList RandomItemMgr::Query(uint32 level, uint8 clazz, uint8 slot, uint32 quality)
 {
     BotEquipKey key(level, clazz, slot, quality);
@@ -615,9 +421,7 @@ RandomItemList RandomItemMgr::Query(uint32 level, uint8 clazz, uint8 slot, uint3
 
 void RandomItemMgr::BuildAmmoCache()
 {
-    uint32 maxLevel = sPlayerbotAIConfig.randomBotMaxLevel;
-    if (maxLevel > sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
-        maxLevel = sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL);
+    uint32 maxLevel = sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL);
 
     sLog.outBasic("Building ammo cache for %d levels", maxLevel);
 	int counter1 = 0;
@@ -653,9 +457,7 @@ uint32 RandomItemMgr::GetAmmo(uint32 level, uint32 subClass)
 
 void RandomItemMgr::BuildPotionCache()
 {
-    uint32 maxLevel = sPlayerbotAIConfig.randomBotMaxLevel;
-    if (maxLevel > sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
-        maxLevel = sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL);
+    uint32 maxLevel = sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL);
 
     sLog.outBasic("Building potion cache for %d levels", maxLevel);
 	int counter2 = 0;
@@ -727,9 +529,7 @@ void RandomItemMgr::BuildPotionCache()
 
 void RandomItemMgr::BuildFoodCache()
 {
-    uint32 maxLevel = sPlayerbotAIConfig.randomBotMaxLevel;
-    if (maxLevel > sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
-        maxLevel = sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL);
+    uint32 maxLevel = sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL);
 
     sLog.outBasic("Building food cache for %d levels", maxLevel);
 	int counter3 = 0;
@@ -879,9 +679,7 @@ uint32 RandomItemMgr::GetRandomFood(uint32 level, uint32 category)
 
 void RandomItemMgr::BuildTradeCache()
 {
-    uint32 maxLevel = sPlayerbotAIConfig.randomBotMaxLevel;
-    if (maxLevel > sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
-        maxLevel = sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL);
+    uint32 maxLevel = sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL);
 
     sLog.outBasic("Building trade cache for %d levels", maxLevel);
 	int counter4 = 0;

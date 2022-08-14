@@ -13,7 +13,7 @@ namespace ai
         virtual bool Execute(Event event);
         virtual bool isUseful();
         static bool isFollowValid(Player* bot, WorldObject* target);
-        static bool isFollowValid(Player* bot, WorldLocation location);
+		static bool isFollowValid(Player* bot, WorldPosition pos);
     protected:
         virtual bool CanTrain(ObjectGuid guid);
         virtual BattleGroundTypeId CanQueueBg(ObjectGuid guid);

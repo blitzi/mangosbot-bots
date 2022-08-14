@@ -257,8 +257,6 @@ void PlayerbotAI::HandleTeleportAck()
 	{
         bot->GetSession()->HandleMoveWorldportAckOpcode();
 	}
-
-    Reset();
 }
 
 void PlayerbotAI::Reset(bool full)
@@ -2216,12 +2214,14 @@ bool PlayerbotAI::AllowActive()
 
 bool PlayerbotAI::AllowActivity()
 {
-    bool allowed = AllowActive();    
+	return true;
+
+/*    bool allowed = AllowActive();
 
     if (!allowed)
-        allowed = !urand(0, sPlayerbotAIConfig.maxRandomBots / 150);
+        allowed = !urand(0, sPlayerbotAIConfig.numRandomBots / 150);
 
-    return allowed;
+    return allowed;*/
 }
 
 bool PlayerbotAI::IsOpposing(Player* player)

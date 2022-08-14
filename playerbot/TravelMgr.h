@@ -605,7 +605,7 @@ namespace ai
     public:
         TravelMgr() {};
         void Clear();
-        void LoadQuestTravelTable();
+        void LoadTravelTable();
 
         template <class D, class W, class URBG>
         void weighted_shuffle
@@ -654,12 +654,6 @@ namespace ai
         void addBadMmap(uint32 mapId, int x, int y) { badMmap.push_back(make_tuple(mapId, x, y)); }
         bool isBadVmap(uint32 mapId, int x, int y) { return std::find(badVmap.begin(), badVmap.end(), make_tuple(mapId, x, y)) != badVmap.end(); }
         bool isBadMmap(uint32 mapId, int x, int y) { return std::find(badMmap.begin(), badMmap.end(), make_tuple(mapId, x, y)) != badMmap.end(); }
-
-
-        void printGrid(uint32 mapId, int x, int y, string type);
-        void printObj(WorldObject* obj, string type);
-    //protected:
-        void logQuestError(uint32 errorNr, Quest* quest, uint32 objective = 0, uint32 unitId = 0, uint32 itemId = 0);
 
         vector<QuestTravelDestination*> questGivers;
         vector<RpgTravelDestination*> rpgNpcs;

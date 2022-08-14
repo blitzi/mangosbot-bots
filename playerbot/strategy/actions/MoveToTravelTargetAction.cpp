@@ -101,7 +101,7 @@ bool MoveToTravelTargetAction::Execute(Event event)
     }    
     else
     {
-        //target->setRetry(true);
+        target->setRetry(true);
     }
      
     return canMove;
@@ -109,31 +109,30 @@ bool MoveToTravelTargetAction::Execute(Event event)
 
 bool MoveToTravelTargetAction::isUseful()
 {
-    if (!context->GetValue<TravelTarget*>("travel target")->Get()->isTraveling())
-        return false;
+	if (!context->GetValue<TravelTarget*>("travel target")->Get()->isTraveling())
+		return false;
 
-    TravelTarget* target = context->GetValue<TravelTarget*>("travel target")->Get();
-    if (!target || !target->getPosition())
-        return false;
+	if (bot->IsTaxiFlying())
+		return false;
 
-    if (bot->IsTaxiFlying())
-        return false;
+#ifndef MANGOSBOT_ZERO
+	if (bot->IsMovingIgnoreFlying())
+		return false;
+#else
+	if (bot->IsMoving())
+		return false;
+#endif
 
-    if (bot->IsFlying())
-        return false;
+	if (!AI_VALUE(bool, "can move around"))
+		return false;
 
-    if (bot->IsMoving())
-        return false;
+	LootObject loot = AI_VALUE(LootObject, "loot target");
+	if (loot.IsLootPossible(bot))
+		return false;
 
-    if (sServerFacade.IsInCombat(bot, true))
-        return false;
+	if (!ChooseRpgTargetAction::isFollowValid(bot, *context->GetValue<TravelTarget*>("travel target")->Get()->getPosition()))
+		return false;
 
-    if (bot->IsNonMeleeSpellCasted(false))
-        return false;
-
-    if (!ChooseRpgTargetAction::isFollowValid(bot, context->GetValue<TravelTarget*>("travel target")->Get()->getLocation()))
-        return false;
-
-    return true;
+	return true;
 }
 
