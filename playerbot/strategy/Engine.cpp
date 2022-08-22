@@ -209,11 +209,6 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
 
                     if (actionExecuted)
                     {
-						if (action->GetName() != "check values")
-						{
-							int x = 0;
-						}
-
                         if (action->IsCast())
                         {
                             lastCastRelevance = relevance;
