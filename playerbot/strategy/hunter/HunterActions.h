@@ -8,6 +8,7 @@ namespace ai
     END_SPELL_ACTION()
 
     BEGIN_RANGED_SPELL_ACTION(CastAutoShotAction, "auto shot")
+	virtual bool isUseful();
     END_SPELL_ACTION()
 
     BEGIN_RANGED_SPELL_ACTION(CastArcaneShotAction, "arcane shot")

@@ -311,6 +311,41 @@ Player* RandomPlayerbotMgr::GetLowestPlayerBot() const
 	return lowestBot;
 }
 
+bool RandomPlayerbotMgr::AddRandomBot(uint32 bot)
+{
+	Player* player = GetPlayerBot(bot);
+	if (player)
+		return true;
+
+	uint32 accountId = sObjectMgr.GetPlayerAccountIdByGUID(ObjectGuid(HIGHGUID_PLAYER, bot));
+
+	if (!sPlayerbotAIConfig.IsInRandomAccountList(accountId))
+	{
+		sLog.outError("Bot #%d login fail: Not random bot!", bot);
+		return false;
+	}
+
+	AddPlayerBot(bot, 0);
+	uint32 randomTime = urand(sPlayerbotAIConfig.minRandomBotReviveTime, sPlayerbotAIConfig.maxRandomBotReviveTime);
+	currentBots.push_back(bot);
+	return true;
+
+	player = GetPlayerBot(bot);
+
+	if (player)
+	{
+		sLog.outError("Random bot added #%d", bot);
+		return true;
+	}
+	else
+	{
+		sLog.outError("Failed to add random bot #%d", bot);
+		return false;
+	}
+
+	return false;
+}
+
 void RandomPlayerbotMgr::TryAddRandomBot()
 {
 	if (currentBots.size() >= sPlayerbotAIConfig.numRandomBots)
@@ -849,223 +884,232 @@ bool RandomPlayerbotMgr::ProcessBot(uint32 bot)
     return false;
 }
 
-void RandomPlayerbotMgr::RandomTeleport(Player* bot, vector<WorldLocation> &locs, bool hearth)
+void RandomPlayerbotMgr::RandomTeleport(Player* bot, vector<WorldLocation>& locs, bool hearth)
 {
-    if (bot->IsBeingTeleported())
-        return;
+	if (bot->IsBeingTeleported())
+		return;
 
-    if (bot->InBattleGround())
-        return;
+	if (bot->InBattleGround())
+		return;
 
-    if (bot->InBattleGroundQueue())
-        return;
+	if (bot->InBattleGroundQueue())
+		return;
 
 	if (bot->GetLevel() < 5)
 		return;
 
-    if (sPlayerbotAIConfig.randomBotRpgChance < 0)
-        return;
+	if (sPlayerbotAIConfig.randomBotRpgChance < 0)
+		return;
 
-    if (locs.empty())
-    {
-        sLog.outError("Cannot teleport bot %s - no locations available", bot->GetName());
-        return;
-    }
+	if (locs.empty())
+	{
+		sLog.outError("Cannot teleport bot %s - no locations available", bot->GetName());
+		return;
+	}
 
-    vector<WorldPosition> tlocs;
+	vector<WorldPosition> tlocs;
 
-    for (auto& loc : locs)
-        tlocs.push_back(WorldPosition(loc));
+	for (auto& loc : locs)
+		tlocs.push_back(WorldPosition(loc));
 
-    //Do not teleport to maps disabled in config
-    tlocs.erase(std::remove_if(tlocs.begin(), tlocs.end(), [bot](WorldPosition l) {vector<uint32>::iterator i = find(sPlayerbotAIConfig.randomBotMaps.begin(), sPlayerbotAIConfig.randomBotMaps.end(), l.getMapId()); return i == sPlayerbotAIConfig.randomBotMaps.end(); }), tlocs.end());
+	//Do not teleport to maps disabled in config
+	tlocs.erase(std::remove_if(tlocs.begin(), tlocs.end(), [bot](WorldPosition l) {vector<uint32>::iterator i = find(sPlayerbotAIConfig.randomBotMaps.begin(), sPlayerbotAIConfig.randomBotMaps.end(), l.getMapId()); return i == sPlayerbotAIConfig.randomBotMaps.end(); }), tlocs.end());
 
-    //Random shuffle based on distance. Closer distances are more likely (but not exclusivly) to be at the begin of the list.
-    tlocs = sTravelMgr.getNextPoint(WorldPosition(bot), tlocs, 0);
+	//Random shuffle based on distance. Closer distances are more likely (but not exclusivly) to be at the begin of the list.
+	tlocs = sTravelMgr.getNextPoint(WorldPosition(bot), tlocs, 0);
 
-    //5% + 0.1% per level chance node on different map in selection.
-    //tlocs.erase(std::remove_if(tlocs.begin(), tlocs.end(), [bot](WorldLocation const& l) {return l.mapid != bot->GetMapId() && urand(1, 100) > 0.5 * bot->GetLevel(); }), tlocs.end());
+	//5% + 0.1% per level chance node on different map in selection.
+	//tlocs.erase(std::remove_if(tlocs.begin(), tlocs.end(), [bot](WorldLocation const& l) {return l.mapid != bot->GetMapId() && urand(1, 100) > 0.5 * bot->GetLevel(); }), tlocs.end());
 
-    //Continent is about 20.000 large
-    //Bot will travel 0-5000 units + 75-150 units per level.
-    //tlocs.erase(std::remove_if(tlocs.begin(), tlocs.end(), [bot](WorldLocation const& l) {return l.mapid == bot->GetMapId() && sServerFacade.GetDistance2d(bot, l.coord_x, l.coord_y) > urand(0, 5000) + bot->GetLevel() * 15 * urand(5, 10); }), tlocs.end());
+	//Continent is about 20.000 large
+	//Bot will travel 0-5000 units + 75-150 units per level.
+	//tlocs.erase(std::remove_if(tlocs.begin(), tlocs.end(), [bot](WorldLocation const& l) {return l.mapid == bot->GetMapId() && sServerFacade.GetDistance2d(bot, l.coord_x, l.coord_y) > urand(0, 5000) + bot->GetLevel() * 15 * urand(5, 10); }), tlocs.end());
 
-    if (tlocs.empty())
-    {
-        sLog.outError("Cannot teleport bot %s - no locations available", bot->GetName());
+	if (tlocs.empty())
+	{
+		sLog.outError("Cannot teleport bot %s - no locations available", bot->GetName());
+		return;
+	}
 
-        return;
-    }
+	PerformanceMonitorOperation* pmo = sPerformanceMonitor.start(PERF_MON_RNDBOT, "RandomTeleportByLocations");
 
-    PerformanceMonitorOperation *pmo = sPerformanceMonitor.start(PERF_MON_RNDBOT, "RandomTeleportByLocations");
+	int index = 0;
 
-    int index = 0;
+	for (int i = 0; i < tlocs.size(); i++)
+	{
+		for (int attemtps = 0; attemtps < 3; ++attemtps)
+		{
 
-    for (int i = 0; i < tlocs.size(); i++)
-    {
-        for (int attemtps = 0; attemtps < 3; ++attemtps)
-        {
+			WorldLocation loc = tlocs[i];
 
-            WorldLocation loc = tlocs[i].getLocation();
-
-#ifndef MANGOSBOT_ZERO
-            // Teleport to Dark Portal area if event is in progress
-            if (sWorldState.GetExpansion() == EXPANSION_NONE && bot->GetLevel() > 54 && urand(0, 100) > 20)
-            {
-                if (urand(0, 1))
-                    loc = WorldLocation(uint32(0), -11772.43f, -3272.84f, -17.9f, 3.32447f);
-                else
-                    loc = WorldLocation(uint32(0), -11741.70f, -3130.3f, -11.7936f, 3.32447f);
-            }
+#ifdef MANGOSBOT_ONE
+			// Teleport to Dark Portal area if event is in progress
+			if (sWorldState.GetExpansion() == EXPANSION_NONE && bot->GetLevel() > 54 && urand(0, 100) > 20)
+			{
+				if (urand(0, 1))
+					loc = WorldLocation(uint32(0), -11772.43f, -3272.84f, -17.9f, 3.32447f);
+				else
+					loc = WorldLocation(uint32(0), -11741.70f, -3130.3f, -11.7936f, 3.32447f);
+			}
 #endif
 
-            float x = loc.coord_x + (attemtps > 0 ? urand(0, sPlayerbotAIConfig.grindDistance) - sPlayerbotAIConfig.grindDistance / 2 : 0);
-            float y = loc.coord_y + (attemtps > 0 ? urand(0, sPlayerbotAIConfig.grindDistance) - sPlayerbotAIConfig.grindDistance / 2 : 0);
-            float z = loc.coord_z;
+			float x = loc.coord_x + (attemtps > 0 ? urand(0, sPlayerbotAIConfig.grindDistance) - sPlayerbotAIConfig.grindDistance / 2 : 0);
+			float y = loc.coord_y + (attemtps > 0 ? urand(0, sPlayerbotAIConfig.grindDistance) - sPlayerbotAIConfig.grindDistance / 2 : 0);
+			float z = loc.coord_z;
 
-            Map* map = sMapMgr.FindMap(loc.mapid, 0);
-            if (!map)
-                continue;
+			Map* map = sMapMgr.FindMap(loc.mapid, 0);
+			if (!map)
+				continue;
 
-            const TerrainInfo* terrain = map->GetTerrain();
-            if (!terrain)
-                continue;
-
-            AreaTableEntry const* area = GetAreaEntryByAreaID(terrain->GetAreaId(x, y, z));
-            if (!area)
-                continue;
+			uint32 areaId = sTerrainMgr.GetAreaId(loc.mapid, x, y, z);
+			AreaTableEntry const* area = GetAreaEntryByAreaID(areaId);
+			if (!area)
+				continue;
 
 #ifndef MANGOSBOT_ZERO
-            // Do not teleport to outland before portal opening (allow new races zones)
-            if (sWorldState.GetExpansion() == EXPANSION_NONE && loc.mapid == 530 && area->team != 2 && area->team != 4)
-                continue;
+			// Do not teleport to outland before portal opening (allow new races zones)
+			if (sWorldState.GetExpansion() == EXPANSION_NONE && (loc.mapid == 571 || (loc.mapid == 530 && area->team != 2 && area->team != 4)))
+				continue;
 #endif
-
-            // Do not teleport to enemy zones if level is low
-            if (area->team == 4 && bot->GetTeam() == ALLIANCE && bot->GetLevel() < 40)
-                continue;
-            if (area->team == 2 && bot->GetTeam() == HORDE && bot->GetLevel() < 40)
-                continue;
-
-            if (terrain->IsUnderWater(x, y, z) ||
-                terrain->IsInWater(x, y, z))
-                continue;
+			if (area->team)
+			{
+				bool isEnemyZone = false;
+				switch (area->team)
+				{
+				case AREATEAM_ALLY:
+					isEnemyZone = bot->GetTeam() != ALLIANCE && (sWorld.IsPvPRealm() || area->flags & AREA_FLAG_CAPITAL);
+					break;
+				case AREATEAM_HORDE:
+					isEnemyZone = bot->GetTeam() != HORDE && (sWorld.IsPvPRealm() || area->flags & AREA_FLAG_CAPITAL);
+					break;
+				default:                                            // 6 in fact
+					isEnemyZone = false;
+					break;
+				}
+				if (isEnemyZone)
+					continue;
+			}
+			// Do not teleport to enemy zones if level is low
+			if (area->team == 4 && bot->GetTeam() == ALLIANCE && bot->GetLevel() < 40)
+				continue;
+			if (area->team == 2 && bot->GetTeam() == HORDE && bot->GetLevel() < 40)
+				continue;
 
 #ifdef MANGOSBOT_TWO
-            float ground = map->GetHeight(bot->GetPhaseMask(), x, y, z + 0.5f);
+			float ground = map->GetHeight(bot->GetPhaseMask(), x, y, z + 0.5f);
 #else
-            float ground = map->GetHeight(x, y, z + 0.5f);
+			float ground = map->GetHeight(x, y, z + 0.5f);
 #endif
-            if (ground <= INVALID_HEIGHT)
-                continue;
+			if (ground <= INVALID_HEIGHT)
+				continue;
 
-            z = 0.05f + ground;
-            sLog.outDetail("Random teleporting bot %s to %s %f,%f,%f (%u/%zu locations)",
-                bot->GetName(), area->area_name[0], x, y, z, attemtps, tlocs.size());
+			z = 0.05f + ground;
+			sLog.outDetail("Random teleporting bot %s to %s %f,%f,%f (%u/%zu locations)",
+				bot->GetName(), area->area_name[0], x, y, z, attemtps, tlocs.size());
 
-            if (bot->IsTaxiFlying())
-            {
-                bot->GetMotionMaster()->MovementExpired();
+			if (bot->IsTaxiFlying())
+			{
+				bot->GetMotionMaster()->MovementExpired();
 #ifdef MANGOS
-                bot->m_taxi.ClearTaxiDestinations();
+				bot->m_taxi.ClearTaxiDestinations();
 #endif
-            }
-            if (hearth)
-                bot->SetHomebindToLocation(loc, area->ID);
+			}
+			if (hearth)
+				bot->SetHomebindToLocation(loc, area->ID);
 
-			bot->GetPlayerbotAI()->StopMoving();
-            bot->TeleportTo(loc.mapid, x, y, z, 0);
-            bot->SendHeartBeat();
-            bot->GetPlayerbotAI()->ResetStrategies();
-            bot->GetPlayerbotAI()->Reset();
-            if (pmo) pmo->finish();
-            return;
-        }
-    }
+			bot->GetMotionMaster()->Clear();
+			bot->TeleportTo(loc.mapid, x, y, z, 0);
+			bot->SendHeartBeat();
+			bot->GetPlayerbotAI()->ResetStrategies();
+			bot->GetPlayerbotAI()->Reset(true);
+			if (pmo) pmo->finish();
+			return;
+		}
+	}
 
-    if (pmo) pmo->finish();
-    sLog.outError("Cannot teleport bot %s - no locations available", bot->GetName());
+	if (pmo) pmo->finish();
+	sLog.outError("Cannot teleport bot %s - no locations available", bot->GetName());
 }
 
 void RandomPlayerbotMgr::PrepareTeleportCache()
 {
-    uint32 maxLevel = sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL);
+	uint32 maxLevel = sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL);
 
-    QueryResult* results = PlayerbotDatabase.PQuery("select map_id, x, y, z, level from ai_playerbot_tele_cache");
-    if (results)
-    {
-        sLog.outString("Loading random teleport caches for %d levels...", maxLevel);
-        do
-        {
-            Field* fields = results->Fetch();
-            uint16 mapId = fields[0].GetUInt16();
-            float x = fields[1].GetFloat();
-            float y = fields[2].GetFloat();
-            float z = fields[3].GetFloat();
-            uint16 level = fields[4].GetUInt16();
-            WorldLocation loc(mapId, x, y, z, 0);
-            locsPerLevelCache[level].push_back(loc);
-        } while (results->NextRow());
-        delete results;
-    }
-    else
-    {
-        sLog.outString("Preparing random teleport caches for %d levels...", maxLevel);
-        BarGoLink bar(maxLevel);
-        for (uint8 level = 1; level <= maxLevel; level++)
-        {
-            QueryResult* results = WorldDatabase.PQuery("select map, position_x, position_y, position_z "
-                "from (select map, position_x, position_y, position_z, avg(t.maxlevel), avg(t.minlevel), "
-                "%u - (avg(t.maxlevel) + avg(t.minlevel)) / 2 delta "
-                "from creature c inner join creature_template t on c.id = t.entry where t.NpcFlags = 0 and t.lootid != 0 and t.unitFlags != 768 group by t.entry having count(*) > 1) q "
-                "where delta >= 0 and delta <= %u and map in (%s) and not exists ( "
-                "select map, position_x, position_y, position_z from "
-                "("
-                "select map, c.position_x, c.position_y, c.position_z, avg(t.maxlevel), avg(t.minlevel), "
-                "%u - (avg(t.maxlevel) + avg(t.minlevel)) / 2 delta "
-                "from creature c "
-                "inner join creature_template t on c.id = t.entry where t.NpcFlags = 0 and t.lootid != 0 group by t.entry "
-                ") q1 "
-                "where abs(delta) > %u and q1.map = q.map "
-                "and sqrt("
-                "(q1.position_x - q.position_x)*(q1.position_x - q.position_x) +"
-                "(q1.position_y - q.position_y)*(q1.position_y - q.position_y) +"
-                "(q1.position_z - q.position_z)*(q1.position_z - q.position_z)"
-                ") < %u)",
-                level,
-                sPlayerbotAIConfig.randomBotTeleLevel,
-                sPlayerbotAIConfig.randomBotMapsAsString.c_str(),
-                level,
-                sPlayerbotAIConfig.randomBotTeleLevel,
-                (uint32)sPlayerbotAIConfig.sightDistance
-                );
-            if (results)
-            {
-                do
-                {
-                    Field* fields = results->Fetch();
-                    uint16 mapId = fields[0].GetUInt16();
-                    float x = fields[1].GetFloat();
-                    float y = fields[2].GetFloat();
-                    float z = fields[3].GetFloat();
-                    WorldLocation loc(mapId, x, y, z, 0);
-                    locsPerLevelCache[level].push_back(loc);
+	QueryResult* results = PlayerbotDatabase.PQuery("select map_id, x, y, z, level from ai_playerbot_tele_cache");
+	if (results)
+	{
+		sLog.outString("Loading random teleport caches for %d levels...", maxLevel);
+		do
+		{
+			Field* fields = results->Fetch();
+			uint16 mapId = fields[0].GetUInt16();
+			float x = fields[1].GetFloat();
+			float y = fields[2].GetFloat();
+			float z = fields[3].GetFloat();
+			uint16 level = fields[4].GetUInt16();
+			WorldLocation loc(mapId, x, y, z, 0);
+			locsPerLevelCache[level].push_back(loc);
+		} while (results->NextRow());
+		delete results;
+	}
+	else
+	{
+		sLog.outString("Preparing random teleport caches for %d levels...", maxLevel);
+		BarGoLink bar(maxLevel);
+		for (uint8 level = 1; level <= maxLevel; level++)
+		{
+			QueryResult* results = WorldDatabase.PQuery("select map, position_x, position_y, position_z "
+				"from (select map, position_x, position_y, position_z, avg(t.maxlevel), avg(t.minlevel), "
+				"%u - (avg(t.maxlevel) + avg(t.minlevel)) / 2 delta "
+				"from creature c inner join creature_template t on c.id = t.entry where t.NpcFlags = 0 and t.lootid != 0 and t.unitFlags != 768 group by t.entry having count(*) > 1) q "
+				"where delta >= 0 and delta <= %u and map in (%s) and not exists ( "
+				"select map, position_x, position_y, position_z from "
+				"("
+				"select map, c.position_x, c.position_y, c.position_z, avg(t.maxlevel), avg(t.minlevel), "
+				"%u - (avg(t.maxlevel) + avg(t.minlevel)) / 2 delta "
+				"from creature c "
+				"inner join creature_template t on c.id = t.entry where t.NpcFlags = 0 and t.lootid != 0 group by t.entry "
+				") q1 "
+				"where abs(delta) > %u and q1.map = q.map "
+				"and sqrt("
+				"(q1.position_x - q.position_x)*(q1.position_x - q.position_x) +"
+				"(q1.position_y - q.position_y)*(q1.position_y - q.position_y) +"
+				"(q1.position_z - q.position_z)*(q1.position_z - q.position_z)"
+				") < %u)",
+				level,
+				sPlayerbotAIConfig.randomBotTeleLevel,
+				sPlayerbotAIConfig.randomBotMapsAsString.c_str(),
+				level,
+				sPlayerbotAIConfig.randomBotTeleLevel,
+				(uint32)sPlayerbotAIConfig.sightDistance
+			);
+			if (results)
+			{
+				do
+				{
+					Field* fields = results->Fetch();
+					uint16 mapId = fields[0].GetUInt16();
+					float x = fields[1].GetFloat();
+					float y = fields[2].GetFloat();
+					float z = fields[3].GetFloat();
+					WorldLocation loc(mapId, x, y, z, 0);
+					locsPerLevelCache[level].push_back(loc);
 
-                    PlayerbotDatabase.PExecute("insert into ai_playerbot_tele_cache (level, map_id, x, y, z) values (%u, %u, %f, %f, %f)",
-                            level, mapId, x, y, z);
-                } while (results->NextRow());
-                delete results;
-            }
-            bar.step();
-        }
-    }
+					PlayerbotDatabase.PExecute("insert into ai_playerbot_tele_cache (level, map_id, x, y, z) values (%u, %u, %f, %f, %f)",
+						level, mapId, x, y, z);
+				} while (results->NextRow());
+				delete results;
+			}
+			bar.step();
+		}
+	}
 
-    sLog.outString("Preparing RPG teleport caches for %d factions...", sFactionTemplateStore.GetNumRows());
+	sLog.outString("Preparing RPG teleport caches for %d factions...", sFactionTemplateStore.GetNumRows());
 
-		    results = WorldDatabase.PQuery("SELECT map, position_x, position_y, position_z, "
-				"r.race, r.minl, r.maxl "
-				"from creature c inner join ai_playerbot_rpg_races r on c.id = r.entry "
-				"where r.race < 15");
+	results = WorldDatabase.PQuery("SELECT map, position_x, position_y, position_z, "
+		"r.race, r.minl, r.maxl "
+		"from creature c inner join ai_playerbot_rpg_races r on c.id = r.entry "
+		"where r.race < 15");
 
 	if (results)
 	{
@@ -1096,6 +1140,16 @@ void RandomPlayerbotMgr::PrepareTeleportCache()
 		} while (results->NextRow());
 		delete results;
 	}
+}
+
+void RandomPlayerbotMgr::RandomTeleportForLevel(Player* bot)
+{
+	if (bot->InBattleGround())
+		return;
+
+	sLog.outDetail("Preparing location to random teleporting bot %s for level %u", bot->GetName(), bot->GetLevel());
+	RandomTeleport(bot, locsPerLevelCache[bot->GetLevel()], false);
+	Refresh(bot);
 }
 
 void RandomPlayerbotMgr::IncreaseLevel(Player* bot)

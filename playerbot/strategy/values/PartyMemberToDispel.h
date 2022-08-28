@@ -13,20 +13,4 @@ namespace ai
     protected:
         virtual Unit* Calculate();
 	};
-
-
-
-    class HasAreaDebuffValue : public BoolCalculatedValue, public Qualified
-    {
-    public:
-        HasAreaDebuffValue(PlayerbotAI* ai) : BoolCalculatedValue(ai) {}
-
-        Unit* GetTarget()
-        {            
-            AiObjectContext* ctx = AiObject::context;
-
-            return ctx->GetValue<Unit*>(qualifier)->Get();
-        }
-        virtual bool Calculate();
-    };
 }

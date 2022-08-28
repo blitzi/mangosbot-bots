@@ -2,15 +2,16 @@
 
 namespace ai
 {
-    class TravelStrategy : public Strategy
-    {
-    public:
-        TravelStrategy(PlayerbotAI* ai);
-        virtual string getName() { return "travel"; }
+	class TravelStrategy : public Strategy
+	{
+	public:
+		TravelStrategy(PlayerbotAI* ai);
+		virtual string getName() { return "travel"; }
 
-    public:
-        virtual void InitTriggers(std::list<TriggerNode*> &triggers);
-    };
+	public:
+		virtual NextAction** getDefaultActions();
+		virtual void InitTriggers(std::list<TriggerNode*>& triggers);
+	};
 
     class ExploreStrategy : public Strategy
     {

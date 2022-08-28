@@ -22,10 +22,6 @@ PlayerbotHolder::~PlayerbotHolder()
 {
 }
 
-
-{
-}
-
 void PlayerbotHolder::UpdateSessions(uint32 elapsed)
 {
     for (PlayerBotMap::const_iterator itr = GetPlayerBotsBegin(); itr != GetPlayerBotsEnd(); ++itr)
@@ -335,11 +331,6 @@ void PlayerbotHolder::OnBotLogin(Player * const bot)
         bot->m_taxi.ClearTaxiDestinations();
 #endif
     }
-
-    // check activity
-    ai->AllowActivity(ALL_ACTIVITY, true);
-    // set delay on login
-    ai->SetNextCheckDelay(urand(2000, 4000));
 
     ai->TellMaster(BOT_TEXT("hello"));
 

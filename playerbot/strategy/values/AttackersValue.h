@@ -27,7 +27,7 @@ namespace ai
         bool ListContainsRti(set<Unit*>& targets) const;
 
     public:
-        static bool IsPossibleTarget(Unit* attacker, Player *bot);
+        static bool IsPossibleTarget(Unit* attacker, Player *bot, float range = sPlayerbotAIConfig.sightDistance);
         static bool IsRti(Unit* enemy, Player* bot);
     };
 

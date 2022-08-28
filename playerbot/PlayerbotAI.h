@@ -246,7 +246,7 @@ public:
 	virtual ~PlayerbotAI();
 
 public:
-	virtual void UpdateAIInternal(uint32 elapsed, bool minimal = false);
+	virtual void UpdateAIInternal(uint32 elapsed);
 	string HandleRemoteCommand(string command);
     void HandleCommand(uint32 type, const string& text, Player& fromPlayer);
     void QueueChatResponse(uint8 msgtype, ObjectGuid guid1, ObjectGuid guid2, std::string message, std::string chanName, std::string name);
@@ -313,7 +313,7 @@ public:
     virtual bool CanCastSpell(string name, Unit* target, Item* itemTarget = NULL);
     virtual bool CanCastSpellInstant(string name, Unit* target, Item* itemTarget = NULL);
     virtual bool CastSpell(string name, Unit* target, Item* itemTarget = NULL);
-    virtual bool HasAura(string spellName, Unit* player, bool maxStack = false, bool checkIsOwner = false, int maxAmount = -1);
+	virtual bool HasAura(string spellName, Unit* player, bool maxStack = false, bool checkIsOwner = false, int maxAmount = -1, bool hasMyAura = false);
     virtual bool HasAnyAuraOf(Unit* player, ...);
     virtual bool HasMyAura(string spellName, Unit* player) { return HasAura(spellName, player, false, false, -1, true); }
     uint8 GetHealthPercent(const Unit& target) const;
@@ -357,8 +357,6 @@ public:
     ReputationRank getReaction(FactionTemplateEntry const* factionTemplate) { return GetFactionReaction(bot->GetFactionTemplateEntry(), factionTemplate);}
 
 	BotState GetCurrentState() { return currentState; }
-
-	void StopMoving();
 
 private:
     void _fillGearScoreData(Player *player, Item* item, std::vector<uint32>* gearScore, uint32& twoHandScore);
@@ -415,7 +413,6 @@ public:
     bool CanMove();
     void StopMoving();
     bool IsInRealGuild();
-    time_t GetCombatStartTime() { return combatStart; }
 
 protected:
 	Player* bot;

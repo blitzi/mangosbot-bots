@@ -38,7 +38,6 @@ namespace ai
         bool IsItemUsefulForSkill(ItemPrototype const * proto);
         bool IsItemNeededForUsefullSpell(ItemPrototype const* proto, bool checkAllReagents = false);
         bool HasItemsNeededForSpell(uint32 spellId, ItemPrototype const* proto);
-        Item* CurrentItem(ItemPrototype const* proto);
         float CurrentStacks(ItemPrototype const* proto);
         float BetterStacks(ItemPrototype const* proto, string usageType = "");
 

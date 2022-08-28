@@ -136,7 +136,6 @@ bool UseItemAction::UseItemAuto(Item* item)
     packet << targetFlag;
     packet.appendPackGUID(bot->GetObjectGuid());
 
-    ai->SetNextCheckDelay(sPlayerbotAIConfig.globalCoolDown);
     if (proto->Class == ITEM_CLASS_CONSUMABLE && (proto->SubClass == ITEM_SUBCLASS_FOOD || proto->SubClass == ITEM_SUBCLASS_CONSUMABLE) &&
         (isFood || isDrink))
     {
@@ -164,11 +163,6 @@ bool UseItemAction::UseItemAuto(Item* item)
             p = hp;
             TellConsumableUse(item, "Eating", p);
         }
-        if (!bot->IsInCombat() && !bot->InBattleGround())
-            ai->SetNextCheckDelay(27000.0f * (100 - p) / 100.0f);
-
-        if (!bot->IsInCombat() && bot->InBattleGround())
-            ai->SetNextCheckDelay(20000.0f * (100 - p) / 100.0f);
     }
 
     bot->GetSession()->HandleUseItemOpcode(packet);
@@ -534,7 +528,6 @@ bool UseHearthStone::Execute(Event event)
     {
         RESET_AI_VALUE(bool, "combat::self target");
         RESET_AI_VALUE(WorldPosition, "current position");
-        ai->SetNextCheckDelay(10 * IN_MILLISECONDS);
     }
 
     return used;

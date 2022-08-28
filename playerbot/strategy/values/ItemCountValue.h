@@ -41,13 +41,4 @@ namespace ai
     public:
         virtual list<Item*> Calculate();
     };
-
-	class EquipedUsableTrinketValue : public CalculatedValue<list<Item*> >, public Qualified, InventoryItemValueBase
-	{
-	public:
-		EquipedUsableTrinketValue(PlayerbotAI* ai) : CalculatedValue<list<Item*> >(ai), InventoryItemValueBase(ai) {}
-
-	public:
-		virtual list<Item*> Calculate();
-	};
 }

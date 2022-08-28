@@ -136,7 +136,6 @@ namespace ai
             range = ai->GetRange("spell");
         }
         virtual string GetTargetName() { return "self target"; }
-        virtual bool isUseful();
         virtual ActionThreatType getThreatType() { return ACTION_THREAT_AOE; }
 
     protected:
@@ -248,6 +247,16 @@ namespace ai
         virtual string getName() { return PartyMemberActionNameSupport::getName(); }
     };
 
+	class HealHotPartyMemberAction : public HealPartyMemberAction
+	{
+	public:
+		HealHotPartyMemberAction(PlayerbotAI* ai, string spell) : HealPartyMemberAction(ai, spell) {}
+		virtual bool isUseful()
+		{
+			return HealPartyMemberAction::isUseful() && GetTarget() && !ai->HasAura(spell, GetTarget());
+		}
+	};
+
     class ResurrectPartyMemberAction : public CastRangeSpellAction
     {
     public:
@@ -323,16 +332,60 @@ namespace ai
         virtual ActionThreatType getThreatType() { return ACTION_THREAT_NONE; }
     };
 
+	class RemoveBuffAction : public Action
+	{
+	public:
+		RemoveBuffAction(PlayerbotAI* ai, string spell) : Action(ai, "remove aura")
+		{
+			name = string(spell);
+		}
+	public:
+		virtual string getName() { return "remove " + name; }
+		virtual bool isUseful() { return ai->HasAura(name, AI_VALUE(Unit*, "self target")); }
+		virtual bool isPossible() { return true; }
+		virtual bool Execute(Event event)
+		{
+			ai->RemoveAura(name);
+			return !ai->HasAura(name, bot);
+		}
+	private:
+		string name;
+	};
+
+	// racials
+
+	// heal
+#ifndef MANGOSBOT_ZERO
+	HEAL_ACTION(CastGiftOfTheNaaruAction, "gift of the naaru");
+#endif
+	HEAL_ACTION(CastCannibalizeAction, "cannibalize");
+
+	// buff
+
+	BUFF_ACTION(CastShadowmeldAction, "shadowmeld");
+	BUFF_ACTION(CastBerserkingAction, "berserking");
+	BUFF_ACTION(CastBloodFuryAction, "blood fury");
+	BUFF_ACTION(CastStoneformAction, "stoneform");
+	BUFF_ACTION(CastPerceptionAction, "perception");
+
+	class CastWarStompAction : public CastSpellAction
+	{
+	public:
+		CastWarStompAction(PlayerbotAI* ai) : CastSpellAction(ai, "war stomp") {}
+	};
+
+	//cc breakers
+
+	BUFF_ACTION(CastWillOfTheForsakenAction, "will of the forsaken");
+	BUFF_ACTION_U(CastEscapeArtistAction, "escape artist", !ai->HasAura("stealth", AI_VALUE(Unit*, "self target")));
+#ifdef MANGOSBOT_TWO
+	SPELL_ACTION(CastEveryManforHimselfAction, "every man for himself");
+#endif
+
     class CastLifeBloodAction : public CastHealingSpellAction
     {
     public:
         CastLifeBloodAction(PlayerbotAI* ai) : CastHealingSpellAction(ai, "lifeblood") {}
-    };
-
-    class CastGiftOfTheNaaruAction : public CastHealingSpellAction
-    {
-    public:
-        CastGiftOfTheNaaruAction(PlayerbotAI* ai) : CastHealingSpellAction(ai, "gift of the naaru") {}
     };
 
     class CastArcaneTorrentAction : public CastBuffSpellAction
@@ -345,12 +398,6 @@ namespace ai
     {
     public:
         CastManaTapAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "mana tap") {}
-    };
-
-    class CastWarStompAction : public CastSpellAction
-    {
-    public:
-        CastWarStompAction(PlayerbotAI* ai) : CastRangeSpellAction(ai, "war stomp") {}
     };
 
     class CastSpellOnEnemyHealerAction : public CastRangeSpellAction
@@ -405,10 +452,10 @@ namespace ai
     //   Vehicle Actions  //
     //--------------------//
 
-    class CastVehicleSpellAction : public CastSpellAction
+    class CastVehicleSpellAction : public CastRangeSpellAction
     {
     public:
-        CastVehicleSpellAction(PlayerbotAI* ai, string spell) : CastSpellAction(ai, spell)
+        CastVehicleSpellAction(PlayerbotAI* ai, string spell) : CastRangeSpellAction(ai, spell)
         {
             range = 120.0f;
         }

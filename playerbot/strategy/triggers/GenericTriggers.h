@@ -86,12 +86,6 @@ namespace ai
         virtual bool IsActive();
     };
 
-    class HasAreaDebuffTrigger : public Trigger {
-    public:
-        HasAreaDebuffTrigger(PlayerbotAI* ai) : Trigger(ai, "have area debuff") {}
-        virtual bool IsActive();
-    };
-
     class PartyMemberHasAggroTrigger : public Trigger {
     public:
         PartyMemberHasAggroTrigger(PlayerbotAI* ai) : Trigger(ai, "party member has aggro") {}
@@ -112,17 +106,9 @@ namespace ai
         virtual string getName() { return spell; }
         virtual bool IsActive();
 
-    class SpellNoCooldownTrigger : public SpellTrigger
-    {
-    public:
-        SpellNoCooldownTrigger(PlayerbotAI* ai, string spell) : SpellTrigger(ai, spell) {}
-        virtual bool IsActive();
-    };
-
-	// TODO: check other targets
-    protected:
-        string spell;
-    };
+	protected:
+		string spell;
+	};
 
     class SpellCanBeCastTrigger : public SpellTrigger
     {
@@ -582,14 +568,14 @@ namespace ai
         AmmoCountTrigger(PlayerbotAI* ai, string item, uint32 count = 1, int interval = 30) : ItemCountTrigger(ai, item, count, interval) {}
     };
 
-    class HasAuraTrigger : public Trigger {
-    public:
-        HasAuraTrigger(PlayerbotAI* ai, string spell) : Trigger(ai, spell) {}
+	class HasAuraTrigger : public Trigger {
+	public:
+		HasAuraTrigger(PlayerbotAI* ai, string spell, int interval = 1) : Trigger(ai, spell, interval) {}
 
-        virtual string GetTargetName() { return "self target"; }
-        virtual bool IsActive();
+		virtual string GetTargetName() { return "self target"; }
+		virtual bool IsActive();
 
-    };
+	};
 
     class HasNoAuraTrigger : public Trigger {
     public:

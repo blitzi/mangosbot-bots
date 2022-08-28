@@ -120,7 +120,7 @@ bool RpgAction::SetNextRpgAction()
         {
             ostringstream out;
 
-            out << " " << action.first->getName() << " " << action.second;
+            out << " " << action.first->GetName() << " " << action.second;
 
             ai->TellMasterNoFacing(out);
         }
@@ -138,12 +138,12 @@ bool RpgAction::SetNextRpgAction()
         out << "do: ";
         out << chat->formatWorldobject(AI_VALUE(GuidPosition, "rpg target").GetWorldObject());
 
-        out << " " << action->getName();
+        out << " " << action->GetName();
 
         ai->TellMasterNoFacing(out);
     }
 
-    SET_AI_VALUE(string, "next rpg action", action->getName());
+    SET_AI_VALUE(string, "next rpg action", action->GetName());
 
     return true;
 }

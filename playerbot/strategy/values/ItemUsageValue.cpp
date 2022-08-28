@@ -81,9 +81,32 @@ ItemUsage ItemUsageValue::Calculate()
     if (bot->GetGuildId() && sGuildTaskMgr.IsGuildTaskItem(itemId, bot->GetGuildId()))
         return ITEM_USAGE_GUILD_TASK;
 
-    ItemUsage equip = QueryItemUsageForEquip(proto);
-    if (equip != ITEM_USAGE_NONE)
-        return equip;
+	list<Item*> found = AI_VALUE2(list < Item*>, "inventory items", chat->formatItem(proto));
+	ItemUsage equip = ITEM_USAGE_NONE;
+
+	//create virtual item if the item does not exist (e.g. for quest rewards)
+	if (found.size() == 0)
+	{
+		Item* item = RandomPlayerbotMgr::CreateTempItem(proto->ItemId, 1, bot);
+		if (!item)
+			return ITEM_USAGE_NONE;
+
+		equip = QueryItemUsageForEquip(item);
+		item->RemoveFromUpdateQueueOf(bot);
+		delete item;
+	}
+	else //use real item
+	{
+		for (auto item : found)
+		{
+			equip = QueryItemUsageForEquip(item);
+
+			if (equip == ITEM_USAGE_EQUIP || equip == ITEM_USAGE_REPLACE || equip == ITEM_USAGE_BAD_EQUIP)
+			{
+				return equip;
+			}
+		}
+	}
 
     if ((proto->Class == ITEM_CLASS_ARMOR || proto->Class == ITEM_CLASS_WEAPON) && proto->Bonding != BIND_WHEN_PICKED_UP &&
         ai->HasSkill(SKILL_ENCHANTING) && proto->Quality >= ITEM_QUALITY_UNCOMMON)
@@ -143,24 +166,20 @@ ItemUsage ItemUsageValue::Calculate()
     return ITEM_USAGE_NONE;
 }
 
-ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemPrototype const* itemProto)
+ItemUsage ItemUsageValue::QueryItemUsageForEquip(Item* item)
 {
+	ItemPrototype const* itemProto = item->GetProto();
+
     if (bot->CanUseItem(itemProto) != EQUIP_ERR_OK)
         return ITEM_USAGE_NONE;
 
     if (itemProto->InventoryType == INVTYPE_NON_EQUIP)
         return ITEM_USAGE_NONE;
 
-    Item* pItem = RandomPlayerbotMgr::CreateTempItem(itemProto->ItemId, 1, bot);
-    if (!pItem)
-        return ITEM_USAGE_NONE;
-
     uint32 specId = sRandomItemMgr.GetPlayerSpecId(bot);
 
     uint16 dest;
-    InventoryResult result = bot->CanEquipItem(NULL_SLOT, dest, pItem, true, false);
-    pItem->RemoveFromUpdateQueueOf(bot);
-    delete pItem;
+    InventoryResult result = bot->CanEquipItem(NULL_SLOT, dest, item, true, false);
 
     if (result != EQUIP_ERR_OK)
         return ITEM_USAGE_NONE;
@@ -236,7 +255,6 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemPrototype const* itemProto)
     else if (newItemPower == oldItemPower && itemProto->Quality == oldItemProto->Quality && itemProto->ItemId > oldItemProto->ItemId)
         isBetter = true;
 
-    Item* item = CurrentItem(itemProto);
     bool itemIsBroken = item && item->GetUInt32Value(ITEM_FIELD_DURABILITY) == 0 && item->GetUInt32Value(ITEM_FIELD_MAXDURABILITY) > 0;
     bool oldItemIsBroken = oldItem->GetUInt32Value(ITEM_FIELD_DURABILITY) == 0 && oldItem->GetUInt32Value(ITEM_FIELD_MAXDURABILITY) > 0;
 
@@ -486,26 +504,6 @@ bool ItemUsageValue::HasItemsNeededForSpell(uint32 spellId, ItemPrototype const*
 
     return true;
 }
-
-Item* ItemUsageValue::CurrentItem(ItemPrototype const* proto)
-{
-    Item* bestItem = nullptr;
-    list<Item*> found = AI_VALUE2(list < Item*>, "inventory items", chat->formatItem(proto));
-
-    for (auto item : found)
-    {
-        if (bestItem && item->GetUInt32Value(ITEM_FIELD_DURABILITY) < bestItem->GetUInt32Value(ITEM_FIELD_DURABILITY))
-            continue;
-
-        if (bestItem && item->GetCount() < bestItem->GetCount())
-            continue;
-
-        bestItem = item;
-    }
-
-    return bestItem;
-}
-
 
 float ItemUsageValue::CurrentStacks(ItemPrototype const* proto)
 {

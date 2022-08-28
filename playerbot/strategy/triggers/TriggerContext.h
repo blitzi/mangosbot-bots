@@ -125,8 +125,7 @@ namespace ai
             creators["behind target"] = &TriggerContext::behind_target;
             creators["not behind target"] = &TriggerContext::not_behind_target;
             creators["not facing target"] = &TriggerContext::not_facing_target;
-            creators["far from master"] = &TriggerContext::far_from_master;            
-            creators["not near master"] = &TriggerContext::not_near_master;
+            creators["far from master"] = &TriggerContext::far_from_master;
             creators["far from loot target"] = &TriggerContext::far_from_loot_target;
             creators["can loot"] = &TriggerContext::can_loot;
             creators["swimming"] = &TriggerContext::swimming;
@@ -283,8 +282,7 @@ namespace ai
         static Trigger* possible_adds(PlayerbotAI* ai) { return new PossibleAddsTrigger(ai); }
         static Trigger* can_loot(PlayerbotAI* ai) { return new CanLootTrigger(ai); }
         static Trigger* far_from_loot_target(PlayerbotAI* ai) { return new FarFromCurrentLootTrigger(ai); }
-        static Trigger* far_from_master(PlayerbotAI* ai) { return new FarFromMasterTrigger(ai); }        
-        static Trigger* not_near_master(PlayerbotAI* ai) { return new NotNearMasterTrigger(ai); }
+        static Trigger* far_from_master(PlayerbotAI* ai) { return new FarFromMasterTrigger(ai); }
         static Trigger* behind_target(PlayerbotAI* ai) { return new IsBehindTargetTrigger(ai); }
         static Trigger* not_behind_target(PlayerbotAI* ai) { return new IsNotBehindTargetTrigger(ai); }
         static Trigger* not_facing_target(PlayerbotAI* ai) { return new IsNotFacingTargetTrigger(ai); }
@@ -297,7 +295,6 @@ namespace ai
         static Trigger* LightAoe(PlayerbotAI* ai) { return new LightAoeTrigger(ai); }
         static Trigger* MediumAoe(PlayerbotAI* ai) { return new MediumAoeTrigger(ai); }
         static Trigger* HighAoe(PlayerbotAI* ai) { return new HighAoeTrigger(ai); }
-        static Trigger* HasAreaDebuff(PlayerbotAI* ai) { return new HasAreaDebuffTrigger(ai); }
         static Trigger* LoseAggro(PlayerbotAI* ai) { return new LoseAggroTrigger(ai); }
         static Trigger* HasAggro(PlayerbotAI* ai) { return new HasAggroTrigger(ai); }
         static Trigger* HasAreaDebuff(PlayerbotAI* ai) { return new HasAreaDebuffTrigger(ai); }
@@ -374,8 +371,6 @@ namespace ai
         static Trigger* use_trinket(PlayerbotAI* ai) { return new UseTrinketTrigger(ai); }
         static Trigger* movement_stuck(PlayerbotAI* ai) { return new MovementStuckTrigger(ai); }
         static Trigger* location_stuck(PlayerbotAI* ai) { return new LocationStuckTrigger(ai); }
-        static Trigger* player_wants_in_bg(PlayerbotAI* ai) { return new PlayerWantsInBattlegroundTrigger(ai); }
-        static Trigger* use_trinket(PlayerbotAI* ai) { return new UseTrinketTrigger(ai); }
         static Trigger* damage_stop(PlayerbotAI* ai) { return new DamageStopTrigger(ai); }
 
         static Trigger* petition_signed(PlayerbotAI* ai) { return new PetitionTurnInTrigger(ai); }

@@ -64,6 +64,7 @@ class RandomPlayerbotMgr : public PlayerbotHolder
         void SetTradeDiscount(Player* bot, Player* master, uint32 value);
         uint32 GetTradeDiscount(Player* bot, Player* master);
         void Refresh(Player* bot);
+		void RandomTeleportForLevel(Player* bot);
         void RandomTeleportForRpg(Player* bot);
         int GetMaxAllowedBotCount();
         void ChangeStrategy(Player* player);
@@ -90,9 +91,16 @@ class RandomPlayerbotMgr : public PlayerbotHolder
         void CheckLfgQueue();
         void CheckPlayers();
 		static Item* CreateTempItem(uint32 item, uint32 count, Player const* player, uint32 randomPropertyId = 0);
+
+		bool AddRandomBot(uint32 bot);
+
 		Player* GetHighestPlayerBot() const;
 		Player* GetLowestPlayerBot() const;
 		void TryAddRandomBot();
+
+		bool arenaTeamsDeleted, guildsDeleted = false;
+
+		std::mutex m_ahActionMutex;
 
         map<Team, map<BattleGroundTypeId, list<uint32> > > getBattleMastersCache() { return BattleMastersCache; }
 
@@ -111,8 +119,7 @@ class RandomPlayerbotMgr : public PlayerbotHolder
         time_t PlayersCheckTimer;
         uint32 AddRandomBots(int minLevel, int maxLevel, int num);
         bool ProcessBot(uint32 bot);
-        void RandomTeleport(Player* bot);
-        void RandomTeleport(Player* bot, vector<WorldLocation> &locs, bool hearth = false);
+		void RandomTeleport(Player* bot, vector<WorldLocation>& locs, bool hearth = false);
         uint32 GetZoneLevel(uint16 mapId, float teleX, float teleY, float teleZ);
         void PrepareTeleportCache();
         typedef void (RandomPlayerbotMgr::*ConsoleCommandHandler) (Player*);

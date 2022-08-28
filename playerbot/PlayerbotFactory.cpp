@@ -894,6 +894,10 @@ void PlayerbotFactory::InitEquipment(bool incremental)
         IterateItems(&visitor, ITERATE_ALL_ITEMS);
 	//}
 
+	uint32 specId = sRandomItemMgr.GetPlayerSpecId(bot);
+	if (specId == 0)
+		return;
+
     for(uint8 slot = 0; slot < EQUIPMENT_SLOT_END; ++slot)
     {
         if (slot == EQUIPMENT_SLOT_TABARD && !bot->GetGuildId())
@@ -906,7 +910,7 @@ void PlayerbotFactory::InitEquipment(bool incremental)
         }
         do
         {
-            vector<uint32> ids = sRandomItemMgr.Query(level, bot->getClass(), slot, quality);
+            vector<uint32> ids = sRandomItemMgr.Query(level, bot->getClass(), uint8(specId), slot, quality);
 
             if (!ids.empty()) ahbot::Shuffle(ids);
             for (uint32 index = 0; index < ids.size(); ++index)

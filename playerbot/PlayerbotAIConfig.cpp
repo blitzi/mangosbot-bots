@@ -333,7 +333,7 @@ bool PlayerbotAIConfig::Initialize()
     sPlayerbotTextMgr.LoadBotTextChance();
 
     sLog.outString("Loading Travel Detail Data...");
-    sTravelMgr.LoadTravelTable();
+    sTravelMgr.LoadQuestTravelTable();
 
     if (sPlayerbotAIConfig.randomBotJoinBG)
         sRandomPlayerbotMgr.LoadBattleMastersCache();

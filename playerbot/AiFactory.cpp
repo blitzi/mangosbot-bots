@@ -242,15 +242,6 @@ void AiFactory::AddDefaultCombatStrategies(Player* player, PlayerbotAI* const fa
                 engine->addStrategies("heal", "dps assist", "cure", "flee", "cc", "ranged", NULL);
             else
                 engine->addStrategies("dps", "dps assist", "cure", "close", "cc", NULL);
-
-            if (player->GetLevel() < 14)
-            {
-                engine->addStrategy("bdps");
-            }
-            if (player->GetLevel() < 16)
-            {
-                engine->addStrategy("barmor");
-            }*/
             break;
         case CLASS_DRUID:
             if (tab == 0)

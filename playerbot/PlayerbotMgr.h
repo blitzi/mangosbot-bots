@@ -20,7 +20,7 @@ public:
     PlayerbotHolder();
     virtual ~PlayerbotHolder();
 
-    void AddPlayerBot(uint32 guid, uint32 masterAccountId);
+    void AddPlayerBot(uint64 guid, uint32 masterAccountId);
 	void HandlePlayerBotLoginCallback(QueryResult * dummy, SqlQueryHolder * holder);
 
     void LogoutPlayerBot(uint32 guid);
@@ -29,7 +29,7 @@ public:
     PlayerBotMap::const_iterator GetPlayerBotsBegin() const { return playerBots.begin(); }
     PlayerBotMap::const_iterator GetPlayerBotsEnd()   const { return playerBots.end();   }
 
-    virtual void UpdateAIInternal(uint32 elapsed, bool minimal = false);
+	virtual void UpdateAIInternal(uint32 elapsed) {};
     void UpdateSessions(uint32 elapsed);
 
     void LogoutAllBots();
@@ -60,7 +60,7 @@ public:
     void OnPlayerLogin(Player* player);
     void CancelLogout();
 
-    virtual void UpdateAIInternal(uint32 elapsed, bool minimal = false);
+    virtual void UpdateAIInternal(uint32 elapsed);
     void TellError(string botName, string text);
 
     Player* GetMaster() const { return master; };

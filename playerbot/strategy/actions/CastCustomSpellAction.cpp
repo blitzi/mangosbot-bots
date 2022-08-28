@@ -111,7 +111,7 @@ bool CastCustomSpellAction::Execute(Event event)
     else if (target == bot) spellName << "self";
     else spellName << target->GetName();
 
-    if (!bot->GetTrader() && !ai->CanCastSpell(spell, target, 0, true, itemTarget))
+    if (!bot->GetTrader() && !ai->CanCastSpell(spell, target, true, itemTarget))
     {
         msg << "Cannot cast " << spellName.str();
         ai->TellError(msg.str());

@@ -69,7 +69,7 @@ PlayerbotSecurityLevel PlayerbotSecurity::LevelFor(Player* from, DenyReason* rea
                 if (reason) *reason = PLAYERBOT_DENY_BG;
                 return PLAYERBOT_SECURITY_TALK;
             }
-        }
+        }*/
 
 #ifdef MANGOSBOT_ONE
         if (bot->GetPlayerbotAI()->HasRealPlayerMaster() && !bot->m_lookingForGroup.isEmpty() &&

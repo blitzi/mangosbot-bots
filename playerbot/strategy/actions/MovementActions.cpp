@@ -154,18 +154,6 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
     }
 #endif
 
-    bool detailedMove = ai->AllowActivity(DETAILED_MOVE_ACTIVITY);
-
-    if (!detailedMove)
-    {
-        time_t now = time(0);
-        if (AI_VALUE(LastMovement&, "last movement").nextTeleport > now) //We can not teleport yet. Wait.
-        {
-            ai->SetNextCheckDelay((AI_VALUE(LastMovement&, "last movement").nextTeleport - now) * 1000);
-            return true;
-        }
-    }
-
     float minDist = sPlayerbotAIConfig.targetPosRecalcDistance; //Minium distance a bot should move.
     float maxDist = sPlayerbotAIConfig.reactDistance;           //Maxium distance a bot can move in one single action.
     float originalZ = z;                                        // save original destination height to check if bot needs to fly up
@@ -552,17 +540,18 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
             WaitForReach(startPosition.distance(movePosition));
     }
 
-    if (!isVehicle)
-    {
-        bot->HandleEmoteState(0);
-        if (!bot->IsStandState())
-            bot->SetStandState(UNIT_STAND_STATE_STAND);
+	if (!isVehicle)
+	{
+		bot->HandleEmoteState(0);
+		if (!bot->IsStandState())
+			bot->SetStandState(UNIT_STAND_STATE_STAND);
 
-    if (bot->IsNonMeleeSpellCasted(false))
-    {
-        bot->CastStop();
-        ai->InterruptSpell();
-    }
+		if (bot->IsNonMeleeSpellCasted(false))
+		{
+			bot->CastStop();
+			ai->InterruptSpell();
+		}
+	}
 
     MotionMaster& mm = *mover->GetMotionMaster();
 
@@ -724,6 +713,58 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
     return true;
 }
 
+bool MovementAction::MoveTo(Unit* target, float distance)
+{
+	if (!target || !target->IsInWorld())
+	{
+		//ai->TellError("Seems I am stuck");
+		return false;
+	}
+
+	float bx = bot->GetPositionX(), by = bot->GetPositionY(), bz = bot->GetPositionZ();
+	float tx = target->GetPositionX(), ty = target->GetPositionY(), tz = target->GetPositionZ();
+
+	if (sServerFacade.IsHostileTo(bot, target))
+	{
+		Stance* stance = AI_VALUE(Stance*, "stance");
+		WorldLocation loc = stance->GetLocation();
+		if (Formation::IsNullLocation(loc) || loc.mapid == -1)
+		{
+			//ai->TellError("Nowhere to move");
+			return false;
+		}
+
+		tx = loc.coord_x;
+		ty = loc.coord_y;
+		tz = loc.coord_z;
+	}
+
+	float distanceToTarget = sServerFacade.GetDistance2d(bot, tx, ty);
+	if (sServerFacade.IsDistanceGreaterThan(distanceToTarget, sPlayerbotAIConfig.targetPosRecalcDistance))
+	{
+		/*
+		float angle = bot->GetAngle(tx, ty);
+		float needToGo = distanceToTarget - distance;
+		float maxDistance = ai->GetRange("spell");
+		if (needToGo > 0 && needToGo > maxDistance)
+			needToGo = maxDistance;
+		else if (needToGo < 0 && needToGo < -maxDistance)
+			needToGo = -maxDistance;
+		float dx = cos(angle) * needToGo + bx;
+		float dy = sin(angle) * needToGo + by;
+		float dz = bz + (tz - bz) * needToGo / distanceToTarget;
+		*/
+
+		float dx = tx;
+		float dy = ty;
+		float dz = tz;
+		return MoveTo(target->GetMapId(), dx, dy, dz);
+	}
+
+	return true;
+}
+
+
 bool MovementAction::MoveToStance(Unit* target)
 {
     if (!target || !target->IsInWorld())
@@ -737,10 +778,11 @@ bool MovementAction::MoveToStance(Unit* target)
 
     Stance* stance = AI_VALUE(Stance*, "stance");
 
-        tx = loc.coord_x;
-        ty = loc.coord_y;
-        tz = loc.coord_z;
-    }
+	WorldLocation loc = stance->GetLocation();
+	if (Formation::IsNullLocation(loc) || loc.mapid == -1)
+	{
+		return false;
+	}
 
     WorldLocation location;
     bot->GetPosition(location);

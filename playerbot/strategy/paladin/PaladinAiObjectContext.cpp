@@ -66,19 +66,15 @@ namespace ai
         public:
             BuffStrategyFactoryInternal() : NamedObjectContext<Strategy>(false, true)
             {
-                creators["bhealth"] = &paladin::BuffStrategyFactoryInternal::bhealth;
-                creators["bmana"] = &paladin::BuffStrategyFactoryInternal::bmana;
-                creators["bdps"] = &paladin::BuffStrategyFactoryInternal::bdps;
-                creators["bspeed"] = &paladin::BuffStrategyFactoryInternal::bspeed;
-                creators["bstats"] = &paladin::BuffStrategyFactoryInternal::bstats;
+				creators["bwisdom"] = &paladin::BuffStrategyFactoryInternal::bwisdom;
+				creators["bmight"] = &paladin::BuffStrategyFactoryInternal::bmight;
+				creators["bkings"] = &paladin::BuffStrategyFactoryInternal::bkings;
             }
 
-        private:
-            static Strategy* bhealth(PlayerbotAI* ai) { return new PaladinBuffHealthStrategy(ai); }
-            static Strategy* bmana(PlayerbotAI* ai) { return new PaladinBuffManaStrategy(ai); }
-            static Strategy* bdps(PlayerbotAI* ai) { return new PaladinBuffDpsStrategy(ai); }
-            static Strategy* bspeed(PlayerbotAI* ai) { return new PaladinBuffSpeedStrategy(ai); }
-            static Strategy* bstats(PlayerbotAI* ai) { return new PaladinBuffStatsStrategy(ai); }
+		private:
+			static Strategy* bwisdom(PlayerbotAI* ai) { return new PaladinBuffWisdomStrategy(ai); }
+			static Strategy* bmight(PlayerbotAI* ai) { return new PaladinBuffMightStrategy(ai); }
+			static Strategy* bkings(PlayerbotAI* ai) { return new PaladinBuffKingsStrategy(ai); }
         };
 
         class CombatStrategyFactoryInternal : public NamedObjectContext<Strategy>

@@ -217,7 +217,7 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
                         }
                     }
 
-                    PerformanceMonitorOperation *pmo = sPerformanceMonitor.start(PERF_MON_ACTION, action->getName(), &aiObjectContext->performanceStack);
+                    PerformanceMonitorOperation *pmo = sPerformanceMonitor.start(PERF_MON_ACTION, action->GetName(), &aiObjectContext->performanceStack);
                     actionExecuted = ListenAndExecute(action, event);
                     if (pmo) pmo->finish();
 
@@ -245,7 +245,7 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
                     {
                         ostringstream out;
                         out << "try: ";
-                        out << action->getName();
+                        out << action->GetName();
                         out << " impossible (";
 
                         out << action->getRelevance() << ")";
@@ -255,7 +255,7 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
 
                         ai->TellMasterNoFacing(out);
                     }
-                    LogAction("A:%s - IMPOSSIBLE", action->getName().c_str());
+                    LogAction("A:%s - IMPOSSIBLE", action->GetName().c_str());
                     MultiplyAndPush(actionNode->getAlternatives(), relevance + 0.03, false, event, "alt");
                 }
             }
@@ -265,7 +265,7 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
                 {
                     ostringstream out;
                     out << "try: ";
-                    out << action->getName();
+                    out << action->GetName();
                     out << " useless (";
 
                     out << action->getRelevance() << ")";
@@ -275,9 +275,7 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
 
                     ai->TellMasterNoFacing(out);
                 }
-                lastRelevance = relevance;
-                LogAction("A:%s - USELESS", action->getName().c_str());
- 				MultiplyAndPush(actionNode->getAlternatives(), relevance + 0.03, false, event, "alt");
+                LogAction("A:%s - USELESS", action->GetName().c_str());
             }
             delete actionNode;
         }
@@ -500,7 +498,7 @@ void Engine::ProcessTriggers(bool minimal)
             if (minimal && node->getFirstRelevance() < 100)
                 continue;
 
-            PerformanceMonitorOperation* pmo = sPerformanceMonitor.start(PERF_MON_TRIGGER, trigger->getName(), &aiObjectContext->performanceStack);
+            PerformanceMonitorOperation* pmo = sPerformanceMonitor.start(PERF_MON_TRIGGER, trigger->GetName(), &aiObjectContext->performanceStack);
             Event event = trigger->Check();
             if (pmo) pmo->finish();
             if (!event)

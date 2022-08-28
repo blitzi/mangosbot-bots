@@ -312,9 +312,7 @@ void RandomItemMgr::BuildRandomItemCache()
             }
         }
 
-        uint32 maxLevel = sPlayerbotAIConfig.randomBotMaxLevel;
-        if (maxLevel > sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
-            maxLevel = sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL);
+        uint32 maxLevel = sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL);
         for (int level = 0; level < maxLevel / 10; level++)
         {
             for (uint32 type = RANDOM_ITEM_GUILD_TASK; type <= RANDOM_ITEM_GUILD_TASK_REWARD_TRADE_RARE; type++)
@@ -2643,9 +2641,7 @@ uint32 RandomItemMgr::GetLiveStatWeight(Player* player, uint32 itemId, uint32 sp
 
 void RandomItemMgr::BuildEquipCache()
 {
-    uint32 maxLevel = sPlayerbotAIConfig.randomBotMaxLevel;
-    if (maxLevel > sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
-        maxLevel = sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL);
+	uint32 maxLevel = sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL);
 
     QueryResult* results = PlayerbotDatabase.PQuery("select clazz, spec, lvl, slot, quality, item from ai_playerbot_equip_cache");
     if (results)
@@ -2807,9 +2803,7 @@ RandomItemList RandomItemMgr::Query(uint32 level, uint8 clazz, uint8 spec, uint8
 
 void RandomItemMgr::BuildAmmoCache()
 {
-    uint32 maxLevel = sPlayerbotAIConfig.randomBotMaxLevel;
-    if (maxLevel > sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
-        maxLevel = sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL);
+	uint32 maxLevel = sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL);
 
     sLog.outBasic("Building ammo cache for %d levels", maxLevel);
 	int counter1 = 0;
@@ -2845,9 +2839,7 @@ uint32 RandomItemMgr::GetAmmo(uint32 level, uint32 subClass)
 
 void RandomItemMgr::BuildPotionCache()
 {
-    uint32 maxLevel = sPlayerbotAIConfig.randomBotMaxLevel;
-    if (maxLevel > sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
-        maxLevel = sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL);
+	uint32 maxLevel = sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL);
 
     sLog.outBasic("Building potion cache for %d levels", maxLevel);
 	int counter2 = 0;
@@ -2919,9 +2911,7 @@ void RandomItemMgr::BuildPotionCache()
 
 void RandomItemMgr::BuildFoodCache()
 {
-    uint32 maxLevel = sPlayerbotAIConfig.randomBotMaxLevel;
-    if (maxLevel > sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
-        maxLevel = sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL);
+	uint32 maxLevel = sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL);
 
     sLog.outBasic("Building food cache for %d levels", maxLevel);
 	int counter3 = 0;
@@ -3071,9 +3061,7 @@ uint32 RandomItemMgr::GetRandomFood(uint32 level, uint32 category)
 
 void RandomItemMgr::BuildTradeCache()
 {
-    uint32 maxLevel = sPlayerbotAIConfig.randomBotMaxLevel;
-    if (maxLevel > sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
-        maxLevel = sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL);
+	uint32 maxLevel = sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL);
 
     sLog.outBasic("Building trade cache for %d levels", maxLevel);
 	int counter4 = 0;

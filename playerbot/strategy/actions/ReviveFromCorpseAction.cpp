@@ -87,7 +87,7 @@ bool FindCorpseAction::Execute(Event event)
         {
             sLog.outBasic("Bot #%d %s:%d <%s>: died too many times and was sent to an inn", bot->GetGUIDLow(), bot->GetTeam() == ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName());
             context->GetValue<uint32>("death count")->Set(0);
-            sRandomPlayerbotMgr.RandomTeleportForRpg(bot, false);
+            sRandomPlayerbotMgr.RandomTeleportForRpg(bot);
             return true;
         }
     }
@@ -141,36 +141,20 @@ bool FindCorpseAction::Execute(Event event)
     //Actual mobing part.
     bool moved = false;
 
-    if (!ai->AllowActivity(ALL_ACTIVITY))
-    {
-        uint32 delay = sServerFacade.GetDistance2d(bot, corpse) / bot->GetSpeed(MOVE_RUN); //Time a bot would take to travel to it's corpse.
-        delay = min(delay, uint32(10 * MINUTE)); //Cap time to get to corpse at 10 minutes.
-
-        if (deadTime > delay)
-        {
-            bot->GetMotionMaster()->Clear();
-            bot->TeleportTo(moveToPos.getMapId(), moveToPos.getX(), moveToPos.getY(), moveToPos.getZ(), 0);
-        }
-
+    if (bot->IsMoving())
         moved = true;
-    }
     else
     {
-        if (bot->IsMoving())
-            moved = true;
-        else
+        if (deadTime < 10 * MINUTE && dCount < 5) //Look for corpse up to 30 minutes.
         {
-            if (deadTime < 10 * MINUTE && dCount < 5) //Look for corpse up to 30 minutes.
-            {
-                moved = MoveTo(moveToPos.getMapId(), moveToPos.getX(), moveToPos.getY(), moveToPos.getZ(), false, false);
-            }
-
-            if (!moved)
-            {
-                moved = ai->DoSpecificAction("spirit healer", Event(), true);
-            }
+            moved = MoveTo(moveToPos.getMapId(), moveToPos.getX(), moveToPos.getY(), moveToPos.getZ(), false, false);
         }
-    }   
+
+        if (!moved)
+        {
+            moved = ai->DoSpecificAction("spirit healer", Event(), true);
+        }
+    }
 
     return moved;
 }

@@ -4,25 +4,25 @@
 
 namespace ai
 {
-    class PaladinBuffWisdomStrategy : public Strategy
-    {
-    public:
+	class PaladinBuffWisdomStrategy : public Strategy
+	{
+	public:
 		PaladinBuffWisdomStrategy(PlayerbotAI* ai) : Strategy(ai) {}
 
-    public:
-        virtual void InitTriggers(std::list<TriggerNode*> &triggers);
-        virtual string getName() { return "bwisdom"; }
-    };
+	public:
+		virtual void InitTriggers(std::list<TriggerNode*>& triggers);
+		virtual string getName() { return "bwisdom"; }
+	};
 
-    class PaladinBuffMightStrategy : public Strategy
-    {
-    public:
+	class PaladinBuffMightStrategy : public Strategy
+	{
+	public:
 		PaladinBuffMightStrategy(PlayerbotAI* ai) : Strategy(ai) {}
 
-    public:
-        virtual void InitTriggers(std::list<TriggerNode*> &triggers);
-        virtual string getName() { return "bmight"; }
-    };
+	public:
+		virtual void InitTriggers(std::list<TriggerNode*>& triggers);
+		virtual string getName() { return "bmight"; }
+	};
 
 	class PaladinBuffArmorStrategy : public Strategy
 	{
@@ -30,7 +30,7 @@ namespace ai
 		PaladinBuffArmorStrategy(PlayerbotAI* ai) : Strategy(ai) {}
 
 	public:
-		virtual void InitTriggers(std::list<TriggerNode*> &triggers);
+		virtual void InitTriggers(std::list<TriggerNode*>& triggers);
 		virtual string getName() { return "barmor"; }
 	};
 
@@ -54,15 +54,15 @@ namespace ai
 		virtual string getName() { return "bsanctity"; }
 	};
 
-    class PaladinBuffAoeStrategy : public Strategy
-    {
-    public:
-        PaladinBuffAoeStrategy(PlayerbotAI* ai) : Strategy(ai) {}
+	class PaladinBuffAoeStrategy : public Strategy
+	{
+	public:
+		PaladinBuffAoeStrategy(PlayerbotAI* ai) : Strategy(ai) {}
 
-    public:
-        virtual void InitTriggers(std::list<TriggerNode*> &triggers);
-        virtual string getName() { return "baoe"; }
-    };
+	public:
+		virtual void InitTriggers(std::list<TriggerNode*>& triggers);
+		virtual string getName() { return "baoe"; }
+	};
 
 	class PaladinBuffThreatStrategy : public Strategy
 	{
@@ -70,7 +70,7 @@ namespace ai
 		PaladinBuffThreatStrategy(PlayerbotAI* ai) : Strategy(ai) {}
 
 	public:
-		virtual void InitTriggers(std::list<TriggerNode*> &triggers);
+		virtual void InitTriggers(std::list<TriggerNode*>& triggers);
 		virtual string getName() { return "bthreat"; }
 	};
 
@@ -80,19 +80,19 @@ namespace ai
 		PaladinBuffSpeedStrategy(PlayerbotAI* ai) : Strategy(ai) {}
 
 	public:
-		virtual void InitTriggers(std::list<TriggerNode*> &triggers);
+		virtual void InitTriggers(std::list<TriggerNode*>& triggers);
 		virtual string getName() { return "crusader"; }
 	};
 
-    class PaladinBuffKingsStrategy : public Strategy
-    {
-    public:
+	class PaladinBuffKingsStrategy : public Strategy
+	{
+	public:
 		PaladinBuffKingsStrategy(PlayerbotAI* ai) : Strategy(ai) {}
 
-    public:
-        virtual void InitTriggers(std::list<TriggerNode*> &triggers);
-        virtual string getName() { return "bkings"; }
-    };
+	public:
+		virtual void InitTriggers(std::list<TriggerNode*>& triggers);
+		virtual string getName() { return "bkings"; }
+	};
 
 	class PaladinShadowResistanceStrategy : public Strategy
 	{
@@ -100,7 +100,7 @@ namespace ai
 		PaladinShadowResistanceStrategy(PlayerbotAI* ai) : Strategy(ai) {}
 
 	public:
-		virtual void InitTriggers(std::list<TriggerNode*> &triggers);
+		virtual void InitTriggers(std::list<TriggerNode*>& triggers);
 		virtual string getName() { return "rshadow"; }
 	};
 
@@ -110,7 +110,7 @@ namespace ai
 		PaladinFrostResistanceStrategy(PlayerbotAI* ai) : Strategy(ai) {}
 
 	public:
-		virtual void InitTriggers(std::list<TriggerNode*> &triggers);
+		virtual void InitTriggers(std::list<TriggerNode*>& triggers);
 		virtual string getName() { return "rfrost"; }
 	};
 
@@ -120,7 +120,7 @@ namespace ai
 		PaladinFireResistanceStrategy(PlayerbotAI* ai) : Strategy(ai) {}
 
 	public:
-		virtual void InitTriggers(std::list<TriggerNode*> &triggers);
+		virtual void InitTriggers(std::list<TriggerNode*>& triggers);
 		virtual string getName() { return "rfire"; }
 	};
 }

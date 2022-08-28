@@ -273,7 +273,6 @@ namespace ai
             creators["should repair"] = &ValueContext::should_repair;
             creators["can repair"] = &ValueContext::can_repair;
             creators["should sell"] = &ValueContext::should_sell;
-            creators["should buy ammo"] = &ValueContext::should_buy_ammo;
             creators["can sell"] = &ValueContext::can_sell;
             creators["can ah sell"] = &ValueContext::can_ah_sell;
             creators["can fight equal"] = &ValueContext::can_fight_equal;
@@ -285,7 +284,6 @@ namespace ai
             creators["near leader"] = &ValueContext::near_leader;
             creators["and"] = &ValueContext::and_value;
             creators["group count"] = &ValueContext::group_count;
-            creators["or"] = &ValueContext::or_value;
             creators["group and"] = &ValueContext::group_and;
             creators["group or"] = &ValueContext::group_or;
             creators["group ready"] = &ValueContext::group_ready;
@@ -481,7 +479,6 @@ namespace ai
         static UntypedValue* should_repair(PlayerbotAI* ai) { return new ShouldRepairValue(ai); }
         static UntypedValue* can_repair(PlayerbotAI* ai) { return new CanRepairValue(ai); }
         static UntypedValue* should_sell(PlayerbotAI* ai) { return new ShouldSellValue(ai); }
-        static UntypedValue* should_buy_ammo(PlayerbotAI* ai) { return new ShouldBuyAmmoValue(ai); }
         static UntypedValue* can_sell(PlayerbotAI* ai) { return new CanSellValue(ai); }
         static UntypedValue* can_ah_sell(PlayerbotAI* ai) { return new CanAHSellValue(ai); }
         static UntypedValue* can_fight_equal(PlayerbotAI* ai) { return new CanFightEqualValue(ai); }
@@ -493,7 +490,6 @@ namespace ai
         static UntypedValue* near_leader(PlayerbotAI* ai) { return new IsNearLeaderValue(ai); }
         static UntypedValue* and_value(PlayerbotAI* ai) { return new BoolANDValue(ai); }
         static UntypedValue* group_count(PlayerbotAI* ai) { return new GroupBoolCountValue(ai); }
-        static UntypedValue* or_value(PlayerbotAI* ai) { return new BoolORValue(ai); }
         static UntypedValue* group_and(PlayerbotAI* ai) { return new GroupBoolANDValue(ai); }
         static UntypedValue* group_or(PlayerbotAI* ai) { return new GroupBoolORValue(ai); }
 		static UntypedValue* group_ready(PlayerbotAI* ai) { return new GroupReadyValue(ai); }
@@ -512,7 +508,5 @@ namespace ai
         static UntypedValue* RTSC_selected(PlayerbotAI* ai) { return new RTSCSelectedValue(ai); }
         static UntypedValue* RTSC_next_spell_action(PlayerbotAI* ai) { return new RTSCNextSpellActionValue(ai); }
         static UntypedValue* RTSC_saved_location(PlayerbotAI* ai) { return new RTSCSavedLocationValue(ai); }
-
-        static UntypedValue* has_area_debuff(PlayerbotAI* ai) { return new HasAreaDebuffValue(ai); }
     };
 };

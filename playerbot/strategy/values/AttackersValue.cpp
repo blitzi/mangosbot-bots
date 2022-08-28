@@ -307,7 +307,7 @@ bool AttackersValue::ListContainsRti(set<Unit*>& targets) const
     return false;
 }
 
-bool AttackersValue::IsPossibleTarget(Unit *target, Player *bot)
+bool AttackersValue::IsPossibleTarget(Unit *target, Player *bot, float range)
 {
     Creature *c = dynamic_cast<Creature*>(target);
     Group* group = bot->GetGroup();
@@ -325,7 +325,7 @@ bool AttackersValue::IsPossibleTarget(Unit *target, Player *bot)
 		!target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_UNINTERACTIBLE) &&
 		target->IsVisibleForOrDetect(bot, target, false) &&
 		!sServerFacade.IsFriendlyTo(target, bot) &&
-		bot->IsWithinDistInMap(target, sPlayerbotAIConfig.sightDistance) &&
+		bot->IsWithinDistInMap(target, range) &&
 		!(sPlayerbotAIConfig.IsInPvpProhibitedZone(target->GetAreaId()) && (target->GetObjectGuid().IsPlayer() || target->GetObjectGuid().IsPet())) &&
 		(!c || !c->GetCombatManager().IsInEvadeMode());
 

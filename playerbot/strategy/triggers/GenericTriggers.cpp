@@ -204,15 +204,6 @@ bool SpellCanBeCastTrigger::IsActive()
     return target && ai->CanCastSpell(spell, target);
 }
 
-bool SpellNoCooldownTrigger::IsActive()
-{
-    uint32 spellId = AI_VALUE2(uint32, "spell id", name);
-    if (!spellId)
-        return false;
-
-    return bot->IsSpellReady(spellId);
-}
-
 bool BuffCanBeCastTrigger::IsActive()
 {
     Unit* target = GetTarget();
@@ -542,12 +533,6 @@ bool IsFallingTrigger::IsActive()
 bool IsFallingFarTrigger::IsActive()
 {
     return bot->HasMovementFlag(MOVEFLAG_FALLINGFAR);
-}
-
-bool HasAreaDebuffTrigger::IsActive()
-{
-    return AI_VALUE2(bool, "has area debuff", "self target");
-}
 }
 
 bool DamageStopTrigger::IsActive()

@@ -31,7 +31,6 @@ namespace ai
                 if (sServerFacade.isMoving(bot))
                 {
                     ai->StopMoving();
-                    ai->SetNextCheckDelay(sPlayerbotAIConfig.globalCoolDown);
                     return false;
                 }
 
@@ -59,7 +58,6 @@ namespace ai
                 }
 
                 ai->CastSpell(24355, bot);
-                ai->SetNextCheckDelay(delay);
                 bot->RemoveSpellCooldown(*pSpellInfo);
 
                 return true;
@@ -100,7 +98,6 @@ namespace ai
                 if (sServerFacade.isMoving(bot))
                 {
                     ai->StopMoving();
-                    ai->SetNextCheckDelay(sPlayerbotAIConfig.globalCoolDown);
                     return false;
                 }
 
@@ -128,7 +125,6 @@ namespace ai
                 }
 
                 ai->CastSpell(24005, bot);
-                ai->SetNextCheckDelay(delay);
                 bot->RemoveSpellCooldown(*pSpellInfo);
 
                 return true;

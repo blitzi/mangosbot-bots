@@ -62,7 +62,6 @@ bool ImbueWithPoisonAction::Execute(Event event)
                   if (item)
                   {
                       ai->ImbueItem(item, EQUIPMENT_SLOT_OFFHAND);
-                      ai->SetNextCheckDelay(5);
                       return true;
                   }
               }

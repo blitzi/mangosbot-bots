@@ -81,9 +81,6 @@ namespace ai
             creators["flee"] = &ActionContext::flee;
             creators["flee with pet"] = &ActionContext::flee_with_pet;
             creators["shoot"] = &ActionContext::shoot;
-            creators["pull start"] = &ActionContext::pull_start;
-            creators["pull finish"] = &ActionContext::pull_finish;
-            creators["start pull"] = &ActionContext::start_pull;
             creators["end pull"] = &ActionContext::end_pull;
             creators["healthstone"] = &ActionContext::healthstone;
             creators["healing potion"] = &ActionContext::healing_potion;
@@ -342,7 +339,6 @@ namespace ai
         static Action* outfit(PlayerbotAI* ai) { return new OutfitAction(ai); }
         static Action* delay(PlayerbotAI* ai) { return new DelayAction(ai); }
         static Action* mount(PlayerbotAI *ai) { return new CastSpellAction(ai, "mount"); }
-        static Action* mount(PlayerbotAI *ai) { return new CastRangeSpellAction(ai, "mount"); }
         static Action* auto_talents(PlayerbotAI* ai) { return new AutoSetTalentsAction(ai); }
         static Action* increase_level(PlayerbotAI* ai) { return new IncreaseLevelAction(ai); }
 		static Action* auto_learn_spell(PlayerbotAI* ai) { return new AutoLearnSpellAction(ai); }

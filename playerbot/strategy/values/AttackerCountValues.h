@@ -46,7 +46,7 @@ namespace ai
     class BalanceThreatValue : public FloatCalculatedValue, public Qualified
     {
     public:
-        BalancePercentValue(PlayerbotAI* ai, string name = "balance percentage") : FloatCalculatedValue(ai, name) {}
+		BalanceThreatValue(PlayerbotAI* ai, string name = "balance percentage") : FloatCalculatedValue(ai, name) {}
 
         Unit* GetTarget()
         {

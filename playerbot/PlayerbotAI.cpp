@@ -85,12 +85,6 @@ PlayerbotAI::PlayerbotAI() : PlayerbotAIBase(), bot(NULL), aiObjectContext(NULL)
 {
     for (int i = 0 ; i < BOT_STATE_MAX; i++)
         engines[i] = NULL;
-
-    for (int i = 0; i < MAX_ACTIVITY_TYPE; i++)
-    {
-        allowActiveCheckTimer[i] = time(nullptr);
-        allowActive[i] = false;
-    }
 }
 
 PlayerbotAI::PlayerbotAI(Player* bot) :
@@ -99,12 +93,6 @@ PlayerbotAI::PlayerbotAI(Player* bot) :
 	this->bot = bot;    
     if (!bot->isTaxiCheater() && HasCheat(BotCheatMask::taxi))
         bot->SetTaxiCheater(true);
-
-    for (int i = 0; i < MAX_ACTIVITY_TYPE; i++)
-    {
-        allowActiveCheckTimer[i] = time(nullptr);
-        allowActive[i] = false;
-    }
 
 	accountId = sObjectMgr.GetPlayerAccountIdByGUID(bot->GetObjectGuid());
 
@@ -308,7 +296,6 @@ void PlayerbotAI::UpdateAIInternal(uint32 elapsed)
             return;
         }
 
-        SetNextCheckDelay(sPlayerbotAIConfig.reactDelay);
         return;
     }
 
@@ -316,7 +303,7 @@ void PlayerbotAI::UpdateAIInternal(uint32 elapsed)
     masterIncomingPacketHandlers.Handle(helper);
     masterOutgoingPacketHandlers.Handle(helper);
 
-	DoNextAction(minimal);
+	DoNextAction();
 	if (pmo) pmo->finish();
 }
 
@@ -397,9 +384,10 @@ void PlayerbotAI::Reset(bool full)
         }
     }
     
-    aiObjectContext->GetValue<set<ObjectGuid>&>("ignore rpg target")->Get().clear();   
+    aiObjectContext->GetValue<set<ObjectGuid>&>("ignore rpg target")->Get().clear();
 
-	StopMoving();
+	if (bot->IsTaxiFlying())
+	{
 #ifdef MANGOS
         bot->m_taxi.ClearTaxiDestinations();
 #endif
@@ -575,8 +563,6 @@ void PlayerbotAI::HandleCommand(uint32 type, const string& text, Player& fromPla
             TellMaster("Max wait time is 20 seconds!");
             return;
         }
-        IncreaseNextCheckDelay(delay);
-        isWaiting = true;
         TellError("Waiting for " + remaining + " seconds!");
         return;
     }
@@ -816,7 +802,7 @@ void PlayerbotAI::HandleBotOutgoingPacket(const WorldPacket& packet)
 
         // set delay based on actual distance
         float newdis = sqrt(bot->GetDistance2d(fx, fy, DIST_CALC_NONE));
-        SetNextCheckDelay((uint32)((newdis / dis) * moveTimeHalf * 4 * IN_MILLISECONDS));
+        GetMoveTimer()->Reset((uint32)((newdis / dis) * moveTimeHalf * 4 * IN_MILLISECONDS));
 
         // add moveflags
 #ifdef MANGOSBOT_TWO
@@ -1283,7 +1269,7 @@ void PlayerbotAI::DoNextAction(bool min)
 
             // set delay based on actual distance
             float newdis = sqrt(bot->GetDistance2d(fx, fy, DIST_CALC_NONE));
-            SetNextCheckDelay((uint32)((newdis / dis)* moveTimeHalf * 4 * IN_MILLISECONDS));
+            GetMoveTimer()->Reset((uint32)((newdis / dis)* moveTimeHalf * 4 * IN_MILLISECONDS));
 
             // jump packet
             WorldPacket jump(MSG_MOVE_JUMP);
@@ -1785,25 +1771,25 @@ bool IsRealAura(Player* bot, Aura const* aura, Unit* unit)
     return false;
 }
 
-bool PlayerbotAI::HasAura(string name, Unit* unit, bool maxStack, bool checkIsOwner, int maxAuraAmount)
+bool PlayerbotAI::HasAura(string name, Unit* unit, bool maxStack, bool checkIsOwner, int maxAuraAmount, bool hasMyAura)
 {
-    if (!unit)
-        return false;
+	if (!unit)
+		return false;
 
-    wstring wnamepart;
-    if (!Utf8toWStr(name, wnamepart))
-        return 0;
+	wstring wnamepart;
+	if (!Utf8toWStr(name, wnamepart))
+		return 0;
 
-    wstrToLower(wnamepart);
+	wstrToLower(wnamepart);
 
-    int auraAmount = 0;
+	int auraAmount = 0;
 
 	for (uint32 auraType = SPELL_AURA_BIND_SIGHT; auraType < TOTAL_AURAS; auraType++)
 	{
 		Unit::AuraList const& auras = unit->GetAurasByType((AuraType)auraType);
 
-        if (auras.empty())
-            continue;
+		if (auras.empty())
+			continue;
 
 		for (Unit::AuraList::const_iterator i = auras.begin(); i != auras.end(); i++)
 		{
@@ -1816,40 +1802,49 @@ bool PlayerbotAI::HasAura(string name, Unit* unit, bool maxStack, bool checkIsOw
 				continue;
 
 			if (IsRealAura(bot, aura, unit))
-            {
-                if (checkIsOwner && aura->GetHolder())
-                {
-                    if (aura->GetHolder()->GetCasterGuid() != bot->GetObjectGuid())
-                        continue;
-                }
+			{
+				if (hasMyAura && aura->GetHolder())
+				{
+					if (aura->GetHolder()->GetCasterGuid() == bot->GetObjectGuid())
+						return true;
+					else
+						continue;
+				}
 
-                uint32 maxStackAmount = aura->GetSpellProto()->StackAmount;
-                uint32 maxProcCharges = aura->GetSpellProto()->procCharges;
+				if (checkIsOwner && aura->GetHolder())
+				{
+					if (aura->GetHolder()->GetCasterGuid() != bot->GetObjectGuid())
+						continue;
+				}
 
-                if (maxStack)
-                {
-                    if (maxStackAmount && aura->GetStackAmount() >= maxStackAmount)
-                       auraAmount++;
+				uint32 maxStackAmount = aura->GetSpellProto()->StackAmount;
+				uint32 maxProcCharges = aura->GetSpellProto()->procCharges;
 
-                    if (maxProcCharges && aura->GetHolder()->GetAuraCharges() >= maxProcCharges)
-                       auraAmount++;
-                }
+				if (maxStack)
+				{
+					if (maxStackAmount && aura->GetStackAmount() >= maxStackAmount)
+						auraAmount++;
 
-                auraAmount++;
+					if (maxProcCharges && aura->GetHolder()->GetAuraCharges() >= maxProcCharges)
+						auraAmount++;
+				}
+				else
+					auraAmount++;
 
-                if (maxAuraAmount < 0)
-                    return auraAmount > 0;
-            }
+				if (maxAuraAmount < 0)
+					return auraAmount > 0;
+			}
 		}
-    }
+	}
 
-    if (maxAuraAmount >= 0)
-    {
-        return auraAmount == maxAuraAmount || (auraAmount > 0 && auraAmount <= maxAuraAmount);
-    }
+	if (maxAuraAmount >= 0)
+	{
+		return auraAmount == maxAuraAmount || (auraAmount > 0 && auraAmount <= maxAuraAmount);
+	}
 
-    return false;
+	return false;
 }
+
 
 bool PlayerbotAI::HasAura(uint32 spellId, const Unit* unit)
 {
@@ -2677,7 +2672,6 @@ bool PlayerbotAI::CastVehicleSpell(uint32 spellId, Unit* target)
 
     if (failWithDelay)
     {
-        SetNextCheckDelay(sPlayerbotAIConfig.globalCoolDown);
         return false;
     }
 
@@ -2733,7 +2727,6 @@ bool PlayerbotAI::CastVehicleSpell(uint32 spellId, Unit* target)
     if (canControl && sServerFacade.isMoving(vehicle) && spell->GetCastTime())
     {
         vehicle->StopMoving();
-        SetNextCheckDelay(sPlayerbotAIConfig.globalCoolDown);
         spell->cancel();
         //delete spell;
         return false;
@@ -2814,7 +2807,7 @@ void PlayerbotAI::WaitForSpellCast(Spell *spell)
 
     // fix hunter Feign Death delay
     if (pSpellInfo->Id == 5384)
-        castTime = 1000.0f;
+		currentCastTime = 1000.0f;
 
     uint32 globalCooldown = CalculateGlobalCooldown(pSpellInfo->Id);
 
@@ -2822,7 +2815,7 @@ void PlayerbotAI::WaitForSpellCast(Spell *spell)
         currentCastTime = globalCooldown;
     // fix cannibalize
     if (pSpellInfo->Id == 20577)
-        castTime = 10000;}
+		currentCastTime = 10000;}
 
 void PlayerbotAI::InterruptSpell()
 {
@@ -4102,36 +4095,41 @@ bool PlayerbotAI::CanMove()
 
 void PlayerbotAI::StopMoving()
 {
-    if (bot->IsTaxiFlying())
-        return;
+	if (bot->IsTaxiFlying())
+		return;
 
-    if (!bot->GetMotionMaster()->empty())
-        if (MovementGenerator* movgen = bot->GetMotionMaster()->top())
-            movgen->Interrupt(*bot);
+	if (!bot->GetMotionMaster()->empty())
+		if (MovementGenerator* movgen = bot->GetMotionMaster()->top())
+			movgen->Interrupt(*bot);
 
-    // remove movement flags, checked in bot->IsMoving()
-    if (bot->IsFalling())
+	// remove movement flags, checked in bot->IsMoving()
+	if (bot->IsFalling())
 #ifdef MANGOSBOT_TWO
-        bot->m_movementInfo.RemoveMovementFlag(MovementFlags(movementFlagsMask & ~(MOVEFLAG_FALLING | MOVEFLAG_FALLINGFAR)));
+		bot->m_movementInfo.RemoveMovementFlag(MovementFlags(movementFlagsMask & ~(MOVEFLAG_FALLING | MOVEFLAG_FALLINGFAR)));
 #else
-        bot->m_movementInfo.RemoveMovementFlag(MovementFlags(movementFlagsMask & ~(MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR)));
+		bot->m_movementInfo.RemoveMovementFlag(MovementFlags(movementFlagsMask & ~(MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR)));
 #endif
-    else
-        bot->m_movementInfo.RemoveMovementFlag(movementFlagsMask);
-    // interrupt movement as much as we can...
-    bot->InterruptMoving(true);
-    bot->GetMotionMaster()->Clear();
-    MovementInfo mInfo = bot->m_movementInfo;
-    float x, y, z;
-    bot->GetPosition(x, y, z);
-    float o = bot->GetPosition().o;
-    mInfo.ChangePosition(x, y, z, o);
-    WorldPacket data(MSG_MOVE_STOP);
+	else
+		bot->m_movementInfo.RemoveMovementFlag(movementFlagsMask);
+	// interrupt movement as much as we can...
+	bot->InterruptMoving(true);
+	bot->GetMotionMaster()->Clear();
+	MovementInfo mInfo = bot->m_movementInfo;
+	float x, y, z;
+	bot->GetPosition(x, y, z);
+	float o = bot->GetPosition().o;
+	mInfo.ChangePosition(x, y, z, o);
+	WorldPacket data(MSG_MOVE_STOP);
 #ifdef MANGOSBOT_TWO
-    data << bot->GetObjectGuid().WriteAsPacked();
+	data << bot->GetObjectGuid().WriteAsPacked();
 #endif
-    data << mInfo;
-    bot->GetSession()->HandleMovementOpcodes(data);
+	data << mInfo;
+	bot->GetSession()->HandleMovementOpcodes(data);
+
+	bot->m_movementInfo.RemoveMovementFlag(MovementFlags(MOVEFLAG_SPLINE_ENABLED | MOVEFLAG_FORWARD));
+	//bot->movespline->_Interrupt();
+
+	GetMoveTimer()->Reset(0);
 }
 
 bool PlayerbotAI::IsInRealGuild()
@@ -4184,43 +4182,4 @@ bool PlayerbotAI::IsDrinking()
 bool PlayerbotAI::IsCasting()
 {
     return bot->IsNonMeleeSpellCasted(false, false, true);
-}
-
-void PlayerbotAI::StopMoving()
-{
-	if (bot->IsTaxiFlying())
-		return;
-
-	if (!bot->GetMotionMaster()->empty())
-		if (MovementGenerator* movgen = bot->GetMotionMaster()->top())
-			movgen->Interrupt(*bot);
-
-	// remove movement flags, checked in bot->IsMoving()
-	if (bot->IsFalling())
-#ifdef MANGOSBOT_TWO
-		bot->m_movementInfo.RemoveMovementFlag(MovementFlags(movementFlagsMask & ~(MOVEFLAG_FALLING | MOVEFLAG_FALLINGFAR)));
-#else
-		bot->m_movementInfo.RemoveMovementFlag(MovementFlags(movementFlagsMask & ~(MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR)));
-#endif
-	else
-		bot->m_movementInfo.RemoveMovementFlag(movementFlagsMask);
-	// interrupt movement as much as we can...
-	bot->InterruptMoving(true);
-	bot->GetMotionMaster()->Clear();
-	MovementInfo mInfo = bot->m_movementInfo;
-	float x, y, z;
-	bot->GetPosition(x, y, z);
-	float o = bot->GetPosition().o;
-	mInfo.ChangePosition(x, y, z, o);
-	WorldPacket data(MSG_MOVE_STOP);
-#ifdef MANGOSBOT_TWO
-	data << bot->GetObjectGuid().WriteAsPacked();
-#endif
-	data << mInfo;
-	bot->GetSession()->HandleMovementOpcodes(data);
-
-	bot->m_movementInfo.RemoveMovementFlag(MovementFlags(MOVEFLAG_SPLINE_ENABLED | MOVEFLAG_FORWARD));
-	//bot->movespline->_Interrupt();
-
-	GetMoveTimer()->Reset(0);
 }

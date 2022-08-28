@@ -143,7 +143,6 @@ ItemIds TalkToQuestGiverAction::BestRewards(Quest const* quest)
 void TalkToQuestGiverAction::RewardMultipleItem(Quest const* quest, WorldObject* questGiver, ostringstream& out)
 {
     set<uint32> bestIds;
-    Item* newItem;
 
     ostringstream outid;
     if (!ai->IsAlt() || sPlayerbotAIConfig.autoPickReward == "yes")

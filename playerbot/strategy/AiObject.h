@@ -187,10 +187,10 @@ class clazz : public super \
     }
 
 #define CD_TRIGGER(clazz, spell) \
-    class clazz : public SpellNoCooldownTrigger \
+    class clazz : public SpellCanBeCastInstantTrigger \
     { \
     public: \
-        clazz(PlayerbotAI* ai) : SpellNoCooldownTrigger(ai, spell) {} \
+        clazz(PlayerbotAI* ai) : SpellCanBeCastInstantTrigger(ai, spell) {} \
     }
 
 #define INTERRUPT_TRIGGER(clazz, spell) \
@@ -257,6 +257,21 @@ class clazz : public super \
     { \
     public: \
         clazz(PlayerbotAI* ai) : DeflectSpellTrigger(ai, spell) {} \
+    }
+
+#define BOOST_TRIGGER(clazz, spell) \
+    class clazz : public BoostTrigger \
+    { \
+    public: \
+        clazz(PlayerbotAI* ai) : BoostTrigger(ai, spell) {} \
+    }
+
+#define BOOST_TRIGGER_A(clazz, spell) \
+    class clazz : public BoostTrigger \
+    { \
+    public: \
+        clazz(PlayerbotAI* ai) : BoostTrigger(ai, spell) {} \
+        virtual bool IsActive(); \
     }
 
 #define BOOST_BUFF_TRIGGER(clazz, spell) \
@@ -525,10 +540,10 @@ class clazz : public CastDebuffSpellAction \
         clazz(PlayerbotAI* ai) : CastDebuffSpellAction(ai, name) {} \
 
 #define BEGIN_RANGED_SPELL_ACTION(clazz, name) \
-class clazz : public CastSpellAction \
+class clazz : public CastRangeSpellAction \
         { \
         public: \
-        clazz(PlayerbotAI* ai) : CastSpellAction(ai, name) {} \
+        clazz(PlayerbotAI* ai) : CastRangeSpellAction(ai, name) {} \
         virtual bool isPossible() { return ai->HasStrategy("ranged", BOT_STATE_COMBAT); } \
 
 #define BEGIN_MELEE_SPELL_ACTION(clazz, name) \
