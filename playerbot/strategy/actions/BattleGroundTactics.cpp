@@ -4784,7 +4784,7 @@ bool BGTactics::useBuff()
     if (closeObjects.empty())
         return false;
 
-    bool needRegen = bot->GetHealthPercent() < sPlayerbotAIConfig.mediumHealth || (AI_VALUE2(bool, "has mana", "self target") && AI_VALUE2(uint8, "mana", "self target") < sPlayerbotAIConfig.mediumMana);
+    bool needRegen = bot->GetHealthPercent() < sPlayerbotAIConfig.mediumHealth || (AI_VALUE2(bool, "has mana", "self target") && AI_VALUE2(float, "mana", "self target") < sPlayerbotAIConfig.mediumMana);
 #ifdef MANGOSBOT_ZERO
     bool needSpeed = (bot->HasAura(BG_WS_SPELL_WARSONG_FLAG) || bot->HasAura(BG_WS_SPELL_SILVERWING_FLAG)) || !(teamFlagTaken() || flagTaken());
 #else

@@ -177,7 +177,7 @@ namespace ai
         ViperStingTrigger(PlayerbotAI* ai) : DebuffTrigger(ai, "viper sting") {}
         virtual bool IsActive()
         {
-            return DebuffTrigger::IsActive() && GetTarget() && GetTarget()->IsPlayer() && AI_VALUE2(uint8, "mana", "current target") >= 10;
+            return DebuffTrigger::IsActive() && GetTarget() && GetTarget()->IsPlayer() && AI_VALUE2(float, "mana", "current target") >= 10;
         }
     };
 

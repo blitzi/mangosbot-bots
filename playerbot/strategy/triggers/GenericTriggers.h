@@ -963,7 +963,7 @@ namespace ai
         CannibalizeTrigger(PlayerbotAI* ai) : Trigger(ai, "cannibalize") {}
         virtual bool IsActive()
         {
-            if (AI_VALUE2(uint8, "health", "self target") > sPlayerbotAIConfig.almostFullHealth)
+            if (AI_VALUE2(float, "health", "self target") > sPlayerbotAIConfig.almostFullHealth)
                 return false;
 
             list<ObjectGuid> corpses = context->GetValue<list<ObjectGuid> >("nearest corpses")->Get();
@@ -1077,7 +1077,7 @@ namespace ai
         {
             Unit* target = AI_VALUE(Unit*, "current target");
             return target && AI_VALUE2(bool, "combat", "self target") && AI_VALUE2(float, "distance", "current target") <= 8.0f &&
-                (AI_VALUE2(uint8, "health", "self target") < sPlayerbotAIConfig.mediumHealth ||
+                (AI_VALUE2(float, "health", "self target") < sPlayerbotAIConfig.mediumHealth ||
                     AI_VALUE(uint8, "my attacker count") >= 3 ||
                     target->IsNonMeleeSpellCasted(true));
         }

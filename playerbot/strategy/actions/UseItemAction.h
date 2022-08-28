@@ -284,7 +284,7 @@ namespace ai
            if (bot->getClass() == CLASS_MAGE) // mage should use mana gem, shares cd with dark rune
                return false;
 
-           return bot->GetLevel() == 60 && AI_VALUE2(uint8, "health", "self target") > sPlayerbotAIConfig.lowHealth;
+           return bot->GetLevel() == 60 && AI_VALUE2(float, "health", "self target") > sPlayerbotAIConfig.lowHealth;
        }
        virtual bool Execute(Event event)
        {

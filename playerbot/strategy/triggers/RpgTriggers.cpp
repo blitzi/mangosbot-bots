@@ -517,7 +517,7 @@ bool RpgDuelTrigger::IsActive()
     }
 
     // do not auto duel with low hp
-    if (AI_VALUE2(uint8, "health", "self target") < 90)
+    if (AI_VALUE2(float, "health", "self target") < 90)
         return false;
 
     GuidPosition guidP(getGuidP());
