@@ -48,7 +48,7 @@ bool FollowAction::isUseful()
     {
         GuidPosition guidP(fTarget);
         Player* fPlayer = guidP.GetPlayer();
-        if (fPlayer->GetPlayerbotAI() && AI_VALUE(GuidPosition, "rpg target") && bot->IsMoving())
+        if (fPlayer && fPlayer->GetPlayerbotAI() && AI_VALUE(GuidPosition, "rpg target") && bot->IsMoving())
             return false;
     }
 
