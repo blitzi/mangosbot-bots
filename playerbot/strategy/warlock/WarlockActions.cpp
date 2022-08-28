@@ -24,6 +24,8 @@ bool UseSoulStone::Execute(Event event)
         if (spellstone)
             ai->ImbueItem(spellstone, ai->GetMaster());
     }
+
+	return true;
 }
 
 bool RemoveToManySoulShards::Execute(Event event)
@@ -73,4 +75,6 @@ bool UseSpellStone::Execute(Event event)
                 ai->ImbueItem(spellstone, EQUIPMENT_SLOT_MAINHAND);
         }
     }
+
+	return true;
 }
