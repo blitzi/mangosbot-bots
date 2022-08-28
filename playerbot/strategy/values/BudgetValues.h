@@ -12,7 +12,9 @@ namespace ai
         consumables = 5,
         gear = 6,
         guild = 7,
-        anything = 8
+        tradeskill = 8,
+        ah = 9,
+        anything = 10
     };
 
     class MaxGearRepairCostValue : public Uint32CalculatedValue
@@ -52,7 +54,7 @@ namespace ai
         TotalMoneyNeededForValue(PlayerbotAI* ai) : Uint32CalculatedValue(ai, "total money needed for", 60) {}
         virtual uint32 Calculate();
     private:
-        vector<NeedMoneyFor> saveMoneyFor = { NeedMoneyFor::guild,NeedMoneyFor::repair,NeedMoneyFor::ammo, NeedMoneyFor::spells, NeedMoneyFor::travel };
+        vector<NeedMoneyFor> saveMoneyFor = { NeedMoneyFor::repair,NeedMoneyFor::ammo, NeedMoneyFor::ah, NeedMoneyFor::guild, NeedMoneyFor::spells, NeedMoneyFor::travel };
     };
 
     class FreeMoneyForValue : public Uint32CalculatedValue, public Qualified
@@ -66,7 +68,7 @@ namespace ai
     {
     public:
         ShouldGetMoneyValue(PlayerbotAI* ai) : BoolCalculatedValue(ai, "should get money",2) {}
-        virtual bool Calculate() { return !AI_VALUE2(uint32, "free money for", (uint32)NeedMoneyFor::anything); };
+        virtual bool Calculate() { return bot->GetLevel() > 6 && !AI_VALUE2(uint32, "free money for", (uint32)NeedMoneyFor::anything); };
     };
 }
 

@@ -19,6 +19,10 @@ void FleeManager::calculateDistanceToCreatures(FleePoint *point)
 		if (!unit)
 		    continue;
 
+        // do not count non-LOS mobs
+        if (!unit->IsWithinLOS(point->x, point->y, point->z + unit->GetCollisionHeight(), true))
+            continue;
+
 		float d = sServerFacade.GetDistance2d(unit, point->x, point->y);
         point->sumDistance += d;
         if (point->minDistance < 0 || point->minDistance > d) point->minDistance = d;

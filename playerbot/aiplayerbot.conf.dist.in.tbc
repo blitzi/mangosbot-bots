@@ -29,6 +29,9 @@ AiPlayerbot.RandomBotJoinLfg = 1
 # Enable BG/Arena for random Bots
 AiPlayerbot.RandomBotJoinBG = 1
 
+# Enable Auto join BG - bots randomly join WSG and 2v2 Arena if server is not lagging
+AiPlayerbot.RandomBotAutoJoinBG = 1
+
 # Mark many quests <= Bot level as complete (slows down bot creation)
 AiPlayerbot.PreQuests = 0
 
@@ -39,11 +42,14 @@ AiPlayerbot.RandomBotAutoCreate = 1
 AiPlayerbot.MinRandomBots = 1000
 AiPlayerbot.MaxRandomBots = 1000
 AiPlayerbot.RandomBotMinLevel = 1
-AiPlayerbot.RandomBotMaxLevel = 255
+AiPlayerbot.RandomBotMaxLevel = 70
 
 # Accounts to create for random bots
 AiPlayerbot.RandomBotAccountPrefix = rndbot
 AiPlayerbot.RandomBotAccountCount = 200
+
+# Percentage of fully active bots. Default is 10, higher numbers may affect performance
+AiPlayerbot.botActiveAlone = 10
 
 # Random bot guild count
 AiPlayerbot.RandomBotGuildCount = 20

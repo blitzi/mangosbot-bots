@@ -3,11 +3,19 @@
 #include "PvpTriggers.h"
 #include "ServerFacade.h"
 #include "BattleGroundWS.h"
+#include "strategy/values/PositionValue.h"
+#ifndef MANGOSBOT_ZERO
+#include "BattleGroundEY.h"
+#endif
 
 using namespace ai;
 
 bool EnemyPlayerNear::IsActive()
 {
+    Unit* current = AI_VALUE(Unit*, "current target");
+    if (current)
+        return current != AI_VALUE(Unit*, "enemy player target");
+
     return AI_VALUE(Unit*, "enemy player target");
 }
 
@@ -58,6 +66,33 @@ bool BgActiveTrigger::IsActive()
     return false;
 }
 
+bool BgInviteActiveTrigger::IsActive()
+{
+    if (bot->InBattleGround() || !bot->InBattleGroundQueue())
+    {
+        return false;
+    }
+
+    for (int i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
+    {
+        BattleGroundQueueTypeId queueTypeId = bot->GetBattleGroundQueueTypeId(i);
+        if (queueTypeId == BATTLEGROUND_QUEUE_NONE)
+            continue;
+
+        BattleGroundQueue& bgQueue = sServerFacade.bgQueue(queueTypeId);
+        GroupQueueInfo ginfo;
+        if (bgQueue.GetPlayerGroupInfoData(bot->GetObjectGuid(), &ginfo))
+        {
+            if (ginfo.isInvitedToBgInstanceGuid && ginfo.removeInviteTime)
+            {
+                sLog.outDetail("Bot #%d <%s> (%u %s) : Invited to BG but not in BG", bot->GetGUIDLow(), bot->GetName(), bot->GetLevel(), bot->GetTeam() == ALLIANCE ? "A" : "H");
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 bool PlayerIsInBattlegroundWithoutFlag::IsActive()
 {
 #ifdef MANGOS
@@ -81,16 +116,27 @@ bool PlayerIsInBattlegroundWithoutFlag::IsActive()
 
 bool PlayerHasFlag::IsActive()
 {
+    ai::PositionEntry pos = context->GetValue<ai::PositionMap&>("position")->Get()["bg objective"];
     if (bot->InBattleGround())
     {
         if (bot->GetBattleGroundTypeId() == BattleGroundTypeId::BATTLEGROUND_WS)
         {
+            if (pos.isSet() && sServerFacade.GetDistance2d(bot, pos.x, pos.y) < 10.0f)
+                return false;
+
             BattleGroundWS *bg = (BattleGroundWS*)ai->GetBot()->GetBattleGround();
             if (bot->GetObjectGuid() == bg->GetFlagCarrierGuid(TEAM_INDEX_ALLIANCE) || bot->GetObjectGuid() == bg->GetFlagCarrierGuid(TEAM_INDEX_HORDE))
             {
                 return true;
             }
         }
+#ifndef MANGOSBOT_ZERO
+        if (bot->GetBattleGroundTypeId() == BattleGroundTypeId::BATTLEGROUND_EY)
+        {
+            BattleGroundEY* bg = (BattleGroundEY*)ai->GetBot()->GetBattleGround();
+            return bot->GetObjectGuid() == bg->GetFlagCarrierGuid();
+        }
+#endif
         return false;
     }
     return false;
@@ -146,13 +192,13 @@ bool EnemyTeamHasFlag::IsActive()
 bool EnemyFlagCarrierNear::IsActive()
 {
     Unit* carrier = AI_VALUE(Unit*, "enemy flag carrier");
-    return carrier && sServerFacade.IsDistanceLessOrEqualThan(sServerFacade.GetDistance2d(bot, carrier), VISIBILITY_DISTANCE_LARGE);
+    return carrier && sServerFacade.IsDistanceLessOrEqualThan(sServerFacade.GetDistance2d(bot, carrier), VISIBILITY_DISTANCE_SMALL);
 }
 
 bool TeamFlagCarrierNear::IsActive()
 {
     Unit* carrier = AI_VALUE(Unit*, "team flag carrier");
-    return carrier && sServerFacade.IsDistanceLessOrEqualThan(sServerFacade.GetDistance2d(bot, carrier), VISIBILITY_DISTANCE_LARGE);
+    return carrier && sServerFacade.IsDistanceLessOrEqualThan(sServerFacade.GetDistance2d(bot, carrier), VISIBILITY_DISTANCE_SMALL);
 }
 
 bool PlayerWantsInBattlegroundTrigger::IsActive()
@@ -171,3 +217,14 @@ bool PlayerWantsInBattlegroundTrigger::IsActive()
 
     return true;
 };
+
+bool VehicleNearTrigger::IsActive()
+{
+    list<ObjectGuid> npcs = AI_VALUE(list<ObjectGuid>, "nearest vehicles");
+    return npcs.size();
+}
+
+bool InVehicleTrigger::IsActive()
+{
+    return ai->IsInVehicle();
+}

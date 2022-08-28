@@ -70,6 +70,8 @@ namespace ai
                 bot->CastSpell(bot, 2584, TRIGGERED_OLD_TRIGGERED);
             }
 
+            sTravelMgr.logEvent(ai, "AutoReleaseSpiritAction");           
+
             return true;
         }
 
@@ -84,7 +86,7 @@ namespace ai
 #endif
 
             if (bot->InBattleGround())
-                return !bot->GetCorpse();
+                return !bot->GetCorpse() || !bot->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST);
 
             if (bot->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST))
                 return false;
@@ -98,7 +100,13 @@ namespace ai
             if (ai->GetGroupMaster() == bot)
                 return true;
 
-            if(ai->GetGroupMaster() && sServerFacade.UnitIsDead(ai->GetGroupMaster()))
+            if (!ai->HasActivePlayerMaster())
+                return true;
+
+            if (ai->HasActivePlayerMaster() && ai->GetGroupMaster()->GetMapId() == bot->GetMapId() && bot->GetMap() && (bot->GetMap()->IsRaid() || bot->GetMap()->IsDungeon()))
+                return false;
+
+            if(sServerFacade.UnitIsDead(ai->GetGroupMaster()))
                 return true;
 
             if (sServerFacade.IsDistanceGreaterThan(AI_VALUE2(float, "distance", "master target"), sPlayerbotAIConfig.sightDistance))
@@ -136,11 +144,17 @@ namespace ai
 
             bot->TeleportTo(ClosestGrave->map_id, ClosestGrave->x, ClosestGrave->y, ClosestGrave->z, ClosestGrave->o);
 
+            RESET_AI_VALUE(bool,"combat::self target");
+            RESET_AI_VALUE(WorldPosition, "current position");
+
             return true;
         }
 
         virtual bool isUseful()
         {
+            if (bot->InBattleGround())
+                return false;
+
             return true;
         }
     };

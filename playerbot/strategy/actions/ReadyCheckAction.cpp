@@ -68,7 +68,7 @@ public:
         Player* master = ai->GetMaster();
         if (master)
         {
-            bool distance = bot->GetDistance(master) <= sPlayerbotAIConfig.sightDistance;
+            bool distance = sServerFacade.GetDistance2d(bot, master) <= sPlayerbotAIConfig.sightDistance;
             if (!distance)
             {
                 return false;
@@ -141,7 +141,7 @@ public:
 
 bool ReadyCheckAction::Execute(Event event)
 {
-    WorldPacket &p = event.getPacket();
+    WorldPacket p = event.getPacket();
     ObjectGuid player;
     p.rpos(0);
     if (!p.empty())
@@ -200,7 +200,6 @@ bool ReadyCheckAction::ReadyCheck()
     ai->TellMaster(out);
 
     WorldPacket packet(MSG_RAID_READY_CHECK);
-    packet << bot->GetObjectGuid();
     packet << uint8(1);
     bot->GetSession()->HandleRaidReadyCheckOpcode(packet);
 

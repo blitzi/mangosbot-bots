@@ -27,7 +27,7 @@ namespace ai
         virtual bool isUseful()
         {
             // if carry flag, do not start fight
-            if (bot->HasAura(23333) || bot->HasAura(23335))
+            if (bot->HasAura(23333) || bot->HasAura(23335) || bot->HasAura(34976))
                 return false;
 
             return true;
@@ -89,9 +89,7 @@ namespace ai
                     if (grindName)
                     {
                         context->GetValue<ObjectGuid>("pull target")->Set(grindTarget->GetObjectGuid());
-                        MotionMaster& mm = *bot->GetMotionMaster();
-                        bot->StopMoving();
-                        mm.Clear();
+                        ai->StopMoving();
                     }
                 }
             }
@@ -114,10 +112,10 @@ namespace ai
         virtual bool isUseful() {
 
             // if carry flag, do not start fight
-            if (bot->HasAura(23333) || bot->HasAura(23335))
+            if (bot->HasAura(23333) || bot->HasAura(23335) || bot->HasAura(34976))
                 return false;
 
-            return !sPlayerbotAIConfig.IsInPvpProhibitedZone(bot->GetAreaId());
+            return !sPlayerbotAIConfig.IsInPvpProhibitedZone(sServerFacade.GetAreaId(bot));
         }
     };
 
@@ -135,7 +133,7 @@ namespace ai
         virtual string GetTargetName() { return "enemy flag carrier"; }
         virtual bool isUseful() {
             Unit* target = context->GetValue<Unit*>("enemy flag carrier")->Get();
-            return target && sServerFacade.IsDistanceLessOrEqualThan(sServerFacade.GetDistance2d(bot, target), 75.0f) && (bot->HasAura(23333) || bot->HasAura(23335));
+            return target && sServerFacade.IsDistanceLessOrEqualThan(sServerFacade.GetDistance2d(bot, target), 75.0f) && (bot->HasAura(23333) || bot->HasAura(23335) || bot->HasAura(34976));
         }
     };
 
@@ -166,7 +164,26 @@ namespace ai
             }
             context->GetValue<Unit*>("current target")->Set(NULL);
             bot->SetSelectionGuid(ObjectGuid());
-			ai->StopMoving();
+
+            // attack next target if in combat
+            uint32 attackers = AI_VALUE(uint8, "attacker count");
+            if (attackers > 0)
+            {
+                Unit* enemy = AI_VALUE(Unit*, "enemy player target");
+                if (!enemy)
+                {
+                    ai->ChangeEngine(BOT_STATE_NON_COMBAT);
+                    ai->InterruptSpell();
+                    bot->AttackStop();
+
+                    if (ai->HasStrategy("dps assist", BOT_STATE_NON_COMBAT))
+                        return ai->DoSpecificAction("dps assist", Event(), true);
+                    if (ai->HasStrategy("tank assist", BOT_STATE_NON_COMBAT))
+                        return ai->DoSpecificAction("tank assist", Event(), true);
+                }
+            }
+
+            ai->ChangeEngine(BOT_STATE_NON_COMBAT);
             ai->InterruptSpell();
             bot->AttackStop();
             Pet* pet = bot->GetPet();
@@ -190,21 +207,6 @@ namespace ai
 #endif
                     pet->AttackStop();
                 }
-            }
-            if (!urand(0, 25))
-            {
-                vector<uint32> sounds;
-                if (target && sServerFacade.UnitIsDead(target))
-                {
-                    sounds.push_back(TEXTEMOTE_CHEER);
-                    sounds.push_back(TEXTEMOTE_CONGRATULATE);
-                }
-                else
-                {
-                    sounds.push_back(304); // guard
-                    sounds.push_back(325); // stay
-                }
-                if (!sounds.empty()) ai->PlaySound(sounds[urand(0, sounds.size() - 1)]);
             }
             return true;
         }

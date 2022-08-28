@@ -106,8 +106,20 @@ namespace ai
             if (ground <= INVALID_HEIGHT)
                 return Formation::NullLocation;
 
-            //z += CONTACT_DISTANCE;
-            //bot->UpdateAllowedPositionZ(x, y, z);
+            // prevent going into terrain
+            float ox, oy, oz;
+            master->GetPosition(ox, oy, oz);
+#ifdef MANGOSBOT_TWO
+            master->GetMap()->GetHitPosition(ox, oy, oz + bot->GetCollisionHeight(), x, y, z, bot->GetPhaseMask(), -0.5f);
+#else
+            master->GetMap()->GetHitPosition(ox, oy, oz + bot->GetCollisionHeight(), x, y, z, -0.5f);
+#endif
+
+            if (!bot->IsFlying() && !bot->IsFreeFlying())
+            {
+                z += CONTACT_DISTANCE;
+                bot->UpdateAllowedPositionZ(x, y, z);
+            }
             return WorldLocation(master->GetMapId(), x, y, z);
         }
 
@@ -147,8 +159,11 @@ namespace ai
             if (ground <= INVALID_HEIGHT)
                 return Formation::NullLocation;
 
-            z += CONTACT_DISTANCE;
-            bot->UpdateAllowedPositionZ(x, y, z);
+            if (!bot->IsFlying() && !bot->IsFreeFlying())
+            {
+                z += CONTACT_DISTANCE;
+                bot->UpdateAllowedPositionZ(x, y, z);
+            }
             return WorldLocation(master->GetMapId(), x, y, z);
         }
 
@@ -205,8 +220,11 @@ namespace ai
             if (ground <= INVALID_HEIGHT)
                 return Formation::NullLocation;
 
-            z += CONTACT_DISTANCE;
-            bot->UpdateAllowedPositionZ(x, y, z);
+            if (!bot->IsFlying() && !bot->IsFreeFlying())
+            {
+                z += CONTACT_DISTANCE;
+                bot->UpdateAllowedPositionZ(x, y, z);
+            }
             return WorldLocation(bot->GetMapId(), x, y, z);
         }
     };
@@ -363,16 +381,30 @@ namespace ai
                 }
                 if (minDist)
                 {
-                    z += CONTACT_DISTANCE;
-                    bot->UpdateAllowedPositionZ(minX, minY, z);
+                    if (!bot->IsFlying() && !bot->IsFreeFlying())
+                    {
+                        z += CONTACT_DISTANCE;
+                        bot->UpdateAllowedPositionZ(minX, minY, z);
+                    }
                     return WorldLocation(bot->GetMapId(), minX, minY, z);
                 }
 
                 return Formation::NullLocation;
             }
 
-            z += CONTACT_DISTANCE;
-            bot->UpdateAllowedPositionZ(x, y, z);
+            // prevent going into terrain
+            float ox, oy, oz;
+            master->GetPosition(ox, oy, oz);
+#ifdef MANGOSBOT_TWO
+            master->GetMap()->GetHitPosition(ox, oy, oz + bot->GetCollisionHeight(), x, y, z, bot->GetPhaseMask(), -0.5f);
+#else
+            master->GetMap()->GetHitPosition(ox, oy, oz + bot->GetCollisionHeight(), x, y, z, -0.5f);
+#endif
+            if (!bot->IsFlying() && !bot->IsFreeFlying())
+            {
+                z += CONTACT_DISTANCE;
+                bot->UpdateAllowedPositionZ(x, y, z);
+            }
             return WorldLocation(bot->GetMapId(), x, y, z);
         }
     };
@@ -384,7 +416,7 @@ float Formation::GetFollowAngle(bool onlyRanged, bool followMaster)
     Group* group = bot->GetGroup();
     PlayerbotAI* ai = bot->GetPlayerbotAI();
     int index = 1, total = 1;
-    if (!group && master && !master->GetPlayerbotAI())
+    if (!group && master && !master->GetPlayerbotAI() && master->GetPlayerbotMgr())
     {
         for (PlayerBotMap::const_iterator i = master->GetPlayerbotMgr()->GetPlayerBotsBegin(); i != master->GetPlayerbotMgr()->GetPlayerBotsEnd(); ++i)
         {
@@ -400,6 +432,7 @@ float Formation::GetFollowAngle(bool onlyRanged, bool followMaster)
         for (GroupReference *ref = group->GetFirstMember(); ref; ref = ref->next())
         {
             Player* member = ref->getSource();
+            if (!member || !sServerFacade.IsAlive(member) || bot->GetMapId() != member->GetMapId()) continue;
 
             if (onlyRanged && !ai->IsRanged(member))
                 continue;
@@ -412,6 +445,7 @@ float Formation::GetFollowAngle(bool onlyRanged, bool followMaster)
         for (GroupReference *ref = group->GetFirstMember(); ref; ref = ref->next())
         {
             Player* member = ref->getSource();
+            if (!member || !sServerFacade.IsAlive(member) || bot->GetMapId() != member->GetMapId()) continue;
 
             if (onlyRanged && !ai->IsRanged(member))
                 continue;
@@ -425,6 +459,7 @@ float Formation::GetFollowAngle(bool onlyRanged, bool followMaster)
         for (GroupReference *ref = group->GetFirstMember(); ref; ref = ref->next())
         {
             Player* member = ref->getSource();
+            if (!member || !sServerFacade.IsAlive(member) || bot->GetMapId() != member->GetMapId()) continue;
 
             if (onlyRanged && !ai->IsRanged(member))
                 continue;
@@ -604,8 +639,11 @@ WorldLocation MoveFormation::MoveSingleLine(vector<Player*> line, float diff, fl
             if (ground <= INVALID_HEIGHT)
                 return Formation::NullLocation;
 
-            lz += CONTACT_DISTANCE;
-            bot->UpdateAllowedPositionZ(lx, ly, lz);
+            if (!bot->IsFlying() && !bot->IsFreeFlying())
+            {
+                lz += CONTACT_DISTANCE;
+                bot->UpdateAllowedPositionZ(lx, ly, lz);
+            }
             return WorldLocation(bot->GetMapId(), lx, ly, lz);
         }
 

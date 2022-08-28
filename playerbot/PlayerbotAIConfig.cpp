@@ -103,11 +103,14 @@ bool PlayerbotAIConfig::Initialize()
     criticalHealth = config.GetIntDefault("AiPlayerbot.CriticalHealth", 20);
     lowHealth = config.GetIntDefault("AiPlayerbot.LowHealth", 50);
     mediumHealth = config.GetIntDefault("AiPlayerbot.MediumHealth", 70);
-    almostFullHealth = config.GetIntDefault("AiPlayerbot.AlmostFullHealth", 85);
+    almostFullHealth = config.GetIntDefault("AiPlayerbot.AlmostFullHealth", 90);
     lostAnyHealth = config.GetIntDefault("AiPlayerbot.LostAnyHealth", 98);
     lowMana = config.GetIntDefault("AiPlayerbot.LowMana", 15);
     mediumMana = config.GetIntDefault("AiPlayerbot.MediumMana", 40);
 
+    randomGearMaxLevel = config.GetIntDefault("AiPlayerbot.RandomGearMaxLevel", 500);
+    randomGearMaxDiff = config.GetIntDefault("AiPlayerbot.RandomGearMaxDiff", 5);
+    randomGearProgression = config.GetBoolDefault("AiPlayerbot.RandomGearProgression", true);
     randomGearLoweringChance = config.GetFloatDefault("AiPlayerbot.RandomGearLoweringChance", 0.15f);
     randomBotMaxLevelChance = config.GetFloatDefault("AiPlayerbot.RandomBotMaxLevelChance", 0.15f);
     randomBotRpgChance = config.GetFloatDefault("AiPlayerbot.RandomBotRpgChance", 0.35f);
@@ -118,8 +121,8 @@ bool PlayerbotAIConfig::Initialize()
 
     randomBotMapsAsString = config.GetStringDefault("AiPlayerbot.RandomBotMaps", "0,1,530,571");
     LoadList<vector<uint32> >(randomBotMapsAsString, randomBotMaps);
-    LoadList<list<uint32> >(config.GetStringDefault("AiPlayerbot.RandomBotQuestItems", "6948,5175,5176,5177,5178,16309,12382,13704,11000"), randomBotQuestItems);
-    LoadList<list<uint32> >(config.GetStringDefault("AiPlayerbot.RandomBotSpellIds", "1"), randomBotSpellIds);
+    LoadList<list<uint32> >(config.GetStringDefault("AiPlayerbot.RandomBotQuestItems", "6948,5175,5176,5177,5178,16309,12382,13704,11000,22754"), randomBotQuestItems);
+    LoadList<list<uint32> >(config.GetStringDefault("AiPlayerbot.RandomBotSpellIds", "54197"), randomBotSpellIds);
 	LoadList<list<uint32> >(config.GetStringDefault("AiPlayerbot.PvpProhibitedZoneIds", "2255,656,2361,2362,2363,976,35,2268,3425,392,541,1446"), pvpProhibitedZoneIds);
     LoadList<list<uint32> >(config.GetStringDefault("AiPlayerbot.RandomBotQuestIds", "7848,3802,5505,6502,7761"), randomBotQuestIds);
     LoadList<list<uint32> >(config.GetStringDefault("AiPlayerbot.DamageStopSpellIds", "69051,69172"), damageStopSpellIds);
@@ -130,16 +133,24 @@ bool PlayerbotAIConfig::Initialize()
     randomBotAutologin = config.GetBoolDefault("AiPlayerbot.RandomBotAutologin", true);
 	numRandomBots = config.GetIntDefault("AiPlayerbot.NumRandomBots", 800);
     randomBotUpdateInterval = config.GetIntDefault("AiPlayerbot.RandomBotUpdateInterval", 60);
-    randomBotCountChangeMinInterval = config.GetIntDefault("AiPlayerbot.RandomBotCountChangeMinInterval", 1 * 60);
-    randomBotCountChangeMaxInterval = config.GetIntDefault("AiPlayerbot.RandomBotCountChangeMaxInterval", 2 * 120);
-    minRandomBotInWorldTime = config.GetIntDefault("AiPlayerbot.MinRandomBotInWorldTime", 24 * 3600);
-    maxRandomBotInWorldTime = config.GetIntDefault("AiPlayerbot.MaxRandomBotInWorldTime", 168 * 3600);
+    randomBotCountChangeMinInterval = config.GetIntDefault("AiPlayerbot.RandomBotCountChangeMinInterval", 1 * 1800);
+    randomBotCountChangeMaxInterval = config.GetIntDefault("AiPlayerbot.RandomBotCountChangeMaxInterval", 2 * 3600);
+    minRandomBotInWorldTime = config.GetIntDefault("AiPlayerbot.MinRandomBotInWorldTime", 1 * 1800);
+    maxRandomBotInWorldTime = config.GetIntDefault("AiPlayerbot.MaxRandomBotInWorldTime", 6 * 3600);
+    minRandomBotRandomizeTime = config.GetIntDefault("AiPlayerbot.MinRandomBotRandomizeTime", 2 * 3600);
+    maxRandomBotRandomizeTime = config.GetIntDefault("AiPlayerbot.MaxRandomRandomizeTime", 12 * 3600);
+    minRandomBotChangeStrategyTime = config.GetIntDefault("AiPlayerbot.MinRandomBotChangeStrategyTime", 1800);
+    maxRandomBotChangeStrategyTime = config.GetIntDefault("AiPlayerbot.MaxRandomBotChangeStrategyTime", 2 * 3600);
+    minRandomBotReviveTime = config.GetIntDefault("AiPlayerbot.MinRandomBotReviveTime", 60);
+    maxRandomBotReviveTime = config.GetIntDefault("AiPlayerbot.MaxRandomReviveTime", 300);
     randomBotTeleportDistance = config.GetIntDefault("AiPlayerbot.RandomBotTeleportDistance", 1000);
     randomBotsPerInterval = config.GetIntDefault("AiPlayerbot.RandomBotsPerInterval", 50);
     minRandomBotsPriceChangeInterval = config.GetIntDefault("AiPlayerbot.MinRandomBotsPriceChangeInterval", 2 * 3600);
     maxRandomBotsPriceChangeInterval = config.GetIntDefault("AiPlayerbot.MaxRandomBotsPriceChangeInterval", 48 * 3600);
     randomBotJoinLfg = config.GetBoolDefault("AiPlayerbot.RandomBotJoinLfg", true);
     randomBotJoinBG = config.GetBoolDefault("AiPlayerbot.RandomBotJoinBG", true);
+    randomBotAutoJoinBG = config.GetBoolDefault("AiPlayerbot.RandomBotAutoJoinBG", false);
+    randomBotBracketCount = config.GetIntDefault("AiPlayerbot.RandomBotBracketCount", 3);
     logInGroupOnly = config.GetBoolDefault("AiPlayerbot.LogInGroupOnly", true);
     logValuesPerTick = config.GetBoolDefault("AiPlayerbot.LogValuesPerTick", false);
     fleeingEnabled = config.GetBoolDefault("AiPlayerbot.FleeingEnabled", false);
@@ -151,7 +162,7 @@ bool PlayerbotAIConfig::Initialize()
     randomChangeMultiplier = config.GetFloatDefault("AiPlayerbot.RandomChangeMultiplier", 1.0);
 
     randomBotCombatStrategies = config.GetStringDefault("AiPlayerbot.RandomBotCombatStrategies", "-threat,+custom::say");
-    randomBotNonCombatStrategies = config.GetStringDefault("AiPlayerbot.RandomBotNonCombatStrategies", "");
+    randomBotNonCombatStrategies = config.GetStringDefault("AiPlayerbot.RandomBotNonCombatStrategies", "+custom::say");
     combatStrategies = config.GetStringDefault("AiPlayerbot.CombatStrategies", "");
     nonCombatStrategies = config.GetStringDefault("AiPlayerbot.NonCombatStrategies", "");
 
@@ -245,12 +256,15 @@ bool PlayerbotAIConfig::Initialize()
     {
         for (uint32 classId = 0; classId < MAX_CLASSES; classId++)
         {
-            for (uint32 minLevel = 0; minLevel < MAX_LEVEL; minLevel++)
+            for (uint32 specId = 0; specId < 4; specId++)
             {
-                for (uint32 maxLevel = 0; maxLevel < MAX_LEVEL; maxLevel++)
+                for (uint32 minLevel = 0; minLevel < MAX_LEVEL; minLevel++)
                 {
-                    loadWorldBuf(&config, factionId, classId, minLevel, maxLevel);
-                 }
+                    for (uint32 maxLevel = 0; maxLevel < MAX_LEVEL; maxLevel++)
+                    {
+                        loadWorldBuf(&config, factionId, classId, specId, minLevel, maxLevel);
+                    }
+                }
             }
         }
     }
@@ -299,6 +313,7 @@ bool PlayerbotAIConfig::Initialize()
     autoPickTalents = config.GetStringDefault("AiPlayerbot.AutoPickTalents", "no");
     autoLearnTrainerSpells = config.GetBoolDefault("AiPlayerbot.AutoLearnTrainerSpells", false);
     autoLearnQuestSpells = config.GetBoolDefault("AiPlayerbot.AutoLearnQuestSpells", false);
+    freeFood = config.GetBoolDefault("AiPlayerbot.FreeFood", true);
 
     selfBotLevel = config.GetIntDefault("AiPlayerbot.SelfBotLevel", 1);
 
@@ -314,6 +329,8 @@ bool PlayerbotAIConfig::Initialize()
 	sLog.outString("Randomize Items...");
 
     sRandomItemMgr.Init();
+    sPlayerbotTextMgr.LoadBotTexts();
+    sPlayerbotTextMgr.LoadBotTextChance();
 
     sLog.outString("Loading Travel Detail Data...");
     sTravelMgr.LoadTravelTable();
@@ -423,47 +440,60 @@ void PlayerbotAIConfig::SetValue(string name, string value)
 }
 
 
-void PlayerbotAIConfig::loadWorldBuf(Config* config, uint32 factionId1, uint32 classId1, uint32 minLevel1, uint32 maxLevel1)
+void PlayerbotAIConfig::loadWorldBuf(Config* config, uint32 factionId1, uint32 classId1, uint32 specId1, uint32 minLevel1, uint32 maxLevel1)
 {
     list<uint32> buffs;
 
-    ostringstream os; os << "AiPlayerbot.WorldBuff." << factionId1 << "." << classId1 << "." << minLevel1 << "." << maxLevel1;
+    ostringstream os; os << "AiPlayerbot.WorldBuff." << factionId1 << "." << classId1 << "." << specId1 << "." << minLevel1 << "." << maxLevel1;
 
     LoadList<list<uint32> >(config->GetStringDefault(os.str().c_str(), ""), buffs);
 
     for (auto buff : buffs)
     {
-        worldBuff wb = { buff, factionId1, classId1, minLevel1, maxLevel1 };
+        worldBuff wb = { buff, factionId1, classId1, specId1, minLevel1, maxLevel1 };
         worldBuffs.push_back(wb);
     }
 
     if (maxLevel1 == 0)
     {
-        ostringstream os; os << "AiPlayerbot.WorldBuff." << factionId1 << "." << classId1 << "." << minLevel1;
+        ostringstream os; os << "AiPlayerbot.WorldBuff." << factionId1 << "." << classId1 << "." << specId1 << "." << minLevel1;
 
         LoadList<list<uint32> >(config->GetStringDefault(os.str().c_str(), ""), buffs);
 
         for (auto buff : buffs)
         {
-            worldBuff wb = { buff, factionId1, classId1, minLevel1, maxLevel1 };
+            worldBuff wb = { buff, factionId1, classId1, specId1, minLevel1, maxLevel1 };
             worldBuffs.push_back(wb);
         }
     }
 
     if (maxLevel1 == 0 && minLevel1 == 0)
     {
-        ostringstream os; os << "AiPlayerbot.WorldBuff." << factionId1 << "." << factionId1 << "." << classId1;
+        ostringstream os; os << "AiPlayerbot.WorldBuff." << factionId1 << "." << classId1 << "." << specId1;
 
         LoadList<list<uint32> >(config->GetStringDefault(os.str().c_str(), ""), buffs);
 
         for (auto buff : buffs)
         {
-            worldBuff wb = { buff, factionId1, classId1, minLevel1, maxLevel1 };
+            worldBuff wb = { buff, factionId1, classId1, specId1, minLevel1, maxLevel1 };
             worldBuffs.push_back(wb);
         }
     }
 
-    if (classId1 == 0 && maxLevel1 == 0 && minLevel1 == 0)
+    if (specId1 == 0 && maxLevel1 == 0 && minLevel1 == 0)
+    {
+        ostringstream os; os << "AiPlayerbot.WorldBuff." << factionId1 << "." << classId1;
+
+        LoadList<list<uint32> >(config->GetStringDefault(os.str().c_str(), ""), buffs);
+
+        for (auto buff : buffs)
+        {
+            worldBuff wb = { buff, factionId1, classId1, specId1, minLevel1, maxLevel1 };
+            worldBuffs.push_back(wb);
+        }
+    }
+
+    if (specId1 == 0 && classId1 == 0 && maxLevel1 == 0 && minLevel1 == 0)
     {
         ostringstream os; os << "AiPlayerbot.WorldBuff." << factionId1;
 
@@ -471,12 +501,12 @@ void PlayerbotAIConfig::loadWorldBuf(Config* config, uint32 factionId1, uint32 c
 
         for (auto buff : buffs)
         {
-            worldBuff wb = { buff, factionId1, classId1, minLevel1, maxLevel1 };
+            worldBuff wb = { buff, factionId1, classId1, specId1, minLevel1, maxLevel1 };
             worldBuffs.push_back(wb);
         }
     }
 
-    if (factionId1 == 0 && classId1 == 0 && maxLevel1 == 0 && minLevel1 == 0)
+    if (factionId1 == 0 && specId1 == 0 && classId1 == 0 && maxLevel1 == 0 && minLevel1 == 0)
     {
         ostringstream os; os << "AiPlayerbot.WorldBuff";
 
@@ -484,7 +514,7 @@ void PlayerbotAIConfig::loadWorldBuf(Config* config, uint32 factionId1, uint32 c
 
         for (auto buff : buffs)
         {
-            worldBuff wb = { buff, factionId1, classId1, minLevel1, maxLevel1 };
+            worldBuff wb = { buff, factionId1, classId1, specId1, minLevel1, maxLevel1 };
             worldBuffs.push_back(wb);
         }
     }

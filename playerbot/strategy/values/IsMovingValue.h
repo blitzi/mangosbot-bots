@@ -7,7 +7,7 @@ namespace ai
     class IsMovingValue : public BoolCalculatedValue, public Qualified
 	{
 	public:
-        IsMovingValue(PlayerbotAI* ai) : BoolCalculatedValue(ai) {}
+        IsMovingValue(PlayerbotAI* ai, string name = "is moving") : BoolCalculatedValue(ai, name) {}
 
         virtual bool Calculate()
         {
@@ -16,14 +16,14 @@ namespace ai
             if (!target)
                 return false;
 
-            return sServerFacade.isMoving(target);
+            return !target->IsStopped();
         }
     };
 
     class IsSwimmingValue : public BoolCalculatedValue, public Qualified
 	{
 	public:
-        IsSwimmingValue(PlayerbotAI* ai) : BoolCalculatedValue(ai) {}
+        IsSwimmingValue(PlayerbotAI* ai, string name = "is swimming") : BoolCalculatedValue(ai, name) {}
 
         virtual bool Calculate()
         {

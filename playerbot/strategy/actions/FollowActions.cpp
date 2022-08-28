@@ -39,10 +39,18 @@ bool FollowAction::isUseful()
     string target = formation->GetTargetName();
 
     Unit* fTarget = NULL;
-    if(!target.empty())
+    if (!target.empty())
         fTarget = AI_VALUE(Unit*, target);
     else
         fTarget = AI_VALUE(Unit*, "master target");
+
+    if (fTarget && fTarget->IsPlayer())
+    {
+        GuidPosition guidP(fTarget);
+        Player* fPlayer = guidP.GetPlayer();
+        if (fPlayer->GetPlayerbotAI() && AI_VALUE(GuidPosition, "rpg target") && bot->IsMoving())
+            return false;
+    }
 
     if (fTarget)
     {
@@ -96,17 +104,17 @@ bool FleeToMasterAction::Execute(Event event)
 
     if (distance < sPlayerbotAIConfig.reactDistance * 3)
     {
-        if (!urand(0, 3))
-            ai->TellMaster("I am close, wait for me!");
+        if (!urand(0, 5))
+            ai->TellMaster(BOT_TEXT("wait_travel_close"));
     }
     else if (distance < 1000)
     {
-        if (!urand(0, 10))
-            ai->TellMaster("I heading to your position.");
+        if (!urand(0, 20))
+            ai->TellMaster(BOT_TEXT("wait_travel_medium"));
     }
     else
-        if (!urand(0,20))
-            ai->TellMaster("I am traveling to your position.");
+        if (!urand(0, 30))
+            ai->TellMaster(BOT_TEXT("wait_travel_medium"));
            
     return true;
 }

@@ -35,7 +35,7 @@ LfgRoles LfgJoinAction::GetRoles()
         if (spec == 2)
             return PLAYER_ROLE_HEALER;
         else if (spec == 1 && bot->GetLevel() >= 20)
-            return PLAYER_ROLE_TANK_DAMAGE;
+            return LfgRoles(PLAYER_ROLE_TANK | PLAYER_ROLE_DAMAGE);
         else
             return PLAYER_ROLE_DAMAGE;
         break;
@@ -84,11 +84,10 @@ LfgRoles LfgJoinAction::GetRoles()
 
 bool LfgJoinAction::SetRoles()
 {
-#ifdef MANGOSBOT_TWO
-	LFGData& data = bot->GetLfgData();
-	data.SetPlayerRoles(GetRoles());
+#ifdef MANGOSBOT_TWO_UNUSED
+    LFGData pState = bot->GetLfgData();
+    pState.SetPlayerRoles(GetRoles());
 #endif
-
     return true;
 }
 
@@ -108,12 +107,43 @@ bool LfgJoinAction::JoinLFG()
         return false;
 
     vector<MeetingStoneInfo> selected;
-
-    for (MeetingStoneSet::iterator i = stones.begin(); i != stones.end(); ++i)
+    for (vector<uint32>::iterator i = dungeons.begin(); i != dungeons.end(); ++i)
     {
-        vector<uint32>::iterator it = find(dungeons.begin(), dungeons.end(), i->area);
-        if (it != dungeons.end())
-            selected.push_back(*i);
+        uint32 zoneId = 0;
+        uint32 dungeonId = (*i & 0xFFFF);
+        zoneId = ((*i >> 16) & 0xFFFF);
+
+        // join only if close to closest graveyard
+        if (zoneId)
+        {
+            WorldSafeLocsEntry const* ClosestGrave = nullptr;
+            ClosestGrave = sWorldSafeLocsStore.LookupEntry<WorldSafeLocsEntry>(zoneId);
+
+            bool inCity = false;
+            AreaTableEntry const* areaEntry = GetAreaEntryByAreaID(bot->GetAreaId());
+            if (areaEntry)
+            {
+                if (areaEntry->zone)
+                    areaEntry = GetAreaEntryByAreaID(areaEntry->zone);
+
+                if (areaEntry && areaEntry->flags & AREA_FLAG_CAPITAL)
+                    inCity = true;
+            }
+
+            if (ClosestGrave)
+            {
+                if (!(inCity || bot->GetMapId() == ClosestGrave->map_id))
+                    continue;
+            }
+            else
+                continue;
+        }
+
+        for (MeetingStoneSet::iterator i = stones.begin(); i != stones.end(); ++i)
+        {
+            if (i->area == dungeonId)
+                selected.push_back(*i);
+        }
     }
 
     if (!selected.size())
@@ -136,6 +166,9 @@ bool LfgJoinAction::JoinLFG()
         _botRoles = "Dps";
         break;
     }
+
+    if (botRoles & BOT_ROLE_TANK && botRoles & BOT_ROLE_DPS)
+        _botRoles = "Tank/Dps";
     /*for (MeetingStoneSet::const_iterator itr = stones.begin(); itr != stones.end(); ++itr)
     {
         auto data = *itr;
@@ -146,19 +179,651 @@ bool LfgJoinAction::JoinLFG()
     if (idx.empty())
         return false;*/
 
-    sLog.outBasic("Bot #%d %s:%d <%s>: queues LFG to %s as %s", bot->GetGUIDLow(), bot->GetTeam() == ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName(), stoneInfo.name, _botRoles);
+    sLog.outBasic("Bot #%d %s:%d <%s>: uses LFG, Dungeon - %s (%s)", bot->GetGUIDLow(), bot->GetTeam() == ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName(), stoneInfo.name, _botRoles);
 
     sLFGMgr.AddToQueue(bot, stoneInfo.area);
 #endif
-#ifdef MANGOSBOT_TWO
-	LFGData& data = bot->GetLfgData();
-   
-    // check if already in lfg
-    if (data.GetState() == LFG_STATE_DUNGEON)
+#ifdef MANGOSBOT_ONE
+    uint32 zoneLFG = 0;
+    uint32 questLFG = 0;
+    uint32 questZoneLFG = 0;
+    string questName;
+    string zoneName;
+    string lfgName;
+    uint32 needMembers = 0;
+    LfgType lfgType = LFG_TYPE_NONE;
+    TravelState state = TRAVEL_STATE_IDLE;
+    TravelStatus status = TRAVEL_STATUS_NONE;
+
+    GrouperType grouperType = ai->GetGrouperType();
+
+    if (grouperType == GrouperType::SOLO)
         return false;
 
-    // set roles
-    if (!SetRoles())
+    bool isLFG = false; // member
+    bool isLFM = false; // leader
+
+    if (grouperType == GrouperType::MEMBER)
+        isLFG = true;
+
+    if (grouperType >= GrouperType::LEADER_2)
+        isLFM = true;
+
+    Group* group = bot->GetGroup();
+
+    // don't use lfg if already has group
+    if (isLFG && group)
+        return false;
+
+    needMembers = uint8(grouperType) - 1;
+
+    // don't use lfg if not leader or group has enough members
+    if (isLFM && group)
+    {
+        if (group->IsFull())
+            return false;
+
+        if (ai->GetGroupMaster() != bot)
+            return false;
+
+        uint32 memberCount = group->GetMembersCount();
+
+        if (memberCount >= uint8(grouperType))
+            return false;
+
+        needMembers = uint8(grouperType) - memberCount;
+    }
+
+    bool groupQ = false;
+    TravelTarget* target = bot->GetPlayerbotAI()->GetAiObjectContext()->GetValue<TravelTarget*>("travel target")->Get();
+    if (target)
+    {
+        state = target->getTravelState();
+        status = target->getStatus();
+        // queue only if quest not completed
+        if (state < TRAVEL_STATE_TRAVEL_HAND_IN_QUEST)
+        {
+            Quest const* quest = NULL;
+            if (target->getDestination())
+                quest = target->getDestination()->GetQuestTemplate();
+
+            if (quest)
+            {
+                Quest const* qinfo = sObjectMgr.GetQuestTemplate(quest->GetQuestId());
+                if (qinfo)
+                {
+                    // only group quests are allowed for quest lfg
+                    if (qinfo->GetType() == QUEST_TYPE_ELITE)
+                        groupQ = true;
+
+                    questLFG = qinfo->GetQuestId();
+                    questZoneLFG = qinfo->GetZoneOrSort();
+                    questName = qinfo->GetTitle();
+                }
+            }
+        }
+    }
+
+    /*AreaTableEntry const* areaEntry = GetAreaEntryByAreaID(bot->GetZoneId());
+    // check if area has no parent zone
+    if (areaEntry && !areaEntry->zone)
+    {
+        zoneLFG = areaEntry->ID;
+        zoneName = areaEntry->area_name[0];
+    }*/
+
+    // only use lfg zone if current quest leads there
+    if (questZoneLFG)
+    {
+        AreaTableEntry const* areaEntry = GetAreaEntryByAreaID(questZoneLFG);
+        // check if area has no parent zone
+        if (areaEntry && !areaEntry->zone)
+        {
+            zoneLFG = areaEntry->ID;
+            zoneName = areaEntry->area_name[0];
+        }
+    }
+    else if (!bot->IsTaxiFlying())
+    {
+        AreaTableEntry const* areaEntry = GetAreaEntryByAreaID(bot->GetZoneId());
+        // check if area has no parent zone
+        if (areaEntry && !areaEntry->zone)
+        {
+            zoneLFG = areaEntry->ID;
+            zoneName = areaEntry->area_name[0];
+        }
+    }
+
+    bool joinedLFG = false;
+    bool realLFG = false;
+    // if bot wants to lead
+    if (isLFM)
+    {
+        // lfm for current elite quest
+        if (questLFG && groupQ)
+        {
+            lfgType = LFG_TYPE_QUEST;
+            lfgName = questName;
+            WorldPacket p;
+            uint32 temp = questLFG | (lfgType << 24);
+            p << temp;
+            bot->GetSession()->HandleSetLfmOpcode(p);
+            bot->GetSession()->HandleLfmClearAutoFillOpcode(p);
+            joinedLFG = true;
+        }
+        // lfm for current quest zone or just current zone
+        else if (zoneLFG && (questZoneLFG || (status >= TRAVEL_STATUS_COOLDOWN || state >= TRAVEL_STATE_TRAVEL_HAND_IN_QUEST || (state == TRAVEL_STATE_IDLE && !urand(0, 4)))))
+        {
+            for (uint32 i = 0; i < sLFGDungeonStore.GetNumRows(); ++i)
+            {
+                if (LFGDungeonEntry const* dungeon = sLFGDungeonStore.LookupEntry(i))
+                {
+                    if (dungeon->maxlevel < bot->GetLevel())
+                        continue;
+                    if (dungeon->minlevel > bot->GetLevel())
+                        continue;
+                    // skip enemy faction
+                    if (dungeon->faction == 0 && bot->GetTeam() == ALLIANCE)
+                        continue;
+                    if (dungeon->faction == 1 && bot->GetTeam() == HORDE)
+                        continue;
+
+                    // check by zone name...
+                    if (dungeon->name[0] == zoneName)
+                    {
+                        lfgType = LFG_TYPE_ZONE;
+                        lfgName = zoneName;
+                        WorldPacket p;
+                        uint32 temp = dungeon->ID | (lfgType << 24);
+                        p << temp;
+                        bot->GetSession()->HandleSetLfmOpcode(p);
+                        bot->GetSession()->HandleLfmClearAutoFillOpcode(p);
+                        joinedLFG = true;
+                        break;
+                    }
+                }
+            }
+        }
+        // lfm for random dungeon if nothing else to do
+        else if (status >= TRAVEL_STATUS_COOLDOWN || state >= TRAVEL_STATE_TRAVEL_HAND_IN_QUEST || (state == TRAVEL_STATE_IDLE && !urand(0, 4)))
+        {
+            vector<uint32> dungeons;
+            for (uint32 i = 0; i < sLFGDungeonStore.GetNumRows(); ++i)
+            {
+                if (LFGDungeonEntry const* dungeon = sLFGDungeonStore.LookupEntry(i))
+                {
+                    if (dungeon->maxlevel < bot->GetLevel())
+                        continue;
+                    if (dungeon->minlevel > bot->GetLevel())
+                        continue;
+
+                    // only normal dungeons
+                    if (dungeon->type != 1)
+                        continue;
+
+                    // skip enemy faction
+                    if (dungeon->faction == 0 && bot->GetTeam() == ALLIANCE)
+                        continue;
+                    if (dungeon->faction == 1 && bot->GetTeam() == HORDE)
+                        continue;
+
+                    dungeons.push_back(dungeon->ID);
+                }
+            }
+            if (!dungeons.empty())
+            {
+                uint32 dungeonId = dungeons[urand(0, dungeons.size() - 1)];
+                if (LFGDungeonEntry const* dungeon = sLFGDungeonStore.LookupEntry(dungeonId))
+                {
+                    lfgType = LFG_TYPE_DUNGEON;
+                    lfgName = dungeon->name[0];
+                    WorldPacket p;
+                    uint32 temp = dungeon->ID | (lfgType << 24);
+                    p << temp;
+                    bot->GetSession()->HandleSetLfmOpcode(p);
+                    bot->GetSession()->HandleLfmClearAutoFillOpcode(p);
+                    joinedLFG = true;
+                }
+            }
+        }
+        // try to LFM for current dungeon
+        if (target && group && !group->IsFull())
+        {
+            // if moving to boss
+            if (target->getDestination() && target->getDestination()->getName() == "BossTravelDestination")
+            {
+                WorldPosition* location = target->getPosition();
+                uint32 targetAreaFlag = GetAreaFlagByMapId(location->mapid);
+                if (targetAreaFlag)
+                {
+                    AreaTableEntry const* areaEntry = GetAreaEntryByAreaFlagAndMap(targetAreaFlag, location->mapid);
+                    if (areaEntry)
+                    {
+                        if (areaEntry->zone)
+                            areaEntry = GetAreaEntryByAreaID(areaEntry->zone);
+
+                        if (areaEntry && !areaEntry->zone)
+                        {
+                            for (uint32 i = 0; i < sLFGDungeonStore.GetNumRows(); ++i)
+                            {
+                                if (LFGDungeonEntry const* dungeon = sLFGDungeonStore.LookupEntry(i))
+                                {
+                                    if (dungeon->maxlevel < bot->GetLevel())
+                                        continue;
+                                    if (dungeon->minlevel > bot->GetLevel())
+                                        continue;
+
+                                    // only normal dungeons
+                                    if (dungeon->type != 1)
+                                        continue;
+
+                                    // skip enemy faction
+                                    if (dungeon->faction == 0 && bot->GetTeam() == ALLIANCE)
+                                        continue;
+                                    if (dungeon->faction == 1 && bot->GetTeam() == HORDE)
+                                        continue;
+
+                                    // check by zone name, doesn't work for some dungeons
+                                    if (dungeon->name[0] == areaEntry->area_name[0])
+                                    {
+                                        lfgType = LFG_TYPE_DUNGEON;
+                                        lfgName = dungeon->name[0];
+                                        WorldPacket p;
+                                        uint32 temp = dungeon->ID | (lfgType << 24);
+                                        p << temp;
+                                        bot->GetSession()->HandleSetLfmOpcode(p);
+                                        bot->GetSession()->HandleLfmSetAutoFillOpcode(p);
+
+                                        // set auto invite if real player in queue
+                                        vector<uint32> player_dungeons = sRandomPlayerbotMgr.LfgDungeons[bot->GetTeam()];
+                                        if (!player_dungeons.empty())
+                                        {
+                                            for (vector<uint32>::iterator i = player_dungeons.begin(); i != player_dungeons.end(); ++i)
+                                            {
+                                                uint32 zoneId = 0;
+                                                uint32 entry = (*i & 0xFFFF);
+                                                uint32 type = ((*i >> 8) & 0xFFFF);
+                                                zoneId = ((*i >> 16) & 0xFFFF);
+
+                                                // only lfg
+                                                if (type != 0)
+                                                    continue;
+
+                                                // join only if close to closest graveyard
+                                                if (zoneId)
+                                                {
+                                                    WorldSafeLocsEntry const* ClosestGrave = nullptr;
+                                                    ClosestGrave = sWorldSafeLocsStore.LookupEntry<WorldSafeLocsEntry>(zoneId);
+
+                                                    bool inCity = false;
+                                                    AreaTableEntry const* areaEntry = GetAreaEntryByAreaID(bot->GetAreaId());
+                                                    if (areaEntry)
+                                                    {
+                                                        if (areaEntry->zone)
+                                                            areaEntry = GetAreaEntryByAreaID(areaEntry->zone);
+
+                                                        if (areaEntry && areaEntry->flags & AREA_FLAG_CAPITAL)
+                                                            inCity = true;
+                                                    }
+
+                                                    if (ClosestGrave)
+                                                    {
+                                                        if (!(inCity || bot->GetMapId() == ClosestGrave->map_id))
+                                                            continue;
+                                                    }
+                                                    else
+                                                        continue;
+                                                }
+
+                                                if (LFGDungeonEntry const* player_dungeon = sLFGDungeonStore.LookupEntry(entry))
+                                                {
+                                                    if (player_dungeon->ID == dungeon->ID)
+                                                        bot->GetSession()->HandleLfmSetAutoFillOpcode(p);
+
+                                                    realLFG = true;
+                                                }
+                                            }
+                                        }
+                                        joinedLFG = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        // set auto invite if real player in queue 
+        vector<uint32> player_dungeons = sRandomPlayerbotMgr.LfgDungeons[bot->GetTeam()];
+        if (!player_dungeons.empty() && !group)
+        {
+            for (vector<uint32>::iterator i = player_dungeons.begin(); i != player_dungeons.end(); ++i)
+            {
+                uint32 zoneId = 0;
+                uint32 entry = (*i & 0xFFFF) & 0xFF;
+                uint32 type = ((*i & 0xFFFF) >> 8);
+                zoneId = (*i >> 16) & 0xFFFF;
+
+                // leader only queue if player is lfg, not lfm
+                if (type != 0)
+                    continue;
+
+                // join only if close to closest graveyard
+                if (zoneId)
+                {
+                    WorldSafeLocsEntry const* ClosestGrave = nullptr;
+                    ClosestGrave = sWorldSafeLocsStore.LookupEntry<WorldSafeLocsEntry>(zoneId);
+
+                    bool inCity = false;
+                    AreaTableEntry const* areaEntry = GetAreaEntryByAreaID(bot->GetAreaId());
+                    if (areaEntry)
+                    {
+                        if (areaEntry->zone)
+                            areaEntry = GetAreaEntryByAreaID(areaEntry->zone);
+
+                        if (areaEntry && areaEntry->flags & AREA_FLAG_CAPITAL)
+                            inCity = true;
+                    }
+
+                    if (ClosestGrave)
+                    {
+                        if (!(inCity || bot->GetMapId() == ClosestGrave->map_id))
+                            continue;
+                    }
+                    else
+                        continue;
+                }
+
+                if (LFGDungeonEntry const* player_dungeon = sLFGDungeonStore.LookupEntry(entry))
+                {
+                    if (player_dungeon->maxlevel < bot->GetLevel())
+                        continue;
+                    if (player_dungeon->minlevel > bot->GetLevel())
+                        continue;
+
+                    // only normal dungeons
+                    if (player_dungeon->type != 1)
+                        continue;
+
+                    // skip enemy faction
+                    if (player_dungeon->faction == 0 && bot->GetTeam() == ALLIANCE)
+                        continue;
+                    if (player_dungeon->faction == 1 && bot->GetTeam() == HORDE)
+                        continue;
+
+                    lfgType = LFG_TYPE_DUNGEON;
+                    lfgName = player_dungeon->name[0];
+                    WorldPacket p;
+                    uint32 temp = player_dungeon->ID | (lfgType << 24);
+                    p << temp;
+                    bot->GetSession()->HandleSetLfmOpcode(p);
+                    bot->GetSession()->HandleLfmSetAutoFillOpcode(p);
+                    joinedLFG = true;
+                    realLFG = true;
+                    break;
+                }
+            }
+        }
+    }
+    else if (isLFG) // bot is alone and looks for group
+    {
+        // lfg slot 1 for current elite quest
+        if (questLFG && groupQ)
+        {
+            lfgType = LFG_TYPE_QUEST;
+            lfgName = questName;
+            WorldPacket p;
+            p << uint32(0); // lfg slot
+            uint32 temp = questLFG | (lfgType << 24);
+            p << temp;
+            bot->GetSession()->HandleSetLfgOpcode(p);
+            bot->GetSession()->HandleLfgClearAutoJoinOpcode(p);
+            joinedLFG = true;
+        }
+        // lfg slot 2 for current quest zone or just current zone
+        if (zoneLFG && (questZoneLFG || (status >= TRAVEL_STATUS_COOLDOWN || state >= TRAVEL_STATE_TRAVEL_HAND_IN_QUEST || (state == TRAVEL_STATE_IDLE && !urand(0, 4))))) // use second lfg slot for zone lfg
+        {
+            for (uint32 i = 0; i < sLFGDungeonStore.GetNumRows(); ++i)
+            {
+                if (LFGDungeonEntry const* dungeon = sLFGDungeonStore.LookupEntry(i))
+                {
+                    if (dungeon->maxlevel < bot->GetLevel())
+                        continue;
+                    if (dungeon->minlevel > bot->GetLevel())
+                        continue;
+
+                    // skip enemy faction
+                    if (dungeon->faction == 0 && bot->GetTeam() == ALLIANCE)
+                        continue;
+                    if (dungeon->faction == 1 && bot->GetTeam() == HORDE)
+                        continue;
+
+                    // check by zone name...
+                    if (dungeon->name[0] == zoneName)
+                    {
+                        lfgType = LFG_TYPE_ZONE;
+                        lfgName = zoneName;
+                        WorldPacket p;
+                        p << uint32(1); // lfg slot
+                        uint32 temp = dungeon->ID | (lfgType << 24);
+                        p << temp;
+                        bot->GetSession()->HandleSetLfgOpcode(p);
+                        bot->GetSession()->HandleLfgClearAutoJoinOpcode(p);
+                        joinedLFG = true;
+                        break;
+                    }
+                }
+            }
+        }
+        // lfg for dungeon if real player used LFM with auto invite
+        vector<uint32> player_dungeons = sRandomPlayerbotMgr.LfgDungeons[bot->GetTeam()];
+        if (!player_dungeons.empty())
+        {
+            for (vector<uint32>::iterator i = player_dungeons.begin(); i != player_dungeons.end(); ++i)
+            {
+                uint32 zoneId = 0;
+                uint32 entry = (*i & 0xFFFF) & 0xFF;
+                uint32 type = ((*i & 0xFFFF) >> 8);
+                zoneId = (*i >> 16) & 0xFFFF;
+
+                // members queue only if player is lfm, not lfg
+                if (type != 1)
+                    continue;
+
+                // join only if close to closest graveyard
+                if (zoneId)
+                {
+                    WorldSafeLocsEntry const* ClosestGrave = nullptr;
+                    ClosestGrave = sWorldSafeLocsStore.LookupEntry<WorldSafeLocsEntry>(zoneId);
+
+                    bool inCity = false;
+                    AreaTableEntry const* areaEntry = GetAreaEntryByAreaID(bot->GetAreaId());
+                    if (areaEntry)
+                    {
+                        if (areaEntry->zone)
+                            areaEntry = GetAreaEntryByAreaID(areaEntry->zone);
+
+                        if (areaEntry && areaEntry->flags & AREA_FLAG_CAPITAL)
+                            inCity = true;
+                    }
+
+                    if (ClosestGrave)
+                    {
+                        if (!(inCity || bot->GetMapId() == ClosestGrave->map_id))
+                            continue;
+                    }
+                    else
+                        continue;
+                }
+
+                if (LFGDungeonEntry const* player_dungeon = sLFGDungeonStore.LookupEntry(entry))
+                {
+                    if (player_dungeon->maxlevel < bot->GetLevel())
+                        continue;
+                    if (player_dungeon->minlevel > bot->GetLevel())
+                        continue;
+
+                    // only normal dungeons
+                    //if (player_dungeon->type != 1)
+                    //    continue;
+
+                    // skip enemy faction
+                    if (player_dungeon->faction == 0 && bot->GetTeam() == ALLIANCE)
+                        continue;
+                    if (player_dungeon->faction == 1 && bot->GetTeam() == HORDE)
+                        continue;
+
+                    lfgType = LFG_TYPE_DUNGEON;
+                    lfgName = player_dungeon->name[0];
+                    WorldPacket p;
+                    p << uint32(2); // lfg slot
+                    uint32 temp = player_dungeon->ID | (lfgType << 24);
+                    p << temp;
+                    bot->GetSession()->HandleSetLfgOpcode(p);
+                    bot->GetSession()->HandleLfgSetAutoJoinOpcode(p);
+                    joinedLFG = true;
+                    realLFG = true;
+                    break;
+                }
+            }
+        }
+        // lfg slot 3 for random dungeon if not very busy
+        else if (status >= TRAVEL_STATUS_COOLDOWN || state >= TRAVEL_STATE_TRAVEL_HAND_IN_QUEST || (state == TRAVEL_STATE_IDLE && !urand(0, 4)))
+        {
+            vector<uint32> dungeons;
+            for (uint32 i = 0; i < sLFGDungeonStore.GetNumRows(); ++i)
+            {
+                if (LFGDungeonEntry const* dungeon = sLFGDungeonStore.LookupEntry(i))
+                {
+                    if (dungeon->maxlevel < bot->GetLevel())
+                        continue;
+                    if (dungeon->minlevel > bot->GetLevel())
+                        continue;
+
+                    // only normal dungeons
+                    if (dungeon->type != 1)
+                        continue;
+
+                    // skip enemy faction
+                    if (dungeon->faction == 0 && bot->GetTeam() == ALLIANCE)
+                        continue;
+                    if (dungeon->faction == 1 && bot->GetTeam() == HORDE)
+                        continue;
+
+                    dungeons.push_back(dungeon->ID);
+                }
+            }
+            if (!dungeons.empty())
+            {
+                uint32 dungeonId = dungeons[urand(0, dungeons.size() - 1)];
+                if (LFGDungeonEntry const* dungeon = sLFGDungeonStore.LookupEntry(dungeonId))
+                {
+                    lfgType = LFG_TYPE_DUNGEON;
+                    lfgName = dungeon->name[0];
+                    WorldPacket p;
+                    p << uint32(2); // lfg slot
+                    uint32 temp = dungeon->ID | (lfgType << 24);
+                    p << temp;
+                    bot->GetSession()->HandleSetLfgOpcode(p);
+                    bot->GetSession()->HandleLfgClearAutoJoinOpcode(p);
+
+                    // set auto invite if real players in queue
+                    /*vector<uint32> player_dungeons = sRandomPlayerbotMgr.LfgDungeons[bot->GetTeam()];
+                    if (!player_dungeons.empty())
+                    {
+                        for (vector<uint32>::iterator i = player_dungeons.begin(); i != player_dungeons.end(); ++i)
+                        {
+                            uint32 zoneId = 0;
+                            uint32 entry = (*i & 0xFFFF) & 0xFF;
+                            uint32 type = ((*i & 0xFFFF) >> 8);
+                            zoneId = (*i >> 16) & 0xFFFF;
+
+                            // join only if in current zone
+                            if (bot->GetZoneId() != zoneId)
+                                continue;
+
+                            // members queue only if player is lfm, not lfg
+                            if (type != 1)
+                                continue;
+
+                            if (LFGDungeonEntry const* player_dungeon = sLFGDungeonStore.LookupEntry(entry))
+                            {
+                                if (player_dungeon->ID == dungeon->ID)
+                                    bot->GetSession()->HandleLfgSetAutoJoinOpcode(p);
+                            }
+                        }
+                    }*/
+                    joinedLFG = true;
+                }
+            }
+        }
+    }
+    
+    if (!joinedLFG)
+        return false;
+
+    // set comment
+    BotRoles botRoles = AiFactory::GetPlayerRoles(bot);
+    string _botRoles;
+    switch (botRoles)
+    {
+    case BOT_ROLE_TANK:
+        _botRoles = "Tank";
+        break;
+    case BOT_ROLE_HEALER:
+        _botRoles = "Healer";
+        break;
+    case BOT_ROLE_DPS:
+    default:
+        _botRoles = "Dps";
+        break;
+    }
+
+    if (botRoles & BOT_ROLE_TANK && botRoles & BOT_ROLE_DPS)
+        _botRoles = "Tank or Dps";
+
+    WorldPacket p;
+    string lfgComment;
+    if (isLFM)
+    {
+        if (!group)
+            lfgComment += _botRoles + ", ";
+
+        lfgComment = "LF " + to_string(needMembers) + " more";
+        if (questLFG)
+            lfgComment += ", doing " + questName;
+    }
+    if (isLFG)
+    {
+        lfgComment = _botRoles;
+        if (groupQ)
+            lfgComment += ", lfg for " + questName;
+        else if (questLFG)
+            lfgComment += ", doing " + questName;
+    }
+    if (lfgType == LFG_TYPE_DUNGEON)
+    {
+        string _gs = to_string(bot->GetPlayerbotAI()->GetEquipGearScore(bot, false, false));
+        lfgComment += ", GS " + _gs;
+    }
+
+    p << lfgComment;// +", GS - " + _gs;
+    bot->GetSession()->HandleSetLfgCommentOpcode(p);
+    string lfgGroup = isLFG ? "LFG" : "LFM";
+    string lfgOption = lfgType == LFG_TYPE_QUEST ? "Quest" : (lfgType == LFG_TYPE_ZONE ? "Zone" : "Dungeon");
+
+    if (realLFG)
+        sLog.outBasic("Bot #%d %s:%d <%s>: uses %s, %s - %s (%s)", bot->GetGUIDLow(), bot->GetTeam() == ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName(), lfgGroup.c_str(), lfgOption.c_str(), lfgName.c_str(), _botRoles.c_str());
+    else
+        sLog.outDetail("Bot #%d %s:%d <%s>: uses %s, %s - %s (%s)", bot->GetGUIDLow(), bot->GetTeam() == ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName(), lfgGroup.c_str(), lfgOption.c_str(), lfgName.c_str(), _botRoles.c_str());
+#endif
+#ifdef MANGOSBOT_TWO
+    LFGData pState = bot->GetLfgData();
+
+    // check if already in lfg
+    if (!pState.GetListedDungeonSet().empty())
         return false;
 
     ItemCountByQuality visitor;
@@ -176,23 +841,19 @@ bool LfgJoinAction::JoinLFG()
 
     for (vector<uint32>::iterator i = dungeons.begin(); i != dungeons.end(); ++i)
     {
-        LFGDungeonEntry const* dungeon = sLFGDungeonStore.LookupEntry(*i);
-        if (!dungeon || (dungeon->TypeID != LFG_TYPE_RANDOM_DUNGEON && dungeon->TypeID != LFG_TYPE_DUNGEON && dungeon->TypeID != LFG_TYPE_HEROIC_DUNGEON &&
-            dungeon->TypeID != LFG_TYPE_RAID))
+        LFGDungeonData const* dungeon = sLFGMgr.GetLFGDungeon(*i);
+        if (!dungeon || (dungeon->type != LFG_TYPE_RANDOM_DUNGEON && dungeon->type != LFG_TYPE_DUNGEON && dungeon->type != LFG_TYPE_HEROIC_DUNGEON &&
+            dungeon->type != LFG_TYPE_RAID))
             continue;
 
         uint32 botLevel = bot->GetLevel();
-        if (dungeon->MinLevel && botLevel < dungeon->MinLevel)
+        if (!dungeon->CheckMinLevel(2, botLevel))
+            continue;
+        if (!dungeon->CheckMaxLevel(2, botLevel))
             continue;
 
-        if (dungeon->MinLevel && botLevel > dungeon->MinLevel + 10)
-            continue;
-
-        if (dungeon->MaxLevel && botLevel > dungeon->MaxLevel)
-            continue;
-
-        selected.push_back(dungeon->ID);
-        list.insert(dungeon->Entry());
+        selected.push_back(dungeon->id);
+        list.insert(dungeon->id);
     }
 
     if (!selected.size())
@@ -201,10 +862,11 @@ bool LfgJoinAction::JoinLFG()
     if (list.empty())
         return false;
 
-    /*bool many = list.size() > 1;
-    LFGDungeonEntry const* dungeon = *list.begin();
+    bool many = list.size() > 1;
+    //LFGDungeonEntry const* dungeon = *list.begin();
+    LFGDungeonData const* dungeon = sLFGMgr.GetLFGDungeon(*list.begin());
 
-    for (uint32 i = 0; i < sLFGDungeonStore.GetNumRows(); ++i)
+    /*for (uint32 i = 0; i < sLFGDungeonStore.GetNumRows(); ++i)
     {
         LFGDungeonEntry const* dungeon = sLFGDungeonStore.LookupEntry(i);
         if (!dungeon || (dungeon->type != LFG_TYPE_RANDOM_DUNGEON && dungeon->type != LFG_TYPE_DUNGEON && dungeon->type != LFG_TYPE_HEROIC_DUNGEON &&
@@ -239,15 +901,15 @@ bool LfgJoinAction::JoinLFG()
     // check role for console msg
     string _roles = "multiple roles";
 
-    if (data.GetPlayerRoles() & PLAYER_ROLE_TANK)
+    if ((pState.GetPlayerRoles() & PLAYER_ROLE_TANK) != 0)
         _roles = "TANK";
-    if (data.GetPlayerRoles() & PLAYER_ROLE_HEALER)
+    if ((pState.GetPlayerRoles() & PLAYER_ROLE_HEALER) != 0)
         _roles = "HEAL";
-    if (data.GetPlayerRoles() & PLAYER_ROLE_DAMAGE)
+    if ((pState.GetPlayerRoles() & PLAYER_ROLE_DAMAGE) != 0)
         _roles = "DPS";
 
-	data.SetState(LFG_STATE_DUNGEON);
-    //sLog.outBasic("Bot #%d %s:%d <%s>: queues LFG, Dungeon as %s (%s)", bot->GetGUIDLow(), bot->GetTeam() == ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName(), _roles, many ? "several dungeons" : dungeon->name[0]);
+    //pState->SetType(LFG_TYPE_DUNGEON);
+    sLog.outBasic("Bot #%d %s:%d <%s>: queues LFG, Dungeon as %s (%s)", bot->GetGUIDLow(), bot->GetTeam() == ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName(), _roles, many ? "several dungeons" : dungeon->name);
 
     /*if (lfgState->IsSingleRole())
     {
@@ -307,12 +969,7 @@ bool LfgJoinAction::JoinLFG()
 
     // Set Raid Browser comment
     string _gs = to_string(bot->GetEquipGearScore());
-	data.SetComment("Bot " + _roles + " GS:" + _gs + " for LFG");
-
-
-    //pState->SetDungeons(list);
-    sLFGMgr.JoinLfg(bot, data.GetPlayerRoles(), list, data.GetComment());
-
+    sLFGMgr.JoinLfg(bot, GetRoles(), list, "Bot " + _roles + " GS:" + _gs + " for LFG");
 #endif
     return true;
 }
@@ -323,61 +980,83 @@ bool LfgRoleCheckAction::Execute(Event event)
     Group* group = bot->GetGroup();
     if (group)
     {
-		LFGData& data = bot->GetLfgData();
-		LfgRoles currentRoles = (LfgRoles)data.GetPlayerRoles();
-		LfgRoles newRoles = GetRoles();
-
-        if (currentRoles == newRoles) return false;
-
-		data.SetPlayerRoles(newRoles);
+        LFGQueuePlayer pData = sWorld.GetLFGQueue().GetQueueData(group->GetObjectGuid()).m_playerInfoPerGuid[bot->GetObjectGuid()];
+        uint8 currentRoles = pData.m_roles;
+        LfgRoles newRoles = GetRoles();
+        if (currentRoles == (uint8)newRoles) return false;
         
-		sWorld.GetLFGQueue().GetMessager().AddMessage([group = group->GetObjectGuid(), playerGuid = bot->GetObjectGuid(), newRoles](LFGQueue* queue)
-		{
-			queue->SetPlayerRoles(group, playerGuid, newRoles);
-		});
-
+        sWorld.GetLFGQueue().GetMessager().AddMessage([group = group->GetObjectGuid(), playerGuid = bot->GetObjectGuid(), newRoles](LFGQueue* queue)
+        {
+            queue->SetPlayerRoles(group, playerGuid, newRoles);
+        });
         sLog.outBasic("Bot #%d %s:%d <%s>: LFG roles checked", bot->GetGUIDLow(), bot->GetTeam() == ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName());
-
         return true;
     }
 #endif
-
     return false;
 }
 
 bool LfgAcceptAction::Execute(Event event)
 {
 #ifdef MANGOSBOT_TWO
+    //LFGData pState = bot->GetLfgData();
+    //if (pState.GetState() != LFG_STATE_PROPOSAL)
+    //    return false;
 
-	uint32 id = AI_VALUE(uint32, "lfg proposal");
-	if (id)
-	{
-		ai->GetAiObjectContext()->GetValue<uint32>("lfg proposal")->Set(0);
+    //if (sWorld.GetLFGQueue().GetQueueData(bot->GetGroup() ? bot->GetGroup()->GetObjectGuid() : bot->GetObjectGuid()))
 
-		bool accept = true;
-		sWorld.GetLFGQueue().GetMessager().AddMessage([playerGuid = bot->GetObjectGuid(), id, accept](LFGQueue* queue)
-		{
-			queue->UpdateProposal(playerGuid, id, accept);
-		});
+    uint32 id = AI_VALUE(uint32, "lfg proposal");
+    if (id)
+    {
+        //if (urand(0, 1 + 10 / sPlayerbotAIConfig.randomChangeMultiplier))
+        //    return false;
 
-		if (sRandomPlayerbotMgr.IsRandomBot(bot) && !bot->GetGroup())
-		{
-			sRandomPlayerbotMgr.Refresh(bot);
-			ai->ResetStrategies();
-		}
-		ai->Reset();
+        if (bot->IsInCombat() || bot->IsDead())
+        {
+            sLog.outBasic("Bot #%d %s:%d <%s> is in combat and refuses LFG proposal %d", bot->GetGUIDLow(), bot->GetTeam() == ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName(), id);
+            /*WorldPacket p(CMSG_LFG_PROPOSAL_RESULT);
+            p << id;
+            p << false;
+            bot->GetSession()->HandleLfgProposalResultOpcode(p);*/
+            bool accept = false;
+            sWorld.GetLFGQueue().GetMessager().AddMessage([playerGuid = bot->GetObjectGuid(), id, accept](LFGQueue* queue)
+            {
+                queue->UpdateProposal(playerGuid, id, accept);
+            });
+            return true;
+        }
 
-		return true;
-	}
+        sLog.outBasic("Bot #%d %s:%d <%s> accepts LFG proposal %d", bot->GetGUIDLow(), bot->GetTeam() == ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName(), id);
+        ai->GetAiObjectContext()->GetValue<uint32>("lfg proposal")->Set(0);
+        bot->clearUnitState(UNIT_STAT_ALL_STATE);
+        /*WorldPacket p(CMSG_LFG_PROPOSAL_RESULT);
+        p << id;
+        p << uint8(1);
+        bot->GetSession()->HandleLfgProposalResultOpcode(p);*/
 
-	WorldPacket p(event.getPacket());
+        bool accept = true;
+        sWorld.GetLFGQueue().GetMessager().AddMessage([playerGuid = bot->GetObjectGuid(), id, accept](LFGQueue* queue)
+        {
+            queue->UpdateProposal(playerGuid, id, accept);
+        });
 
-	uint32 dungeon;
-	uint8 state;
-	p >> dungeon >> state >> id;
+        if (sRandomPlayerbotMgr.IsRandomBot(bot) && !bot->GetGroup())
+        {
+            sRandomPlayerbotMgr.Refresh(bot);
+            ai->ResetStrategies();
+            //bot->TeleportToHomebind();
+        }
+        ai->Reset();
+        return true;
+    }
 
-	ai->GetAiObjectContext()->GetValue<uint32>("lfg proposal")->Set(id);
+    WorldPacket p(event.getPacket());
 
+    uint32 dungeon;
+    uint8 state;
+    p >> dungeon >> state >> id;
+
+    ai->GetAiObjectContext()->GetValue<uint32>("lfg proposal")->Set(id);
 #endif
     return true;
 }
@@ -397,9 +1076,33 @@ bool LfgLeaveAction::Execute(Event event)
         sLFGMgr.RemovePlayerFromQueue(bot->GetObjectGuid(), PLAYER_CLIENT_LEAVE);
     }
 #endif
+#ifdef MANGOSBOT_ONE
+    bool isLFG = false;
+    bool isLFM = false;
+    for (int i = 0; i < MAX_LOOKING_FOR_GROUP_SLOT; ++i)
+        if (!bot->m_lookingForGroup.group[i].empty())
+            isLFG = true;
+
+    if (!bot->m_lookingForGroup.more.empty())
+        isLFM = true;
+
+    if (isLFG || isLFM)
+    {
+        sLog.outDetail("Bot #%d %s:%d <%s>: leaves %s", bot->GetGUIDLow(), bot->GetTeam() == ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName(), isLFG ? "LFG" : "LFM");
+        WorldPacket p;
+        if (isLFG) // clear lfg
+            bot->GetSession()->HandleLfgClearOpcode(p);
+        if (isLFM) // clear lfm
+            bot->GetSession()->HandleLfmClearOpcode(p);
+
+        // clear comment
+        string empty;
+        p << empty;
+        bot->GetSession()->HandleSetLfgCommentOpcode(p);
+    }
+#endif
 #ifdef MANGOSBOT_TWO
     // Don't leave if already invited / in dungeon
-	
     if (bot->GetLfgData().GetState() > LFG_STATE_QUEUED)
         return false;
 
@@ -448,7 +1151,7 @@ bool LfgTeleportAction::Execute(Event event)
     }
 
     bot->clearUnitState(UNIT_STAT_ALL_STATE);
-    //sLFGMgr.Teleport(bot, out);
+    sLFGMgr.TeleportPlayer(bot, out, false);
 #endif
     return true;
 }
@@ -461,10 +1164,16 @@ bool LfgJoinAction::isUseful()
         return false;
     }
 
+#ifdef MANGOSBOT_TWO
     if (bot->GetLevel() < 15)
         return false;
+#endif
 
-    if ((ai->GetMaster() && !ai->GetMaster()->GetPlayerbotAI()) || bot->GetGroup() && bot->GetGroup()->GetLeaderGuid() != bot->GetObjectGuid())
+    // don't use if active player master
+    if (ai->HasRealPlayerMaster())
+        return false;
+
+    if (bot->GetGroup() && bot->GetGroup()->GetLeaderGuid() != bot->GetObjectGuid())
     {
         //ai->ChangeStrategy("-lfg", BOT_STATE_NON_COMBAT);
         return false;
@@ -496,21 +1205,34 @@ bool LfgJoinAction::isUseful()
     if (sLFGMgr.IsPlayerInQueue(bot->GetObjectGuid()))
         return false;
 
-    BotRoles botRoles = AiFactory::GetPlayerRoles(bot);
+    LfgRoles botRoles = sLFGMgr.CalculateTalentRoles(bot);
 
-    RolesPriority prio = sLFGMgr.getPriority((Classes)bot->getClass(), (ClassRoles)botRoles);
+    LfgRolePriority prio = sLFGMgr.GetPriority((Classes)bot->getClass(), (LfgRoles)botRoles);
     if (prio < LFG_PRIORITY_NORMAL)
         return false;
 
     if (bot->GetGroup() && bot->GetGroup()->IsFull())
         return false;
 #endif
+#ifdef MANGOSBOT_ONE
+    bool isLFG = false;
+    bool isLFM = false;
+    for (int i = 0; i < MAX_LOOKING_FOR_GROUP_SLOT; ++i)
+        if (!bot->m_lookingForGroup.group[i].empty())
+            isLFG = true;
+
+    if (!bot->m_lookingForGroup.more.empty())
+        isLFM = true;
+
+    if ((isLFG || isLFM) && sRandomPlayerbotMgr.LfgDungeons[bot->GetTeam()].empty())
+        return false;
+#endif
 #ifdef MANGOSBOT_TWO
-	
-/*    if (sLFGMgr.GetQueueInfo(bot->GetObjectGuid()))
-        return false;*/
-    
-    if (bot->GetLfgData().GetState() != LFG_STATE_NONE)
+    if (sRandomPlayerbotMgr.LfgDungeons[bot->GetTeam()].empty())
+        return false;
+
+    LFGData pState = bot->GetLfgData();
+    if (pState.GetState() != LFG_STATE_NONE)
         return false;
 #endif
     return true;

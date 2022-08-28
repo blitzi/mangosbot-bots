@@ -15,7 +15,7 @@ namespace ai
         if (!player)
             return false;
 
-        if (!player->GetPlayerbotAI() && !ai->GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_INVITE, false, player))
+        if (!player->GetPlayerbotAI() && !ai->GetSecurity()->CheckLevelFor(PLAYERBOT_SECURITY_INVITE, true, player))
             return false;
 
         WorldPacket p;
@@ -38,6 +38,9 @@ namespace ai
                 continue;
 
             if (player->GetGroup())
+                continue;
+
+            if (player->isDND())
                 continue;
 
             PlayerbotAI* botAi = player->GetPlayerbotAI();
@@ -125,6 +128,9 @@ namespace ai
             if (player->GetGroup())
                 continue;
 
+            if (player->isDND())
+                continue;
+
             PlayerbotAI* botAi = player->GetPlayerbotAI();
 
             if (botAi)
@@ -149,10 +155,10 @@ namespace ai
                     return false;
             }
 
-            if (player->GetLevel() + 2 < bot->GetLevel())
+            if (abs(int32(player->GetLevel() - bot->GetLevel())) > 4)
                 continue;
 
-            if (player->GetLevel() > bot->GetLevel() + 20)
+            if (!botAi && sServerFacade.GetDistance2d(bot, player) > sPlayerbotAIConfig.sightDistance)
                 continue;
 
             return Invite(player);

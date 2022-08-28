@@ -24,7 +24,7 @@ namespace ai
     class ItemUsageValue : public CalculatedValue<ItemUsage>, public Qualified
 	{
 	public:
-        ItemUsageValue(PlayerbotAI* ai) : CalculatedValue<ItemUsage>(ai) {}
+        ItemUsageValue(PlayerbotAI* ai, string name = "item usage") : CalculatedValue<ItemUsage>(ai, name) {}
 
     public:
         virtual ItemUsage Calculate();
@@ -33,7 +33,7 @@ namespace ai
         ItemUsage QueryItemUsageForEquip(Item* item);
 
         uint32 GetSmallestBagSize();
-        bool IsItemUsefulForQuest(Player* player, ItemPrototype const* proto);
+        bool IsItemUsefulForQuest(Player* player, ItemPrototype const* proto, bool ignoreInventory = false);
         bool IsItemNeededForSkill(ItemPrototype const* proto);
         bool IsItemUsefulForSkill(ItemPrototype const * proto);
         bool IsItemNeededForUsefullSpell(ItemPrototype const* proto, bool checkAllReagents = false);

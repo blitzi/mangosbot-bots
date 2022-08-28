@@ -43,16 +43,16 @@ list<Item*> EquipedUsableTrinketValue::Calculate()
 
 	Player* bot = InventoryAction::ai->GetBot();
 
-	Item* trinket1 = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_TRINKET1);
-	Item* trinket2 = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_TRINKET2);
-
-	if (trinket1)
+	if (Item* trinket1 = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_TRINKET1))
 		trinkets.push_back(trinket1);
 
-	if (trinket2)
+	if (Item* trinket2 = bot->GetItemByPos(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_TRINKET2))
 		trinkets.push_back(trinket2);
 
-	for each (Item* item in trinkets)
+	if (trinkets.empty())
+		return result;
+
+	for each (Item * item in trinkets)
 	{
 		ItemPrototype const* proto = item->GetProto();
 
@@ -69,4 +69,3 @@ list<Item*> EquipedUsableTrinketValue::Calculate()
 
 	return result;
 }
-

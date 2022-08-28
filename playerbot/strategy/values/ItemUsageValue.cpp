@@ -6,7 +6,6 @@
 #include "../../GuildTaskMgr.h"
 #include "../../RandomItemMgr.h"
 #include "../../ServerFacade.h"
-#include <playerbot/PlayerbotFactory.h>
 
 using namespace ai;
 
@@ -79,37 +78,10 @@ ItemUsage ItemUsageValue::Calculate()
         }
     }
 
-    if (sPlayerbotAIConfig.guildTaskEnabled && bot->GetGuildId() && sGuildTaskMgr.IsGuildTaskItem(proto->ItemId, bot->GetGuildId()))
+    if (bot->GetGuildId() && sGuildTaskMgr.IsGuildTaskItem(itemId, bot->GetGuildId()))
         return ITEM_USAGE_GUILD_TASK;
 
-    list<Item*> found = AI_VALUE2(list < Item*>, "inventory items", chat->formatItem(proto));
-    ItemUsage equip = ITEM_USAGE_NONE;
-
-    //create virtual item if the item does not exist (e.g. for quest rewards)
-    if (found.size() == 0)
-    {
-        Item* item = RandomPlayerbotMgr::CreateTempItem(proto->ItemId, 1, bot);
-
-        if (!item)
-            return ITEM_USAGE_NONE;
-
-        equip = QueryItemUsageForEquip(item);
-        item->RemoveFromUpdateQueueOf(bot);
-        delete item;
-    }
-    else //use real item
-    {
-        for (auto item : found)
-        {
-            equip = QueryItemUsageForEquip(item);
-
-            if (equip == ITEM_USAGE_EQUIP || equip == ITEM_USAGE_REPLACE || equip == ITEM_USAGE_BAD_EQUIP)
-            {
-                return equip;
-            }
-        }
-    }
-     
+    ItemUsage equip = QueryItemUsageForEquip(proto);
     if (equip != ITEM_USAGE_NONE)
         return equip;
 
@@ -121,6 +93,9 @@ ItemUsage ItemUsageValue::Calculate()
     if (!ai->GetMaster() || !sPlayerbotAIConfig.syncQuestWithPlayer || !IsItemUsefulForQuest(ai->GetMaster(), proto))
         if (IsItemUsefulForQuest(bot, proto))
             return ITEM_USAGE_QUEST;
+        else if (IsItemUsefulForQuest(bot, proto, true) && CurrentStacks(proto) < 2) //Do not sell quest items unless selling a full stack will stil keep enough in inventory.
+            return ITEM_USAGE_KEEP;
+
 
     if (proto->Class == ITEM_CLASS_PROJECTILE && bot->CanUseItem(proto) == EQUIP_ERR_OK)
         if (bot->getClass() == CLASS_HUNTER || bot->getClass() == CLASS_ROGUE || bot->getClass() == CLASS_WARRIOR)
@@ -160,7 +135,7 @@ ItemUsage ItemUsageValue::Calculate()
 
     //Need to add something like free bagspace or item value.
     if (proto->SellPrice > 0)
-        if (proto->Quality > ITEM_QUALITY_NORMAL)
+        if (auctionbot.GetSellPrice(proto) > ((int32)proto->SellPrice) * 1.5f) //Put an item on AH if the (predicted) sell price is 50% above the vendor price.
             return ITEM_USAGE_AH;
         else
             return ITEM_USAGE_VENDOR;
@@ -168,18 +143,24 @@ ItemUsage ItemUsageValue::Calculate()
     return ITEM_USAGE_NONE;
 }
 
-ItemUsage ItemUsageValue::QueryItemUsageForEquip(Item* item)
+ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemPrototype const* itemProto)
 {
-    ItemPrototype const* itemProto = item->GetProto();
-
     if (bot->CanUseItem(itemProto) != EQUIP_ERR_OK)
         return ITEM_USAGE_NONE;
 
     if (itemProto->InventoryType == INVTYPE_NON_EQUIP)
         return ITEM_USAGE_NONE;
 
+    Item* pItem = RandomPlayerbotMgr::CreateTempItem(itemProto->ItemId, 1, bot);
+    if (!pItem)
+        return ITEM_USAGE_NONE;
+
+    uint32 specId = sRandomItemMgr.GetPlayerSpecId(bot);
+
     uint16 dest;
-    InventoryResult result = bot->CanEquipItem(NULL_SLOT, dest, item, true, false);
+    InventoryResult result = bot->CanEquipItem(NULL_SLOT, dest, pItem, true, false);
+    pItem->RemoveFromUpdateQueueOf(bot);
+    delete pItem;
 
     if (result != EQUIP_ERR_OK)
         return ITEM_USAGE_NONE;
@@ -199,12 +180,15 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(Item* item)
         return ITEM_USAGE_EQUIP;
     }
 
-    PlayerbotFactory factory(bot, bot->GetLevel());
+    bool shouldEquip = false;
 
-    bool shouldEquip = true;
-    if (itemProto->Class == ITEM_CLASS_WEAPON && !factory.ShouldEquipWeapon(item))
+    uint32 statWeight = sRandomItemMgr.GetLiveStatWeight(bot, itemProto->ItemId, specId);
+    if (statWeight)
+        shouldEquip = true;
+
+    if (itemProto->Class == ITEM_CLASS_WEAPON && !sRandomItemMgr.CanEquipWeapon(bot->getClass(), itemProto))
         shouldEquip = false;
-    if (itemProto->Class == ITEM_CLASS_ARMOR && !factory.ShouldEquipArmor(item))
+    if (itemProto->Class == ITEM_CLASS_ARMOR && !sRandomItemMgr.CanEquipArmor(bot->getClass(), specId, bot->GetLevel(), itemProto))
         shouldEquip = false;
 
     Item* oldItem = bot->GetItemByPos(dest);
@@ -218,6 +202,15 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(Item* item)
 
     const ItemPrototype* oldItemProto = oldItem->GetProto();
 
+    if (oldItem)
+    {
+        uint32 oldStatWeight = sRandomItemMgr.GetLiveStatWeight(bot, oldItemProto->ItemId, specId);
+        if (statWeight || oldStatWeight)
+        {
+            shouldEquip = statWeight >= oldStatWeight;
+        }
+    }
+
     //Bigger quiver
     if (itemProto->Class == ITEM_CLASS_QUIVER)
         if (!oldItem || oldItemProto->ContainerSlots < itemProto->ContainerSlots)
@@ -226,13 +219,13 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(Item* item)
             ITEM_USAGE_NONE;
 
     bool existingShouldEquip = true;
-    if (oldItemProto->Class == ITEM_CLASS_WEAPON && !factory.ShouldEquipWeapon(oldItem))
+    if (oldItemProto->Class == ITEM_CLASS_WEAPON && !sRandomItemMgr.CanEquipWeapon(bot->getClass(), oldItemProto))
         existingShouldEquip = false;
-    if (oldItemProto->Class == ITEM_CLASS_ARMOR && !factory.ShouldEquipArmor(oldItem))
+    if (oldItemProto->Class == ITEM_CLASS_ARMOR && !sRandomItemMgr.CanEquipArmor(bot->getClass(), specId, bot->GetLevel(), oldItemProto))
         existingShouldEquip = false;
 
-    uint32 oldItemPower = oldItemProto->ItemLevel + oldItemProto->Quality * 5;
-    uint32 newItemPower = itemProto->ItemLevel + itemProto->Quality * 5;
+    uint32 oldItemPower = sRandomItemMgr.GetLiveStatWeight(bot, oldItemProto->ItemId);
+    uint32 newItemPower = sRandomItemMgr.GetLiveStatWeight(bot, itemProto->ItemId);
 
     //Compare items based on item level, quality or itemId.
     bool isBetter = false;
@@ -242,22 +235,35 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(Item* item)
         isBetter = true;
     else if (newItemPower == oldItemPower && itemProto->Quality == oldItemProto->Quality && itemProto->ItemId > oldItemProto->ItemId)
         isBetter = true;
-    
-    //white items can never be better than >= green items
-    isBetter &= (oldItemProto->Quality <= ITEM_QUALITY_NORMAL && itemProto->Quality >= ITEM_QUALITY_UNCOMMON);
 
+    Item* item = CurrentItem(itemProto);
     bool itemIsBroken = item && item->GetUInt32Value(ITEM_FIELD_DURABILITY) == 0 && item->GetUInt32Value(ITEM_FIELD_MAXDURABILITY) > 0;
     bool oldItemIsBroken = oldItem->GetUInt32Value(ITEM_FIELD_DURABILITY) == 0 && oldItem->GetUInt32Value(ITEM_FIELD_MAXDURABILITY) > 0;
 
-    if ((shouldEquip || !existingShouldEquip) && isBetter)
+    if (itemProto->ItemId != oldItemProto->ItemId && (shouldEquip || !existingShouldEquip) && isBetter)
     {
-        if (itemIsBroken && !oldItemIsBroken)
-            return ITEM_USAGE_BROKEN_EQUIP;
-        else
-            if (shouldEquip)
-                return ITEM_USAGE_EQUIP;
+        switch (itemProto->Class)
+        {
+        case ITEM_CLASS_ARMOR:
+            if (oldItemProto->SubClass <= itemProto->SubClass) {
+                if (itemIsBroken && !oldItemIsBroken)
+                    return ITEM_USAGE_BROKEN_EQUIP;
+                else
+                    if (shouldEquip)
+                        return ITEM_USAGE_REPLACE;
+                    else
+                        return ITEM_USAGE_BAD_EQUIP;
+            }
+            break;
+        default:
+            if (itemIsBroken && !oldItemIsBroken)
+                return ITEM_USAGE_BROKEN_EQUIP;
             else
-                return ITEM_USAGE_BAD_EQUIP;        
+                if (shouldEquip)
+                    return ITEM_USAGE_EQUIP;
+                else
+                    return ITEM_USAGE_BAD_EQUIP;
+        }
     }
 
     //Item is not better but current item is broken and new one is not.
@@ -290,7 +296,7 @@ uint32 ItemUsageValue::GetSmallestBagSize()
     return curSlots;
 }
 
-bool ItemUsageValue::IsItemUsefulForQuest(Player* player, ItemPrototype const* proto)
+bool ItemUsageValue::IsItemUsefulForQuest(Player* player, ItemPrototype const* proto, bool ignoreInventory)
 {
     for (uint8 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
     {
@@ -304,7 +310,7 @@ bool ItemUsageValue::IsItemUsefulForQuest(Player* player, ItemPrototype const* p
             if (quest->ReqItemId[i] != proto->ItemId)
                 continue;
 
-            if (player->GetPlayerbotAI() && AI_VALUE2(uint32, "item count", proto->Name1) >= quest->ReqItemCount[i])
+            if (player->GetPlayerbotAI() && AI_VALUE2(uint32, "item count", proto->Name1) >= quest->ReqItemCount[i] && !ignoreInventory)
                 continue;
 
             return true;
@@ -324,6 +330,14 @@ bool ItemUsageValue::IsItemNeededForSkill(ItemPrototype const* proto)
         return ai->HasSkill(SKILL_BLACKSMITHING) || ai->HasSkill(SKILL_ENGINEERING);
     case 6219: //Arclight Spanner
         return ai->HasSkill(SKILL_ENGINEERING);
+    case 6218: //Runed copper rod
+        return ai->HasSkill(SKILL_ENCHANTING);
+    case 6339: //Runed silver rod
+        return ai->HasSkill(SKILL_ENCHANTING);
+    case 11130: //Runed golden rod
+        return ai->HasSkill(SKILL_ENCHANTING);
+    case 11145: //Runed truesilver rod
+        return ai->HasSkill(SKILL_ENCHANTING);
     case 16207: //Runed Arcanite Rod
         return ai->HasSkill(SKILL_ENCHANTING);
     case 7005: //Skinning Knife

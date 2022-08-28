@@ -6,7 +6,7 @@ namespace ai
     class EnemyPlayerNear : public Trigger
     {
     public:
-        EnemyPlayerNear(PlayerbotAI* ai) : Trigger(ai, "enemy player near", 3) {}
+        EnemyPlayerNear(PlayerbotAI* ai) : Trigger(ai, "enemy player near") {}
 
     public:
         virtual bool IsActive();
@@ -93,6 +93,15 @@ namespace ai
         virtual bool IsActive();
     };
 
+    class BgInviteActiveTrigger : public Trigger
+    {
+    public:
+        BgInviteActiveTrigger(PlayerbotAI* ai) : Trigger(ai, "bg invite active", 10) {}
+
+    public:
+        virtual bool IsActive();
+    };
+
     class PlayerIsInBattlegroundWithoutFlag : public Trigger
     {
     public:
@@ -106,6 +115,24 @@ namespace ai
     {
     public:
         PlayerWantsInBattlegroundTrigger(PlayerbotAI* ai) : Trigger(ai, "wants in bg") {}
+
+    public:
+        virtual bool IsActive();
+    };
+
+    class VehicleNearTrigger : public Trigger
+    {
+    public:
+        VehicleNearTrigger(PlayerbotAI* ai) : Trigger(ai, "vehicle near", 10) {}
+
+    public:
+        virtual bool IsActive();
+    };
+
+    class InVehicleTrigger : public Trigger
+    {
+    public:
+        InVehicleTrigger(PlayerbotAI* ai) : Trigger(ai, "in vehicle") {}
 
     public:
         virtual bool IsActive();

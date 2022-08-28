@@ -5,6 +5,7 @@
 
 namespace ai
 {
+    HAS_AURA_TRIGGER_TIME(FeignDeathTrigger, "feign death", 5);
     BEGIN_TRIGGER(HunterNoStingsActiveTrigger, Trigger)
     END_TRIGGER()
 
@@ -55,6 +56,8 @@ namespace ai
         BlackArrowTrigger(PlayerbotAI* ai) : DebuffTrigger(ai, "black arrow") {}
     };
 
+    SNARE_TRIGGER(BlackArrowSnareTrigger, "black arrow");
+
     class HuntersMarkTrigger : public DebuffTrigger
     {
     public:
@@ -100,6 +103,8 @@ namespace ai
         ArcaneShotTrigger(PlayerbotAI* ai) : SpellCanBeCastTrigger(ai, "arcane shot") {}
     };
 
+    SNARE_TRIGGER(ScatterShotSnareTrigger, "scatter shot");
+
     class ScareBeastTrigger : public HasCcTargetTrigger
     {
     public:
@@ -110,7 +115,7 @@ namespace ai
     {
     public:
         HunterLowAmmoTrigger(PlayerbotAI* ai) : AmmoCountTrigger(ai, "ammo", 1, 30) {}
-        virtual bool IsActive() { return (AI_VALUE2(uint32, "item count", "ammo") < 200) && (AI_VALUE2(uint32, "item count", "ammo") > 0); }
+        virtual bool IsActive() { return bot->GetGroup() &&  (AI_VALUE2(uint32, "item count", "ammo") < 100) && (AI_VALUE2(uint32, "item count", "ammo") > 0); }
     };
 
     class HunterNoAmmoTrigger : public AmmoCountTrigger
@@ -153,6 +158,54 @@ namespace ai
                 return false;
 
             return target && ai->HasStrategy("ranged", BOT_STATE_COMBAT) && sServerFacade.IsDistanceLessOrEqualThan(AI_VALUE2(float, "distance", "current target"), 8.0f);
+        }
+    };
+
+    CAN_CAST_TRIGGER(MultishotCanCastTrigger, "multi shot");
+    SNARE_TRIGGER(IntimidationSnareTrigger, "intimidation");
+    CAN_CAST_TRIGGER(CounterattackCanCastTrigger, "counterattack");
+    SNARE_TRIGGER(WybernStingSnareTrigger, "wyvern sting");
+    CAN_CAST_TRIGGER(MongooseBiteCastTrigger, "mongoose bite");
+    BOOST_TRIGGER(BestialWrathBoostTrigger, "bestial wrath");
+
+    INTERRUPT_TRIGGER(SilencingShotInterruptTrigger, "silencing shot");
+    INTERRUPT_HEALER_TRIGGER(SilencingShotInterruptHealerTrigger, "silencing shot");
+
+    class ViperStingTrigger : public DebuffTrigger
+    {
+    public:
+        ViperStingTrigger(PlayerbotAI* ai) : DebuffTrigger(ai, "viper sting") {}
+        virtual bool IsActive()
+        {
+            return DebuffTrigger::IsActive() && GetTarget() && GetTarget()->IsPlayer() && AI_VALUE2(uint8, "mana", "current target") >= 10;
+        }
+    };
+
+    class AimedShotTrigger : public Trigger
+    {
+    public:
+        AimedShotTrigger(PlayerbotAI* ai) : Trigger(ai, "aimed shot", 2) {}
+        virtual string GetTargetName() { return "current target"; }
+        virtual bool IsActive()
+        {
+            if (!bot->HasSpell(19434) || !bot->IsSpellReady(19434))
+                return false;
+
+            Unit* target = GetTarget();
+            if (!target)
+                return false;
+
+            float distanceTo = AI_VALUE2(float, "distance", GetTargetName());
+            if (target->GetSelectionGuid() != bot->GetObjectGuid() && sServerFacade.IsDistanceGreaterOrEqualThan(distanceTo, 8.0f))
+                return true;
+
+            // victim
+            if (target->GetSelectionGuid() == bot->GetObjectGuid())
+            {
+                if (sServerFacade.IsDistanceGreaterOrEqualThan(distanceTo, 15.0f))
+                    return true;
+            }
+            return false;
         }
     };
 }

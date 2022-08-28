@@ -78,7 +78,7 @@ public:
     {
         ItemUsage usage = context->GetValue<ItemUsage>("item usage", item->GetEntry())->Get();
 
-        if (usage != ITEM_USAGE_VENDOR && usage != ITEM_USAGE_AH)
+        if (usage != ITEM_USAGE_VENDOR)
             return true;
 
         return SellItemsVisitor::Visit(item);

@@ -6,8 +6,10 @@
 
 using namespace ai;
 
-void TalkToQuestGiverAction::ProcessQuest(Quest const* quest, WorldObject* questGiver)
+bool TalkToQuestGiverAction::ProcessQuest(Quest const* quest, WorldObject* questGiver)
 {
+    bool isCompleted = false;
+
     std::ostringstream out; out << "Quest ";
 
     QuestStatus status = bot->GetQuestStatus(quest->GetQuestId());
@@ -20,7 +22,7 @@ void TalkToQuestGiverAction::ProcessQuest(Quest const* quest, WorldObject* quest
         {
             QuestStatus masterStatus = master->GetQuestStatus(quest->GetQuestId());
             if (masterStatus == QUEST_STATUS_INCOMPLETE || masterStatus == QUEST_STATUS_FAILED)
-                CompleteQuest(master, quest->GetQuestId());
+                isCompleted |= CompleteQuest(master, quest->GetQuestId());
         }
     }
 
@@ -28,7 +30,7 @@ void TalkToQuestGiverAction::ProcessQuest(Quest const* quest, WorldObject* quest
     {        
         if (master && master->GetQuestStatus(quest->GetQuestId()) == QUEST_STATUS_COMPLETE && (status == QUEST_STATUS_INCOMPLETE || status == QUEST_STATUS_FAILED))
         {
-            CompleteQuest(bot, quest->GetQuestId());
+            isCompleted |= CompleteQuest(bot, quest->GetQuestId());
             status = bot->GetQuestStatus(quest->GetQuestId());
         }
     }    
@@ -55,6 +57,8 @@ void TalkToQuestGiverAction::ProcessQuest(Quest const* quest, WorldObject* quest
 
     out << ": " << chat->formatQuest(quest);
     ai->TellMaster(out);
+
+    return isCompleted;
 }
 
 void TalkToQuestGiverAction::TurnInQuest(Quest const* quest, WorldObject* questGiver, ostringstream& out) 
@@ -65,6 +69,8 @@ void TalkToQuestGiverAction::TurnInQuest(Quest const* quest, WorldObject* questG
         return;
 
     bot->PlayDistanceSound(621);
+
+    sTravelMgr.logEvent(ai, "TalkToQuestGiverAction", quest->GetTitle(), to_string(quest->GetQuestId()));
 
     if (quest->GetRewChoiceItemsCount() == 0)
         RewardNoItem(quest, questGiver, out);
@@ -140,18 +146,18 @@ void TalkToQuestGiverAction::RewardMultipleItem(Quest const* quest, WorldObject*
     Item* newItem;
 
     ostringstream outid;
-    if (sPlayerbotAIConfig.autoPickReward == "no" || !sRandomPlayerbotMgr.IsRandomBot(ai->GetBot()))
-    {   //Old functionality, list rewards.
-        AskToSelectReward(quest, out, false);       
-    }
-    else if(sPlayerbotAIConfig.autoPickReward == "yes")
+    if (!ai->IsAlt() || sPlayerbotAIConfig.autoPickReward == "yes")
     {
         //Pick the first item of the best rewards.
         bestIds = BestRewards(quest);
         ItemPrototype const* item = sObjectMgr.GetItemPrototype(quest->RewChoiceItemId[*bestIds.begin()]);
-        bot->RewardQuest(quest, *bestIds.begin(), questGiver, true);        
+        bot->RewardQuest(quest, *bestIds.begin(), questGiver, true);
 
         out << "Rewarded " << chat->formatItem(item);
+    }
+    else if (sPlayerbotAIConfig.autoPickReward == "no")
+    {   //Old functionality, list rewards.
+        AskToSelectReward(quest, out, false);       
     }
     else 
     {   //Try to pick the usable item. If multiple list usable rewards.

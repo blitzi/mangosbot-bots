@@ -44,8 +44,11 @@ PlayerbotSecurityLevel PlayerbotSecurity::LevelFor(Player* from, DenyReason* rea
 
         if ((int)bot->GetLevel() - (int)from->GetLevel() > 5)
         {
-            if (reason) *reason = PLAYERBOT_DENY_LOW_LEVEL;
-            return PLAYERBOT_SECURITY_TALK;
+            if (!bot->GetGuildId() || bot->GetGuildId() != from->GetGuildId())
+            {
+                if (reason) *reason = PLAYERBOT_DENY_LOW_LEVEL;
+                return PLAYERBOT_SECURITY_TALK;
+            }
         }
 
         int botGS = (int)bot->GetPlayerbotAI()->GetEquipGearScore(bot, false, false);
@@ -55,6 +58,36 @@ PlayerbotSecurityLevel PlayerbotSecurity::LevelFor(Player* from, DenyReason* rea
             if (botGS && bot->GetLevel() > 15 && botGS > fromGS && (100 * (botGS - fromGS) / botGS) >= 12 * sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL) / from->GetLevel())
             {
                 if (reason) *reason = PLAYERBOT_DENY_GEARSCORE;
+                return PLAYERBOT_SECURITY_TALK;
+            }
+        }
+
+        /*if (sServerFacade.UnitIsDead(bot))
+        {
+            if (!bot->GetGuildId() || bot->GetGuildId() != from->GetGuildId())
+            {
+                if (reason) *reason = PLAYERBOT_DENY_BG;
+                return PLAYERBOT_SECURITY_TALK;
+            }
+        }
+
+#ifdef MANGOSBOT_ONE
+        if (bot->GetPlayerbotAI()->HasRealPlayerMaster() && !bot->m_lookingForGroup.isEmpty() &&
+            (!bot->m_lookingForGroup.group[0].empty() && bot->m_lookingForGroup.group[0].type == LFG_TYPE_DUNGEON ||
+            (!bot->m_lookingForGroup.group[1].empty() && bot->m_lookingForGroup.group[1].type == LFG_TYPE_DUNGEON) ||
+            (!bot->m_lookingForGroup.group[2].empty() && bot->m_lookingForGroup.group[2].type == LFG_TYPE_DUNGEON) ||
+                (!bot->m_lookingForGroup.more.empty() && bot->m_lookingForGroup.more.type == LFG_TYPE_DUNGEON)))
+#endif
+#ifdef MANGOSBOT_ZERO
+        if (sLFGMgr.IsPlayerInQueue(bot->GetObjectGuid()))
+#endif
+#ifdef MANGOSBOT_TWO
+        if (false/*sLFGMgr.GetQueueInfo(bot->GetObjectGuid())*/)
+#endif
+        {
+            if (!bot->GetGuildId() || bot->GetGuildId() != from->GetGuildId())
+            {
+                if (reason) *reason = PLAYERBOT_DENY_LFG;
                 return PLAYERBOT_SECURITY_TALK;
             }
         }
@@ -92,31 +125,6 @@ PlayerbotSecurityLevel PlayerbotSecurity::LevelFor(Player* from, DenyReason* rea
         {
             if (reason) *reason = PLAYERBOT_DENY_FULL_GROUP;
             return PLAYERBOT_SECURITY_TALK;
-        }
-
-        if (bot->InBattleGroundQueue())
-        {
-            if (!bot->GetGuildId() || bot->GetGuildId() != from->GetGuildId())
-            {
-                if (reason) *reason = PLAYERBOT_DENY_BG;
-                return PLAYERBOT_SECURITY_TALK;
-            }
-        }
-
-#ifdef MANGOSBOT_ONE
-        if (!bot->m_lookingForGroup.Empty())
-#endif
-        {
-            if (!bot->GetGuildId() || bot->GetGuildId() != from->GetGuildId())
-            {
-#ifdef MANGOSBOT_ZERO
-                if (sLFGMgr.IsPlayerInQueue(bot->GetObjectGuid()))
-                {
-                    if (reason) *reason = PLAYERBOT_DENY_LFG;
-                    return PLAYERBOT_SECURITY_TALK;
-                }
-#endif
-            }
         }
 
         if (group->GetLeaderGuid() != bot->GetObjectGuid())
@@ -194,7 +202,7 @@ bool PlayerbotSecurity::CheckLevelFor(PlayerbotSecurityLevel level, bool silent,
             {
                 out << "You must be closer to invite me to your group. I am in ";
 
-                uint32 area = bot->GetAreaId();
+                uint32 area = sServerFacade.GetAreaId(bot);
                 if (area)
                 {
 					const AreaTableEntry* entry = GetAreaEntryByAreaID(area);
@@ -212,7 +220,7 @@ bool PlayerbotSecurity::CheckLevelFor(PlayerbotSecurityLevel level, bool silent,
             out << "I am currently leading a group. I can invite you if you want.";
             break;
         case PLAYERBOT_DENY_NOT_LEADER:
-            out << "I am in a group with " << bot->GetPlayerbotAI()->GetGroupMaster()->GetName() << ". Will do it later.";
+            out << "I am in a group with " << bot->GetPlayerbotAI()->GetGroupMaster()->GetName() << ". You can ask him for invite.";
             break;
         case PLAYERBOT_DENY_BG:
             out << "I am in a queue for BG. Will do it later";

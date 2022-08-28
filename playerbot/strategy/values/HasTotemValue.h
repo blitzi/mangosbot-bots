@@ -8,7 +8,7 @@ namespace ai
     class HasTotemValue : public BoolCalculatedValue, public Qualified
 	{
 	public:
-        HasTotemValue(PlayerbotAI* ai) : BoolCalculatedValue(ai) {}
+        HasTotemValue(PlayerbotAI* ai, string name = "has totem") : BoolCalculatedValue(ai, name) {}
 
     public:
         bool Calculate()
@@ -24,7 +24,7 @@ namespace ai
                 if (!creature || !creature->IsTotem())
                     continue;
 
-                if (strstri(creature->GetName(), qualifier.c_str()) && bot->GetDistance(creature) <= ai->GetRange("spell"))
+                if (strstri(creature->GetName(), qualifier.c_str()) && sServerFacade.GetDistance2d(bot, creature) <= ai->GetRange("spell"))
                     return true;
             }
 

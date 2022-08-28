@@ -39,6 +39,8 @@ Unit* PartyMemberValue::FindPartyMember(FindPlayerPredicate &predicate, bool ign
     {
         for (GroupReference *ref = group->GetFirstMember(); ref; ref = ref->next())
         {
+            if (!ref->getSource() || bot->GetMapId() != ref->getSource()->GetMapId()) continue;
+
             if (ref->getSource() != bot)
             {
                 nearestGroupPlayers.push_back(ref->getSource()->GetObjectGuid());
@@ -46,7 +48,7 @@ Unit* PartyMemberValue::FindPartyMember(FindPlayerPredicate &predicate, bool ign
         }
     }
     
-    if (!ignoreOutOfGroup && !nearestPlayers.empty())
+    if (!ignoreOutOfGroup && !nearestPlayers.empty() && nearestPlayers.size() < 100)
         nearestGroupPlayers.insert(nearestGroupPlayers.end(), nearestPlayers.begin(), nearestPlayers.end());
 
     nearestPlayers = nearestGroupPlayers;

@@ -59,11 +59,8 @@ bool GuidManageAction::Execute(Event event)
 
     if (!player || !PlayerIsValid(player) || player == bot)
         return false;
-#ifdef MANGOSBOT_ZERO
-    WorldPacket data(opcode, 8);
-#else
+
     WorldPacket data(Opcodes(opcode), 8);
-#endif
     data << player->GetName();
 
     SendPacket(data);
@@ -86,38 +83,31 @@ bool GuildManageNearbyAction::Execute(Event event)
         if (!player || bot == player)
             continue;
 
-        if (player->GetGuildId() != bot->GetGuildId())
+        if (player->isDND())
             continue;
+
 
         if(player->GetGuildId()) //Promote or demote nearby members based on chance.
         {          
             MemberSlot* member = guild->GetMemberSlot(player->GetObjectGuid());
             uint32 dCount = AI_VALUE(uint32, "death count");
 
-            if (dCount < 2 || !urand(0, 10))
+            if (!urand(0, 30))
             {
-                if (!urand(0, 10))
-                {
-                    ai->DoSpecificAction("guild promote", Event("guild management", guid), true);
-
-                    continue;
-                }
+                ai->DoSpecificAction("guild promote", Event("guild management", guid), true);
+                continue;
             }
 
-            if (dCount > 3 || !urand(0, 10))
+            if (!urand(0, 30))
             {
-                if (!urand(0, 10))
-                {
-                    ai->DoSpecificAction("guild demote", Event("guild management", guid), true);
-
-                    continue;
-                }
+                ai->DoSpecificAction("guild demote", Event("guild management", guid), true);
+                continue;
             }
 
             continue;
         }
 
-        if (!(guild->GetRankRights(botMember->RankId) & GR_RIGHT_INVITE))
+        if ((guild->GetRankRights(botMember->RankId) & GR_RIGHT_INVITE) == 0)
             continue;
 
         if (player->GetGuildIdInvited())
@@ -144,7 +134,7 @@ bool GuildManageNearbyAction::Execute(Event event)
         if (sServerFacade.GetDistance2d(bot, player) > sPlayerbotAIConfig.sightDistance)
             continue;
         
-        if (ai->DoSpecificAction("ginvite", Event("guild management", guid)))
+        if (ai->DoSpecificAction("ginvite", Event("guild management", guid), true))
             found++;
     }
 

@@ -49,6 +49,8 @@
 #include "GuildCreateActions.h"
 #include "GuildManagementActions.h"
 #include "GuildAcceptAction.h"
+#include "RpgSubActions.h"
+#include "VehicleActions.h"
 #include "UseTrinketAction.h"
 
 namespace ai
@@ -78,10 +80,7 @@ namespace ai
             creators["reach party member to heal"] = &ActionContext::reach_party_member_to_heal;
             creators["flee"] = &ActionContext::flee;
             creators["flee with pet"] = &ActionContext::flee_with_pet;
-            creators["gift of the naaru"] = &ActionContext::gift_of_the_naaru;
             creators["shoot"] = &ActionContext::shoot;
-            creators["lifeblood"] = &ActionContext::lifeblood;
-            creators["arcane torrent"] = &ActionContext::arcane_torrent;
             creators["pull start"] = &ActionContext::pull_start;
             creators["pull finish"] = &ActionContext::pull_finish;
             creators["start pull"] = &ActionContext::start_pull;
@@ -138,7 +137,6 @@ namespace ai
             creators["give water"] = &ActionContext::give_water;
             creators["give refreshment"] = &ActionContext::give_refreshment;
             creators["mount"] = &ActionContext::mount;
-            creators["war stomp"] = &ActionContext::war_stomp;
             creators["auto talents"] = &ActionContext::auto_talents;
             creators["increase level"] = &ActionContext::increase_level;
 			creators["auto learn spell"] = &ActionContext::auto_learn_spell;
@@ -157,6 +155,8 @@ namespace ai
             creators["use random quest item"] = &ActionContext::use_random_quest_item;
             creators["craft random item"] = &ActionContext::craft_random_item;
             creators["smart destroy item"] = &ActionContext::smart_destroy_item;
+            creators["disenchant random item"] = &ActionContext::disenchant_random_item;
+            creators["enchant random item"] = &ActionContext::enchant_random_item;
             creators["reset instances"] = &ActionContext::reset_instances;
             creators["buy petition"] = &ActionContext::buy_petition;
             creators["offer petition"] = &ActionContext::offer_petition;
@@ -164,8 +164,12 @@ namespace ai
             creators["turn in petition"] = &ActionContext::turn_in_petition;
             creators["buy tabard"] = &ActionContext::buy_tabard;
             creators["guild manage nearby"] = &ActionContext::guild_manage_nearby;
-            creators["cancel heal"] = &ActionContext::cancel_heal;
             creators["use trinket"] = &ActionContext::use_trinket;
+            creators["goblin sapper"] = &ActionContext::goblin_sapper;
+            creators["oil of immolation"] = &ActionContext::oil_of_immolation;
+            creators["dark rune"] = &ActionContext::dark_rune;
+            creators["adamantite grenade"] = &ActionContext::adamantite_grenade;
+            creators["cancel heal"] = &ActionContext::cancel_heal;
             creators["damage stop"] = &ActionContext::damage_stop;
 
             // BG Tactics
@@ -179,6 +183,69 @@ namespace ai
             creators["bg use buff"] = &ActionContext::bg_use_buff;
             creators["attack enemy flag carrier"] = &ActionContext::attack_enemy_fc;
             creators["bg check flag"] = &ActionContext::bg_check_flag;
+
+            // lightwell
+            creators["use lightwell"] = &ActionContext::use_lightwell;
+
+            // Vehicles
+            creators["enter vehicle"] = &ActionContext::enter_vehicle;
+            creators["leave vehicle"] = &ActionContext::leave_vehicle;
+            creators["hurl boulder"] = &ActionContext::hurl_boulder;
+            creators["ram"] = &ActionContext::ram;
+            creators["steam rush"] = &ActionContext::steam_rush;
+            creators["steam blast"] = &ActionContext::steam_blast;
+            creators["napalm"] = &ActionContext::napalm;
+            creators["fire cannon"] = &ActionContext::fire_cannon;
+            creators["incendiary rocket"] = &ActionContext::incendiary_rocket;
+            creators["rocket blast"] = &ActionContext::rocket_blast;
+            creators["blade salvo"] = &ActionContext::blade_salvo;
+            creators["glaive throw"] = &ActionContext::glaive_throw;
+
+            //Rpg
+            creators["rpg stay"] = &ActionContext::rpg_stay;
+            creators["rpg work"] = &ActionContext::rpg_work;
+            creators["rpg emote"] = &ActionContext::rpg_emote;
+            creators["rpg cancel"] = &ActionContext::rpg_cancel;
+            creators["rpg taxi"] = &ActionContext::rpg_taxi;
+            creators["rpg discover"] = &ActionContext::rpg_discover;
+            creators["rpg start quest"] = &ActionContext::rpg_start_quest;
+            creators["rpg end quest"] = &ActionContext::rpg_end_quest;
+            creators["rpg buy"] = &ActionContext::rpg_buy;
+            creators["rpg sell"] = &ActionContext::rpg_sell;
+            creators["rpg ah sell"] = &ActionContext::rpg_ah_sell;
+            creators["rpg ah buy"] = &ActionContext::rpg_ah_buy;
+            creators["rpg get mail"] = &ActionContext::rpg_get_mail;
+            creators["rpg repair"] = &ActionContext::rpg_repair;
+            creators["rpg train"] = &ActionContext::rpg_train;
+            creators["rpg heal"] = &ActionContext::rpg_heal;
+            creators["rpg home bind"] = &ActionContext::rpg_home_bind;
+            creators["rpg queue bg"] = &ActionContext::rpg_queue_bg;
+            creators["rpg buy petition"] = &ActionContext::rpg_buy_petition;
+            creators["rpg use"] = &ActionContext::rpg_use;
+            creators["rpg spell"] = &ActionContext::rpg_spell;
+            creators["rpg craft"] = &ActionContext::rpg_craft;
+            creators["rpg trade useful"] = &ActionContext::rpg_trade_useful;
+            creators["rpg duel"] = &ActionContext::rpg_duel;
+            creators["rpg mount anim"] = &ActionContext::rpg_mount_anim;
+
+            //racials
+            creators["war stomp"] = &ActionContext::war_stomp;
+            creators["berserking"] = &ActionContext::berserking;
+            creators["blood fury"] = &ActionContext::blood_fury;
+            creators["cannibalize"] = &ActionContext::cannibalize;
+            creators["escape artist"] = &ActionContext::escape_artist;
+            creators["shadowmeld"] = &ActionContext::shadowmeld;
+            creators["stoneform"] = &ActionContext::stoneform;
+            creators["perception"] = &ActionContext::perception;
+            creators["will of the forsaken"] = &ActionContext::will_of_the_forsaken;
+#ifndef MANGOSBOT_ZERO
+            creators["mana tap"] = &ActionContext::mana_tap;
+            creators["arcane torrent"] = &ActionContext::arcane_torrent;
+            creators["gift of the naaru"] = &ActionContext::gift_of_the_naaru;
+#endif
+#ifdef MANGOSBOT_TWO
+            creators["every_man_for_himself"] = &ActionContext::every_man_for_himself;
+#endif    
         }
 
     private:
@@ -220,15 +287,26 @@ namespace ai
         static Action* reach_party_member_to_heal(PlayerbotAI* ai) { return new ReachPartyMemberToHealAction(ai); }
         static Action* flee_with_pet(PlayerbotAI* ai) { return new FleeWithPetAction(ai); }
         static Action* flee(PlayerbotAI* ai) { return new FleeAction(ai); }
+        static Action* end_pull(PlayerbotAI* ai) { return new ChangeCombatStrategyAction(ai, "-pull"); }
+
+        //racials      
+        static Action* war_stomp(PlayerbotAI* ai) { return new CastWarStompAction(ai); }
+        static Action* berserking(PlayerbotAI* ai) { return new CastBerserkingAction(ai); }
+        static Action* blood_fury(PlayerbotAI* ai) { return new CastBloodFuryAction(ai); }
+        static Action* cannibalize(PlayerbotAI* ai) { return new CastCannibalizeAction(ai); }
+        static Action* escape_artist(PlayerbotAI* ai) { return new CastEscapeArtistAction(ai); }
+        static Action* shadowmeld(PlayerbotAI* ai) { return new CastShadowmeldAction(ai); }
+        static Action* stoneform(PlayerbotAI* ai) { return new CastStoneformAction(ai); }
+        static Action* perception(PlayerbotAI* ai) { return new CastPerceptionAction(ai); }
+        static Action* will_of_the_forsaken(PlayerbotAI* ai) { return new CastWillOfTheForsakenAction(ai); }
+#ifndef MANGOSBOT_ZERO
         static Action* gift_of_the_naaru(PlayerbotAI* ai) { return new CastGiftOfTheNaaruAction(ai); }
-        static Action* lifeblood(PlayerbotAI* ai) { return new CastLifeBloodAction(ai); }
         static Action* arcane_torrent(PlayerbotAI* ai) { return new CastArcaneTorrentAction(ai); }
         static Action* mana_tap(PlayerbotAI* ai) { return new CastManaTapAction(ai); }
-        static Action* war_stomp(PlayerbotAI* ai) { return new CastWarStompAction(ai); }
-        static Action* pull_start(PlayerbotAI* ai) { return new Action(ai); }
-        static Action* pull_finish(PlayerbotAI* ai) { return new Action(ai); }
-        static Action* start_pull(PlayerbotAI* ai) { return new ChangeCombatStrategyAction(ai, "+pull"); }
-        static Action* end_pull(PlayerbotAI* ai) { return new ChangeCombatStrategyAction(ai, "-pull"); }
+#endif 
+#ifdef MANGOSBOT_TWO
+        static Action* every_man_for_himself(PlayerbotAI* ai) { return new CastEveryManforHimselfAction(ai); }
+#endif 
 
         static Action* emote(PlayerbotAI* ai) { return new EmoteAction(ai); }
         static Action* talk(PlayerbotAI* ai) { return new TalkAction(ai); }
@@ -263,6 +341,7 @@ namespace ai
         static Action* reveal_gathering_item(PlayerbotAI* ai) { return new RevealGatheringItemAction(ai); }
         static Action* outfit(PlayerbotAI* ai) { return new OutfitAction(ai); }
         static Action* delay(PlayerbotAI* ai) { return new DelayAction(ai); }
+        static Action* mount(PlayerbotAI *ai) { return new CastSpellAction(ai, "mount"); }
         static Action* mount(PlayerbotAI *ai) { return new CastRangeSpellAction(ai, "mount"); }
         static Action* auto_talents(PlayerbotAI* ai) { return new AutoSetTalentsAction(ai); }
         static Action* increase_level(PlayerbotAI* ai) { return new IncreaseLevelAction(ai); }
@@ -282,6 +361,8 @@ namespace ai
         static Action* use_random_quest_item(PlayerbotAI* ai) { return new UseRandomQuestItem(ai); }
         static Action* craft_random_item(PlayerbotAI* ai) { return new CraftRandomItemAction(ai); }
         static Action* smart_destroy_item(PlayerbotAI* ai) { return new SmartDestroyItemAction(ai); }
+        static Action* disenchant_random_item(PlayerbotAI* ai) { return new DisEnchantRandomItemAction(ai); }
+        static Action* enchant_random_item(PlayerbotAI* ai) { return new EnchantRandomItemAction(ai); }
         static Action* reset_instances(PlayerbotAI* ai) { return new ResetInstancesAction(ai); }
         static Action* buy_petition(PlayerbotAI* ai) { return new BuyPetitionAction(ai); }
         static Action* offer_petition(PlayerbotAI* ai) { return new PetitionOfferAction(ai); }
@@ -289,10 +370,16 @@ namespace ai
         static Action* turn_in_petition(PlayerbotAI* ai) { return new PetitionTurnInAction(ai); }
         static Action* buy_tabard(PlayerbotAI* ai) { return new BuyTabardAction(ai); }
         static Action* guild_manage_nearby(PlayerbotAI* ai) { return new GuildManageNearbyAction(ai); }
+        static Action* use_trinket(PlayerbotAI* ai) { return new UseTrinketAction(ai); }
+
+        // item helpers
+        static Action* goblin_sapper(PlayerbotAI* ai) { return new CastGoblinSappersAction(ai); }
+        static Action* oil_of_immolation(PlayerbotAI* ai) { return new CastOilOfImmolationAction(ai); }
+        static Action* dark_rune(PlayerbotAI* ai) { return new DarkRuneAction(ai); }
+        static Action* adamantite_grenade(PlayerbotAI* ai) { return new UseAdamantiteGrenadeAction(ai); }
         
         
         static Action* cancel_heal(PlayerbotAI* ai) { return new CancelHealAction(ai); }
-        static Action* use_trinket(PlayerbotAI* ai) { return new UseTrinketAction(ai); }
         static Action* damage_stop(PlayerbotAI* ai) { return new DamageStopAction(ai); }
 
         // BG Tactics
@@ -305,6 +392,50 @@ namespace ai
         static Action* bg_protect_fc(PlayerbotAI* ai) { return new BGTactics(ai, "protect fc"); }
         static Action* attack_enemy_fc(PlayerbotAI* ai) { return new AttackEnemyFlagCarrierAction(ai); }
         static Action* bg_use_buff(PlayerbotAI* ai) { return new BGTactics(ai, "use buff"); }
-        static Action* bg_check_flag(PlayerbotAI* ai) { return new BGTactics(ai, "check flag"); }    
+        static Action* bg_check_flag(PlayerbotAI* ai) { return new BGTactics(ai, "check flag"); }   
+
+        // lightwell
+        static Action* use_lightwell(PlayerbotAI* ai) { return new UseLightwellAction(ai); }
+
+        // Vehicles
+        static Action* enter_vehicle(PlayerbotAI* ai) { return new EnterVehicleAction(ai); }
+        static Action* leave_vehicle(PlayerbotAI* ai) { return new LeaveVehicleAction(ai); }
+        static Action* hurl_boulder(PlayerbotAI* ai) { return new CastHurlBoulderAction(ai); }
+        static Action* ram(PlayerbotAI* ai) { return new CastRamAction(ai); }
+        static Action* steam_blast(PlayerbotAI* ai) { return new CastSteamBlastAction(ai); }
+        static Action* steam_rush(PlayerbotAI* ai) { return new CastSteamRushAction(ai); }
+        static Action* napalm(PlayerbotAI* ai) { return new CastNapalmAction(ai); }
+        static Action* fire_cannon(PlayerbotAI* ai) { return new CastFireCannonAction(ai); }
+        static Action* incendiary_rocket(PlayerbotAI* ai) { return new CastIncendiaryRocketAction(ai); }
+        static Action* rocket_blast(PlayerbotAI* ai) { return new CastRocketBlastAction(ai); }
+        static Action* glaive_throw(PlayerbotAI* ai) { return new CastGlaiveThrowAction(ai); }
+        static Action* blade_salvo(PlayerbotAI* ai) { return new CastBladeSalvoAction(ai); }
+
+        //Rpg
+        static Action* rpg_stay(PlayerbotAI* ai) { return new RpgStayAction(ai); }
+        static Action* rpg_work(PlayerbotAI* ai) { return new RpgWorkAction(ai); }
+        static Action* rpg_emote(PlayerbotAI* ai) { return new RpgEmoteAction(ai); }
+        static Action* rpg_cancel(PlayerbotAI* ai) { return new RpgCancelAction(ai); }
+        static Action* rpg_taxi(PlayerbotAI* ai) { return new RpgTaxiAction(ai); }
+        static Action* rpg_discover(PlayerbotAI* ai) { return new RpgDiscoverAction(ai); }
+        static Action* rpg_start_quest(PlayerbotAI* ai) { return new RpgStartQuestAction(ai); }
+        static Action* rpg_end_quest(PlayerbotAI* ai) { return new RpgEndQuestAction(ai); }
+        static Action* rpg_buy(PlayerbotAI* ai) { return new RpgBuyAction(ai); }
+        static Action* rpg_sell(PlayerbotAI* ai) { return new RpgSellAction(ai); }
+        static Action* rpg_ah_sell(PlayerbotAI* ai) { return new RpgAHSellAction(ai); }
+        static Action* rpg_ah_buy(PlayerbotAI* ai) { return new RpgAHBuyAction(ai); }
+        static Action* rpg_get_mail(PlayerbotAI* ai) { return new RpgGetMailAction(ai); }
+        static Action* rpg_repair(PlayerbotAI* ai) { return new RpgRepairAction(ai); }
+        static Action* rpg_train(PlayerbotAI* ai) { return new RpgTrainAction(ai); }
+        static Action* rpg_heal(PlayerbotAI* ai) { return new RpgHealAction(ai); }
+        static Action* rpg_home_bind(PlayerbotAI* ai) { return new RpgHomeBindAction(ai); }
+        static Action* rpg_queue_bg(PlayerbotAI* ai) { return new RpgQueueBgAction(ai); }
+        static Action* rpg_buy_petition(PlayerbotAI* ai) { return new RpgBuyPetitionAction(ai); }
+        static Action* rpg_use(PlayerbotAI* ai) { return new RpgUseAction(ai); }
+        static Action* rpg_spell(PlayerbotAI* ai) { return new RpgSpellAction(ai); }
+        static Action* rpg_craft(PlayerbotAI* ai) { return new RpgCraftAction(ai); }
+        static Action* rpg_trade_useful(PlayerbotAI* ai) { return new RpgTradeUsefulAction(ai); }
+        static Action* rpg_duel(PlayerbotAI* ai) { return new RpgDuelAction(ai); }
+        static Action* rpg_mount_anim(PlayerbotAI* ai) { return new RpgMountAnimAction(ai); }
     };
 };

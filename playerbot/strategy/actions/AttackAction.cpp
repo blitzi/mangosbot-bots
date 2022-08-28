@@ -13,8 +13,12 @@ bool AttackAction::Execute(Event event)
 {
     Unit* target = GetTarget();
 
-    if (!target)
+    if (!target || !target->IsInWorld() || target->GetMapId() != bot->GetMapId())
         return false;
+
+    Unit* victim = bot->GetVictim();
+    //if (victim && victim->IsPlayer() && victim->GetObjectGuid() == target->GetObjectGuid())
+    //    return false;
 
     return Attack(target);
 }
@@ -82,7 +86,7 @@ bool AttackAction::Attack(Unit* target)
         return false;
     }
 
-    if (bot->IsMounted() && bot->IsWithinLOSInMap(target, true) && (sServerFacade.GetDistance2d(bot, target) < 40.0f))
+    if (bot->IsMounted() && (sServerFacade.GetDistance2d(bot, target) < 40.0f))
     {
         WorldPacket emptyPacket;
         bot->GetSession()->HandleCancelMountAuraOpcode(emptyPacket);
@@ -110,22 +114,13 @@ bool AttackAction::Attack(Unit* target)
         if (creatureAI)
         {
 #ifdef CMANGOS
-            creatureAI->SetReactState(REACT_PASSIVE);
+            creatureAI->SetReactState(REACT_DEFENSIVE);
 #endif
 #ifdef MANGOS
             pet->GetCharmInfo()->SetCommandState(COMMAND_ATTACK);
 #endif
             creatureAI->AttackStart(target);
         }
-    }
-
-    if (!urand(0, 300))
-    {
-        vector<uint32> sounds;
-        sounds.push_back(TEXTEMOTE_OPENFIRE);
-        sounds.push_back(305);
-        sounds.push_back(307);
-        ai->PlaySound(sounds[urand(0, sounds.size() - 1)]);
     }
 
     /*if (IsMovingAllowed() && !sServerFacade.IsInFront(bot, target, sPlayerbotAIConfig.sightDistance, CAST_ANGLE_IN_FRONT))

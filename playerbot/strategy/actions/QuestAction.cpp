@@ -143,7 +143,7 @@ bool QuestAction::ProcessQuests(WorldObject* questGiver)
 {
     ObjectGuid guid = questGiver->GetObjectGuid();
 
-    if (bot->GetDistance(questGiver) > INTERACTION_DISTANCE && !sPlayerbotAIConfig.syncQuestWithPlayer)
+    if (sServerFacade.GetDistance2d(bot, questGiver) > INTERACTION_DISTANCE && !sPlayerbotAIConfig.syncQuestWithPlayer)
     {
         ai->TellError("Cannot talk to quest giver");
         return false;
@@ -156,6 +156,8 @@ bool QuestAction::ProcessQuests(WorldObject* questGiver)
     bot->PrepareQuestMenu(guid);
     QuestMenu& questMenu = bot->GetPlayerMenu()->GetQuestMenu();
 
+    bool hasAccept = false;
+
     for (uint32 i = 0; i < questMenu.MenuItemCount(); ++i)
     {
         QuestMenuItem const& menuItem = questMenu.GetItem(i);
@@ -164,10 +166,10 @@ bool QuestAction::ProcessQuests(WorldObject* questGiver)
         if (!quest)
             continue;
 
-        ProcessQuest(quest, questGiver);
+        hasAccept |= ProcessQuest(quest, questGiver);
     }
 
-    return true;
+    return hasAccept;
 }
 
 bool QuestAction::AcceptQuest(Quest const* quest, uint64 questGiver)
@@ -203,6 +205,9 @@ bool QuestAction::AcceptQuest(Quest const* quest, uint64 questGiver)
 
         if (bot->GetQuestStatus(questId) != QUEST_STATUS_NONE && bot->GetQuestStatus(questId) != QUEST_STATUS_AVAILABLE)
         {
+
+            sTravelMgr.logEvent(ai, "AcceptQuestAction", quest->GetTitle(), to_string(quest->GetQuestId()));          
+
             out << "Accepted " << chat->formatQuest(quest);
             ai->TellMaster(out);
             return true;
@@ -237,5 +242,9 @@ bool QuestObjectiveCompletedAction::Execute(Event event)
             ai->TellMaster(chat->formatQuestObjective(info->Name, available, required));
     }
 
-    return true;
+    Quest const* qInfo = sObjectMgr.GetQuestTemplate(questId);
+
+    sTravelMgr.logEvent(ai, "QuestObjectiveCompletedAction", qInfo->GetTitle(), to_string((float)available / (float)required));   
+
+    return false;
 }

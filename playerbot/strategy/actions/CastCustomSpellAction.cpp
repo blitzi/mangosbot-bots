@@ -5,7 +5,6 @@
 #include "../../PlayerbotAIConfig.h"
 #include "../../ServerFacade.h"
 
-
 using namespace ai;
 
 int FindLastSeparator(string text, string sep)
@@ -29,6 +28,10 @@ static inline void ltrim(std::string& s) {
 
 bool CastCustomSpellAction::Execute(Event event)
 {
+    // only allow proper vehicle seats
+    if (ai->IsInVehicle() && !ai->IsInVehicle(false, false, true))
+        return false;
+
     Unit* target = NULL;
     string text = event.getParam();
     Player* master = GetMaster();
@@ -108,14 +111,11 @@ bool CastCustomSpellAction::Execute(Event event)
     else if (target == bot) spellName << "self";
     else spellName << target->GetName();
 
-    if (!bot->GetTrader())
-    {                
-        if (!ai->CanCastSpell(spell, target, true, itemTarget))
-        {
-            msg << "Cannot cast " << spellName.str();
-            ai->TellError(msg.str());
-            return false;
-        }                                          
+    if (!bot->GetTrader() && !ai->CanCastSpell(spell, target, 0, true, itemTarget))
+    {
+        msg << "Cannot cast " << spellName.str();
+        ai->TellError(msg.str());
+        return false;
     }
 
     MotionMaster& mm = *bot->GetMotionMaster();
@@ -227,10 +227,7 @@ bool CastRandomSpellAction::Execute(Event event)
         uint32 spellId = spell.first;
         WorldObject* wo = spell.second.second;
 
-        if(wo->GetObjectGuid().IsUnit())
-            isCast = ai->CastSpell(spellId, (Unit*)(wo));
-        else
-            isCast = ai->CastSpell(spellId, wo->GetPositionX(), wo->GetPositionY(), wo->GetPositionZ());
+        bool isCast = castSpell(spellId, wo);
 
         if (isCast)
         {
@@ -248,3 +245,33 @@ bool CastRandomSpellAction::Execute(Event event)
 
     return false;
 }
+
+bool CastRandomSpellAction::castSpell(uint32 spellId, WorldObject* wo)
+{
+
+    if (wo->GetObjectGuid().IsUnit())
+        return ai->CastSpell(spellId, (Unit*)(wo));
+    else
+        return ai->CastSpell(spellId, wo->GetPositionX(), wo->GetPositionY(), wo->GetPositionZ());
+}
+
+bool DisEnchantRandomItemAction::Execute(Event event)
+{
+    list<Item*> items = AI_VALUE2(list<Item*>, "inventory items", "usage " + to_string(ITEM_USAGE_DISENCHANT));
+
+    items.reverse();
+
+    for (auto& item: items)
+    {
+        // don't touch rare+ items if with real player/guild
+        if ((ai->HasRealPlayerMaster() || ai->IsInRealGuild()) && item->GetProto()->Quality > ITEM_QUALITY_UNCOMMON)
+            return false;
+
+        if(CastCustomSpellAction::Execute(Event("disenchant random item", "13262 "+ chat->formatQItem(item->GetEntry()))))
+            return true;
+    }
+
+    return false;
+};
+
+

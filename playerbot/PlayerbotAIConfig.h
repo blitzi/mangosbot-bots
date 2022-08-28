@@ -56,6 +56,9 @@ public:
     std::list<uint32> damageStopSpellIds;
     std::list<uint32> damageFocusGUIDs;
     uint32 randomBotTeleportDistance;
+    uint32 randomGearMaxLevel;
+    uint32 randomGearMaxDiff;
+    bool randomGearProgression;
     float randomGearLoweringChance;
     float randomBotMaxLevelChance;
     float randomBotRpgChance;
@@ -70,6 +73,7 @@ public:
     uint32 minRandomBotsPriceChangeInterval, maxRandomBotsPriceChangeInterval;
     bool randomBotJoinLfg;
     bool randomBotJoinBG;
+    bool randomBotAutoJoinBG;
     uint32 randomBotBracketCount;
     bool randomBotLoginAtStartup;
     uint32 randomBotTeleLevel;
@@ -125,6 +129,10 @@ public:
     std::string autoPickTalents;
     bool autoLearnTrainerSpells;
     bool autoLearnQuestSpells;
+    bool autoDoQuests;
+    bool syncLevelWithPlayers;
+    bool freeFood;
+    uint32 tweakValue; //Debugging config
 
     std::mutex m_logMtx;
 
@@ -139,6 +147,7 @@ public:
         uint32 spellId;
         uint32 factionId = 0;
         uint32 classId = 0;
+        uint32 specId = 0;
         uint32 minLevel = 0;
         uint32 maxLevel = 0;
     };
@@ -151,7 +160,7 @@ public:
     std::string GetValue(std::string name);
     void SetValue(std::string name, std::string value);
 
-    void loadWorldBuf(Config* config, uint32 factionId, uint32 classId, uint32 minLevel, uint32 maxLevel);
+    void loadWorldBuf(Config* config, uint32 factionId, uint32 classId, uint32 specId1, uint32 minLevel, uint32 maxLevel);
 
     std::string GetTimestampStr();
 

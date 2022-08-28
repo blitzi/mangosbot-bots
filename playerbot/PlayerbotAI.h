@@ -9,6 +9,7 @@
 #include "ChatFilter.h"
 #include "PlayerbotSecurity.h"
 #include "TravelMgr.h"
+#include "PlayerbotTextMgr.h"
 #include <stack>
 
 class Player;
@@ -85,6 +86,9 @@ enum HealingItemDisplayId
 enum RoguePoisonDisplayId
 {
    DEADLY_POISON_DISPLAYID = 13707,
+   CRIPPLING_POISON_DISPLAYID = 13708,
+   CRIPPLING_POISON_DISPLAYID_II = 2947,
+   MIND_POISON_DISPLAYID = 13709,
    INSTANT_POISON_DISPLAYID = 13710,
 #ifdef MANGOSBOT_ZERO
    WOUND_POISON_DISPLAYID = 13708
@@ -242,15 +246,16 @@ public:
 	virtual ~PlayerbotAI();
 
 public:
-	virtual void UpdateAIInternal(uint32 elapsed);
+	virtual void UpdateAIInternal(uint32 elapsed, bool minimal = false);
 	string HandleRemoteCommand(string command);
     void HandleCommand(uint32 type, const string& text, Player& fromPlayer);
+    void QueueChatResponse(uint8 msgtype, ObjectGuid guid1, ObjectGuid guid2, std::string message, std::string chanName, std::string name);
 	void HandleBotOutgoingPacket(const WorldPacket& packet);
     void HandleMasterIncomingPacket(const WorldPacket& packet);
     void HandleMasterOutgoingPacket(const WorldPacket& packet);
 	void HandleTeleportAck();
     void ChangeEngine(BotState type);
-    void DoNextAction();
+    void DoNextAction(bool minimal = false);
     virtual bool DoSpecificAction(string name, Event event = Event(), bool silent = false, string qualifier = "");
     void ChangeStrategy(string name, BotState type);
     void ChangeStrategy(string name);
@@ -258,6 +263,7 @@ public:
     list<string> GetStrategies(BotState type);
     bool ContainsStrategy(StrategyType type);
     bool HasStrategy(string name, BotState type);
+    BotState GetState() { return currentState; };
     bool HasStrategy(string name);
     bool HasStrategyInAllEngines(string name);
     void ResetStrategies(bool load = true);
@@ -285,6 +291,7 @@ public:
     void RemoveShapeshift();
     void WaitForSpellCast(Spell *spell);
     bool PlaySound(uint32 emote);
+    bool PlayEmote(uint32 emote);
     void Ping(float x, float y);
     Item * FindPoison() const;
     Item * FindConsumable(uint32 displayId) const;
@@ -299,7 +306,7 @@ public:
     void ImbueItem(Item* item, uint8 targetInventorySlot);
     void ImbueItem(Item* item, Unit* target);
     void ImbueItem(Item* item);
-    void EnchantItemT(uint32 spellid, uint8 slot);
+    void EnchantItemT(uint32 spellid, uint8 slot, Item* item = nullptr);
     uint32 GetBuffedCount(Player* player, string spellname);
   
 
@@ -308,6 +315,7 @@ public:
     virtual bool CastSpell(string name, Unit* target, Item* itemTarget = NULL);
     virtual bool HasAura(string spellName, Unit* player, bool maxStack = false, bool checkIsOwner = false, int maxAmount = -1);
     virtual bool HasAnyAuraOf(Unit* player, ...);
+    virtual bool HasMyAura(string spellName, Unit* player) { return HasAura(spellName, player, false, false, -1, true); }
     uint8 GetHealthPercent(const Unit& target) const;
     uint8 GetHealthPercent() const;
     uint8 GetManaPercent(const Unit& target) const;
@@ -324,7 +332,13 @@ public:
     bool CastSpell(uint32 spellId, float x, float y, float z, Item* itemTarget = NULL);
     bool canDispel(const SpellEntry* entry, uint32 dispelType);
 
+    bool CanCastVehicleSpell(uint32 spellid, Unit* target);
+    bool CastVehicleSpell(uint32 spellId, Unit* target);
+    bool CastVehicleSpell(uint32 spellId, float x, float y, float z);
+    bool IsInVehicle(bool canControl = false, bool canCast = false, bool canAttack = false, bool canTurn = false, bool fixed = false);
+
     uint32 GetEquipGearScore(Player* player, bool withBags, bool withBank);
+    uint32 GetEquipStatsValue(Player* player);
     bool HasSkill(SkillType skill);
     bool IsAllowedCommand(string text);
     float GetRange(string type);
@@ -368,7 +382,7 @@ public:
     bool IsAlt() { return HasRealPlayerMaster() && !sRandomPlayerbotMgr.IsRandomBot(bot); }
 
     //Get the group leader or the master of the bot.
-    Player* GetGroupMaster() { return bot->GetGroup() ? (sObjectMgr.GetPlayer(bot->GetGroup()->GetLeaderGuid()) ? sObjectMgr.GetPlayer(bot->GetGroup()->GetLeaderGuid()) : master) : master; }
+    Player* GetGroupMaster() { return bot->InBattleGround() ? master : bot->GetGroup() ? (sObjectMgr.GetPlayer(bot->GetGroup()->GetLeaderGuid()) ? sObjectMgr.GetPlayer(bot->GetGroup()->GetLeaderGuid()) : master) : master; }
     //Returns a semi-random (cycling) number that is fixed for each bot.
     uint32 GetFixedBotNumer(BotTypeNumber typeNumber, uint32 maxNum = 100, float cyclePerMin = 1); 
 
@@ -394,6 +408,15 @@ public:
     ShortTimeTracker* GetMoveTimer() { return &moveUpdateTimer; }
     ShortTimeTracker* GetSpellTimer() { return &spellUpdateTimer; }
 
+    Position GetJumpDestination() { return jumpDestination; }
+    void SetJumpDestination(Position pos) { jumpDestination = pos; }
+    void ResetJumpDestination() { jumpDestination = Position(); }
+
+    bool CanMove();
+    void StopMoving();
+    bool IsInRealGuild();
+    time_t GetCombatStartTime() { return combatStart; }
+
 protected:
 	Player* bot;
 	Player* master;
@@ -404,6 +427,7 @@ protected:
     BotState currentState;
     ChatHelper chatHelper;
     queue<ChatCommandHolder> chatCommands;
+    queue<ChatQueuedReply> chatReplies;
     PacketHandlingHelper botOutgoingPacketHandlers;
     PacketHandlingHelper masterIncomingPacketHandlers;
     PacketHandlingHelper masterOutgoingPacketHandlers;
@@ -418,6 +442,7 @@ protected:
     ShortTimeTracker spellUpdateTimer;
     bool inCombat = false;
     BotCheatMask cheatMask = BotCheatMask::none;
+    Position jumpDestination = Position();
 };
 
 

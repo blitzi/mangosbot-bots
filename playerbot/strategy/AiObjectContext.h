@@ -40,27 +40,41 @@ namespace ai
             return GetValue<T>(name, out.str());
         }
 
+        set<string> GetValues()
+        {
+            return valueContexts.GetCreated();
+        }
+
         set<string> GetSupportedStrategies()
         {
             return strategyContexts.supports();
         }
 
-        string FormatValues()
+        set<string> GetSupportedActions()
+        {
+            return actionContexts.supports();
+        }
+
+        string FormatValues(string findName = "")
         {
             ostringstream out;
             set<string> names = valueContexts.GetCreated();
-            for (set<string>::iterator i = names.begin(); i != names.end(); ++i, out << "|")
+            for (set<string>::iterator i = names.begin(); i != names.end(); ++i)
             {
                 UntypedValue* value = GetUntypedValue(*i);
                 if (!value)
+                    continue;
+
+                if (!findName.empty() && i->find(findName) == string::npos)
                     continue;
 
                 string text = value->Format();
                 if (text == "?")
                     continue;
 
-                out << "{" << *i << "=" << text << "}";
+                out << "{" << *i << "=" << text << "}|";
             }
+            out.seekp(-1, out.cur);
             return out.str();
         }
 
@@ -74,6 +88,7 @@ namespace ai
         list<string> Save();
         void Load(list<string> data);
 
+        vector<string> performanceStack;
     protected:
         NamedObjectContextList<Strategy> strategyContexts;
         NamedObjectContextList<Action> actionContexts;

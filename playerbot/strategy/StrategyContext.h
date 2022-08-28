@@ -62,6 +62,7 @@ namespace ai
             creators["dead"] = &StrategyContext::dead;
             creators["flee"] = &StrategyContext::flee;
             creators["duel"] = &StrategyContext::duel;
+            creators["start duel"] = &StrategyContext::start_duel;
             creators["kite"] = &StrategyContext::kite;
             creators["potions"] = &StrategyContext::potions;
             creators["cast time"] = &StrategyContext::cast_time;
@@ -74,6 +75,14 @@ namespace ai
             creators["reveal"] = &StrategyContext::reveal;
             creators["collision"] = &StrategyContext::collision;
             creators["rpg"] = &StrategyContext::rpg;
+            creators["rpg quest"] = &StrategyContext::rpg_quest;
+            creators["rpg vendor"] = &StrategyContext::rpg_vendor;
+            creators["rpg explore"] = &StrategyContext::rpg_explore;
+            creators["rpg maintenance"] = &StrategyContext::rpg_maintenance;
+            creators["rpg guild"] = &StrategyContext::rpg_guild;
+            creators["rpg bg"] = &StrategyContext::rpg_bg;
+            creators["rpg player"] = &StrategyContext::rpg_player;
+            creators["rpg craft"] = &StrategyContext::rpg_craft;
 			creators["travel"] = &StrategyContext::travel;
             creators["explore"] = &StrategyContext::explore;
             creators["map"] = &StrategyContext::map;
@@ -89,10 +98,13 @@ namespace ai
             creators["warsong"] = &StrategyContext::warsong;
             creators["alterac"] = &StrategyContext::alterac;
             creators["arathi"] = &StrategyContext::arathi;
+            creators["eye"] = &StrategyContext::eye;
+            creators["isle"] = &StrategyContext::isle;
             creators["arena"] = &StrategyContext::arena;
             creators["mount"] = &StrategyContext::mount;
             creators["attack tagged"] = &StrategyContext::attack_tagged;
             creators["debug"] = &StrategyContext::debug;
+            creators["debug action"] = &StrategyContext::debug_action;
             creators["debug move"] = &StrategyContext::debug_move;
             creators["debug rpg"] = &StrategyContext::debug_rpg;
             creators["debug spell"] = &StrategyContext::debug_spell;
@@ -105,6 +117,7 @@ namespace ai
             creators["group"] = &StrategyContext::group;
             creators["guild"] = &StrategyContext::guild;
             creators["grind"] = &StrategyContext::grind;
+            creators["avoid aoe"] = &StrategyContext::avoid_aoe;
         }
 
     private:
@@ -115,6 +128,8 @@ namespace ai
         static Strategy* warsong(PlayerbotAI* ai) { return new WarsongStrategy(ai); }
         static Strategy* alterac(PlayerbotAI* ai) { return new AlteracStrategy(ai); }
         static Strategy* arathi(PlayerbotAI* ai) { return new ArathiStrategy(ai); }
+        static Strategy* eye(PlayerbotAI* ai) { return new EyeStrategy(ai); }
+        static Strategy* isle(PlayerbotAI* ai) { return new IsleStrategy(ai); }
         static Strategy* behind(PlayerbotAI* ai) { return new SetBehindCombatStrategy(ai); }
         static Strategy* ranged(PlayerbotAI* ai) { return new RangedCombatStrategy(ai); }
         static Strategy* close(PlayerbotAI* ai) { return new MeleeCombatStrategy(ai); }
@@ -125,6 +140,7 @@ namespace ai
         static Strategy* potions(PlayerbotAI* ai) { return new UsePotionsStrategy(ai); }
         static Strategy* kite(PlayerbotAI* ai) { return new KiteStrategy(ai); }
         static Strategy* duel(PlayerbotAI* ai) { return new DuelStrategy(ai); }
+        static Strategy* start_duel(PlayerbotAI* ai) { return new StartDuelStrategy(ai); }
         static Strategy* flee(PlayerbotAI* ai) { return new FleeStrategy(ai); }
         static Strategy* dead(PlayerbotAI* ai) { return new DeadStrategy(ai); }
         static Strategy* racials(PlayerbotAI* ai) { return new RacialsStrategy(ai); }
@@ -144,6 +160,14 @@ namespace ai
         static Strategy* reveal(PlayerbotAI* ai) { return new RevealStrategy(ai); }
         static Strategy* collision(PlayerbotAI* ai) { return new CollisionStrategy(ai); }
         static Strategy* rpg(PlayerbotAI* ai) { return new RpgStrategy(ai); }
+        static Strategy* rpg_quest(PlayerbotAI* ai) { return new RpgQuestStrategy(ai); }
+        static Strategy* rpg_vendor(PlayerbotAI* ai) { return new RpgVendorStrategy(ai); }
+        static Strategy* rpg_explore(PlayerbotAI* ai) { return new RpgExploreStrategy(ai); }
+        static Strategy* rpg_maintenance(PlayerbotAI* ai) { return new RpgMaintenanceStrategy(ai); }
+        static Strategy* rpg_guild(PlayerbotAI* ai) { return new RpgGuildStrategy(ai); }
+        static Strategy* rpg_bg(PlayerbotAI* ai) { return new RpgBgStrategy(ai); }
+        static Strategy* rpg_player(PlayerbotAI* ai) { return new RpgPlayerStrategy(ai); }
+        static Strategy* rpg_craft(PlayerbotAI* ai) { return new RpgCraftStrategy(ai); }
 		static Strategy* travel(PlayerbotAI* ai) { return new TravelStrategy(ai); }
         static Strategy* explore(PlayerbotAI* ai) { return new ExploreStrategy(ai); }
         static Strategy* map(PlayerbotAI* ai) { return new MapStrategy(ai); }
@@ -152,6 +176,7 @@ namespace ai
         static Strategy* possible_ads(PlayerbotAI* ai) { return new PossibleAdsStrategy(ai); }
         static Strategy* attack_tagged(PlayerbotAI* ai) { return new AttackTaggedStrategy(ai); }
         static Strategy* debug(PlayerbotAI* ai) { return new DebugStrategy(ai); }
+        static Strategy* debug_action(PlayerbotAI* ai) { return new DebugActionStrategy(ai); }
         static Strategy* debug_move(PlayerbotAI* ai) { return new DebugMoveStrategy(ai); }
         static Strategy* debug_rpg(PlayerbotAI* ai) { return new DebugRpgStrategy(ai); }
         static Strategy* debug_spell(PlayerbotAI* ai) { return new DebugSpellStrategy(ai); }
@@ -161,6 +186,7 @@ namespace ai
         static Strategy* group(PlayerbotAI* ai) { return new GroupStrategy(ai); }
         static Strategy* guild (PlayerbotAI* ai) { return new GuildStrategy(ai); }
         static Strategy* grind(PlayerbotAI* ai) { return new GrindingStrategy(ai); }
+        static Strategy* avoid_aoe(PlayerbotAI* ai) { return new AvoidAoeStrategy(ai); }
         static Strategy* dont_move(PlayerbotAI* ai) { return new DontMoveStrategy(ai); }
         static Strategy* careful_tanking(PlayerbotAI* ai) { return new CarefulTankingStrategy(ai); }
         static Strategy* run_away_on_area_debuff(PlayerbotAI* ai) { return new RunAwayOnAreaDebuff(ai); }

@@ -11,6 +11,7 @@
 #include "RtiTriggers.h"
 #include "CureTriggers.h"
 #include "GuildTriggers.h"
+#include "StuckTriggers.h"
 
 namespace ai
 {
@@ -29,6 +30,7 @@ namespace ai
             creators["random"] = &TriggerContext::Random;
             creators["seldom"] = &TriggerContext::seldom;
             creators["often"] = &TriggerContext::often;
+            creators["very often"] = &TriggerContext::very_often;
 
             creators["target critical health"] = &TriggerContext::TargetCriticalHealth;
 
@@ -88,6 +90,9 @@ namespace ai
             creators["medium aoe"] = &TriggerContext::MediumAoe;
             creators["high aoe"] = &TriggerContext::HighAoe;
 
+            creators["has area debuff"] = &TriggerContext::HasAreaDebuff;
+
+
             creators["enemy out of melee"] = &TriggerContext::EnemyOutOfMelee;
             creators["enemy out of spell"] = &TriggerContext::EnemyOutOfSpell;
             creators["enemy too close for spell"] = &TriggerContext::enemy_too_close_for_spell;
@@ -95,6 +100,8 @@ namespace ai
             creators["enemy too close for melee"] = &TriggerContext::enemy_too_close_for_melee;
             creators["enemy is close"] = &TriggerContext::enemy_is_close;
             creators["party member to heal out of spell range"] = &TriggerContext::party_member_to_heal_out_of_spell_range;
+            creators["enemy ten yards"] = &TriggerContext::enemy_ten_yards;
+            creators["enemy five yards"] = &TriggerContext::enemy_five_yards;
 
             creators["combo points available"] = &TriggerContext::ComboPointsAvailable;
 
@@ -119,6 +126,7 @@ namespace ai
             creators["not behind target"] = &TriggerContext::not_behind_target;
             creators["not facing target"] = &TriggerContext::not_facing_target;
             creators["far from master"] = &TriggerContext::far_from_master;            
+            creators["not near master"] = &TriggerContext::not_near_master;
             creators["far from loot target"] = &TriggerContext::far_from_loot_target;
             creators["can loot"] = &TriggerContext::can_loot;
             creators["swimming"] = &TriggerContext::swimming;
@@ -136,6 +144,7 @@ namespace ai
             creators["no non bot players around"] = &TriggerContext::no_non_bot_players_around;
             creators["new player nearby"] = &TriggerContext::new_player_nearby;
             creators["no rpg target"] = &TriggerContext::no_rpg_target;
+            creators["has rpg target"] = &TriggerContext::has_rpg_target;
             creators["far from rpg target"] = &TriggerContext::far_from_rpg_target;
             creators["near rpg target"] = &TriggerContext::near_rpg_target;
             creators["no travel target"] = &TriggerContext::no_travel_target;
@@ -148,6 +157,7 @@ namespace ai
 
             creators["bg waiting"] = &TriggerContext::bg_waiting;
             creators["bg active"] = &TriggerContext::bg_active;
+            creators["bg invite active"] = &TriggerContext::bg_invite_active;
             creators["player has no flag"] = &TriggerContext::player_has_no_flag;
             creators["player has flag"] = &TriggerContext::player_has_flag;
             creators["team has flag"] = &TriggerContext::team_has_flag;
@@ -156,6 +166,7 @@ namespace ai
             creators["in battleground"] = &TriggerContext::player_is_in_battleground;
             creators["in battleground without flag"] = &TriggerContext::player_is_in_battleground_no_flag;
             creators["wants in bg"] = &TriggerContext::player_wants_in_bg;
+            creators["use trinket"] = &TriggerContext::use_trinket;
 
             creators["mounted"] = &TriggerContext::mounted;
 
@@ -164,18 +175,73 @@ namespace ai
             creators["at dark portal azeroth"] = &TriggerContext::at_dark_portal_azeroth;
             creators["at dark portal outland"] = &TriggerContext::at_dark_portal_outland;
 
+            creators["vehicle near"] = &TriggerContext::vehicle_near;
+            creators["in vehicle"] = &TriggerContext::in_vehicle;
+
             creators["need world buff"] = &TriggerContext::need_world_buff;
             creators["falling"] = &TriggerContext::falling;
             creators["falling far"] = &TriggerContext::falling_far;
-            creators["movement stuck"] = &TriggerContext::movement_stuck;
-            creators["location stuck"] = &TriggerContext::location_stuck;
+            creators["move stuck"] = &TriggerContext::move_stuck;
+            creators["move long stuck"] = &TriggerContext::move_long_stuck;
+            creators["combat stuck"] = &TriggerContext::combat_stuck;
+            creators["combat long stuck"] = &TriggerContext::combat_long_stuck;
+            creators["leader is afk"] = &TriggerContext::leader_is_afk;
 
             creators["petition signed"] = &TriggerContext::petition_signed;
             creators["buy tabard"] = &TriggerContext::buy_tabard;
             creators["leave large guild"] = &TriggerContext::leave_large_guild;
+
+            creators["rpg"] = &TriggerContext::rpg;
+            creators["rpg taxi"] = &TriggerContext::rpg_taxi;
+            creators["rpg discover"] = &TriggerContext::rpg_discover;
+            creators["rpg start quest"] = &TriggerContext::rpg_start_quest;
+            creators["rpg end quest"] = &TriggerContext::rpg_end_quest;
+            creators["rpg repeat quest"] = &TriggerContext::rpg_repeat_quest;
+            creators["rpg buy"] = &TriggerContext::rpg_buy;
+            creators["rpg sell"] = &TriggerContext::rpg_sell;
+            creators["rpg ah sell"] = &TriggerContext::rpg_ah_sell;
+            creators["rpg ah buy"] = &TriggerContext::rpg_ah_buy;
+            creators["rpg get mail"] = &TriggerContext::rpg_get_mail;
+            creators["rpg repair"] = &TriggerContext::rpg_repair;
+            creators["rpg train"] = &TriggerContext::rpg_train;
+            creators["rpg heal"] = &TriggerContext::rpg_heal;
+            creators["rpg home bind"] = &TriggerContext::rpg_home_bind;
+            creators["rpg queue bg"] = &TriggerContext::rpg_queue_bg;
+            creators["rpg buy petition"] = &TriggerContext::rpg_buy_petition;
+            creators["rpg use"] = &TriggerContext::rpg_use;
+            creators["rpg spell"] = &TriggerContext::rpg_spell;
+            creators["rpg craft"] = &TriggerContext::rpg_craft;
+            creators["rpg trade useful"] = &TriggerContext::rpg_trade_useful;
+            creators["rpg duel"] = &TriggerContext::rpg_duel;
+
+            // racials
+            creators["berserking"] = &TriggerContext::berserking;
+            creators["blood fury"] = &TriggerContext::blood_fury;
+            creators["cannibalize"] = &TriggerContext::cannibalize;
+            creators["will of the forsaken"] = &TriggerContext::will_of_the_forsaken;
+            creators["rooted"] = &TriggerContext::rooted;
+            creators["stoneform"] = &TriggerContext::stoneform;
+            creators["shadowmeld"] = &TriggerContext::shadowmeld;
+            creators["mana tap"] = &TriggerContext::mana_tap;
+            creators["arcane torrent"] = &TriggerContext::arcane_torrent;
+            creators["war stomp"] = &TriggerContext::war_stomp;
+            creators["perception"] = &TriggerContext::cannibalize;
         }
 
     private:
+        static Trigger* berserking(PlayerbotAI* ai) { return new BerserkingTrigger(ai); }
+        static Trigger* blood_fury(PlayerbotAI* ai) { return new BloodFuryTrigger(ai); }
+        static Trigger* cannibalize(PlayerbotAI* ai) { return new CannibalizeTrigger(ai); }
+        static Trigger* will_of_the_forsaken(PlayerbotAI* ai) { return new WOtFTrigger(ai); }
+        static Trigger* rooted(PlayerbotAI* ai) { return new RootedTrigger(ai); }
+        static Trigger* stoneform(PlayerbotAI* ai) { return new StoneformTrigger(ai); }
+        static Trigger* shadowmeld(PlayerbotAI* ai) { return new ShadowmeldTrigger(ai); }
+        static Trigger* mana_tap(PlayerbotAI* ai) { return new ManaTapTrigger(ai); }
+        static Trigger* arcane_torrent(PlayerbotAI* ai) { return new ArcanetorrentTrigger(ai); }
+        static Trigger* war_stomp(PlayerbotAI* ai) { return new WarStompTrigger(ai); }
+        static Trigger* perception(PlayerbotAI* ai) { return new PerceptionTrigger(ai); }
+        static Trigger* in_vehicle(PlayerbotAI* ai) { return new InVehicleTrigger(ai); }
+        static Trigger* vehicle_near(PlayerbotAI* ai) { return new VehicleNearTrigger(ai); }
         static Trigger* at_dark_portal_outland(PlayerbotAI* ai) { return new AtDarkPortalOutlandTrigger(ai); }
         static Trigger* at_dark_portal_azeroth(PlayerbotAI* ai) { return new AtDarkPortalAzerothTrigger(ai); }
         static Trigger* near_dark_portal(PlayerbotAI* ai) { return new NearDarkPortalTrigger(ai); }
@@ -184,6 +250,7 @@ namespace ai
         static Trigger* player_has_no_flag(PlayerbotAI* ai) { return new PlayerHasNoFlag(ai); }
         static Trigger* bg_waiting(PlayerbotAI* ai) { return new BgWaitingTrigger(ai); }
         static Trigger* bg_active(PlayerbotAI* ai) { return new BgActiveTrigger(ai); }
+        static Trigger* bg_invite_active(PlayerbotAI* ai) { return new BgInviteActiveTrigger(ai); }
         static Trigger* player_has_flag(PlayerbotAI* ai) { return new PlayerHasFlag(ai); }
         static Trigger* team_has_flag(PlayerbotAI* ai) { return new TeamHasFlag(ai); }
         static Trigger* enemy_team_has_flag(PlayerbotAI* ai) { return new EnemyTeamHasFlag(ai); }
@@ -198,6 +265,7 @@ namespace ai
         static Trigger* far_from_rpg_target(PlayerbotAI* ai) { return new FarFromRpgTargetTrigger(ai); }
         static Trigger* near_rpg_target(PlayerbotAI* ai) { return new NearRpgTargetTrigger(ai); }
         static Trigger* no_rpg_target(PlayerbotAI* ai) { return new NoRpgTargetTrigger(ai); }
+        static Trigger* has_rpg_target(PlayerbotAI* ai) { return new HasRpgTargetTrigger(ai); }
         static Trigger* far_from_travel_target(PlayerbotAI* ai) { return new FarFromTravelTargetTrigger(ai); }
         static Trigger* no_travel_target(PlayerbotAI* ai) { return new NoTravelTargetTrigger(ai); }
         static Trigger* collision(PlayerbotAI* ai) { return new CollisionTrigger(ai); }
@@ -216,6 +284,7 @@ namespace ai
         static Trigger* can_loot(PlayerbotAI* ai) { return new CanLootTrigger(ai); }
         static Trigger* far_from_loot_target(PlayerbotAI* ai) { return new FarFromCurrentLootTrigger(ai); }
         static Trigger* far_from_master(PlayerbotAI* ai) { return new FarFromMasterTrigger(ai); }        
+        static Trigger* not_near_master(PlayerbotAI* ai) { return new NotNearMasterTrigger(ai); }
         static Trigger* behind_target(PlayerbotAI* ai) { return new IsBehindTargetTrigger(ai); }
         static Trigger* not_behind_target(PlayerbotAI* ai) { return new IsNotBehindTargetTrigger(ai); }
         static Trigger* not_facing_target(PlayerbotAI* ai) { return new IsNotFacingTargetTrigger(ai); }
@@ -228,6 +297,7 @@ namespace ai
         static Trigger* LightAoe(PlayerbotAI* ai) { return new LightAoeTrigger(ai); }
         static Trigger* MediumAoe(PlayerbotAI* ai) { return new MediumAoeTrigger(ai); }
         static Trigger* HighAoe(PlayerbotAI* ai) { return new HighAoeTrigger(ai); }
+        static Trigger* HasAreaDebuff(PlayerbotAI* ai) { return new HasAreaDebuffTrigger(ai); }
         static Trigger* LoseAggro(PlayerbotAI* ai) { return new LoseAggroTrigger(ai); }
         static Trigger* HasAggro(PlayerbotAI* ai) { return new HasAggroTrigger(ai); }
         static Trigger* HasAreaDebuff(PlayerbotAI* ai) { return new HasAreaDebuffTrigger(ai); }
@@ -264,12 +334,15 @@ namespace ai
         static Trigger* Random(PlayerbotAI* ai) { return new RandomTrigger(ai, "random", 20); }
         static Trigger* seldom(PlayerbotAI* ai) { return new RandomTrigger(ai, "seldom", 300); }
         static Trigger* often(PlayerbotAI* ai) { return new RandomTrigger(ai, "often", 5); }
+        static Trigger* very_often(PlayerbotAI* ai) { return new TimeTrigger(ai, "very often", 5); }
         static Trigger* EnemyOutOfMelee(PlayerbotAI* ai) { return new EnemyOutOfMeleeTrigger(ai); }
         static Trigger* EnemyOutOfSpell(PlayerbotAI* ai) { return new EnemyOutOfSpellRangeTrigger(ai); }
         static Trigger* enemy_too_close_for_spell(PlayerbotAI* ai) { return new EnemyTooCloseForSpellTrigger(ai); }
         static Trigger* enemy_too_close_for_shoot(PlayerbotAI* ai) { return new EnemyTooCloseForShootTrigger(ai); }
         static Trigger* enemy_too_close_for_melee(PlayerbotAI* ai) { return new EnemyTooCloseForMeleeTrigger(ai); }
         static Trigger* enemy_is_close(PlayerbotAI* ai) { return new EnemyIsCloseTrigger(ai); }
+        static Trigger* enemy_ten_yards(PlayerbotAI* ai) { return new EnemyInRangeTrigger(ai, "enemy ten yards", 10.0f); }
+        static Trigger* enemy_five_yards(PlayerbotAI* ai) { return new EnemyInRangeTrigger(ai, "enemy five yards", 5.0f); }
         static Trigger* party_member_to_heal_out_of_spell_range(PlayerbotAI* ai) { return new PartyMemberToHealOutOfSpellRangeTrigger(ai); }
         static Trigger* ComboPointsAvailable(PlayerbotAI* ai) { return new ComboPointsAvailableTrigger(ai); }
         static Trigger* MediumThreat(PlayerbotAI* ai) { return new MediumThreatTrigger(ai); }
@@ -292,6 +365,13 @@ namespace ai
         static Trigger* need_world_buff(PlayerbotAI* ai) { return new NeedWorldBuffTrigger(ai); }
         static Trigger* falling(PlayerbotAI* ai) { return new IsFallingTrigger(ai); }
         static Trigger* falling_far(PlayerbotAI* ai) { return new IsFallingFarTrigger(ai); }
+        static Trigger* move_stuck(PlayerbotAI* ai) { return new MoveStuckTrigger(ai); }
+        static Trigger* move_long_stuck(PlayerbotAI* ai) { return new MoveLongStuckTrigger(ai); }
+        static Trigger* combat_stuck(PlayerbotAI* ai) { return new CombatStuckTrigger(ai); }
+        static Trigger* combat_long_stuck(PlayerbotAI* ai) { return new CombatLongStuckTrigger(ai); }
+        static Trigger* leader_is_afk(PlayerbotAI* ai) { return new LeaderIsAfkTrigger(ai); }
+        static Trigger* player_wants_in_bg(PlayerbotAI* ai) { return new PlayerWantsInBattlegroundTrigger(ai); }
+        static Trigger* use_trinket(PlayerbotAI* ai) { return new UseTrinketTrigger(ai); }
         static Trigger* movement_stuck(PlayerbotAI* ai) { return new MovementStuckTrigger(ai); }
         static Trigger* location_stuck(PlayerbotAI* ai) { return new LocationStuckTrigger(ai); }
         static Trigger* player_wants_in_bg(PlayerbotAI* ai) { return new PlayerWantsInBattlegroundTrigger(ai); }
@@ -301,5 +381,28 @@ namespace ai
         static Trigger* petition_signed(PlayerbotAI* ai) { return new PetitionTurnInTrigger(ai); }
         static Trigger* buy_tabard(PlayerbotAI* ai) { return new BuyTabardTrigger(ai); }
         static Trigger* leave_large_guild(PlayerbotAI* ai) { return new LeaveLargeGuildTrigger(ai); }
+
+        static Trigger* rpg(PlayerbotAI* ai) { return new RpgTrigger(ai); }
+        static Trigger* rpg_taxi(PlayerbotAI* ai) { return new RpgTaxiTrigger(ai); }
+        static Trigger* rpg_discover(PlayerbotAI* ai) { return new RpgDiscoverTrigger(ai); }
+        static Trigger* rpg_start_quest(PlayerbotAI* ai) { return new RpgStartQuestTrigger(ai); }
+        static Trigger* rpg_end_quest(PlayerbotAI* ai) { return new RpgEndQuestTrigger(ai); }
+        static Trigger* rpg_repeat_quest(PlayerbotAI* ai) { return new RpgRepeatQuestTrigger(ai); }
+        static Trigger* rpg_buy(PlayerbotAI* ai) { return new RpgBuyTrigger(ai); }
+        static Trigger* rpg_sell(PlayerbotAI* ai) { return new RpgSellTrigger(ai); }
+        static Trigger* rpg_ah_sell(PlayerbotAI* ai) { return new RpgAHSellTrigger(ai); }
+        static Trigger* rpg_ah_buy(PlayerbotAI* ai) { return new RpgAHBuyTrigger(ai); }
+        static Trigger* rpg_get_mail(PlayerbotAI* ai) { return new RpgGetMailTrigger(ai); }
+        static Trigger* rpg_repair(PlayerbotAI* ai) { return new RpgRepairTrigger(ai); }
+        static Trigger* rpg_train(PlayerbotAI* ai) { return new RpgTrainTrigger(ai); }
+        static Trigger* rpg_heal(PlayerbotAI* ai) { return new RpgHealTrigger(ai); }
+        static Trigger* rpg_home_bind(PlayerbotAI* ai) { return new RpgHomeBindTrigger(ai); }
+        static Trigger* rpg_queue_bg(PlayerbotAI* ai) { return new RpgQueueBGTrigger(ai); }
+        static Trigger* rpg_buy_petition(PlayerbotAI* ai) { return new RpgBuyPetitionTrigger(ai); }
+        static Trigger* rpg_use(PlayerbotAI* ai) { return new RpgUseTrigger(ai); }
+        static Trigger* rpg_spell(PlayerbotAI* ai) { return new RpgUseTrigger(ai); }
+        static Trigger* rpg_craft(PlayerbotAI* ai) { return new RpgCraftTrigger(ai); }
+        static Trigger* rpg_trade_useful(PlayerbotAI* ai) { return new RpgTradeUsefulTrigger(ai); }
+        static Trigger* rpg_duel(PlayerbotAI* ai) { return new RpgDuelTrigger(ai); }
     };
 };

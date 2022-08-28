@@ -42,56 +42,45 @@ Unit* GrindTargetValue::FindTargetForGrinding(int assistCount)
     }
 
     list<ObjectGuid> targets = *context->GetValue<list<ObjectGuid> >("possible targets");
-    TravelTarget* travelTarget = context->GetValue<TravelTarget*>("travel target")->Get();
 
     if (targets.empty())
         return NULL;
 
     float distance = 0;
     Unit* result = NULL;
+
+    unordered_map<uint32, bool> needForQuestMap;
+
     for (list<ObjectGuid>::iterator tIter = targets.begin(); tIter != targets.end(); tIter++)
     {
         Unit* unit = ai->GetUnit(*tIter);
         if (!unit)
             continue;
 
-        if (abs(bot->GetPositionZ() - unit->GetPositionZ()) > sPlayerbotAIConfig.spellDistance / 2)
+        if (abs(bot->GetPositionZ() - unit->GetPositionZ()) > sPlayerbotAIConfig.spellDistance)
             continue;
 
         if (!bot->InBattleGround() && GetTargetingPlayerCount(unit) > assistCount)
             continue;
 
-        if (!bot->InBattleGround() && !unit->GetObjectGuid().IsPlayer())
-        {
-            int gap = (int)unit->GetLevel() - (int)bot->GetLevel();
-            
-            //if nothing to do kill low mobs
-            if (travelTarget->getStatus() == TRAVEL_STATUS_COOLDOWN)
-            {
-                if (gap > 0)
-                    continue;
-            }
-            else
-            {
-                if(gap > 0 || gap < -4)
-                    continue;
-            }
-        }
+        //if (master && master->GetDistance(unit) >= sPlayerbotAIConfig.grindDistance && !sRandomPlayerbotMgr.IsRandomBot(bot))
+        //    continue;
+
+        if (!bot->InBattleGround() && (int)unit->GetLevel() - (int)bot->GetLevel() > 4 && !unit->GetObjectGuid().IsPlayer())
+            continue;
+
+        if (needForQuestMap.find(unit->GetEntry()) == needForQuestMap.end())
+            needForQuestMap[unit->GetEntry()] = needForQuest(unit);
+
+        if (!needForQuestMap[unit->GetEntry()])
+            if (urand(0, 100) < 75 || (context->GetValue<TravelTarget*>("travel target")->Get()->isWorking() && context->GetValue<TravelTarget*>("travel target")->Get()->getDestination()->getName() != "GrindTravelDestination"))
+                continue;
+
+        //if (bot->InBattleGround() && bot->GetDistance(unit) > 40.0f)
+            //continue;
 
         Creature* creature = dynamic_cast<Creature*>(unit);
-        if (creature && creature->GetCreatureInfo() && creature->GetCreatureInfo()->Rank > CREATURE_ELITE_NORMAL && !AI_VALUE(bool, "can fight boss"))
-            continue;
-
-        //ignore swimming units
-        if (creature && (!creature->CanWalk() && creature->CanSwim() || creature->IsSwimming()) )
-            continue;
-
-        if (creature && creature->IsInvisible())
-            continue;
-
-        Player* player = dynamic_cast<Player*>(unit);
-
-        if (player)
+        if (creature && creature->GetCreatureInfo() && creature->GetCreatureInfo()->Rank > CREATURE_ELITE_NORMAL && !AI_VALUE(bool, "can fight elite"))
             continue;
 
         if (group)
@@ -103,7 +92,7 @@ Unit* GrindTargetValue::FindTargetForGrinding(int assistCount)
                 if (!member || !sServerFacade.IsAlive(member))
                     continue;
 
-                float d = member->GetDistance(unit);
+                float d = sServerFacade.GetDistance2d(member, unit);
                 if (!result || d < distance)
                 {
                     distance = d;
@@ -113,8 +102,8 @@ Unit* GrindTargetValue::FindTargetForGrinding(int assistCount)
         }
         else
         {
-            float newdistance = bot->GetDistance(unit);
-            if (!result || (newdistance < distance))
+            float newdistance = sServerFacade.GetDistance2d(bot, unit);
+            if (!result || (newdistance < distance && urand(0, abs(distance - newdistance)) > sPlayerbotAIConfig.sightDistance * 0.1))
             {
                 distance = newdistance;
                 result = unit;

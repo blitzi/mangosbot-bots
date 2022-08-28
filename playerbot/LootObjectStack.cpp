@@ -3,6 +3,7 @@
 #include "playerbot.h"
 #include "PlayerbotAIConfig.h"
 #include "ServerFacade.h"
+#include "strategy/values/SharedValueContext.h"
 
 using namespace ai;
 using namespace std;
@@ -88,6 +89,7 @@ void LootObject::Refresh(Player* bot, ObjectGuid guid)
     {
         bool isQuestItemOnly = false;
 
+#ifdef MANGOSBOT_TWO
         for (int i = 0; i < QUEST_ITEM_OBJECTIVES_COUNT; i++)
         {
             int itemId = go->GetGOInfo()->questItems[i];
@@ -97,13 +99,27 @@ void LootObject::Refresh(Player* bot, ObjectGuid guid)
                 this->guid = guid;
                 return;
             }
-
             isQuestItemOnly |= itemId > 0;
-        }        
+        }
+#else
+        /*if (!guid.IsEmpty())
+        {
+            for (auto& entry : GAI_VALUE2(list<int32>, "item drop list", -go->GetEntry()))
+            {
+                if (IsNeededForQuest(bot, entry))
+                {
+                    this->guid = guid;
+                    return;
+                }
+                isQuestItemOnly |= entry > 0;
+            }
+        }*/
+#endif
 
         if (isQuestItemOnly)
             return;
 
+        uint32 goId = go->GetGOInfo()->id;
         uint32 lockId = go->GetGOInfo()->GetLockId();
         LockEntry const *lockInfo = sLockStore.LookupEntry(lockId);
         if (!lockInfo)
@@ -121,7 +137,11 @@ void LootObject::Refresh(Player* bot, ObjectGuid guid)
                 }
                 break;
             case LOCK_KEY_SKILL:
-                if (SkillByLockType(LockType(lockInfo->Index[i])) > 0)
+                if (goId == 13891 || goId == 19535) // Serpentbloom
+                {
+                    this->guid = guid;
+                }
+                else if (SkillByLockType(LockType(lockInfo->Index[i])) > 0)
                 {
                     skillId = SkillByLockType(LockType(lockInfo->Index[i]));
                     reqSkillValue = max((uint32)1, lockInfo->Skill[i]);
@@ -214,19 +234,31 @@ bool LootObject::IsLootPossible(Player* bot)
         return false;
     }
 
-    if (abs(GetWorldObject(bot)->GetPositionZ() - bot->GetPositionZ()) > INTERACTION_DISTANCE)
-        return false;
-
-    Creature* creature = ai->GetCreature(guid);
-    if (creature && sServerFacade.GetDeathState(creature) == CORPSE)
+    if (guid.IsCreature())
     {
-        if (creature->m_loot && skillId != SKILL_SKINNING)
-            if (creature->m_loot->CanLoot(bot))
-                return true;
+        Creature* creature = ai->GetCreature(guid);
+        if (creature && sServerFacade.GetDeathState(creature) == CORPSE)
+        {
+            if (creature->m_loot && skillId != SKILL_SKINNING)
+                if (!creature->m_loot->CanLoot(bot))
+                    return false;
+        }
     }
 
     if (skillId == SKILL_NONE)
+    {
+        if (guid.IsGameObject())
+        {
+            GameObject* go = ai->GetGameObject(guid);
+            if (go)
+            {
+                if (sObjectMgr.IsGameObjectForQuests(guid.GetEntry())) //If object has quest loot bot needs the quest.
+                    if (!go->ActivateToQuest(bot))
+                        return false;
+            }
+        }
         return true;
+    }
 
     if (skillId == SKILL_FISHING)
         return false;
@@ -302,7 +334,7 @@ vector<LootObject> LootObjectStack::OrderByDistance(float maxDistance)
         if (!lootObject.IsLootPossible(bot))
             continue;
 
-        float distance = bot->GetDistance(lootObject.GetWorldObject(bot));
+        float distance = sqrt(bot->GetDistance(lootObject.GetWorldObject(bot)));
         if (!maxDistance || distance <= maxDistance)
             sortedMap[distance] = lootObject;
     }

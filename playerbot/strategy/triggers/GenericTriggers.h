@@ -1,6 +1,7 @@
 #pragma once
 #include "../Trigger.h"
 #include "../../PlayerbotAIConfig.h"
+#include "ServerFacade.h"
 
 namespace ai
 {
@@ -111,6 +112,14 @@ namespace ai
         virtual string getName() { return spell; }
         virtual bool IsActive();
 
+    class SpellNoCooldownTrigger : public SpellTrigger
+    {
+    public:
+        SpellNoCooldownTrigger(PlayerbotAI* ai, string spell) : SpellTrigger(ai, spell) {}
+        virtual bool IsActive();
+    };
+
+	// TODO: check other targets
     protected:
         string spell;
     };
@@ -255,10 +264,27 @@ namespace ai
         bool checkIsOwner;
     };
 
+    class MyBuffTrigger : public BuffTrigger
+    {
+    public:
+        MyBuffTrigger(PlayerbotAI* ai, string spell, int checkInterval = 1) : BuffTrigger(ai, spell, checkInterval) {}
+    public:
+        virtual bool IsActive();
+    };
+
     class BuffOnPartyTrigger : public BuffTrigger
     {
     public:
         BuffOnPartyTrigger(PlayerbotAI* ai, string spell, int checkInterval = 1) : BuffTrigger(ai, spell, checkInterval) {}
+    public:
+        virtual Value<Unit*>* GetTargetValue();
+        virtual string getName() { return spell + " on party"; }
+    };
+
+    class MyBuffOnPartyTrigger : public BuffOnPartyTrigger
+    {
+    public:
+        MyBuffOnPartyTrigger(PlayerbotAI* ai, string spell, int checkInterval = 1) : BuffOnPartyTrigger(ai, spell, checkInterval) {}
     public:
         virtual Value<Unit*>* GetTargetValue();
         virtual string getName() { return spell + " on party"; }
@@ -403,6 +429,20 @@ namespace ai
         time_t lastCheck;
     };
 
+    class TimeTrigger : public Trigger
+    {
+    public:
+        TimeTrigger(PlayerbotAI* ai, string name, int interval = 2) : Trigger(ai, name, interval) {}
+    public:
+        virtual bool IsActive()
+        {
+            return true;
+        }
+
+    protected:
+        int interval;
+    };
+
     class AndTrigger : public Trigger
     {
     public:
@@ -423,6 +463,21 @@ namespace ai
     protected:
         Trigger* ls;
         Trigger* rs;
+    };
+
+    class TwoTriggers : public Trigger
+    {
+    public:
+        TwoTriggers(PlayerbotAI* ai, std::string name1 = "", std::string name2 = "") : Trigger(ai)
+        {
+            this->name1 = name1;
+            this->name2 = name2;
+        }
+        virtual bool IsActive();
+        virtual string getName();
+    protected:
+        std::string name1;
+        std::string name2;
     };
 
     class OrTrigger : public Trigger
@@ -450,7 +505,7 @@ namespace ai
     class SnareTargetTrigger : public DebuffTrigger
     {
     public:
-        SnareTargetTrigger(PlayerbotAI* ai, string spell) : DebuffTrigger(ai, spell) {}
+        SnareTargetTrigger(PlayerbotAI* ai, string spell, int interval = 1) : DebuffTrigger(ai, spell, interval) {}
     public:
         virtual Value<Unit*>* GetTargetValue();
         virtual string getName() { return spell + " on snare target"; }
@@ -893,6 +948,174 @@ namespace ai
 
     public:
         virtual bool IsActive();
+    };
+
+
+    class HasAreaDebuffTrigger : public Trigger {
+    public:
+        HasAreaDebuffTrigger(PlayerbotAI* ai) : Trigger(ai, "has area debuff") {}
+        virtual bool IsActive();
+    };
+
+    // racials
+
+    class BerserkingTrigger : public BoostTrigger
+    {
+    public:
+        BerserkingTrigger(PlayerbotAI* ai) : BoostTrigger(ai, "berserking") {}
+    };
+
+    class BloodFuryTrigger : public BoostTrigger
+    {
+    public:
+        BloodFuryTrigger(PlayerbotAI* ai) : BoostTrigger(ai, "blood fury") {}
+    };
+
+    class CannibalizeTrigger : public Trigger
+    {
+    public:
+        CannibalizeTrigger(PlayerbotAI* ai) : Trigger(ai, "cannibalize") {}
+        virtual bool IsActive()
+        {
+            if (AI_VALUE2(uint8, "health", "self target") > sPlayerbotAIConfig.almostFullHealth)
+                return false;
+
+            list<ObjectGuid> corpses = context->GetValue<list<ObjectGuid> >("nearest corpses")->Get();
+            for (list<ObjectGuid>::iterator i = corpses.begin(); i != corpses.end(); i++)
+            {
+                if (!i->IsUnit())
+                    continue;
+
+                Unit* corpse = ai->GetUnit(*i);
+                if (!corpse)
+                    continue;
+
+                if (!(corpse->GetCreatureType() == CREATURE_TYPE_HUMANOID || corpse->GetCreatureType() == CREATURE_TYPE_UNDEAD))
+                    continue;
+
+                if (sServerFacade.GetDistance2d(bot, corpse) <= 5.0f)
+                    return true;
+            }
+            return false;
+        }
+
+    };
+
+    class WOtFTrigger : public Trigger
+    {
+    public:
+        WOtFTrigger(PlayerbotAI* ai) : Trigger(ai, "will of the forsaken") {}
+        virtual bool IsActive()
+        {
+            return bot->HasAuraType(SPELL_AURA_MOD_FEAR);
+            return bot->HasAuraType(SPELL_AURA_MOD_STUN);
+            return bot->HasAuraType(SPELL_AURA_MOD_CHARM);
+            return bot->HasAuraType(SPELL_AURA_MOD_CONFUSE);
+        }
+    };
+
+    class RootedTrigger : public Trigger
+    {
+    public:
+        RootedTrigger(PlayerbotAI* ai) : Trigger(ai, "rooted") {}
+        virtual bool IsActive()
+        {
+            return bot->HasAuraType(SPELL_AURA_MOD_ROOT) ||
+                bot->HasAuraType(SPELL_AURA_MOD_DECREASE_SPEED);
+        }
+    };
+
+    class StoneformTrigger : public Trigger
+    {
+    public:
+        StoneformTrigger(PlayerbotAI* ai) : Trigger(ai, "stoneform") {}
+        virtual bool IsActive()
+        {
+            uint32 disMask = GetDispellMask(DISPEL_DISEASE);
+            uint32 poisMask = GetDispellMask(DISPEL_POISON);
+            uint32 bleedType = 1 << (MECHANIC_BLEED - 1);
+            for (auto itr : bot->GetSpellAuraHolderMap())
+            {
+                SpellEntry const* spell = itr.second->GetSpellProto();
+                if (((1 << spell->Dispel) & disMask) || ((1 << spell->Dispel) & poisMask))
+                    return true;
+
+                if (!spell->HasAttribute(SPELL_ATTR_NO_IMMUNITIES) && itr.second->HasMechanicMask(bleedType))
+                    return true;
+            }
+            return false;
+        }
+    };
+
+    class ShadowmeldTrigger : public Trigger
+    {
+    public:
+        ShadowmeldTrigger(PlayerbotAI* ai) : Trigger(ai, "shadowmeld") {}
+        virtual bool IsActive()
+        {
+            Unit* master = ai->GetMaster();
+            if (ai->HasAura("shadowmeld", bot))
+                return false;
+            return ((!master || (master && master->HasStealthAura() && !master->IsMoving())) && !bot->IsMoving());
+        }
+    };
+
+    class ManaTapTrigger : public Trigger
+    {
+    public:
+        ManaTapTrigger(PlayerbotAI* ai) : Trigger(ai, "mana tap") {}
+        virtual bool IsActive()
+        {
+            Unit* target = AI_VALUE(Unit*, "current target");
+            return target && AI_VALUE2(bool, "has mana", "current target");
+        }
+    };
+
+    class ArcanetorrentTrigger : public InterruptSpellTrigger
+    {
+    public:
+        ArcanetorrentTrigger(PlayerbotAI* ai) : InterruptSpellTrigger(ai, "arcane torrent") {}
+        virtual bool IsActive()
+        {
+            Unit* target = AI_VALUE(Unit*, "current target");
+            return InterruptSpellTrigger::IsActive() && target && AI_VALUE2(float, "distance", "current target") <= 8.0f;
+        }
+
+    };
+
+    class WarStompTrigger : public Trigger
+    {
+    public:
+        WarStompTrigger(PlayerbotAI* ai) : Trigger(ai, "war stomp") {}
+        virtual bool IsActive()
+        {
+            Unit* target = AI_VALUE(Unit*, "current target");
+            return target && AI_VALUE2(bool, "combat", "self target") && AI_VALUE2(float, "distance", "current target") <= 8.0f &&
+                (AI_VALUE2(uint8, "health", "self target") < sPlayerbotAIConfig.mediumHealth ||
+                    AI_VALUE(uint8, "my attacker count") >= 3 ||
+                    target->IsNonMeleeSpellCasted(true));
+        }
+
+    };
+
+    class PerceptionTrigger : public BuffTrigger
+    {
+    public:
+        PerceptionTrigger(PlayerbotAI* ai) : BuffTrigger(ai, "perception") {}
+        virtual bool IsActive()
+        {
+            for (auto& attacker : ai->GetAiObjectContext()->GetValue<list<ObjectGuid> >("attackers")->Get())
+            {
+                Unit* enemy = ai->GetUnit(attacker);
+                if (!enemy)
+                    continue;
+
+                if (enemy->getClass() == CLASS_ROGUE || enemy->getClass() == CLASS_DRUID)
+                    return true;
+            }
+            return false;
+        }
+
     };
 
     class UseTrinketTrigger : public BoostTrigger

@@ -8,16 +8,16 @@ namespace ai
     BUFF_TRIGGER(DefensiveStanceTrigger, "defensive stance");
     BUFF_TRIGGER(BerserkerStanceTrigger, "berserker stance");
     BUFF_TRIGGER(ShieldBlockTrigger, "shield block");
-    BUFF_TRIGGER(CommandingShoutTrigger, "commanding shout");
+    BUFF_TRIGGER_A(CommandingShoutTrigger, "commanding shout");
 
     DEBUFF_TRIGGER(RendDebuffTrigger, "rend");
     DEBUFF_TRIGGER(DisarmDebuffTrigger, "disarm");
-    DEBUFF_TRIGGER(SunderArmorDebuffTrigger, "sunder armor");
+    DEBUFF_TRIGGER_A(SunderArmorDebuffTrigger, "sunder armor");
     DEBUFF_TRIGGER(MortalStrikeDebuffTrigger, "mortal strike");
     DEBUFF_ENEMY_TRIGGER(RendDebuffOnAttackerTrigger, "rend");
     CAN_CAST_TRIGGER(RevengeAvailableTrigger, "revenge");
     CAN_CAST_TRIGGER(OverpowerAvailableTrigger, "overpower");
-    CAN_CAST_TRIGGER(RampageAvailableTrigger, "rampage");
+    BUFF_TRIGGER(RampageAvailableTrigger, "rampage");
     BUFF_TRIGGER_A(BloodrageBuffTrigger, "bloodrage");
     CAN_CAST_TRIGGER(VictoryRushTrigger, "victory rush");
     HAS_AURA_TRIGGER(SwordAndBoardTrigger, "sword and board");
@@ -28,6 +28,7 @@ namespace ai
     DEBUFF_TRIGGER(ThunderClapTrigger, "thunder clap");
     SNARE_TRIGGER(TauntSnareTrigger, "taunt");
     SNARE_TRIGGER(InterceptSnareTrigger, "intercept");
+    CD_TRIGGER(InterceptCanCastTrigger, "intercept");
     SNARE_TRIGGER(ShockwaveSnareTrigger, "shockwave");
     DEBUFF_TRIGGER(ShockwaveTrigger, "shockwave");
     BOOST_BUFF_TRIGGER(DeathWishTrigger, "death wish");

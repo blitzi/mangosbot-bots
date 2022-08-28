@@ -18,10 +18,10 @@ bool ReviveFromCorpseAction::Execute(Event event)
     {
         if (sServerFacade.IsDistanceLessThan(AI_VALUE2(float, "distance", "master target"), sPlayerbotAIConfig.farDistance))
         {
-            if (!ai->HasStrategy("follow"))
+            if (!ai->HasStrategy("follow", BOT_STATE_NON_COMBAT))
             {
                 ai->TellMasterNoFacing("Welcome back!");
-                ai->ChangeStrategy("+follow,-stay");
+                ai->ChangeStrategy("+follow,-stay", BOT_STATE_NON_COMBAT);
                 return true;
             }
         }
@@ -46,18 +46,19 @@ bool ReviveFromCorpseAction::Execute(Event event)
 
         if (dCount >= 5)
         {
-            return ai->DoSpecificAction("spirit healer");
+            return ai->DoSpecificAction("spirit healer", Event(), true);
         }
     }
 
     sLog.outDetail("Bot #%d %s:%d <%s> revives at body", bot->GetGUIDLow(), bot->GetTeam() == ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName());
 
-	ai->StopMoving();
-
+    ai->StopMoving();
     WorldPacket packet(CMSG_RECLAIM_CORPSE);
     packet << bot->GetObjectGuid();
     bot->GetSession()->HandleReclaimCorpseOpcode(packet);
 
+    sTravelMgr.logEvent(ai, "ReviveFromCorpseAction");
+   
     return true;
 }
 
@@ -86,7 +87,7 @@ bool FindCorpseAction::Execute(Event event)
         {
             sLog.outBasic("Bot #%d %s:%d <%s>: died too many times and was sent to an inn", bot->GetGUIDLow(), bot->GetTeam() == ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName());
             context->GetValue<uint32>("death count")->Set(0);
-            sRandomPlayerbotMgr.RandomTeleportForRpg(bot);
+            sRandomPlayerbotMgr.RandomTeleportForRpg(bot, false);
             return true;
         }
     }
@@ -112,7 +113,7 @@ bool FindCorpseAction::Execute(Event event)
         {
             list<ObjectGuid> units = AI_VALUE(list<ObjectGuid>, "possible targets no los");
             
-            if (botPos.getUnitsAggro(units, bot) <= 1) //There are almost no mobs near.
+            if (botPos.getUnitsAggro(units, bot) == 0) //There are no mobs near.
                 return false;
         }
     }
@@ -140,21 +141,36 @@ bool FindCorpseAction::Execute(Event event)
     //Actual mobing part.
     bool moved = false;
 
-    if (bot->IsMoving())
-        moved = true;
-    else
+    if (!ai->AllowActivity(ALL_ACTIVITY))
     {
-        if (deadTime < 10 * MINUTE && dCount < 5) //Look for corpse up to 30 minutes.
+        uint32 delay = sServerFacade.GetDistance2d(bot, corpse) / bot->GetSpeed(MOVE_RUN); //Time a bot would take to travel to it's corpse.
+        delay = min(delay, uint32(10 * MINUTE)); //Cap time to get to corpse at 10 minutes.
+
+        if (deadTime > delay)
         {
-            moved = MoveTo(moveToPos.getMapId(), moveToPos.getX(), moveToPos.getY(), moveToPos.getZ(), false, false);
+            bot->GetMotionMaster()->Clear();
+            bot->TeleportTo(moveToPos.getMapId(), moveToPos.getX(), moveToPos.getY(), moveToPos.getZ(), 0);
         }
 
-        if (!moved)
-        {
-            moved = ai->DoSpecificAction("spirit healer");
-        }
+        moved = true;
     }
-      
+    else
+    {
+        if (bot->IsMoving())
+            moved = true;
+        else
+        {
+            if (deadTime < 10 * MINUTE && dCount < 5) //Look for corpse up to 30 minutes.
+            {
+                moved = MoveTo(moveToPos.getMapId(), moveToPos.getX(), moveToPos.getY(), moveToPos.getZ(), false, false);
+            }
+
+            if (!moved)
+            {
+                moved = ai->DoSpecificAction("spirit healer", Event(), true);
+            }
+        }
+    }   
 
     return moved;
 }
@@ -177,7 +193,7 @@ WorldSafeLocsEntry const* SpiritHealerAction::GetGrave(bool startZone)
     if (!startZone && ClosestGrave)
         return ClosestGrave;
 
-    if (ai->HasStrategy("follow"))
+    if (ai->HasStrategy("follow", BOT_STATE_NON_COMBAT)&& ai->GetGroupMaster() && ai->GetGroupMaster() != bot)
     {
         Player* master = ai->GetGroupMaster();
 
@@ -189,6 +205,20 @@ WorldSafeLocsEntry const* SpiritHealerAction::GetGrave(bool startZone)
                 return ClosestGrave;
         }
     }
+    else if(startZone && AI_VALUE(uint8, "durability"))
+    {
+        TravelTarget* travelTarget = AI_VALUE(TravelTarget*, "travel target");
+
+        if (travelTarget->getPosition())
+        {
+            WorldPosition travelPos = *travelTarget->getPosition();
+            ClosestGrave = bot->GetMap()->GetGraveyardManager().GetClosestGraveYard(travelPos.getX(), travelPos.getY(), travelPos.getZ(), travelPos.getMapId(), bot->GetTeam());
+
+            if (ClosestGrave)
+                return ClosestGrave;
+        }
+    }
+
 
     vector<uint32> races;
 
@@ -242,7 +272,7 @@ bool SpiritHealerAction::Execute(Event event)
     uint32 dCount = AI_VALUE(uint32, "death count");
     int64 deadTime = time(nullptr) - corpse->GetGhostTime();
 
-    WorldSafeLocsEntry const* ClosestGrave = GetGrave(dCount > 10 || deadTime > 15 * MINUTE || AI_VALUE(float, "durability") <= 20);
+    WorldSafeLocsEntry const* ClosestGrave = GetGrave(dCount > 10 || deadTime > 15 * MINUTE || AI_VALUE(uint8, "durability") < 10);
 
     if (bot->GetDistance2d(ClosestGrave->x, ClosestGrave->y) < sPlayerbotAIConfig.sightDistance)
     {
@@ -259,7 +289,7 @@ bool SpiritHealerAction::Execute(Event event)
                 bot->SaveToDB();
                 context->GetValue<Unit*>("current target")->Set(NULL);
                 bot->SetSelectionGuid(ObjectGuid());
-                ai->TellMaster("Hello");
+                ai->TellMaster(BOT_TEXT("hello"));
 
                 if (dCount > 20)
                     context->GetValue<uint32>("death count")->Set(0);
@@ -293,4 +323,9 @@ bool SpiritHealerAction::Execute(Event event)
     sLog.outBasic("Bot #%d %s:%d <%s> can't find a spirit healer", bot->GetGUIDLow(), bot->GetTeam() == ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName());
     ai->TellError("Cannot find any spirit healer nearby");
     return false;
+}
+
+bool SpiritHealerAction::isUseful()
+{
+    return bot->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST);
 }

@@ -7,22 +7,17 @@ using namespace ai;
 
 bool CastSerpentStingAction::isUseful()
 {
-    return AI_VALUE2(float, "health", "current target") > 50;
+    return AI_VALUE2(uint8, "health", "current target") > 50;
 }
 
 bool CastViperStingAction::isUseful()
 {
-    return AI_VALUE2(float, "mana", "self target") < 50 && AI_VALUE2(float, "mana", "current target") >= 30;
+    return AI_VALUE2(uint8, "mana", "current target") >= 10;
 }
 
 bool CastAspectOfTheCheetahAction::isUseful()
 {
-    return !ai->HasAnyAuraOf(GetTarget(), "aspect of the cheetah", "aspect of the pack", NULL);
-}
-
-Value<Unit*>* CastFreezingTrap::GetTargetValue()
-{
-    return context->GetValue<Unit*>("cc target", "freezing trap");
+    return !AI_VALUE(uint8, "attacker count") && !ai->HasAnyAuraOf(GetTarget(), "aspect of the cheetah", "aspect of the pack", NULL);
 }
 
 bool FeedPetAction::Execute(Event event)
@@ -32,6 +27,14 @@ bool FeedPetAction::Execute(Event event)
         pet->SetPower(POWER_HAPPINESS, HAPPINESS_LEVEL_SIZE * 2);
 
     return true;
+}
+
+bool CastAutoShotAction::isUseful()
+{
+    if (ai->IsInVehicle() && !ai->IsInVehicle(false, false, true))
+        return false;
+
+    return ai->HasStrategy("ranged", BOT_STATE_COMBAT) && AI_VALUE(uint32, "active spell") != AI_VALUE2(uint32, "spell id", getName());
 }
 
 Value<Unit*>* CastScareBeastCcAction::GetTargetValue()

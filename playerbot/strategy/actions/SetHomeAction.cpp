@@ -11,7 +11,7 @@ bool SetHomeAction::Execute(Event event)
     Player* master = GetMaster();
 
     ObjectGuid selection = bot->GetSelectionGuid();
-    bool isRpgAction = AI_VALUE(ObjectGuid, "rpg target") == selection;
+    bool isRpgAction = AI_VALUE(GuidPosition, "rpg target") == selection;
 
     if (!isRpgAction)
         if (master)
@@ -29,17 +29,15 @@ bool SetHomeAction::Execute(Event event)
                 Creature* creature = ai->GetCreature(selection);                   
                 bot->GetSession()->SendBindPoint(creature);
                 ai->TellMaster("This inn is my new home");
+                RESET_AI_VALUE(WorldPosition, "home bind");
                 return true;
             }
             else
             {
-                float angle = GetFollowAngle();
-                float x = unit->GetPositionX() + sPlayerbotAIConfig.followDistance * cos(angle);
-                float y = unit->GetPositionY() + sPlayerbotAIConfig.followDistance * sin(angle);
-                float z = unit->GetPositionZ();
-                WorldLocation loc(unit->GetMapId(), x, y, z);
-                bot->SetHomebindToLocation(loc, unit->GetAreaId());
+                Creature* creature = ai->GetCreature(selection);
+                bot->GetSession()->SendBindPoint(creature);
                 ai->TellMaster("This inn is my new home");
+                RESET_AI_VALUE(WorldPosition, "home bind");
                 return true;
             }
         }
@@ -54,6 +52,7 @@ bool SetHomeAction::Execute(Event event)
 
         bot->GetSession()->SendBindPoint(unit);
         ai->TellMaster("This inn is my new home");
+        RESET_AI_VALUE(WorldPosition, "home bind");
         return true;
     }
 

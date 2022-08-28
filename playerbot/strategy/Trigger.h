@@ -72,10 +72,10 @@ namespace ai
 
     public:
         NextAction** getHandlers() { return NextAction::merge(NextAction::clone(handlers), trigger->getHandlers()); }
-
+        float getFirstRelevance() {return handlers[0] ? handlers[0]->getRelevance() : -1; }
     private:
+        std::string name;
         Trigger* trigger;
         NextAction** handlers;
-        std::string name;
     };
 }

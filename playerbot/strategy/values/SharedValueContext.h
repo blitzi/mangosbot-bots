@@ -12,9 +12,10 @@ namespace ai
         {
             creators["bg masters"] = &SharedValueContext::bg_masters;
 
-            creators["loot map"] = &SharedValueContext::loot_map;
+            creators["drop map"] = &SharedValueContext::drop_map;
+            creators["item drop list"] = &SharedValueContext::item_drop_list;
             creators["entry loot list"] = &SharedValueContext::entry_loot_list;
-            creators["item loot list"] = &SharedValueContext::item_loot_list;
+            creators["loot chance"] = &SharedValueContext::loot_chance;
 
             creators["entry quest relation"] = &SharedValueContext::entry_quest_relation;
 
@@ -26,9 +27,10 @@ namespace ai
     private:
         static UntypedValue* bg_masters(PlayerbotAI* ai) { return new BgMastersValue(ai); }
 
-        static UntypedValue* loot_map(PlayerbotAI* ai) { return new LootMapValue(ai); }
+        static UntypedValue* drop_map(PlayerbotAI* ai) { return new DropMapValue(ai); }
+        static UntypedValue* item_drop_list(PlayerbotAI* ai) { return new ItemDropListValue(ai); }
         static UntypedValue* entry_loot_list(PlayerbotAI* ai) { return new EntryLootListValue(ai); }
-        static UntypedValue* item_loot_list(PlayerbotAI* ai) { return new ItemLootListValue(ai); }
+        static UntypedValue* loot_chance(PlayerbotAI* ai) { return new LootChanceValue(ai); }
 
         static UntypedValue* entry_quest_relation(PlayerbotAI* ai) { return new EntryQuestRelationMapValue(ai); }        
 

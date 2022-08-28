@@ -24,10 +24,24 @@ void TrainerAction::Learn(uint32 cost, TrainerSpell const* tSpell, ostringstream
         return;
 
 #ifdef CMANGOS
-    if (tSpell->IsCastable())
-        ai->CastSpell(tSpell->spell, bot);
+    if (tSpell->learnedSpell)
+    {
+        // old code
+        // bot->learnSpell(tSpell->learnedSpell, false);
+        bool learned = false;
+        for (int j = 0; j < 3; ++j)
+        {
+            if (proto->Effect[j] == SPELL_EFFECT_LEARN_SPELL)
+            {
+                uint32 learnedSpell = proto->EffectTriggerSpell[j];
+                bot->learnSpell(learnedSpell, false);
+                learned = true;
+            }
+        }
+        if (!learned) bot->learnSpell(tSpell->learnedSpell, false);
+    }
     else
-        bot->learnSpell(tSpell->learnedSpell, false);
+        ai->CastSpell(tSpell->spell, bot);
 #endif
 
 #ifdef MANGOS
@@ -43,6 +57,8 @@ void TrainerAction::Learn(uint32 cost, TrainerSpell const* tSpell, ostringstream
     }
     if (!learned) bot->learnSpell(tSpell->spell, false);
 #endif
+
+    sTravelMgr.logEvent(ai, "TrainerAction", proto->SpellName[0], to_string(proto->Id));   
 
     msg << " - learned";
 }
@@ -104,13 +120,29 @@ bool TrainerAction::Execute(Event event)
     string text = event.getParam();
 
     Player* master = GetMaster();
+    Creature* creature;
 
-    if (!master)
-        return false;
+    if (event.getSource() == "rpg action")
+    {
+        ObjectGuid guid = event.getObject();
+        creature = ai->GetCreature(guid);
+    }
+    else
+    {
+        if (master)
+            creature = ai->GetCreature(master->GetSelectionGuid());
+        else
+            return false;
+    }
 
-    Creature *creature = ai->GetCreature(master->GetSelectionGuid());
+#ifdef MANGOS
+    if (!creature || !creature->IsTrainer())
+#endif
+#ifdef CMANGOS
     if (!creature || !creature->isTrainer())
+#endif
         return false;
+
             
     if (!creature->IsTrainerOf(bot, false))
     {

@@ -56,7 +56,7 @@ bool BuyAction::Execute(Event event)
                 m_items_sorted.insert(m_items_sorted.begin(), vItems->m_items.begin(), vItems->m_items.end());
             
 
-            std::remove_if(m_items_sorted.begin(), m_items_sorted.end(), [](VendorItem* i) {ItemPrototype const* proto = sObjectMgr.GetItemPrototype(i->item); return !proto; });
+            m_items_sorted.erase(std::remove_if(m_items_sorted.begin(), m_items_sorted.end(), [](VendorItem* i) {ItemPrototype const* proto = sObjectMgr.GetItemPrototype(i->item); return !proto; }), m_items_sorted.end());
 
             if (m_items_sorted.empty())
                 continue;
@@ -65,39 +65,59 @@ bool BuyAction::Execute(Event event)
 
             for (auto& tItem : m_items_sorted)
             {
-
-                ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", tItem->item);
-                ItemPrototype const* proto = sObjectMgr.GetItemPrototype(tItem->item);
-
-                uint32 price = proto->BuyPrice;
-
-                // reputation discount
-                price = uint32(floor(price * bot->GetReputationPriceDiscount(pCreature)));
-
-                NeedMoneyFor needMoneyFor = NeedMoneyFor::none;
-
-                switch (usage)
+                for (uint32 i=0; i<10; i++) //Buy 10 times or until no longer usefull/possible
                 {
-                case ITEM_USAGE_REPLACE:
-                case ITEM_USAGE_EQUIP:
-                    needMoneyFor = NeedMoneyFor::gear;
-                    break;
-                }
+                    ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", tItem->item);
+                    ItemPrototype const* proto = sObjectMgr.GetItemPrototype(tItem->item);
 
-                if (needMoneyFor == NeedMoneyFor::none)
-                    continue;
+                    uint32 price = proto->BuyPrice;
 
-                if (AI_VALUE2(uint32, "free money for", uint32(needMoneyFor)) < price)
-                    continue;
+                    // reputation discount
+                    price = uint32(floor(price * bot->GetReputationPriceDiscount(pCreature)));
 
-                if (!BuyItem(tItems, vendorguid, proto))
+                    NeedMoneyFor needMoneyFor = NeedMoneyFor::none;
+
+                    switch (usage)
+                    {
+                    case ITEM_USAGE_REPLACE:
+                    case ITEM_USAGE_EQUIP:
+                        needMoneyFor = NeedMoneyFor::gear;
+                        break;
+                    case ITEM_USAGE_AMMO:
+                        needMoneyFor = NeedMoneyFor::ammo;
+                        break;
+                    case ITEM_USAGE_QUEST:
+                        needMoneyFor = NeedMoneyFor::anything;
+                        break;
+                    case ITEM_USAGE_USE:
+                        needMoneyFor = NeedMoneyFor::consumables;
+                        break;
+                    case ITEM_USAGE_SKILL:
+                        needMoneyFor = NeedMoneyFor::tradeskill;
+                        break;
+                    }
+
+                    if (needMoneyFor == NeedMoneyFor::none)
+                        break;
+
+                    if (AI_VALUE2(uint32, "free money for", uint32(needMoneyFor)) < price)
+                        break;
+
+                    result |= BuyItem(tItems, vendorguid, proto);
 #ifndef MANGOSBOT_ZERO
-                    if(!BuyItem(vItems, vendorguid, proto))
+                    if(!result)
+                        result |= BuyItem(vItems, vendorguid, proto);
 #endif
-                        continue;
-            } 
+                    if(!result)
+                        break;    
 
-            ai->DoSpecificAction("equip upgrades", Event(), true);            
+                    if (usage == ITEM_USAGE_REPLACE || usage == ITEM_USAGE_EQUIP) //Equip upgrades and stop buying this time.
+                    {
+                        ai->DoSpecificAction("equip upgrades");
+                        break;
+                    }
+                } 
+            }
         }
         else
         {
@@ -131,7 +151,7 @@ bool BuyAction::Execute(Event event)
         return false;
     }
 
-    return true;
+    return result;
 }
 
 bool BuyAction::BuyItem(VendorItemData const* tItems, ObjectGuid vendorguid, const ItemPrototype* proto)

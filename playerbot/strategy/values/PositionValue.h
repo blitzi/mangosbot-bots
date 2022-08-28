@@ -22,7 +22,7 @@ namespace ai
     class PositionValue : public ManualSetValue<PositionMap&>
 	{
 	public:
-        PositionValue(PlayerbotAI* ai);
+        PositionValue(PlayerbotAI* ai, string name = "position");
 
         virtual string Save();
         virtual bool Load(string value);
@@ -39,4 +39,12 @@ namespace ai
 
         virtual WorldPosition Calculate() {return WorldPosition(bot);};
     };  
+
+    class CustomPositionValue : public ManualSetValue<WorldPosition>, public Qualified
+    {
+    public:
+        CustomPositionValue(PlayerbotAI* ai, string name = "custom position") : ManualSetValue<WorldPosition>(ai, WorldPosition(), name) { };
+
+        virtual WorldPosition Calculate() { return WorldPosition(bot); };
+    };
 }

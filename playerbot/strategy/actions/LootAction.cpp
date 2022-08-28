@@ -72,7 +72,7 @@ bool OpenLootAction::DoLoot(LootObject& lootObject)
         return false;
 
     Creature* creature = ai->GetCreature(lootObject.guid);
-    if (creature && bot->GetDistance(creature) > INTERACTION_DISTANCE)
+    if (creature && sServerFacade.GetDistance2d(bot, creature) > INTERACTION_DISTANCE)
         return false;
 
     if (creature && creature->HasFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE)
@@ -107,7 +107,7 @@ bool OpenLootAction::DoLoot(LootObject& lootObject)
     }
 
     GameObject* go = ai->GetGameObject(lootObject.guid);
-    if (go && bot->GetDistance(go) > INTERACTION_DISTANCE)
+    if (go && sServerFacade.GetDistance2d(bot, go) > INTERACTION_DISTANCE)
         return false;
 
     if (go && (
@@ -430,12 +430,14 @@ bool StoreLootAction::Execute(Event event)
         packet << itemindex;
         bot->GetSession()->HandleAutostoreLootItemOpcode(packet);
 
-        if (proto->Quality > ITEM_QUALITY_NORMAL && !urand(0, 50)) ai->PlaySound(TEXTEMOTE_CHEER);
-        if (proto->Quality >= ITEM_QUALITY_RARE) ai->PlaySound(TEXTEMOTE_CHEER);
+        if (proto->Quality > ITEM_QUALITY_NORMAL && !urand(0, 50) && ai->HasStrategy("emote", BOT_STATE_NON_COMBAT)) ai->PlayEmote(TEXTEMOTE_CHEER);
+        if (proto->Quality >= ITEM_QUALITY_RARE && !urand(0, 1) && ai->HasStrategy("emote", BOT_STATE_NON_COMBAT)) ai->PlayEmote(TEXTEMOTE_CHEER);
 
         ostringstream out; out << "Looting " << chat->formatItem(proto);
 
         ai->TellMasterNoFacing(out.str());
+
+        sTravelMgr.logEvent(ai, "StoreLootAction", proto->Name1, to_string(proto->ItemId));      
 
         //ItemUsage usage = AI_VALUE2(ItemUsage, "item usage", proto->ItemId);
         //sLog.outErrorDb("Bot %s is looting %d %s for usage %d.", bot->GetName(), itemcount, proto->Name1, usage);
@@ -489,6 +491,10 @@ bool StoreLootAction::IsLootAllowed(uint32 itemid, PlayerbotAI *ai)
     if (!proto)
         return false;
 
+    set<uint32>& lootItems = AI_VALUE(set<uint32>&, "always loot list");
+    if (lootItems.find(itemid) != lootItems.end())
+        return true;
+
     uint32 max = proto->MaxCount;
     if (max > 0 && ai->GetBot()->HasItemCount(itemid, max, true))
         return false;
@@ -501,11 +507,6 @@ bool StoreLootAction::IsLootAllowed(uint32 itemid, PlayerbotAI *ai)
             return true;
     }
 
-    //if (proto->Bonding == BIND_QUEST_ITEM ||  //Still testing if it works ok without these lines.
-    //    proto->Bonding == BIND_QUEST_ITEM1 || //Eventually this has to be removed.
-    //    proto->Class == ITEM_CLASS_QUEST)
-    //{
-    
     for (uint8 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
     {
         uint32 entry = ai->GetBot()->GetQuestSlotQuestId(slot);
@@ -519,11 +520,17 @@ bool StoreLootAction::IsLootAllowed(uint32 itemid, PlayerbotAI *ai)
             {
                 if (ai->GetMaster() && sPlayerbotAIConfig.syncQuestWithPlayer)
                     return false; //Quest is autocomplete for the bot so no item needed.
-                if (AI_VALUE2(uint32, "item count", proto->Name1) < quest->ReqItemCount[i])
-                    return true;
+
+                if (AI_VALUE2(uint32, "item count", proto->Name1) >= quest->ReqItemCount[i])
+                    return false;
             }
         }
     }
+
+    //if (proto->Bonding == BIND_QUEST_ITEM ||  //Still testing if it works ok without these lines.
+    //    proto->Bonding == BIND_QUEST_ITEM1 || //Eventually this has to be removed.
+    //    proto->Class == ITEM_CLASS_QUEST)
+    //{
 
     bool canLoot = lootStrategy->CanLoot(proto, context);
 

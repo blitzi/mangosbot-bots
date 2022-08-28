@@ -4,20 +4,14 @@
 
 using namespace ai;
 
-
-NextAction** GuildStrategy::getDefaultActions()
-{
-    return NULL;
-}
-
 void GuildStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
     triggers.push_back(new TriggerNode(
-        "often",
+        "random",
         NextAction::array(0, new NextAction("offer petition nearby", 4.0f), NULL)));
 
     triggers.push_back(new TriggerNode(
-        "often",
+        "random",
         NextAction::array(0, new NextAction("guild manage nearby", 4.0f), NULL)));
 
     triggers.push_back(new TriggerNode(

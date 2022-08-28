@@ -65,11 +65,16 @@ bool PanicTrigger::IsActive()
 
 bool OutNumberedTrigger::IsActive()
 {
+    if (bot->GetMap() && (bot->GetMap()->IsDungeon() || bot->GetMap()->IsRaid()))
+        return false;
+
+    if (bot->GetGroup() && bot->GetGroup()->IsRaidGroup())
+        return false;
+
     int32 botLevel = bot->GetLevel();
     uint32 friendPower = 200, foePower = 0;
     for (auto &attacker : ai->GetAiObjectContext()->GetValue<list<ObjectGuid> >("attackers")->Get())
     {
-
         Creature* creature = ai->GetCreature(attacker);
         if (!creature)
             continue;
@@ -92,7 +97,7 @@ bool OutNumberedTrigger::IsActive()
 
         int32 dLevel = player->GetLevel() - botLevel;
 
-        if (dLevel > -10 && bot->GetDistance(player) < 10.0f)
+        if (dLevel > -10 && sServerFacade.GetDistance2d(bot, player) < 10.0f)
             friendPower += std::max(200 + 20 * dLevel, dLevel * 200);
     }
 
@@ -104,6 +109,13 @@ bool BuffTrigger::IsActive()
     Unit* target = GetTarget();
     return SpellTrigger::IsActive() &&
         !ai->HasAura(spell, target, false, checkIsOwner);
+}
+
+bool MyBuffTrigger::IsActive()
+{
+    Unit* target = GetTarget();
+    return SpellTrigger::IsActive() &&
+        !ai->HasMyAura(spell, target);
 }
 
 Value<Unit*>* PartyMemberHasAggroTrigger::GetTargetValue()
@@ -121,6 +133,11 @@ bool PartyMemberHasAggroTrigger::IsActive()
 Value<Unit*>* BuffOnPartyTrigger::GetTargetValue()
 {
     return context->GetValue<Unit*>("party member without aura", spell);
+}
+
+Value<Unit*>* MyBuffOnPartyTrigger::GetTargetValue()
+{
+    return context->GetValue<Unit*>("party member without my aura", spell);
 }
 
 Value<Unit*>* BuffOnTankTrigger::GetTargetValue()
@@ -187,6 +204,15 @@ bool SpellCanBeCastTrigger::IsActive()
     return target && ai->CanCastSpell(spell, target);
 }
 
+bool SpellNoCooldownTrigger::IsActive()
+{
+    uint32 spellId = AI_VALUE2(uint32, "spell id", name);
+    if (!spellId)
+        return false;
+
+    return bot->IsSpellReady(spellId);
+}
+
 bool BuffCanBeCastTrigger::IsActive()
 {
     Unit* target = GetTarget();
@@ -212,7 +238,7 @@ bool RandomTrigger::IsActive()
 
 bool AndTrigger::IsActive()
 {
-    return ls->IsActive() && rs->IsActive();
+    return ls && rs && ls->IsActive() && rs->IsActive();
 }
 
 string AndTrigger::getName()
@@ -220,6 +246,27 @@ string AndTrigger::getName()
     std::string name(ls->GetName());
     name = name + " and ";
     name = name + rs->GetName();
+    return name;
+}
+
+bool TwoTriggers::IsActive()
+{
+    if (name1.empty() || name2.empty())
+        return false;
+
+    Trigger* trigger1 = ai->GetAiObjectContext()->GetTrigger(name1);
+    Trigger* trigger2 = ai->GetAiObjectContext()->GetTrigger(name2);
+
+    if (!trigger1 || !trigger2)
+        return false;
+
+    return trigger1->IsActive() && trigger2->IsActive();
+}
+
+string TwoTriggers::getName()
+{
+    std::string name;
+    name = name1 + " and " + name2;
     return name;
 }
 
@@ -253,7 +300,7 @@ bool BoostTrigger::IsActive()
 
 bool ItemCountTrigger::IsActive()
 {
-    return AI_VALUE2(uint32, "item count", item) < count;
+	return AI_VALUE2(uint32, "item count", item) < uint32(count);
 }
 
 bool InterruptSpellTrigger::IsActive()
@@ -390,6 +437,9 @@ bool NotDpsTargetActiveTrigger::IsActive()
     if (target && target == enemy && sServerFacade.IsAlive(target))
         return false;
 
+    if (target && target->IsPlayer())
+        return false;
+
     return dps && target != dps;
 }
 
@@ -482,12 +532,22 @@ bool CorpseNearTrigger::IsActive()
 
 bool IsFallingTrigger::IsActive()
 {
+#ifndef MANGOSBOT_TWO
+    return bot->HasMovementFlag(MOVEFLAG_JUMPING);
+#else
     return bot->HasMovementFlag(MOVEFLAG_FALLING);
+#endif
 }
 
 bool IsFallingFarTrigger::IsActive()
 {
     return bot->HasMovementFlag(MOVEFLAG_FALLINGFAR);
+}
+
+bool HasAreaDebuffTrigger::IsActive()
+{
+    return AI_VALUE2(bool, "has area debuff", "self target");
+}
 }
 
 bool DamageStopTrigger::IsActive()

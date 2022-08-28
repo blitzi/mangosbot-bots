@@ -81,7 +81,100 @@ bool UseItemAction::UseGameObject(ObjectGuid guid)
 
 bool UseItemAction::UseItemAuto(Item* item)
 {
-   return UseItem(item, ObjectGuid(), nullptr);
+    uint8 bagIndex = item->GetBagSlot();
+    uint8 slot = item->GetSlot();
+    uint8 spell_index = 0;
+    uint8 cast_count = 1;
+    uint32 spellId = 0;
+    ObjectGuid item_guid = item->GetObjectGuid();
+#ifdef MANGOSBOT_ZERO
+    uint16 targetFlag = TARGET_FLAG_SELF;
+#else
+    uint32 targetFlag = TARGET_FLAG_SELF;
+#endif
+    uint32 glyphIndex = 0;
+    uint8 unk_flags = 0;
+
+    ItemPrototype const* proto = item->GetProto();
+    bool isDrink = proto->Spells[0].SpellCategory == 59;
+    bool isFood = proto->Spells[0].SpellCategory == 11;
+
+    for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
+    {
+        // wrong triggering type
+        if (proto->Spells[i].SpellTrigger != ITEM_SPELLTRIGGER_ON_USE)
+            continue;
+
+        if (proto->Spells[i].SpellId > 0)
+        {
+            spell_index = i;
+        }
+    }
+
+#ifdef MANGOSBOT_ZERO
+    WorldPacket packet(CMSG_USE_ITEM);
+    packet << bagIndex << slot << spell_index;
+#endif
+#ifdef MANGOSBOT_ONE
+    WorldPacket packet(CMSG_USE_ITEM);
+    packet << bagIndex << slot << spell_index << cast_count << item_guid;
+#endif
+#ifdef MANGOSBOT_TWO
+    for (uint8 i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
+    {
+        if (item->GetProto()->Spells[i].SpellId > 0)
+        {
+            spellId = item->GetProto()->Spells[i].SpellId;
+            break;
+        }
+    }
+
+    WorldPacket packet(CMSG_USE_ITEM, 1 + 1 + 1 + 4 + 8 + 4 + 1 + 8 + 1);
+    packet << bagIndex << slot << cast_count << spellId << item_guid << glyphIndex << unk_flags;
+#endif
+
+    packet << targetFlag;
+    packet.appendPackGUID(bot->GetObjectGuid());
+
+    ai->SetNextCheckDelay(sPlayerbotAIConfig.globalCoolDown);
+    if (proto->Class == ITEM_CLASS_CONSUMABLE && (proto->SubClass == ITEM_SUBCLASS_FOOD || proto->SubClass == ITEM_SUBCLASS_CONSUMABLE) &&
+        (isFood || isDrink))
+    {
+        if (sServerFacade.IsInCombat(bot))
+            return false;
+
+        bot->addUnitState(UNIT_STAND_STATE_SIT);
+        ai->InterruptSpell();
+
+        float hp = bot->GetHealthPercent();
+        float mp = bot->GetPower(POWER_MANA) * 100.0f / bot->GetMaxPower(POWER_MANA);
+        float p;
+        if (isDrink && isFood)
+        {
+            p = min(hp, mp);
+            TellConsumableUse(item, "Feasting", p);
+        }
+        else if (isDrink)
+        {
+            p = mp;
+            TellConsumableUse(item, "Drinking", p);
+        }
+        else if (isFood)
+        {
+            p = hp;
+            TellConsumableUse(item, "Eating", p);
+        }
+        if (!bot->IsInCombat() && !bot->InBattleGround())
+            ai->SetNextCheckDelay(27000.0f * (100 - p) / 100.0f);
+
+        if (!bot->IsInCombat() && bot->InBattleGround())
+            ai->SetNextCheckDelay(20000.0f * (100 - p) / 100.0f);
+    }
+
+    bot->GetSession()->HandleUseItemOpcode(packet);
+    return true;
+
+   //return UseItem(item, ObjectGuid(), nullptr);
 }
 
 bool UseItemAction::UseItemOnGameObject(Item* item, ObjectGuid go)
@@ -236,6 +329,33 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Uni
        }
    }
 
+   if (unitTarget)
+   {
+       uint32 spellid = 0;
+       for (int i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
+       {
+           if (item->GetProto()->Spells[i].SpellTrigger == ITEM_SPELLTRIGGER_ON_USE)
+           {
+               spellid = item->GetProto()->Spells[i].SpellId;
+               break;
+           }
+       }
+
+       if (SpellEntry const* spellInfo = sSpellTemplate.LookupEntry<SpellEntry>(spellid))
+       {
+           if (spellInfo->Targets & TARGET_FLAG_DEST_LOCATION)
+           {
+               targetFlag = TARGET_FLAG_DEST_LOCATION;
+               Position pos = unitTarget->GetPosition();
+               SpellCastTargets targets;
+               targets.setDestination(pos.x, pos.y, pos.z);
+               packet << targetFlag;
+               targets.write(packet);
+               targetSelected = true;
+           }
+       }
+   }
+
    if (uint32 questid = item->GetProto()->StartQuest)
    {
       Quest const* qInfo = sObjectMgr.GetQuestTemplate(questid);
@@ -252,12 +372,12 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Uni
       }
    }
 
-   bot->clearUnitState(UNIT_STAT_CHASE);
-   bot->clearUnitState(UNIT_STAT_FOLLOW);
+   //bot->clearUnitState(UNIT_STAT_CHASE);
+   //bot->clearUnitState(UNIT_STAT_FOLLOW);
 
    if (sServerFacade.isMoving(bot))
    {
-       bot->StopMoving();
+       ai->StopMoving();
        return false;
    }
 
@@ -313,48 +433,6 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Uni
       packet.appendPackGUID(bot->GetObjectGuid());
       targetSelected = true;
       out << " on self";
-   }
-
-   ItemPrototype const* proto = item->GetProto();
-   bool isDrink = proto->Spells[0].SpellCategory == 59;
-   bool isFood = proto->Spells[0].SpellCategory == 11;
-
-   const SpellEntry* const pSpellInfo = sServerFacade.LookupSpellInfo(proto->Spells[0].SpellId);
-
-   //check if item aura already exists
-   if (pSpellInfo && ai->HasAura(pSpellInfo->Id, bot))
-       return false;
-
-   if (proto->Class == ITEM_CLASS_CONSUMABLE && (proto->SubClass == ITEM_SUBCLASS_FOOD || proto->SubClass == ITEM_SUBCLASS_CONSUMABLE) &&
-       (isFood || isDrink))
-   {
-      if (sServerFacade.IsInCombat(bot))
-         return false;           
-
-      bot->addUnitState(UNIT_STAND_STATE_SIT);
-      ai->InterruptSpell();
-
-      float hp = bot->GetHealthPercent();
-      float mp = bot->GetPower(POWER_MANA) * 100.0f / bot->GetMaxPower(POWER_MANA);
-      float p;
-      if (isDrink && isFood)
-      {
-          p = min(hp, mp);
-          TellConsumableUse(item, "Feasting", p);
-      }
-      else if (isDrink)
-      {
-          p = mp;
-          TellConsumableUse(item, "Drinking", p);
-      }
-      else if (isFood)
-      {
-          p = hp;
-          TellConsumableUse(item, "Eating", p);
-      }
-
-      bot->GetSession()->HandleUseItemOpcode(packet);
-      return true;
    }
 
    if (!spellId)
@@ -448,11 +526,16 @@ bool UseHearthStone::Execute(Event event)
 {
     if (bot->IsMoving())
     {
-        MotionMaster& mm = *bot->GetMotionMaster();
-        bot->StopMoving();
-        mm.Clear();
+        ai->StopMoving();
     }
     bool used = UseItemAction::Execute(event);
+
+    if (used)
+    {
+        RESET_AI_VALUE(bool, "combat::self target");
+        RESET_AI_VALUE(WorldPosition, "current position");
+        ai->SetNextCheckDelay(10 * IN_MILLISECONDS);
+    }
 
     return used;
 }

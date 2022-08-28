@@ -50,6 +50,9 @@ bool CastSpellAction::Execute(Event event)
 
 bool CastSpellAction::isPossible()
 {
+    if (ai->IsInVehicle() && !ai->IsInVehicle(false, false, true))
+        return false;
+
     if (spell == "mount" && !bot->IsMounted() && !bot->IsInCombat())
         return true;
     if (spell == "mount" && bot->IsInCombat())
@@ -108,21 +111,16 @@ bool CastRangeSpellAction::isUseful()
 
 bool CastAuraSpellAction::isUseful()
 {
-    return GetTarget() && (GetTarget() != nullptr) && (GetTarget() != NULL) && CastRangeSpellAction::isUseful() && !ai->HasAura(spell, GetTarget(), true, isOwner);
+    return GetTarget() && (GetTarget() != nullptr) && (GetTarget() != NULL) && CastSpellAction::isUseful() && !ai->HasAura(spell, GetTarget(), true, isOwner);
 }
 
 bool CastEnchantItemAction::isPossible()
 {
-    if (!CastRangeSpellAction::isPossible())
+    if (!CastSpellAction::isPossible())
         return false;
 
     uint32 spellId = AI_VALUE2(uint32, "spell id", spell);
     return spellId && AI_VALUE2(Item*, "item for spell", spellId);
-}
-
-bool CastHealingSpellAction::isUseful()
-{
-    return CastAuraSpellAction::isUseful();
 }
 
 bool CastAoeHealSpellAction::isUseful()
@@ -138,6 +136,23 @@ Value<Unit*>* CurePartyMemberAction::GetTargetValue()
 Value<Unit*>* BuffOnPartyAction::GetTargetValue()
 {
     return context->GetValue<Unit*>("party member without aura", spell);
+}
+
+bool CastVehicleSpellAction::isPossible()
+{
+    uint32 spellId = AI_VALUE2(uint32, "vehicle spell id", spell);
+    return ai->CanCastVehicleSpell(spellId, GetTarget());
+}
+
+bool CastVehicleSpellAction::isUseful()
+{
+    return ai->IsInVehicle(false, true);
+}
+
+bool CastVehicleSpellAction::Execute(Event event)
+{
+    uint32 spellId = AI_VALUE2(uint32, "vehicle spell id", spell);
+    return ai->CastVehicleSpell(spellId, GetTarget());
 }
 
 Value<Unit*>* BuffOnTankAction::GetTargetValue()

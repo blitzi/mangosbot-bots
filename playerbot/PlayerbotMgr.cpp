@@ -6,6 +6,7 @@
 #include "RandomPlayerbotMgr.h"
 #include "ServerFacade.h"
 #include "TravelMgr.h"
+#include "Chat/ChannelMgr.h"
 
 
 class LoginQueryHolder;
@@ -22,7 +23,6 @@ PlayerbotHolder::~PlayerbotHolder()
 }
 
 
-void PlayerbotHolder::UpdateAIInternal(uint32 elapsed)
 {
 }
 
@@ -59,54 +59,159 @@ void PlayerbotHolder::LogoutAllBots()
     for (auto& itr : bots)
     {
         Player* bot = itr.second;
+        if (!bot)
+            continue;
+
         if (!bot->GetPlayerbotAI() || bot->GetPlayerbotAI()->IsRealPlayer())
             continue;
 
-        LogoutPlayerBot(bot->GetObjectGuid().GetRawValue());
+        LogoutPlayerBot(bot->GetGUIDLow());
     }
 }
 
-void PlayerbotHolder::LogoutPlayerBot(uint64 guid)
+void PlayerbotMgr::CancelLogout()
+{
+    Player* master = GetMaster();
+    if (!master)
+        return;
+
+    for (PlayerBotMap::const_iterator it = GetPlayerBotsBegin(); it != GetPlayerBotsEnd(); ++it)
+    {
+        Player* const bot = it->second;
+        PlayerbotAI* ai = bot->GetPlayerbotAI();
+        if (!ai || ai->IsRealPlayer())
+            continue;
+
+        if (bot->IsStunnedByLogout() || bot->GetSession()->isLogingOut())
+        {
+            WorldPacket p;
+            bot->GetSession()->HandleLogoutCancelOpcode(p);
+            ai->TellMaster(BOT_TEXT("logout_cancel"));
+        }
+    }
+
+    for (PlayerBotMap::const_iterator it = sRandomPlayerbotMgr.GetPlayerBotsBegin(); it != sRandomPlayerbotMgr.GetPlayerBotsEnd(); ++it)
+    {
+        Player* const bot = it->second;
+        PlayerbotAI* ai = bot->GetPlayerbotAI();
+        if (!ai || ai->IsRealPlayer())
+            continue;
+
+        if (bot->GetPlayerbotAI()->GetMaster() != master)
+            continue;
+
+        if (bot->IsStunnedByLogout() || bot->GetSession()->isLogingOut())
+        {
+            WorldPacket p;
+            bot->GetSession()->HandleLogoutCancelOpcode(p);
+        }
+    }
+}
+
+void PlayerbotHolder::LogoutPlayerBot(uint32 guid)
 {
     Player* bot = GetPlayerBot(guid);
     if (bot)
     {
-        bot->GetPlayerbotAI()->TellMaster("Goodbye!");
-        Group *group = bot->GetGroup();
-        if (group)
-        {
-            sPlayerbotDbStore.Save(bot->GetPlayerbotAI());
-        }
+        PlayerbotAI* ai = bot->GetPlayerbotAI();
+        if (!ai)
+            return;
 
-        sLog.outDebug("Bot %s logged out", bot->GetName());
+        Group *group = bot->GetGroup();
+        if (group && !bot->InBattleGround() && !bot->InBattleGroundQueue() && ai->HasActivePlayerMaster())
+        {
+            sPlayerbotDbStore.Save(ai);
+        }
+        sLog.outDebug("Bot %s logging out", bot->GetName());
         bot->SaveToDB();
 
-        if (bot->GetPlayerbotAI()->GetAiObjectContext()) //Maybe some day re-write to delate all pointer values.
+        WorldSession* botWorldSessionPtr = bot->GetSession();
+        WorldSession* masterWorldSessionPtr = nullptr;
+
+        Player* master = ai->GetMaster();
+        if (master)
+            masterWorldSessionPtr = master->GetSession();
+
+        // check for instant logout
+        bool logout = botWorldSessionPtr->ShouldLogOut(time(nullptr));
+
+        // make instant logout for now
+        logout = true;
+
+        if (masterWorldSessionPtr && masterWorldSessionPtr->ShouldLogOut(time(nullptr)))
+            logout = true;
+        
+        if (masterWorldSessionPtr && masterWorldSessionPtr->GetState() != WORLD_SESSION_STATE_READY)
+            logout = true;
+
+        if (bot->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) || bot->IsTaxiFlying() ||
+            botWorldSessionPtr->GetSecurity() >= (AccountTypes)sWorld.getConfig(CONFIG_UINT32_INSTANT_LOGOUT))
         {
-            TravelTarget* target = bot->GetPlayerbotAI()->GetAiObjectContext()->GetValue<TravelTarget*>("travel target")->Get();
-            if (target)
-                delete target;
+            logout = true;
         }
 
-        WorldSession * botWorldSessionPtr = bot->GetSession();
-        playerBots.erase(guid);    // deletes bot player ptr inside this WorldSession PlayerBotMap
+        if (master && (master->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) || master->IsTaxiFlying() ||
+            (masterWorldSessionPtr && masterWorldSessionPtr->GetSecurity() >= (AccountTypes)sWorld.getConfig(CONFIG_UINT32_INSTANT_LOGOUT))))
+        {
+            logout = true;
+        }
+
+        TravelTarget* target = nullptr;
+        if (ai->GetAiObjectContext()) //Maybe some day re-write to delate all pointer values.
+        {
+            target = ai->GetAiObjectContext()->GetValue<TravelTarget*>("travel target")->Get();
+        }
+
+        // if no instant logout, request normal logout
+        if (!logout)
+        {
+            if (bot && (bot->IsStunnedByLogout() || bot->GetSession()->isLogingOut()))
+                return;
+            else if (bot)
+            {
+                ai->TellMaster(BOT_TEXT("logout_start"));
+                WorldPacket p;
+                botWorldSessionPtr->HandleLogoutRequestOpcode(p);
+                if (!bot)
+                {
+                    playerBots.erase(guid);
+                    delete botWorldSessionPtr;
+                    if (target)
+                        delete target;
+                }
+                return;
+            }
+            else
+            {
+                playerBots.erase(guid);    // deletes bot player ptr inside this WorldSession PlayerBotMap
+                delete botWorldSessionPtr;  // finally delete the bot's WorldSession
+                if (target)
+                    delete target;
+            }
+            return;
+        } // if instant logout possible, do it
+        else if (bot && (logout || !botWorldSessionPtr->isLogingOut()))
+        {
+            ai->TellMaster(BOT_TEXT("goodbye"));
+            playerBots.erase(guid);    // deletes bot player ptr inside this WorldSession PlayerBotMap
 #ifdef CMANGOS
-        botWorldSessionPtr->LogoutPlayer(); // this will delete the bot Player object and PlayerbotAI object
+            botWorldSessionPtr->LogoutPlayer(); // this will delete the bot Player object and PlayerbotAI object
 #endif
 #ifdef MANGOS
-        botWorldSessionPtr->LogoutPlayer(true); // this will delete the bot Player object and PlayerbotAI object
+            //botWorldSessionPtr->LogoutPlayer(true); // this will delete the bot Player object and PlayerbotAI object
 #endif
-        delete botWorldSessionPtr;  // finally delete the bot's WorldSession
+            delete botWorldSessionPtr;  // finally delete the bot's WorldSession
+        }
     }
 }
 
-void PlayerbotHolder::DisablePlayerBot(uint64 guid)
+void PlayerbotHolder::DisablePlayerBot(uint32 guid)
 {
     Player* bot = GetPlayerBot(guid);
     if (bot)
     {
-        bot->GetPlayerbotAI()->TellMaster("Goodbye!");
-        bot->StopMoving();
+        bot->GetPlayerbotAI()->TellMaster(BOT_TEXT("goodbye"));
+        bot->GetPlayerbotAI()->StopMoving();
         MotionMaster& mm = *bot->GetMotionMaster();
         mm.Clear();
 
@@ -137,10 +242,10 @@ void PlayerbotHolder::DisablePlayerBot(uint64 guid)
     }
 }
 
-Player* PlayerbotHolder::GetPlayerBot(uint64 playerGuid) const
+Player* PlayerbotHolder::GetPlayerBot(uint32 playerGuid) const
 {
     PlayerBotMap::const_iterator it = playerBots.find(playerGuid);
-    return (it == playerBots.end()) ? 0 : it->second;
+    return (it == playerBots.end()) ? nullptr : it->second ? it->second : nullptr;
 }
 
 class ViewPointAccess
@@ -163,19 +268,11 @@ void PlayerbotHolder::OnBotLogin(Player * const bot)
 	PlayerbotAI* ai = new PlayerbotAI(bot);
 	bot->SetPlayerbotAI(ai);
 
-    playerBots[bot->GetObjectGuid().GetRawValue()] = bot;
+    playerBots[bot->GetGUIDLow()] = bot;
 
 	OnBotLoginInternal(bot);
 
     Player* master = ai->GetMaster();
-
-    if (master != bot)
-    {
-        ViewPoint* view = &bot->GetViewPoint();
-        ViewPointAccess* viewAccess = reinterpret_cast<ViewPointAccess*>(view);
-
-        viewAccess->m_cameras.clear();
-    }
 
     if (master)
     {
@@ -228,7 +325,7 @@ void PlayerbotHolder::OnBotLogin(Player * const bot)
     }
     else
     {
-        ai->ResetStrategies(!sRandomPlayerbotMgr.IsRandomBot(bot->GetGUIDLow()));
+        ai->ResetStrategies(!sRandomPlayerbotMgr.IsRandomBot(bot));
     }
 
     if (master && !master->IsTaxiFlying())
@@ -239,13 +336,88 @@ void PlayerbotHolder::OnBotLogin(Player * const bot)
 #endif
     }
 
-    if (sRandomPlayerbotMgr.IsRandomBot(bot->GetGUIDLow()))
-    {
-        PlayerbotFactory factory(bot, bot->GetLevel());
-        factory.Randomize(false);
-    }
+    // check activity
+    ai->AllowActivity(ALL_ACTIVITY, true);
+    // set delay on login
+    ai->SetNextCheckDelay(urand(2000, 4000));
 
-    ai->TellMaster("Hello!");
+    ai->TellMaster(BOT_TEXT("hello"));
+
+    // bots join World chat if not solo oriented
+    if (bot->GetLevel() >= 10 && sRandomPlayerbotMgr.IsRandomBot(bot) && bot->GetPlayerbotAI() && bot->GetPlayerbotAI()->GetGrouperType() != GrouperType::SOLO)
+    {
+        // TODO make action/config
+        // Make the bot join the world channel for chat
+        WorldPacket pkt(CMSG_JOIN_CHANNEL);
+#ifndef MANGOSBOT_ZERO
+        pkt << uint32(0) << uint8(0) << uint8(0);
+#endif
+        pkt << std::string("World");
+        pkt << ""; // Pass
+        bot->GetSession()->HandleJoinChannelOpcode(pkt);
+
+#ifdef MANGOSBOT_ZERO
+        // bots join World Defense
+        WorldPacket pkt2(CMSG_JOIN_CHANNEL);
+#ifndef MANGOSBOT_ZERO
+        pkt2 << uint32(0) << uint8(0) << uint8(0);
+#endif
+        pkt2 << std::string("WorldDefense");
+        pkt2 << ""; // Pass
+        bot->GetSession()->HandleJoinChannelOpcode(pkt2);
+#endif
+    }
+    // join standard channels
+    int32 locale = sConfig.GetIntDefault("DBC.Locale", 0 /*LocaleConstant::LOCALE_enUS*/); // bot->GetSession()->GetSessionDbcLocale();
+    // -- In case we're using auto detect on config file
+    if (locale == 255)
+        locale = static_cast<int32>(LocaleConstant::LOCALE_enUS);
+    
+    AreaTableEntry const* current_zone = GetAreaEntryByAreaID(sTerrainMgr.GetAreaId(bot->GetMapId(), bot->GetPositionX(), bot->GetPositionY(), bot->GetPositionZ()));
+    ChannelMgr* cMgr = channelMgr(bot->GetTeam());
+    std::string current_zone_name = current_zone ? current_zone->area_name[locale] : "";
+
+    if (current_zone && cMgr)
+    {
+        for (uint32 i = 0; i < sChatChannelsStore.GetNumRows(); ++i)
+        {
+            ChatChannelsEntry const* channel = sChatChannelsStore.LookupEntry(i);
+            if (!channel) continue;
+
+#ifndef MANGOSBOT_ZERO
+            bool isLfg = (channel->flags & Channel::CHANNEL_DBC_FLAG_LFG) != 0;
+#else
+            bool isLfg = channel->ChannelID == 24;
+#endif
+
+            // skip non built-in channels or global channel without zone name in pattern
+            if (!isLfg && (!channel || (channel->flags & 4) == 4))
+                continue;
+
+            //  new channel
+            Channel* new_channel = nullptr;
+            if (isLfg)
+            {
+#ifndef MANGOSBOT_ZERO
+                new_channel = cMgr->GetJoinChannel(channel->pattern[locale], channel->ChannelID);
+#else
+                new_channel = cMgr->GetJoinChannel("LookingForGroup");
+#endif
+            }
+            else
+            {
+                char new_channel_name_buf[100];
+                snprintf(new_channel_name_buf, 100, channel->pattern[locale], current_zone_name.c_str());
+#ifndef MANGOSBOT_ZERO
+                new_channel = cMgr->GetJoinChannel(new_channel_name_buf, channel->ChannelID);
+#else
+                new_channel = cMgr->GetJoinChannel(new_channel_name_buf);
+#endif
+            }
+            if (new_channel)
+                new_channel->Join(bot, "");
+        }
+    }
 }
 
 string PlayerbotHolder::ProcessBotCommand(string cmd, ObjectGuid guid, ObjectGuid masterguid, bool admin, uint32 masterAccountId, uint32 masterGuildId)
@@ -270,7 +442,11 @@ string PlayerbotHolder::ProcessBotCommand(string cmd, ObjectGuid guid, ObjectGui
         if (sObjectMgr.GetPlayer(guid))
             return "player already logged in";
 
-        AddPlayerBot(guid.GetRawValue(), masterAccountId);
+        if (isRandomAccount)
+            sRandomPlayerbotMgr.AddRandomBot(guid.GetCounter());
+        else
+            AddPlayerBot(guid.GetCounter(), masterAccountId);
+
         return "ok";
     }
     else if (cmd == "remove" || cmd == "logout" || cmd == "rm")
@@ -278,17 +454,17 @@ string PlayerbotHolder::ProcessBotCommand(string cmd, ObjectGuid guid, ObjectGui
         if (!sObjectMgr.GetPlayer(guid))
             return "player is offline";
 
-        if (!GetPlayerBot(guid.GetRawValue()))
+        if (!GetPlayerBot(guid.GetCounter()))
             return "not your bot";
 
-        LogoutPlayerBot(guid.GetRawValue());
+        LogoutPlayerBot(guid.GetCounter());
         return "ok";
     }
 
     if (admin)
     {
-        Player* bot = GetPlayerBot(guid.GetRawValue());
-        if (!bot) bot = sRandomPlayerbotMgr.GetPlayerBot(guid.GetRawValue());
+        Player* bot = GetPlayerBot(guid.GetCounter());
+        if (!bot) bot = sRandomPlayerbotMgr.GetPlayerBot(guid.GetCounter());
         if (!bot)
             return "bot not found";
 
@@ -297,32 +473,46 @@ string PlayerbotHolder::ProcessBotCommand(string cmd, ObjectGuid guid, ObjectGui
         {
             if (cmd == "init=white" || cmd == "init=common")
             {
+                PlayerbotFactory factory(bot, master->GetLevel(), ITEM_QUALITY_NORMAL);
+                factory.Randomize(false);
                 return "ok";
             }
             else if (cmd == "init=green" || cmd == "init=uncommon")
             {
+                PlayerbotFactory factory(bot, master->GetLevel(), ITEM_QUALITY_UNCOMMON);
+                factory.Randomize(false);
                 return "ok";
             }
             else if (cmd == "init=blue" || cmd == "init=rare")
             {
+                PlayerbotFactory factory(bot, master->GetLevel(), ITEM_QUALITY_RARE);
+                factory.Randomize(false);
                 return "ok";
             }
             else if (cmd == "init=epic" || cmd == "init=purple")
             {
+                PlayerbotFactory factory(bot, master->GetLevel(), ITEM_QUALITY_EPIC);
+                factory.Randomize(false);
                 return "ok";
             }
             else if (cmd == "init=legendary" || cmd == "init=yellow")
             {
+                PlayerbotFactory factory(bot, master->GetLevel(), ITEM_QUALITY_LEGENDARY);
+                factory.Randomize(false);
                 return "ok";
             }
         }
 
         if (cmd == "levelup" || cmd == "level")
         {
+            PlayerbotFactory factory(bot, bot->GetLevel());
+            factory.Randomize(true);
             return "ok";
         }
         else if (cmd == "refresh")
         {
+            PlayerbotFactory factory(bot, bot->GetLevel());
+            factory.Refresh();
             return "ok";
         }
         else if (cmd == "random")
@@ -401,12 +591,22 @@ list<string> PlayerbotHolder::HandlePlayerbotCommand(char const* args, Player* m
         return messages;
     }   
 
+    if (!strcmp(cmd, "tweak"))
+    {
+        sPlayerbotAIConfig.tweakValue = sPlayerbotAIConfig.tweakValue++;
+        if (sPlayerbotAIConfig.tweakValue > 2)
+            sPlayerbotAIConfig.tweakValue = 0;
+
+        messages.push_back("Set tweakvalue to " + to_string(sPlayerbotAIConfig.tweakValue));
+        return messages;
+    }
+
     if (!strcmp(cmd, "self"))
     {
         if (master->GetPlayerbotAI())
         {
             messages.push_back("Disable player ai");
-            DisablePlayerBot(master->GetObjectGuid().GetRawValue());
+            DisablePlayerBot(master->GetGUIDLow());
         }
         else if (sPlayerbotAIConfig.selfBotLevel == 0)
             messages.push_back("Self-bot is disabled");
@@ -673,12 +873,18 @@ void PlayerbotMgr::HandleMasterIncomingPacket(const WorldPacket& packet)
     for (PlayerBotMap::const_iterator it = GetPlayerBotsBegin(); it != GetPlayerBotsEnd(); ++it)
     {
         Player* const bot = it->second;
+        if (!bot)
+            continue;
+
         bot->GetPlayerbotAI()->HandleMasterIncomingPacket(packet);
     }
 
     for (PlayerBotMap::const_iterator it = sRandomPlayerbotMgr.GetPlayerBotsBegin(); it != sRandomPlayerbotMgr.GetPlayerBotsEnd(); ++it)
     {
         Player* const bot = it->second;
+        if (!bot)
+            continue;
+
         if (bot->GetPlayerbotAI()->GetMaster() == GetMaster())
             bot->GetPlayerbotAI()->HandleMasterIncomingPacket(packet);
     }
@@ -691,6 +897,12 @@ void PlayerbotMgr::HandleMasterIncomingPacket(const WorldPacket& packet)
             LogoutAllBots();
             return;
         }
+        // if master cancelled logout, cancel too
+        case CMSG_LOGOUT_CANCEL:
+        {
+            CancelLogout();
+            return;
+        }
     }
 }
 void PlayerbotMgr::HandleMasterOutgoingPacket(const WorldPacket& packet)
@@ -698,6 +910,9 @@ void PlayerbotMgr::HandleMasterOutgoingPacket(const WorldPacket& packet)
     for (PlayerBotMap::const_iterator it = GetPlayerBotsBegin(); it != GetPlayerBotsEnd(); ++it)
     {
         Player* const bot = it->second;
+        if (!bot)
+            continue;
+
         bot->GetPlayerbotAI()->HandleMasterOutgoingPacket(packet);
     }
 
@@ -715,6 +930,9 @@ void PlayerbotMgr::HandleMasterOutgoingPacket(const WorldPacket& packet)
    /* for (PlayerBotMap::const_iterator it = sRandomPlayerbotMgr.GetPlayerBotsBegin(); it != sRandomPlayerbotMgr.GetPlayerBotsEnd(); ++it)
     {
         Player* const bot = it->second;
+        if (!bot)
+            continue;
+
         if (bot->GetPlayerbotAI()->GetMaster() == GetMaster())
             bot->GetPlayerbotAI()->HandleMasterOutgoingPacket(packet);
     }*/
@@ -746,6 +964,10 @@ void PlayerbotMgr::OnBotLoginInternal(Player * const bot)
 
 void PlayerbotMgr::OnPlayerLogin(Player* player)
 {
+    // set locale priority for bot texts
+    sPlayerbotTextMgr.AddLocalePriority(player->GetSession()->GetSessionDbLocaleIndex());
+    sLog.outBasic("Player %s logged in, localeDbc %i, localeDb %i", player->GetName(), (uint32)(player->GetSession()->GetSessionDbcLocale()), player->GetSession()->GetSessionDbLocaleIndex());
+
     if(sPlayerbotAIConfig.selfBotLevel > 2)
         HandlePlayerbotCommand("self", player);
 

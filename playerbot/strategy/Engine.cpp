@@ -143,7 +143,7 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
 
 
     int iterations = 0;
-    int iterationsPerTick = queue.Size() * (minimal ? 1 : sPlayerbotAIConfig.iterationsPerTick);
+    int iterationsPerTick = queue.Size() * (minimal ? (uint32)(sPlayerbotAIConfig.iterationsPerTick / 2) : sPlayerbotAIConfig.iterationsPerTick);
     do 
 	{
         basket = queue.Peek();
@@ -172,6 +172,20 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
 
             if (!action)
             {
+                if (ai->HasStrategy("debug action", BOT_STATE_NON_COMBAT))
+                {
+                    ostringstream out;
+                    out << "try: ";
+                    out << actionNode->getName();
+                    out << " unknown (";
+
+                    out << relevance << ")";
+
+                    if (!event.getSource().empty())
+                        out << " [" << event.getSource() << "]";
+
+                    ai->TellMasterNoFacing(out);
+                }
                 LogAction("A:%s - UNKNOWN", actionNode->getName().c_str());
             }
             else if (action->isUseful())
@@ -203,7 +217,7 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
                         }
                     }
 
-                    PerformanceMonitorOperation *pmo = sPerformanceMonitor.start(PERF_MON_ACTION, action->GetName());
+                    PerformanceMonitorOperation *pmo = sPerformanceMonitor.start(PERF_MON_ACTION, action->getName(), &aiObjectContext->performanceStack);
                     actionExecuted = ListenAndExecute(action, event);
                     if (pmo) pmo->finish();
 
@@ -227,14 +241,43 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
                 }
                 else
                 {
-                    LogAction("A:%s - IMPOSSIBLE", action->GetName().c_str());
+                    if (ai->HasStrategy("debug action", BOT_STATE_NON_COMBAT))
+                    {
+                        ostringstream out;
+                        out << "try: ";
+                        out << action->getName();
+                        out << " impossible (";
+
+                        out << action->getRelevance() << ")";
+
+                        if (!event.getSource().empty())
+                            out << " [" << event.getSource() << "]";
+
+                        ai->TellMasterNoFacing(out);
+                    }
+                    LogAction("A:%s - IMPOSSIBLE", action->getName().c_str());
                     MultiplyAndPush(actionNode->getAlternatives(), relevance + 0.03, false, event, "alt");
                 }
             }
             else
             {
-                LogAction("A:%s - USELESS", action->GetName().c_str());
-                MultiplyAndPush(actionNode->getAlternatives(), relevance + 0.03, false, event, "alt");
+                if (ai->HasStrategy("debug action", BOT_STATE_NON_COMBAT))
+                {
+                    ostringstream out;
+                    out << "try: ";
+                    out << action->getName();
+                    out << " useless (";
+
+                    out << action->getRelevance() << ")";
+
+                    if (!event.getSource().empty())
+                        out << " [" << event.getSource() << "]";
+
+                    ai->TellMasterNoFacing(out);
+                }
+                lastRelevance = relevance;
+                LogAction("A:%s - USELESS", action->getName().c_str());
+ 				MultiplyAndPush(actionNode->getAlternatives(), relevance + 0.03, false, event, "alt");
             }
             delete actionNode;
         }
@@ -454,7 +497,10 @@ void Engine::ProcessTriggers(bool minimal)
 
         if (testMode || trigger->needCheck(minimal))
         {
-            PerformanceMonitorOperation *pmo = sPerformanceMonitor.start(PERF_MON_TRIGGER, trigger->GetName());
+            if (minimal && node->getFirstRelevance() < 100)
+                continue;
+
+            PerformanceMonitorOperation* pmo = sPerformanceMonitor.start(PERF_MON_TRIGGER, trigger->getName(), &aiObjectContext->performanceStack);
             Event event = trigger->Check();
             if (pmo) pmo->finish();
             if (!event)

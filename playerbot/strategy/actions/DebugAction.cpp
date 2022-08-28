@@ -4,6 +4,7 @@
 #include "../../PlayerbotAIConfig.h"
 #include <playerbot/TravelNode.h>
 #include "ChooseTravelTargetAction.h"
+#include "strategy/values/SharedValueContext.h"
 
 using namespace ai;
 
@@ -90,7 +91,7 @@ bool DebugAction::Execute(Event event)
 
         Quest const* quest = sObjectMgr.GetQuestTemplate(questId);
 
-        if (!quest)
+        if (!quest || sTravelMgr.quests.find(questId) == sTravelMgr.quests.end())
         {
             ai->TellMasterNoFacing("Quest " + text.substr(6) + " not found.");
             return false;
@@ -100,27 +101,39 @@ bool DebugAction::Execute(Event event)
 
         out << quest->GetTitle() << ": ";
 
+        ai->TellMasterNoFacing(out);
+
         QuestContainer* cont = sTravelMgr.quests[questId];
+
+        uint32 i = 0;
 
         for (auto g : cont->questGivers)
         {
-            out << g->getTitle() << " +" << cont->questGivers.size() << " ";
-            break;
+            if(i<10)
+                ai->TellMasterNoFacing(g->getTitle());
+
+            i++;
         }
+
+        i = 0;
 
         for (auto g : cont->questTakers)
         {
-            out << g->getTitle() << " +" << cont->questTakers.size() - 1;
-            break;
+            if (i < 10)
+                ai->TellMasterNoFacing(g->getTitle());
+
+            i++;
         }
+
+        i = 0;
 
         for (auto g : cont->questObjectives)
         {
-            out << g->getTitle() << " +" << cont->questObjectives.size() - 1;
-            break;
-        }
+            if (i < 10)
+                ai->TellMasterNoFacing(g->getTitle());
 
-        ai->TellMasterNoFacing(out);
+            i++;
+        }
 
         return true;
     }
@@ -181,6 +194,94 @@ bool DebugAction::Execute(Event event)
         ai->TellMasterNoFacing(out);
 
     }
+    else if (text.find("values ") != std::string::npos)
+    {
+        ai->TellMasterNoFacing(ai->GetAiObjectContext()->FormatValues(text.substr(7)));
+
+        return true;
+    }
+    else if (text.find("loot ") != std::string::npos)
+    {
+        ostringstream out;
+        for (auto itemId : chat->parseItems(text.substr(5)))
+        {
+            list<int32> entries = GAI_VALUE2(list<int32>, "item drop list", itemId);
+
+            if (entries.empty())
+                out << chat->formatItem(sObjectMgr.GetItemPrototype(itemId), 0, 0) << " no sources found.";
+            else
+                out << chat->formatItem(sObjectMgr.GetItemPrototype(itemId), 0, 0) << " " << to_string(entries.size()) << " sources found:";
+
+            ai->TellMasterNoFacing(out);
+            out.str("");
+            out.clear();
+
+            vector<pair<int32, float>> chances;
+
+            for (auto entry : entries)
+            {
+                string qualifier = Qualified::MultiQualify({ to_string(entry) , to_string(itemId) });
+                float chance = GAI_VALUE2(float, "loot chance", qualifier);
+                if(chance > 0)
+                    chances.push_back(make_pair(entry, chance));
+            }
+
+            std::sort(chances.begin(), chances.end(), [](std::pair<int32, float> i, std::pair<int32, float> j) {return i.second > j.second; });
+
+            chances.resize(std::min(20, (int)chances.size()));
+
+            for (auto chance : chances)
+            {
+                out << chat->formatWorldEntry(chance.first) << ": " << chance.second << "%";
+                ai->TellMasterNoFacing(out);
+                out.str("");
+                out.clear();
+            }
+        }
+        return true;
+    }
+    else if (text.find("drops ") != std::string::npos)
+    {
+    ostringstream out;
+    for (auto entry : chat->parseWorldEntries(text.substr(6)))
+    {
+        list<uint32> itemIds = GAI_VALUE2(list<uint32>, "entry loot list", entry);
+
+        if (itemIds.empty())
+            out << chat->formatWorldEntry(entry) << " no drops found.";
+        else
+            out << chat->formatWorldEntry(entry) << " " << to_string(itemIds.size()) << " drops found:";
+
+        ai->TellMasterNoFacing(out);
+        out.str("");
+        out.clear();
+
+        vector<pair<uint32, float>> chances;
+
+        for (auto itemId : itemIds)
+        {
+            string qualifier = Qualified::MultiQualify({ to_string(entry) , to_string(itemId) });
+            float chance = GAI_VALUE2(float, "loot chance", qualifier);
+            if (chance > 0 && sObjectMgr.GetItemPrototype(itemId))
+            {
+                chances.push_back(make_pair(itemId, chance));
+            }
+        }
+
+        std::sort(chances.begin(), chances.end(), [](std::pair<uint32, float> i, std::pair<int32, float> j) {return i.second > j.second; });
+
+        chances.resize(std::min(20, (int)chances.size()));
+
+        for (auto chance : chances)
+        {
+            out << chat->formatItem(sObjectMgr.GetItemPrototype(chance.first), 0, 0) << ": " << chance.second << "%";
+            ai->TellMasterNoFacing(out);
+            out.str("");
+            out.clear();
+        }
+    }
+    return true;
+    }
     else if (text.find("add node") != std::string::npos)
     {
         WorldPosition pos(bot);
@@ -213,7 +314,7 @@ bool DebugAction::Execute(Event event)
         {
             ai->TellMasterNoFacing("Node can not be removed.");
         }
-
+        sTravelNodeMap.m_nMapMtx.lock();
         sTravelNodeMap.removeNode(startNode);
         ai->TellMasterNoFacing("Node removed.");
         sTravelNodeMap.m_nMapMtx.unlock();
@@ -221,7 +322,6 @@ bool DebugAction::Execute(Event event)
         sTravelNodeMap.setHasToGen();
 
         return true;
-
     }
     else if (text.find("reset node") != std::string::npos) {
         for (auto& node : sTravelNodeMap.getNodes())
@@ -245,10 +345,8 @@ bool DebugAction::Execute(Event event)
     return true;
     }
     else if (text.find("crop path") != std::string::npos) {
-    sTravelNodeMap.removeUselessPaths();
-    sTravelNodeMap.saveNodeStore();
-    sTravelNodeMap.loadNodeStore();
-    return true;
+        sTravelNodeMap.removeUselessPaths();
+        return true;
     }
     else if (text.find("save node") != std::string::npos)
     {
@@ -257,8 +355,11 @@ bool DebugAction::Execute(Event event)
     }
     else if (text.find("load node") != std::string::npos)
     {
-        sTravelNodeMap.removeNodes();
-        sTravelNodeMap.loadNodeStore();
+        std::thread t([] {if (sTravelNodeMap.removeNodes())
+            sTravelNodeMap.loadNodeStore(); });
+
+        t.detach();
+
         return true;
     }
     else if (text.find("show node") != std::string::npos)
@@ -541,7 +642,7 @@ bool DebugAction::Execute(Event event)
                     //wpCreature->SendMessageToSet(data, true);
                     datMap.push_back(data);
 
-                    wpCreature->MonsterMoveWithSpeed(botPos.getX(), botPos.getY()+80, botPos.getZ(), 8.0f,true,true);
+                    //wpCreature->MonsterMoveWithSpeed(botPos.getX(), botPos.getY()+80, botPos.getZ(), 8.0f,true,true);
                 }
             }
         }

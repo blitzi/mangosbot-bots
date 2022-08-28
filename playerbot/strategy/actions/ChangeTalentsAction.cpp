@@ -101,6 +101,8 @@ bool ChangeTalentsAction::Execute(Event event)
                 }
             }
         }
+        // learn available spells
+        ai->DoSpecificAction("auto learn spell");
     }
     else
     {
@@ -221,7 +223,7 @@ bool ChangeTalentsAction::AutoSelectTalents(ostringstream* out)
     }
 
     uint32 specNo = sRandomPlayerbotMgr.GetValue(bot->GetGUIDLow(), "specNo");
-    uint32 specId = specNo - 1;
+    uint32 specId = specNo ? specNo - 1 : 0;
     string specLink = sRandomPlayerbotMgr.GetData(bot->GetGUIDLow(), "specLink");
 
     //Continue the current spec
@@ -312,6 +314,8 @@ TalentSpec* ChangeTalentsAction::GetBestPremadeSpec(int specId)
 
 bool AutoSetTalentsAction::Execute(Event event)
 {
+    sTravelMgr.logEvent(ai, "AutoSetTalentsAction", to_string(bot->m_Played_time[PLAYED_TIME_LEVEL]), to_string(bot->m_Played_time[PLAYED_TIME_TOTAL]));
+
     ostringstream out;
 
     if (sPlayerbotAIConfig.autoPickTalents == "no" && !sRandomPlayerbotMgr.IsRandomBot(bot))

@@ -9,6 +9,10 @@ PlayerbotAIBase::PlayerbotAIBase()
 {
 }
 
+void PlayerbotAIBase::UpdateAIInternal(uint32 elapsed, bool minimal)
+{
+}
+
 void PlayerbotAIBase::UpdateAI(uint32 elapsed)
 {
     UpdateAIInternal(elapsed);

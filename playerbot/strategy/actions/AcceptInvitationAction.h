@@ -28,6 +28,9 @@ namespace ai
                 bot->UninviteFromGroup();
                 return false;
             }
+            
+            if (bot->isAFK())
+                bot->ToggleAFK();
 
             WorldPacket p;
             uint32 roles_mask = 0;
@@ -43,7 +46,10 @@ namespace ai
             ai->ChangeStrategy("+follow,-lfg,-bg", BOT_STATE_NON_COMBAT);
             ai->Reset();
 
-            ai->TellMaster("Hello");
+            ai->TellMaster(BOT_TEXT("hello"));
+
+            sTravelMgr.logEvent(ai, "AcceptInvitationAction", grp->GetLeaderName(), to_string(grp->GetMembersCount()));
+
             return true;
         }
     };
