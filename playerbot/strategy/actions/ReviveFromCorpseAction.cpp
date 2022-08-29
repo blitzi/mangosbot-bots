@@ -189,7 +189,7 @@ WorldSafeLocsEntry const* SpiritHealerAction::GetGrave(bool startZone)
                 return ClosestGrave;
         }
     }
-    else if(startZone && AI_VALUE(uint8, "durability"))
+    else if(startZone && AI_VALUE(float, "durability"))
     {
         TravelTarget* travelTarget = AI_VALUE(TravelTarget*, "travel target");
 
@@ -256,7 +256,7 @@ bool SpiritHealerAction::Execute(Event event)
     uint32 dCount = AI_VALUE(uint32, "death count");
     int64 deadTime = time(nullptr) - corpse->GetGhostTime();
 
-    WorldSafeLocsEntry const* ClosestGrave = GetGrave(dCount > 10 || deadTime > 15 * MINUTE || AI_VALUE(uint8, "durability") < 10);
+    WorldSafeLocsEntry const* ClosestGrave = GetGrave(dCount > 10 || deadTime > 15 * MINUTE || AI_VALUE(float, "durability") < 10);
 
     if (bot->GetDistance2d(ClosestGrave->x, ClosestGrave->y) < sPlayerbotAIConfig.sightDistance)
     {

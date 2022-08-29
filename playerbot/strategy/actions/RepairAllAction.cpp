@@ -26,7 +26,7 @@ bool RepairAllAction::Execute(Event event)
         sServerFacade.SetFacingTo(bot, unit);
         float discountMod = bot->GetReputationPriceDiscount(unit);
 
-        float durability = AI_VALUE(uint8, "durability");
+        float durability = AI_VALUE(float, "durability");
 
         uint32 botMoney = bot->GetMoney();
         if (ai->HasCheat(BotCheatMask::gold))
@@ -76,7 +76,7 @@ bool RepairAllAction::Execute(Event event)
 
         context->GetValue<uint32>("death count")->Set(0);
 
-        return durability < 100 && AI_VALUE(uint8, "durability") > durability;
+        return durability < 100 && AI_VALUE(float, "durability") > durability;
     }
 
     ai->TellError("Cannot find any npc to repair at");
