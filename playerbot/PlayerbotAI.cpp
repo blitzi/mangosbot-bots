@@ -334,6 +334,7 @@ void PlayerbotAI::HandleTeleportAck()
 	else if (bot->IsBeingTeleportedFar())
 	{
         bot->GetSession()->HandleMoveWorldportAckOpcode();
+		Reset();
 	}
 }
 
