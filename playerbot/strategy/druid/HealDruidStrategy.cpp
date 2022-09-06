@@ -10,8 +10,104 @@ class HealDruidStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 public:
     HealDruidStrategyActionNodeFactory()
     {
+        creators["wild growth"] = &wild_growth;
+        creators["rejuvenation"] = &rejuvenation;
+        creators["rejuvenation hot on party"] = &rejuvenation_hot_on_party;
+        creators["rejuvenation on party"] = &rejuvenation_on_party;
+        creators["regrowth"] = &regrowth;
+        creators["regrowth on party"] = &regrowth_on_party;
+        creators["nourish"] = &nourish;
+        creators["nourish on party"] = &nourish_on_party;
+        creators["swiftmend"] = &swiftmend;
+        creators["swiftmend on party"] = &swiftmend_on_party;
+        creators["healing touch"] = &healing_touch;
+        creators["healing touch on party"] = &healing_touch_on_party;
     }
 private:
+    static ActionNode* wild_growth(PlayerbotAI* ai)
+    {
+        return new ActionNode("wild growth",
+            /*P*/ NextAction::array(0, new NextAction("tree form"), NULL),
+            /*A*/ NULL,
+            /*C*/ NULL);
+    }
+    static ActionNode* rejuvenation(PlayerbotAI* ai)
+    {
+        return new ActionNode("rejuvenation",
+            /*P*/ NextAction::array(0, new NextAction("tree form"), NULL),
+            /*A*/ NULL,
+            /*C*/ NULL);
+    }
+    static ActionNode* rejuvenation_hot_on_party(PlayerbotAI* ai)
+    {
+        return new ActionNode("rejuvenation hot on party",
+            /*P*/ NextAction::array(0, new NextAction("tree form"), NULL),
+            /*A*/ NULL,
+            /*C*/ NULL);
+    }
+    static ActionNode* rejuvenation_on_party(PlayerbotAI* ai)
+    {
+        return new ActionNode("rejuvenation on party",
+            /*P*/ NextAction::array(0, new NextAction("tree form"), NULL),
+            /*A*/ NULL,
+            /*C*/ NULL);
+    }
+    static ActionNode* regrowth(PlayerbotAI* ai)
+    {
+        return new ActionNode("regrowth",
+            /*P*/ NextAction::array(0, new NextAction("tree form"), NULL),
+            /*A*/ NULL,
+            /*C*/ NULL);
+    }
+    static ActionNode* regrowth_on_party(PlayerbotAI* ai)
+    {
+        return new ActionNode("regrowth on party",
+            /*P*/ NextAction::array(0, new NextAction("tree form"), NULL),
+            /*A*/ NULL,
+            /*C*/ NULL);
+    }
+    static ActionNode* nourish(PlayerbotAI* ai)
+    {
+        return new ActionNode("nourish",
+            /*P*/ NextAction::array(0, new NextAction("tree form"), NULL),
+            /*A*/ NULL,
+            /*C*/ NULL);
+    }
+    static ActionNode* nourish_on_party(PlayerbotAI* ai)
+    {
+        return new ActionNode("nourish on party",
+            /*P*/ NextAction::array(0, new NextAction("tree form"), NULL),
+            /*A*/ NULL,
+            /*C*/ NULL);
+    }
+    static ActionNode* swiftmend(PlayerbotAI* ai)
+    {
+        return new ActionNode("swiftmend",
+            /*P*/ NextAction::array(0, new NextAction("tree form"), NULL),
+            /*A*/ NULL,
+            /*C*/ NULL);
+    }
+    static ActionNode* swiftmend_on_party(PlayerbotAI* ai)
+    {
+        return new ActionNode("swiftmend on party",
+            /*P*/ NextAction::array(0, new NextAction("tree form"), NULL),
+            /*A*/ NULL,
+            /*C*/ NULL);
+    }
+    static ActionNode* healing_touch(PlayerbotAI* ai)
+    {
+        return new ActionNode("healing touch",
+            /*P*/ NextAction::array(0, new NextAction("tree form"), NULL),
+            /*A*/ NULL,
+            /*C*/ NULL);
+    }
+    static ActionNode* healing_touch_on_party(PlayerbotAI* ai)
+    {
+        return new ActionNode("healing touch on party",
+            /*P*/ NextAction::array(0, new NextAction("tree form"), NULL),
+            /*A*/ NULL,
+            /*C*/ NULL);
+    }
 };
 
 HealDruidStrategy::HealDruidStrategy(PlayerbotAI* ai) : GenericDruidStrategy(ai)
@@ -68,10 +164,6 @@ void HealDruidStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
         triggers.push_back(new TriggerNode(
             "low mana",
             NextAction::array(0, new NextAction("innervate", ACTION_EMERGENCY + 15), NULL)));
-
-        triggers.push_back(new TriggerNode(
-            "tree form",
-            NextAction::array(0, new NextAction("tree form", ACTION_EMERGENCY + 20), NULL)));
     }
 
     // low section
