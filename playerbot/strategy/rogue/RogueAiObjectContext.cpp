@@ -27,8 +27,8 @@ namespace ai
                 creators["pull"] = &rogue::StrategyFactoryInternal::pull;
                 creators["aoe"] = &rogue::StrategyFactoryInternal::aoe;
                 creators["boost"] = &rogue::StrategyFactoryInternal::boost;
-                creators["stealthed"] = &rogue::StrategyFactoryInternal::stealthed;
-                creators["stealth"] = &rogue::StrategyFactoryInternal::stealth;
+                //creators["stealthed"] = &rogue::StrategyFactoryInternal::stealthed;
+                //creators["stealth"] = &rogue::StrategyFactoryInternal::stealth;
                 creators["cc"] = &rogue::StrategyFactoryInternal::cc;
                 creators["combat"] = &rogue::StrategyFactoryInternal::combat;
                 creators["assassin"] = &rogue::StrategyFactoryInternal::assassination;

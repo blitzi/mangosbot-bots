@@ -53,7 +53,8 @@ void GenericWarlockNonCombatStrategy::InitTriggers(std::list<TriggerNode*> &trig
 
 void WarlockPetStrategy::InitTriggers(std::list<TriggerNode*> &triggers)
 {
+    // felhunter is crashing the damagemeter
     triggers.push_back(new TriggerNode(
         "no pet",
-        NextAction::array(0, new NextAction("summon felhunter", ACTION_NORMAL + 1), NULL)));// new NextAction(bestPet, ACTION_HIGH), new NextAction("summon succubus", ACTION_NORMAL + 2), new NextAction("summon imp", ACTION_NORMAL + 1), NULL)));
+        NextAction::array(0, new NextAction("summon imp", ACTION_NORMAL + 1), NULL)));// new NextAction(bestPet, ACTION_HIGH), new NextAction("summon succubus", ACTION_NORMAL + 2), new NextAction("summon imp", ACTION_NORMAL + 1), NULL)));
 }

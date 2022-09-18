@@ -81,10 +81,10 @@ namespace ai
         virtual bool Execute(Event event) { return ai->CastSpell("banish", GetTarget()); }
     };
 
-    class CastSeedOfCorruptionAction : public CastDebuffSpellAction
+    class CastSeedOfCorruptionAction : public CastDebuffSpellOnAttackerAction
     {
     public:
-        CastSeedOfCorruptionAction(PlayerbotAI* ai) : CastDebuffSpellAction(ai, "seed of corruption") {}
+        CastSeedOfCorruptionAction(PlayerbotAI* ai) : CastDebuffSpellOnAttackerAction(ai, "seed of corruption") {}
     };
 
     class CastRainOfFireAction : public CastRangeSpellAction

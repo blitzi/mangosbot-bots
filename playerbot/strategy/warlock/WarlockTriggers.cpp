@@ -40,9 +40,10 @@ bool SoulstoneOnTankTrigger::IsActive()
 
 bool DrainSoulTrigger::IsActive()
 {
+	bool isAoEActive = AI_VALUE(uint8, "aoe count") >= aoeEnemyAmount && AI_VALUE(uint8, "attacker count") >= aoeEnemyAmount;
 	bool isLowHealth = ValueInRangeTrigger::IsActive();
 	bool hasLessItems = AI_VALUE2(uint32, "item count", "soul shard") < 28;// int(AI_VALUE(uint8, "bag space") * 0.2);
-	return isLowHealth && hasLessItems && !AI_VALUE2(bool, "dead", GetTargetName());
+	return isLowHealth && hasLessItems && !AI_VALUE2(bool, "dead", GetTargetName()) && !isAoEActive;
 }
 
 bool RemoveSoulShardTrigger::IsActive()

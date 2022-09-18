@@ -26,7 +26,7 @@ namespace ai
 
     class SoulstoneOnTankTrigger : public BuffOnPartyTrigger{
     public:
-        SoulstoneOnTankTrigger(PlayerbotAI* ai) : BuffOnPartyTrigger(ai, "soulstone resurrection", 20) {}
+        SoulstoneOnTankTrigger(PlayerbotAI* ai) : BuffOnPartyTrigger(ai, "soulstone resurrection", 5) {}
 
         virtual Unit* GetTarget()
         {
@@ -113,6 +113,8 @@ namespace ai
 
     class DrainSoulTrigger : public ValueInRangeTrigger
     {
+    private:
+        const int aoeEnemyAmount = 2;
     public:
         DrainSoulTrigger(PlayerbotAI* ai) : ValueInRangeTrigger(ai, "target low health", 25, 0) {}
         virtual bool IsActive();
