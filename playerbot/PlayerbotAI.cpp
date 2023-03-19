@@ -100,33 +100,22 @@ void PacketHandlingHelper::AddPacket(const WorldPacket& packet)
 
 
 PlayerbotAI::PlayerbotAI() : PlayerbotAIBase(), bot(NULL), aiObjectContext(NULL),
-    currentEngine(NULL), chatHelper(this), chatFilter(this), accountId(0), security(NULL), master(NULL), currentState(BotState::BOT_STATE_NON_COMBAT), faceTargetUpdateDelay(0)
+    currentEngine(NULL), chatHelper(this), chatFilter(this), accountId(0), security(NULL), master(NULL), currentState(BotState::BOT_STATE_NON_COMBAT), faceTargetUpdateDelay(0),
+    moveUpdateTimer(0)
 {
     for (uint8 i = 0 ; i < (uint8)BotState::BOT_STATE_ALL; i++)
         engines[i] = NULL;
-
-    for (int i = 0; i < MAX_ACTIVITY_TYPE; i++)
-    {
-        allowActiveCheckTimer[i] = time(nullptr);
-        allowActive[i] = false;
-    }
 }
 
 PlayerbotAI::PlayerbotAI(Player* bot) :
-    PlayerbotAIBase(), chatHelper(this), chatFilter(this), security(bot), master(NULL), faceTargetUpdateDelay(0)
+    PlayerbotAIBase(), chatHelper(this), chatFilter(this), security(bot), master(NULL), faceTargetUpdateDelay(0), moveUpdateTimer(0)
 {
-	this->bot = bot;    
+	this->bot = bot;
     if (!bot->isTaxiCheater() && HasCheat(BotCheatMask::taxi))
         bot->SetTaxiCheater(true);
 
     for (uint8 i = 0; i < (uint8)BotState::BOT_STATE_ALL; i++)
         engines[i] = NULL;
-
-    for (int i = 0; i < MAX_ACTIVITY_TYPE; i++)
-    {
-        allowActiveCheckTimer[i] = time(nullptr);
-        allowActive[i] = false;
-    }
 
 	accountId = sObjectMgr.GetPlayerAccountIdByGUID(bot->GetObjectGuid());
 
@@ -135,7 +124,6 @@ PlayerbotAI::PlayerbotAI(Player* bot) :
     engines[(uint8)BotState::BOT_STATE_COMBAT] = AiFactory::createCombatEngine(bot, this, aiObjectContext);
     engines[(uint8)BotState::BOT_STATE_NON_COMBAT] = AiFactory::createNonCombatEngine(bot, this, aiObjectContext);
     engines[(uint8)BotState::BOT_STATE_DEAD] = AiFactory::createDeadEngine(bot, this, aiObjectContext);
-    engines[(uint8)BotState::BOT_STATE_REACTION] = reactionEngine = AiFactory::createReactionEngine(bot, this, aiObjectContext);
 
     for (uint8 e = 0; e < (uint8)BotState::BOT_STATE_ALL; e++)
     {
@@ -232,15 +220,6 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
 {
     string mapString = WorldPosition(bot).isOverworld() ? to_string(bot->GetMapId()) : "I";
     PerformanceMonitorOperation* pmo = sPerformanceMonitor.start(PERF_MON_TOTAL, "PlayerbotAI::UpdateAI " + mapString);
-    if(aiInternalUpdateDelay > elapsed)
-    {
-        aiInternalUpdateDelay -= elapsed;
-    }
-    else
-    {
-        aiInternalUpdateDelay = 0;
-        isWaiting = false;
-    }
 
     // cancel logout in combat
     if (bot->IsStunnedByLogout() || bot->GetSession()->isLogingOut())
@@ -278,30 +257,6 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
         isMoving = false;
     }
 
-    // wake up if in combat
-    bool isCasting = bot->IsNonMeleeSpellCasted(true);
-    if (sServerFacade.IsInCombat(bot))
-    {
-        if (!inCombat && !isCasting && !isWaiting)
-        {
-            ResetAIInternalUpdateDelay();
-        }
-        else if (!AllowActivity())
-        {
-            if (AllowActivity(ALL_ACTIVITY, true))
-                ResetAIInternalUpdateDelay();
-        }
-
-        inCombat = true;
-    }
-    else
-    {
-        if (inCombat && !isCasting && !isWaiting)
-            ResetAIInternalUpdateDelay();
-
-        inCombat = false;
-    }
-
     // force stop if moving but should not
 #ifndef MANGOSBOT_TWO
     if (!bot->IsStopped() && !CanMove() && !bot->m_movementInfo.HasMovementFlag(MOVEFLAG_JUMPING) && !bot->IsTaxiFlying() && !bot->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_FLEEING) && !bot->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_CONFUSED))
@@ -323,134 +278,9 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
             bot->SetPower(bot->GetPowerType(), bot->GetMaxPower(bot->GetPowerType()));
     }
 
-    // Update facing
-    UpdateFaceTarget(elapsed, minimal);
+    UpdateAIInternal(elapsed, minimal);
 
-    bool doMinimalReaction = minimal || !AllowActivity(REACT_ACTIVITY);
-
-    // Only update the internal ai when no reaction is running and the internal ai can be updated
-    if(!UpdateAIReaction(elapsed, doMinimalReaction) && CanUpdateAIInternal())
-    {      
-        // Update the delay with the spell cast time
-        Spell* currentSpell = bot->GetCurrentSpell(CURRENT_GENERIC_SPELL);
-        if (currentSpell && (currentSpell->getState() == SPELL_STATE_CASTING) && (currentSpell->GetCastedTime() > 0U))
-        {
-            SetAIInternalUpdateDelay(currentSpell->GetCastedTime() + sPlayerbotAIConfig.reactDelay + sWorld.GetAverageDiff());
-    
-            // Cancel the update if the new delay increased
-            if (!CanUpdateAIInternal())
-            {
-                if (pmo) pmo->finish();
-                return;
-            }
-        }
-
-        UpdateAIInternal(elapsed, minimal);
-
-        bool min = minimal;
-        // test fix lags because of BG
-        if (!inCombat)
-            min = true;
-
-        if (bot && HasRealPlayerMaster())
-            min = false;
-
-        YieldAIInternalThread(min);
-    }
     if (pmo) pmo->finish();
-}
-
-bool PlayerbotAI::UpdateAIReaction(uint32 elapsed, bool minimal)
-{
-    bool reactionFound;
-    string mapString = WorldPosition(bot).isOverworld() ? to_string(bot->GetMapId()) : "I";
-    PerformanceMonitorOperation* pmo = sPerformanceMonitor.start(PERF_MON_TOTAL, "PlayerbotAI::UpdateAIReaction " + mapString);
-    const bool reactionInProgress = reactionEngine->Update(elapsed, minimal, reactionFound);
-    if (pmo) pmo->finish();
-
-    if(reactionFound)
-    {
-        // If new reaction found force stop current actions (if required)
-        const Reaction* reaction = reactionEngine->GetReaction();
-        if(reaction)
-        {
-            if(reaction->ShouldInterruptCast())
-            {
-                InterruptSpell();
-            }
-
-            if (reaction->ShouldInterruptMovement())
-            {
-                StopMoving();
-            }
-        }
-    }
-
-    return reactionInProgress;
-}
-
-void PlayerbotAI::UpdateFaceTarget(uint32 elapsed, bool minimal)
-{
-    faceTargetUpdateDelay = faceTargetUpdateDelay > elapsed ? faceTargetUpdateDelay - elapsed : 0U;
-    if (faceTargetUpdateDelay <= 0U)
-    {
-        // Only update the target facing when in combat
-        if (IsStateActive(BotState::BOT_STATE_COMBAT))
-        {
-            // Don't update facing if bot is moving
-            if (bot->IsStopped())
-            {
-                AiObjectContext* context = GetAiObjectContext();
-                Unit* target = AI_VALUE(Unit*, "current target");
-                if(target)
-                {
-                    // Do not update the facing while pulling
-                    Unit* pullTarget = AI_VALUE(Unit*, "pull target");
-                    if (pullTarget == nullptr)
-                    {
-                        if (!AI_VALUE2(bool, "facing", "current target"))
-                        {
-                            if (!sServerFacade.UnitIsDead(bot) &&
-                                !sServerFacade.IsFrozen(bot) &&
-                                !sServerFacade.IsCharmed(bot) &&
-                                !bot->IsPolymorphed() &&
-                                !bot->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GHOST) &&
-                                !bot->IsBeingTeleported() &&
-                                !bot->HasAuraType(SPELL_AURA_MOD_CONFUSE) &&
-                                !bot->HasAuraType(SPELL_AURA_MOD_STUN) &&
-                                !bot->IsTaxiFlying() &&
-                                !bot->hasUnitState(UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL))
-                            {
-                                sServerFacade.SetFacingTo(bot, target);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        faceTargetUpdateDelay = minimal ? sPlayerbotAIConfig.reactDelay * 10 : sPlayerbotAIConfig.reactDelay * 5;
-    }
-}
-
-void PlayerbotAI::SetActionDuration(const Action* action)
-{
-    if (action)
-    {
-        if(action->IsReaction())
-        {
-            reactionEngine->SetReactionDuration(action);
-        }
-        else
-        {
-            SetAIInternalUpdateDelay(action->GetDuration());
-        }
-    }
-}
-
-void PlayerbotAI::SetActionDuration(uint32 duration)
-{
-    SetAIInternalUpdateDelay(duration);
 }
 
 bool PlayerbotAI::IsStateActive(BotState state) const
@@ -611,6 +441,8 @@ void PlayerbotAI::UpdateAIInternal(uint32 elapsed, bool minimal)
     if (bot->IsBeingTeleported() || !bot->IsInWorld())
         return;
 
+    moveUpdateTimer.Update(elapsed);
+
     string mapString = WorldPosition(bot).isOverworld() ? to_string(bot->GetMapId()) : "I";
     PerformanceMonitorOperation* pmo = sPerformanceMonitor.start(PERF_MON_TOTAL, "PlayerbotAI::UpdateAIInternal " + mapString);
 
@@ -670,7 +502,6 @@ void PlayerbotAI::UpdateAIInternal(uint32 elapsed, bool minimal)
             return;
         }
 
-        SetAIInternalUpdateDelay(sPlayerbotAIConfig.reactDelay);
         return;
     }
 
@@ -707,16 +538,10 @@ void PlayerbotAI::HandleTeleportAck()
 		p << (uint32) 0; // supposed to be flags? not used currently
 		p << (uint32) time(0); // time - not currently used
         bot->GetSession()->HandleMoveTeleportAckOpcode(p);
-
-        // add delay to simulate teleport delay
-        SetAIInternalUpdateDelay(urand(1000, 2000));
 	}
 	else if (bot->IsBeingTeleportedFar())
 	{
         bot->GetSession()->HandleMoveWorldportAckOpcode();
-
-        // add delay to simulate teleport delay
-        SetAIInternalUpdateDelay(urand(2000, 5000));
 	}
 
     Reset();
@@ -727,10 +552,10 @@ void PlayerbotAI::Reset(bool full)
     if (bot->IsTaxiFlying())
         return;
 
+    ChangeEngine(BotState::BOT_STATE_NON_COMBAT);
+
     currentEngine = engines[(uint8)BotState::BOT_STATE_NON_COMBAT];
     currentState = BotState::BOT_STATE_NON_COMBAT;
-    ResetAIInternalUpdateDelay();
-    reactionEngine->Reset();
     whispers.clear();
 
     PullStrategy* strategy = PullStrategy::Get(this);
@@ -962,20 +787,6 @@ void PlayerbotAI::HandleCommand(uint32 type, const string& text, Player& fromPla
             bot->GetSession()->HandleLogoutCancelOpcode(p);
         }
     }
-    else if ((filtered.size() > 5) && (filtered.substr(0, 5) == "wait ") && (filtered.find("wait for attack") == std::string::npos))
-    {
-        std::string remaining = filtered.substr(filtered.find(" ") + 1);
-        uint32 delay = atof(remaining.c_str()) * IN_MILLISECONDS;
-        if (delay > 20000)
-        {
-            TellMaster("Max wait time is 20 seconds!");
-            return;
-        }
-        IncreaseAIInternalUpdateDelay(delay);
-        isWaiting = true;
-        TellError("Waiting for " + remaining + " seconds!");
-        return;
-    }
     else
     {
         ChatCommandHolder cmd(filtered, &fromPlayer, type);
@@ -1004,22 +815,21 @@ void PlayerbotAI::HandleBotOutgoingPacket(const WorldPacket& packet)
 		SpellInterrupted(spellId);
 		return;
 	}
-	case SMSG_SPELL_DELAYED:
-	{
-		WorldPacket p(packet);
-		p.rpos(0);
-		ObjectGuid casterGuid;
+    case SMSG_SPELL_DELAYED:
+    {
+        WorldPacket p(packet);
+        p.rpos(0);
+        ObjectGuid casterGuid;
         p >> casterGuid.ReadAsPacked();
 
-		if (casterGuid != bot->GetObjectGuid())
-			return;
+        if (casterGuid != bot->GetObjectGuid())
+            return;
 
-		uint32 delaytime;
-		p >> delaytime;
-		if (delaytime <= 1000)
-            IncreaseAIInternalUpdateDelay(delaytime);
-		return;
-	}
+        uint32 delaytime;
+        p >> delaytime;
+
+        return;
+    }
     case SMSG_EMOTE: // do not react to NPC emotes
     {
         WorldPacket p(packet);
@@ -1034,9 +844,6 @@ void PlayerbotAI::HandleBotOutgoingPacket(const WorldPacket& packet)
     }
     case SMSG_MESSAGECHAT: // do not react to self or if not ready to reply
     {
-        if (!AllowActivity())
-            return;
-
         WorldPacket p(packet);
 #ifndef MANGOSBOT_ZERO
         if (!p.empty() && (p.GetOpcode() == SMSG_MESSAGECHAT || p.GetOpcode() == SMSG_GM_MESSAGECHAT))
@@ -1219,7 +1026,7 @@ void PlayerbotAI::HandleBotOutgoingPacket(const WorldPacket& packet)
 
         // set delay based on actual distance
         float newdis = sqrt(bot->GetDistance2d(fx, fy, DIST_CALC_NONE));
-        SetAIInternalUpdateDelay((uint32)((newdis / dis) * moveTimeHalf * 4 * IN_MILLISECONDS));
+        //TODO blitzi: SetAIInternalUpdateDelay((uint32)((newdis / dis) * moveTimeHalf * 4 * IN_MILLISECONDS));
 
         // add moveflags
 #ifdef MANGOSBOT_TWO
@@ -1271,13 +1078,6 @@ void PlayerbotAI::SpellInterrupted(uint32 spellid)
     if (now <= lastSpell.time)
         return;
 
-    uint32 castTimeSpent = 1000 * (now - lastSpell.time);
-    uint32 globalCooldown = CalculateGlobalCooldown(lastSpell.id);
-    if (castTimeSpent < globalCooldown)
-        SetAIInternalUpdateDelay(globalCooldown - castTimeSpent);
-    else
-        SetAIInternalUpdateDelay(sPlayerbotAIConfig.reactDelay);
-
     lastSpell.id = 0;
 }
 
@@ -1327,9 +1127,6 @@ void PlayerbotAI::ChangeEngine(BotState type)
         case BotState::BOT_STATE_DEAD:
             sLog.outDebug( "=== %s DEAD ===", bot->GetName());
             break;
-        case BotState::BOT_STATE_REACTION:
-            sLog.outDebug("=== %s REACTION ===", bot->GetName());
-            break;
         default: break;
         }
     }
@@ -1337,18 +1134,6 @@ void PlayerbotAI::ChangeEngine(BotState type)
 
 void PlayerbotAI::DoNextAction(bool min)
 {
-    if (!bot->IsInWorld() || bot->IsBeingTeleported() || (GetMaster() && GetMaster()->IsBeingTeleported()))
-    {
-        SetAIInternalUpdateDelay(sPlayerbotAIConfig.globalCoolDown);
-        return;
-    }
-
-    if (bot->IsTaxiFlying())
-    {
-        SetAIInternalUpdateDelay(sPlayerbotAIConfig.passiveDelay);
-        return;
-    }
-
     // if in combat but stuck with old data - clear targets
     if (currentEngine == engines[(uint8)BotState::BOT_STATE_NON_COMBAT] && sServerFacade.IsInCombat(bot))
     {
@@ -1360,16 +1145,13 @@ void PlayerbotAI::DoNextAction(bool min)
         }
     }
 
-    bool minimal = !AllowActivity();
+    currentEngine->DoNextAction(NULL, 0, min);
 
-    currentEngine->DoNextAction(NULL, 0, (minimal || min));
-
-    if (minimal)
+    if (min)
     {
         if(!bot->isAFK() && !bot->InBattleGround() && !HasRealPlayerMaster())
             bot->ToggleAFK();
 
-        SetAIInternalUpdateDelay(sPlayerbotAIConfig.passiveDelay);
         return;
     }
     else if (bot->isAFK())
@@ -1496,12 +1278,12 @@ void PlayerbotAI::DoNextAction(bool min)
 		if (master->m_movementInfo.HasMovementFlag(MOVEFLAG_WALK_MODE) && sServerFacade.GetDistance2d(bot, master) < 20.0f) bot->m_movementInfo.AddMovementFlag(MOVEFLAG_WALK_MODE);
 		else bot->m_movementInfo.RemoveMovementFlag(MOVEFLAG_WALK_MODE);
 
-        if (master->IsSitState() && aiInternalUpdateDelay < 1000)
+        if (master->IsSitState())
         {
             if (!sServerFacade.isMoving(bot) && sServerFacade.GetDistance2d(bot, master) < 10.0f)
                 bot->SetStandState(UNIT_STAND_STATE_SIT);
         }
-        else if (aiInternalUpdateDelay < 1000)
+        else
             bot->SetStandState(UNIT_STAND_STATE_STAND);
 
         if (!group && sRandomPlayerbotMgr.IsFreeBot(bot))
@@ -1509,8 +1291,10 @@ void PlayerbotAI::DoNextAction(bool min)
             bot->GetPlayerbotAI()->SetMaster(nullptr);
         }
 	}
-	else if (bot->m_movementInfo.HasMovementFlag(MOVEFLAG_WALK_MODE)) bot->m_movementInfo.RemoveMovementFlag(MOVEFLAG_WALK_MODE);
-    else if ((aiInternalUpdateDelay < 1000) && bot->IsSitState()) bot->SetStandState(UNIT_STAND_STATE_STAND);
+	else if (bot->m_movementInfo.HasMovementFlag(MOVEFLAG_WALK_MODE)) 
+        bot->m_movementInfo.RemoveMovementFlag(MOVEFLAG_WALK_MODE);
+    else if (bot->IsSitState())
+        bot->SetStandState(UNIT_STAND_STATE_STAND);
 
 #ifndef MANGOSBOT_ZERO
     if (bot->IsFlying() && !bot->IsFreeFlying())
@@ -1622,7 +1406,7 @@ void PlayerbotAI::DoNextAction(bool min)
 
             // set delay based on actual distance
             float newdis = sqrt(bot->GetDistance2d(fx, fy, DIST_CALC_NONE));
-            SetAIInternalUpdateDelay((uint32)((newdis / dis)* moveTimeHalf * 4 * IN_MILLISECONDS));
+            //TODO blitzi: SetAIInternalUpdateDelay((uint32)((newdis / dis)* moveTimeHalf * 4 * IN_MILLISECONDS));
 
             // jump packet
             WorldPacket jump(MSG_MOVE_JUMP);
@@ -1892,8 +1676,7 @@ void PlayerbotAI::ResetStrategies(bool autoLoad)
 
     AiFactory::AddDefaultCombatStrategies(bot, this, engines[(uint8)BotState::BOT_STATE_COMBAT]);
     AiFactory::AddDefaultNonCombatStrategies(bot, this, engines[(uint8)BotState::BOT_STATE_NON_COMBAT]);
-    AiFactory::AddDefaultDeadStrategies(bot, this, engines[(uint8)BotState::BOT_STATE_DEAD]);
-    AiFactory::AddDefaultReactionStrategies(bot, this, reactionEngine);
+    AiFactory::AddDefaultDeadStrategies(bot, this, engines[(uint8)BotState::BOT_STATE_DEAD]);    
     if (autoLoad && HasPlayerRelation()) sPlayerbotDbStore.Load(this);
 
     for (uint8 i = 0; i < (uint8)BotState::BOT_STATE_ALL; i++)
@@ -2694,9 +2477,9 @@ uint8 PlayerbotAI::GetManaPercent() const
    return GetManaPercent(*bot);
 }
 
-bool PlayerbotAI::CastSpell(string name, Unit* target, Item* itemTarget, bool waitForSpell, uint32* outSpellDuration)
+bool PlayerbotAI::CastSpell(string name, Unit* target, Item* itemTarget)
 {
-    bool result = CastSpell(aiObjectContext->GetValue<uint32>("spell id", name)->Get(), target, itemTarget, waitForSpell, outSpellDuration);
+    bool result = CastSpell(aiObjectContext->GetValue<uint32>("spell id", name)->Get(), target, itemTarget);
     if (result)
     {
         aiObjectContext->GetValue<time_t>("last spell cast time", name)->Set(time(0));
@@ -2705,7 +2488,7 @@ bool PlayerbotAI::CastSpell(string name, Unit* target, Item* itemTarget, bool wa
     return result;
 }
 
-bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget, bool waitForSpell, uint32* outSpellDuration)
+bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
 {
     if (!spellId)
         return false;
@@ -2746,11 +2529,9 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget, bool
 	//bot->clearUnitState(UNIT_STAT_CHASE);
 	//bot->clearUnitState(UNIT_STAT_FOLLOW);
 
-	bool failWithDelay = false;
     if (!bot->IsStandState())
     {
         bot->SetStandState(UNIT_STAND_STATE_STAND);
-        failWithDelay = true;
     }
 
 	ObjectGuid oldSel = bot->GetSelectionGuid();
@@ -2761,21 +2542,6 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget, bool
     {
         sServerFacade.SetFacingTo(bot, faceTo);
         //failWithDelay = true;
-    }
-
-    if (failWithDelay)
-    {
-        if(waitForSpell)
-        {
-            SetAIInternalUpdateDelay(sPlayerbotAIConfig.globalCoolDown);
-        }
-
-        if(outSpellDuration)
-        {
-            *outSpellDuration = sPlayerbotAIConfig.globalCoolDown;
-        }
-
-        return false;
     }
 
     Spell *spell = new Spell(bot, pSpellInfo, false);
@@ -2872,19 +2638,6 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget, bool
         }
     }
 
-    //if (spellSuccess != SPELL_CAST_OK)
-    //    return false;
-
-    if(waitForSpell)
-    {
-        WaitForSpellCast(spell);
-    }
-
-    if(outSpellDuration)
-    {
-        *outSpellDuration = GetSpellCastDuration(spell);
-    }
-
     if (spell->GetCastTime() || (IsChanneledSpell(pSpellInfo) && GetSpellDuration(pSpellInfo) > 0))
         aiObjectContext->GetValue<LastSpellCast&>("last spell cast")->Get().Set(spellId, target->GetObjectGuid(), time(0));
 
@@ -2903,7 +2656,7 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget, bool
     return true;
 }
 
-bool PlayerbotAI::CastSpell(uint32 spellId, float x, float y, float z, Item* itemTarget, bool waitForSpell, uint32* outSpellDuration)
+bool PlayerbotAI::CastSpell(uint32 spellId, float x, float y, float z, Item* itemTarget)
 {
     if (!spellId)
         return false;
@@ -2959,21 +2712,6 @@ bool PlayerbotAI::CastSpell(uint32 spellId, float x, float y, float z, Item* ite
         isMoving = true;
 
     if (!sServerFacade.isMoving(bot) || isMoving) bot->SetFacingTo(bot->GetAngleAt(bot->GetPositionX(), bot->GetPositionY(), x, y));
-
-    if (failWithDelay)
-    {
-        if (waitForSpell)
-        {
-            SetAIInternalUpdateDelay(sPlayerbotAIConfig.globalCoolDown);
-        }
-
-        if (outSpellDuration)
-        {
-            *outSpellDuration = sPlayerbotAIConfig.globalCoolDown;
-        }
-
-        return false;
-    }
 
     Spell* spell = new Spell(bot, pSpellInfo, false);
 
@@ -3032,16 +2770,6 @@ bool PlayerbotAI::CastSpell(uint32 spellId, float x, float y, float z, Item* ite
             //delete spell;
             return false;
         }
-    }
-
-    if (waitForSpell)
-    {
-        WaitForSpellCast(spell);
-    }
-
-    if (outSpellDuration)
-    {
-        *outSpellDuration = GetSpellCastDuration(spell);
     }
 
     aiObjectContext->GetValue<LastSpellCast&>("last spell cast")->Get().Set(spellId, bot->GetObjectGuid(), time(0));
@@ -3354,11 +3082,6 @@ bool PlayerbotAI::IsInVehicle(bool canControl, bool canCast, bool canAttack, boo
 
 #endif
     return false;
-}
-
-void PlayerbotAI::WaitForSpellCast(Spell *spell)
-{
-    SetAIInternalUpdateDelay(GetSpellCastDuration(spell));
 }
 
 void PlayerbotAI::InterruptSpell()
@@ -3755,99 +3478,6 @@ pair<uint32, uint32> PlayerbotAI::GetPriorityBracket(ActivePiorityType type)
     return { 90, 100 };
 }
 
-bool PlayerbotAI::AllowActive(ActivityType activityType)
-{
-    ActivePiorityType type = GetPriorityType();
-
-    if (activityType == DETAILED_MOVE_ACTIVITY)
-    {
-        switch (type)
-        {
-        case ActivePiorityType::HAS_REAL_PLAYER_MASTER:
-        case ActivePiorityType::IS_REAL_PLAYER:
-        case ActivePiorityType::IN_GROUP_WITH_REAL_PLAYER:
-        case ActivePiorityType::IN_INSTANCE:
-        case ActivePiorityType::VISIBLE_FOR_PLAYER:
-        case ActivePiorityType::IN_COMBAT:
-        case ActivePiorityType::NEARBY_PLAYER:
-            return true;
-            break;
-        case ActivePiorityType::IS_ALWAYS_ACTIVE:
-        case ActivePiorityType::IN_BG_QUEUE:
-        case ActivePiorityType::IN_LFG:
-        case ActivePiorityType::PLAYER_FRIEND:
-        case ActivePiorityType::PLAYER_GUILD:
-        case ActivePiorityType::IN_ACTIVE_AREA:
-        case ActivePiorityType::IN_EMPTY_SERVER:
-        case ActivePiorityType::IN_ACTIVE_MAP:
-        case ActivePiorityType::IN_INACTIVE_MAP:
-        default:
-            break;
-        }
-    }
-    else if (activityType == REACT_ACTIVITY)
-    {
-        switch (type)
-        {
-        case ActivePiorityType::HAS_REAL_PLAYER_MASTER:
-        case ActivePiorityType::IS_REAL_PLAYER:
-        case ActivePiorityType::IN_GROUP_WITH_REAL_PLAYER:
-        case ActivePiorityType::IN_INSTANCE:
-        case ActivePiorityType::VISIBLE_FOR_PLAYER:
-        case ActivePiorityType::IS_ALWAYS_ACTIVE:
-        case ActivePiorityType::IN_COMBAT:
-            return true;
-            break;
-        case ActivePiorityType::NEARBY_PLAYER:
-        case ActivePiorityType::IN_BG_QUEUE:
-        case ActivePiorityType::IN_LFG:
-        case ActivePiorityType::PLAYER_FRIEND:
-        case ActivePiorityType::PLAYER_GUILD:
-        case ActivePiorityType::IN_ACTIVE_AREA:
-        case ActivePiorityType::IN_EMPTY_SERVER:
-        case ActivePiorityType::IN_ACTIVE_MAP:
-        case ActivePiorityType::IN_INACTIVE_MAP:
-        default:
-            return false;
-            break;
-        }
-    }
-
-    pair<uint8, uint8> priorityBracket = GetPriorityBracket(type);
-   
-    float activityPercentage = sRandomPlayerbotMgr.getActivityPercentage(); //Activity between 0 and 100.
-
-    if (!priorityBracket.second) //No scaling
-        return true;
-
-    if (priorityBracket.first >= activityPercentage)
-        return false;
-    if (priorityBracket.second <= activityPercentage && priorityBracket.second < 100)
-        return true;
-
-    float activePerc = (activityPercentage - priorityBracket.first) / (priorityBracket.second - priorityBracket.first);
-
-    activePerc *= (priorityBracket.second == 100) ? sPlayerbotAIConfig.botActiveAlone : 100;
-
-    uint32 ActivityNumber = GetFixedBotNumer(BotTypeNumber::ACTIVITY_TYPE_NUMBER, 100, activePerc * 0.01f); //The last number if the amount it cycles per min. Currently set to 1% of the active bots.
-
-    return ActivityNumber <= (activePerc);           //The given percentage of bots should be active and rotate 1% of those active bots each minute.
-}
-
-bool PlayerbotAI::AllowActivity(ActivityType activityType, bool checkNow)
-{
-    if (!allowActiveCheckTimer[activityType])
-        allowActiveCheckTimer[activityType] = time(NULL);
-
-    if (!checkNow && time(NULL) < (allowActiveCheckTimer[activityType] + 5))
-        return allowActive[activityType];
-
-    bool allowed = AllowActive(activityType);
-    allowActive[activityType] = allowed;
-    allowActiveCheckTimer[activityType] = time(NULL);
-    return allowed;
-}
-
 bool PlayerbotAI::IsOpposing(Player* player)
 {
     return IsOpposing(player->getRace(), bot->getRace());
@@ -4070,7 +3700,6 @@ string PlayerbotAI::BotStateToString(BotState state)
         case BotState::BOT_STATE_COMBAT: return "Combat";
         case BotState::BOT_STATE_NON_COMBAT: return "Non Combat";
         case BotState::BOT_STATE_DEAD: return "Dead";
-        case BotState::BOT_STATE_REACTION: return "Reaction";
         default: return "";
     }
 }
@@ -5389,4 +5018,9 @@ bool PlayerbotAI::HasPlayerRelation()
 void PlayerbotAI::QueueChatResponse(uint8 msgtype, ObjectGuid guid1, ObjectGuid guid2, std::string message, std::string chanName, std::string name)
 {
     chatReplies.push(ChatQueuedReply(msgtype, guid1.GetCounter(), guid2.GetCounter(), message, chanName, name, time(0) + urand(inCombat ? 10 : 5, inCombat ? 25 : 15)));
+}
+
+bool PlayerbotAI::IsCasting()
+{
+    return bot->IsNonMeleeSpellCasted(false, false, true);
 }

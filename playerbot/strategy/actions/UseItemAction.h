@@ -21,9 +21,7 @@ namespace ai
 
     public:
         virtual bool isPossible() override;
-
-        // Used when this action is executed as a reaction
-        virtual bool ShouldReactionInterruptCast() const override { return true; }
+        virtual bool IsCast() { return true; }
 
     protected:
         virtual bool Execute(Event& event) override;
@@ -110,9 +108,6 @@ namespace ai
         virtual bool Execute(Event& event) override;
 
         bool isUseful() override { return !bot->InBattleGround() && sServerFacade.IsSpellReady(bot, 8690); }
-    
-        // Used when this action is executed as a reaction
-        bool ShouldReactionInterruptMovement() const override { return true; }
     };
 
     class UseRandomRecipeAction : public UseItemAction
@@ -124,9 +119,6 @@ namespace ai
         virtual bool isPossible() override {return AI_VALUE2(uint32,"item count", "recipe") > 0; }
       
         virtual bool Execute(Event& event) override;
-
-        // Used when this action is executed as a reaction
-        bool ShouldReactionInterruptMovement() const override { return true; }
     };
 
     class UseRandomQuestItemAction : public UseItemAction
@@ -138,9 +130,6 @@ namespace ai
         virtual bool isPossible() override { return AI_VALUE2(uint32, "item count", "quest") > 0;}
 
         virtual bool Execute(Event& event) override;
-
-        // Used when this action is executed as a reaction
-        bool ShouldReactionInterruptMovement() const override { return true; }
     };
 
     // goblin sappers
@@ -208,9 +197,6 @@ namespace ai
         {
             return bot->GetTeam() == ALLIANCE ? 18606 : 18607;
         }
-
-        // Used when this action is executed as a reaction
-        bool ShouldReactionInterruptMovement() const override { return true; }
     };
 
     class UseRocketBootsAction : public UseItemIdAction
@@ -275,9 +261,6 @@ namespace ai
                 return 2581;
             return 1251;
         }
-
-        // Used when this action is executed as a reaction
-        bool ShouldReactionInterruptMovement() const override { return true; }
     };
 
     class UseAdamantiteGrenadeAction : public UseTargetedItemIdAction

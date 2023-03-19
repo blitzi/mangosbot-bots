@@ -20,7 +20,6 @@ namespace ai
         virtual GuidPosition guidP() { return AI_VALUE(GuidPosition, "rpg target"); }
         virtual ObjectGuid guid() { return (ObjectGuid)guidP(); }        
         virtual bool InRange() { return guidP() ? (guidP().sqDistance2d(bot) < INTERACTION_DISTANCE * INTERACTION_DISTANCE) : false; }
-        void setDelay(bool waitForGroup);
     private:
         void setFacingTo(GuidPosition guidPosition);
         void setFacing(GuidPosition guidPosition);
@@ -45,9 +44,8 @@ namespace ai
         //Short range can we do the action now?
         virtual bool isUseful() { return rpg->InRange(); }
 
-        virtual bool Execute(Event& event) { rpg->BeforeExecute();  bool doAction = ai->DoSpecificAction(ActionName(), ActionEvent(event), true); rpg->AfterExecute(doAction, true); DoDelay(); return doAction; }
+        virtual bool Execute(Event& event) { rpg->BeforeExecute();  bool doAction = ai->DoSpecificAction(ActionName(), ActionEvent(event), true); rpg->AfterExecute(doAction, true); return doAction; }
     protected:
-        void DoDelay(){ SetDuration(ai->GetAIInternalUpdateDelay()); }
         virtual string ActionName() { return "none"; }
         virtual Event ActionEvent(Event event) { return event; }
     };        
@@ -57,9 +55,7 @@ namespace ai
     public:
         RpgStayAction(PlayerbotAI* ai, string name = "rpg stay") : RpgSubAction(ai, name) {}
 
-        //virtual bool isUseful() { return rpg->InRange() && !ai->HasRealPlayerMaster(); }
-
-        virtual bool Execute(Event& event) { rpg->BeforeExecute(); if (bot->GetPlayerMenu()) bot->GetPlayerMenu()->CloseGossip(); rpg->AfterExecute(); DoDelay(); return true; };
+        virtual bool Execute(Event& event) { rpg->BeforeExecute(); if (bot->GetPlayerMenu()) bot->GetPlayerMenu()->CloseGossip(); rpg->AfterExecute(); return true; };
     };   
 
     class RpgWorkAction : public RpgSubAction
@@ -69,7 +65,7 @@ namespace ai
 
         //virtual bool isUseful() { return rpg->InRange() && !ai->HasRealPlayerMaster(); }
 
-        virtual bool Execute(Event& event) { rpg->BeforeExecute(); bot->HandleEmoteCommand(EMOTE_STATE_USESTANDING); rpg->AfterExecute(); DoDelay(); return true; };
+        virtual bool Execute(Event& event) { rpg->BeforeExecute(); bot->HandleEmoteCommand(EMOTE_STATE_USESTANDING); rpg->AfterExecute(); return true; };
     };
 
     class RpgEmoteAction : public RpgSubAction
@@ -87,7 +83,7 @@ namespace ai
     public:
         RpgCancelAction(PlayerbotAI* ai, string name = "rpg cancel") : RpgSubAction(ai, name) {}
 
-        virtual bool Execute(Event& event) { rpg->OnCancel();  AI_VALUE(set<ObjectGuid>&, "ignore rpg target").insert(AI_VALUE(GuidPosition, "rpg target")); RESET_AI_VALUE(GuidPosition, "rpg target"); rpg->AfterExecute(false, false, ""); DoDelay(); return true; };
+        virtual bool Execute(Event& event) { rpg->OnCancel();  AI_VALUE(set<ObjectGuid>&, "ignore rpg target").insert(AI_VALUE(GuidPosition, "rpg target")); RESET_AI_VALUE(GuidPosition, "rpg target"); rpg->AfterExecute(false, false, ""); return true; };
     };
 
     class RpgTaxiAction : public RpgSubAction
@@ -114,7 +110,7 @@ namespace ai
     {
     public:
         RpgStartQuestAction(PlayerbotAI* ai, string name = "rpg start quest") : RpgSubAction(ai, name) {}
-        virtual bool Execute(Event& event) { rpg->BeforeExecute();  bool doAction = ai->DoSpecificAction(ActionName(), ActionEvent(event), true); rpg->AfterExecute(doAction, true, ""); DoDelay(); return doAction; }
+        virtual bool Execute(Event& event) { rpg->BeforeExecute();  bool doAction = ai->DoSpecificAction(ActionName(), ActionEvent(event), true); rpg->AfterExecute(doAction, true, ""); return doAction; }
     private:
         virtual string ActionName() { return "accept all quests"; }
         virtual Event ActionEvent(Event event) {WorldPacket p(CMSG_QUESTGIVER_ACCEPT_QUEST); p << rpg->guid(); p.rpos(0);  return  Event("rpg action", p); }
@@ -241,7 +237,7 @@ namespace ai
     public:
         RpgUseAction(PlayerbotAI* ai, string name = "rpg use") : RpgSubAction(ai, name) {}
 
-        virtual bool Execute(Event& event) { rpg->BeforeExecute();  return ai->DoSpecificAction(ActionName(), ActionEvent(event), true); rpg->AfterExecute(true); DoDelay();}
+        virtual bool Execute(Event& event) { rpg->BeforeExecute();  return ai->DoSpecificAction(ActionName(), ActionEvent(event), true); rpg->AfterExecute(true); }
     private:
         virtual string ActionName() { if (rpg->guidP().IsGameObject() && rpg->guidP().GetGameObject()->GetGoType() == GAMEOBJECT_TYPE_CHEST) return "add all loot";  return "use"; }
         virtual Event ActionEvent(Event event) { return Event("rpg action", chat->formatWorldobject(rpg->guidP().GetWorldObject())); }

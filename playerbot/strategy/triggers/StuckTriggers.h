@@ -20,12 +20,6 @@ namespace ai
 
             LogCalculatedValue<WorldPosition>* posVal = dynamic_cast<LogCalculatedValue<WorldPosition>*>(context->GetUntypedValue("current position"));
 
-            if (!ai->AllowActivity(ALL_ACTIVITY))
-            {
-                posVal->Reset();
-                return false;
-            }
-
             WorldPosition botPos(bot);
 
             if (posVal->LastChangeDelay() > 5 * MINUTE)
@@ -75,13 +69,6 @@ namespace ai
 
             LogCalculatedValue<WorldPosition>* posVal = dynamic_cast<LogCalculatedValue<WorldPosition>*>(context->GetUntypedValue("current position"));
             MemoryCalculatedValue<uint32>* expVal = dynamic_cast<MemoryCalculatedValue<uint32>*>(context->GetUntypedValue("experience"));
-
-            if (!ai->AllowActivity(ALL_ACTIVITY))
-            {
-                posVal->Reset();
-                expVal->Reset();
-                return false;
-            }
 
             WorldPosition botPos(bot);
 
@@ -169,9 +156,6 @@ namespace ai
             if (ai->GetGroupMaster() && !ai->GetGroupMaster()->GetPlayerbotAI())
                 return false;
 
-            if (!ai->AllowActivity(ALL_ACTIVITY))
-                return false;
-
             WorldPosition botPos(bot);
 
             MemoryCalculatedValue<bool>* combatVal = dynamic_cast<MemoryCalculatedValue<bool>*>(context->GetUntypedValue("combat::self target"));
@@ -201,9 +185,6 @@ namespace ai
                 return false;
 
             if (ai->GetGroupMaster() && !ai->GetGroupMaster()->GetPlayerbotAI())
-                return false;
-
-            if (!ai->AllowActivity(ALL_ACTIVITY))
                 return false;
 
             WorldPosition botPos(bot);

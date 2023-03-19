@@ -31,9 +31,6 @@ bool ChooseRpgTargetAction::HasSameTarget(ObjectGuid guid, uint32 max, list<Obje
         if (!ai)
             continue;
 
-        if (!ai->AllowActivity(GRIND_ACTIVITY))
-            continue;
-
         if (PAI_VALUE(GuidPosition,"rpg target") != guid)
             continue;
 
@@ -372,9 +369,6 @@ bool ChooseRpgTargetAction::Execute(Event& event)
 
 bool ChooseRpgTargetAction::isUseful()
 {
-    if (!ai->AllowActivity(RPG_ACTIVITY))
-        return false;
-
     if (AI_VALUE(GuidPosition, "rpg target"))
         return false;
 

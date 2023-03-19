@@ -259,7 +259,6 @@ bool UseItemAction::UseItemAuto(Item* item)
     packet << targetFlag;
     packet.appendPackGUID(bot->GetObjectGuid());
 
-    SetDuration(sPlayerbotAIConfig.globalCoolDown);
     if (proto->Class == ITEM_CLASS_CONSUMABLE && (proto->SubClass == ITEM_SUBCLASS_FOOD || proto->SubClass == ITEM_SUBCLASS_CONSUMABLE) &&
         (isFood || isDrink))
     {
@@ -292,7 +291,6 @@ bool UseItemAction::UseItemAuto(Item* item)
         {
             const float multiplier = bot->InBattleGround() ? 20000.0f : 27000.0f;
             const float duration = multiplier * ((100 - p) / 100.0f);
-            SetDuration(duration);
         }
     }
 
@@ -524,9 +522,8 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Uni
 
    if (sServerFacade.isMoving(bot))
    {
-       ai->StopMoving();
-       SetDuration(sPlayerbotAIConfig.globalCoolDown);
-      return false;
+        ai->StopMoving();
+        return false;
    }
 
    for (int i = 0; i < MAX_ITEM_PROTO_SPELLS; i++)
@@ -583,7 +580,6 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Uni
          }
 
          Spell *spell = new Spell(bot, pSpellInfo, false);
-         ai->WaitForSpellCast(spell);
          delete spell;
       }
       break;
@@ -601,7 +597,6 @@ bool UseItemAction::UseItem(Item* item, ObjectGuid goGuid, Item* itemTarget, Uni
    if (!spellId)
        return false;
 
-   SetDuration(sPlayerbotAIConfig.globalCoolDown);
    ai->TellMasterNoFacing(out.str(), PlayerbotSecurityLevel::PLAYERBOT_SECURITY_ALLOW_ALL, false);
 
    bot->GetSession()->HandleUseItemOpcode(packet);
@@ -1022,11 +1017,5 @@ bool UseRandomQuestItemAction::Execute(Event& event)
     if (!goTarget && !unitTarget)
         return false;
 
-    bool used = UseItem(item, goTarget, nullptr, unitTarget);
-    if (used)
-    {
-        SetDuration(sPlayerbotAIConfig.globalCoolDown);
-    }
-
-    return used;
+    return UseItem(item, goTarget, nullptr, unitTarget);
 }

@@ -10,7 +10,7 @@
 using namespace ai;
 using namespace std;
 
-Engine::Engine(PlayerbotAI* ai, AiObjectContext *factory, BotState state) : PlayerbotAIAware(ai), aiObjectContext(factory), state(state)
+Engine::Engine(PlayerbotAI* ai, AiObjectContext *factory, BotState state) : PlayerbotAIAware(ai), aiObjectContext(factory), state(state), lastCastRelevance(0.0f)
 {
     lastRelevance = 0.0f;
     testMode = false;
@@ -126,8 +126,14 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
     ActionBasket* basket = NULL;
 
     time_t currentTime = time(0);
+
+    if (lastCastRelevance > 0 && !ai->IsCasting())
+        lastCastRelevance = 0.0f;
+
     aiObjectContext->Update();
     ProcessTriggers(minimal);
+
+    bool replaceCastWithBetterOption = false;
 
     int iterations = 0;
     int iterationsPerTick = queue.Size() * (minimal ? (uint32)(sPlayerbotAIConfig.iterationsPerTick / 2) : sPlayerbotAIConfig.iterationsPerTick);
@@ -142,6 +148,14 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
             // NOTE: queue.Pop() deletes basket
             ActionNode* actionNode = queue.Pop();
             Action* action = InitializeAction(actionNode);
+
+            if (action && action->IsCast() && lastCastRelevance)
+            {
+                replaceCastWithBetterOption = lastCastRelevance + 100 < relevance;
+
+                if (!action->IgnoresCasting() && !replaceCastWithBetterOption)
+                    continue;
+            }
 
             string actionName = (action ? action->getName() : "unknown");
             if (!event.getSource().empty())
@@ -222,12 +236,20 @@ bool Engine::DoNextAction(Unit* unit, int depth, bool minimal)
 
                         if (actionExecuted)
                         {
+                            if (action->IsCast())
+                                lastCastRelevance = relevance;
+
                             LogAction("A:%s - OK", action->getName().c_str());
                             MultiplyAndPush(actionNode->getContinuers(), 0, false, event, "cont");
                             lastRelevance = relevance;
-                            delete actionNode;
+
                             if (pmo1) pmo1->finish();
-                            break;
+
+                            if (action->ExecuteAndBreak())
+                            {
+                                delete actionNode;
+                                break;
+                            }
                         }
                         else
                         {
@@ -636,11 +658,6 @@ Action* Engine::InitializeAction(ActionNode* actionNode)
         actionNode->setAction(action);
     }
 
-    if (action)
-    {
-        action->SetReaction(false);
-    }
-
     return action;
 }
 
@@ -650,10 +667,6 @@ bool Engine::ListenAndExecute(Action* action, Event& event)
     if (actionExecutionListeners.Before(action, event))
     {
         actionExecuted = actionExecutionListeners.AllowExecution(action, event) ? action->Execute(event) : true;
-        if (actionExecuted)
-        {
-            ai->SetActionDuration(action);
-        }
     }
 
     if (ai->HasStrategy("debug", BotState::BOT_STATE_NON_COMBAT))
@@ -671,15 +684,6 @@ bool Engine::ListenAndExecute(Action* action, Event& event)
 
         if(!event.getSource().empty())
             out << " [" << event.getSource() << "]";
-
-        if (actionExecuted)
-        {
-            const uint32 actionDuration = action->GetDuration();
-            if (actionDuration > 0)
-            {
-                out << " (duration: " << ((float)actionDuration / IN_MILLISECONDS) << "s)";
-            }
-        }
 
         ai->TellMasterNoFacing(out);
     }

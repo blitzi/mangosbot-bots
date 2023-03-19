@@ -37,11 +37,7 @@ void MovementAction::CreateWp(Player* wpOwner, float x, float y, float z, float 
 
 bool MovementAction::isPossible()
 {
-    // Do not move if stay strategy is set
-    if (ai->HasStrategy("stay", ai->GetState()))
-        return false;
-
-    return true;
+    return ai->GetMoveTimer()->Passed() && Action::isPossible();
 }
 
 bool MovementAction::MoveNear(uint32 mapId, float x, float y, float z, float distance)
@@ -348,24 +344,12 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
     }
 #endif
 
-    bool detailedMove = ai->AllowActivity(DETAILED_MOVE_ACTIVITY,true);
-
-    if (!detailedMove)
-    {
-        time_t now = time(0);
-        if (AI_VALUE(LastMovement&, "last movement").nextTeleport > now) //We can not teleport yet. Wait.
-        {
-            SetDuration((AI_VALUE(LastMovement&, "last movement").nextTeleport - now) * 1000);
-            return true;
-        }
-    }
-
     float minDist = sPlayerbotAIConfig.targetPosRecalcDistance; //Minimum distance a bot should move.
     float maxDist = sPlayerbotAIConfig.sightDistance;           //Maximum distance a bot can move in one single action.
     float originalZ = z;                                        // save original destination height to check if bot needs to fly up
 
-
     bool generatePath = !bot->IsFlying() && !bot->HasMovementFlag(MOVEFLAG_SWIMMING) && !bot->IsInWater() && !sServerFacade.IsUnderwater(bot);
+
     if (noPath)
         generatePath = false;
 
@@ -857,7 +841,7 @@ bool MovementAction::MoveTo(uint32 mapId, float x, float y, float z, bool idle, 
         }
     }
 
-    if (totalDistance > maxDist && !detailedMove && !ai->HasPlayerNearby(&movePosition)) //Why walk if you can fly?
+    if (totalDistance > maxDist && !ai->HasPlayerNearby(&movePosition)) //Why walk if you can fly?
     {
         time_t now = time(0);
 
@@ -1424,15 +1408,10 @@ void MovementAction::WaitForReach(float distance)
     if (duration > sPlayerbotAIConfig.maxWaitForMove)
         duration = sPlayerbotAIConfig.maxWaitForMove;
 
-    /*Unit* target = *ai->GetAiObjectContext()->GetValue<Unit*>("current target");
-    Unit* player = *ai->GetAiObjectContext()->GetValue<Unit*>("enemy player target");
-    if ((player || target) && duration > sPlayerbotAIConfig.globalCoolDown)
-        duration = sPlayerbotAIConfig.globalCoolDown;*/
-
     if (duration < 0.0f)
         duration = 0.0f;
 
-    SetDuration(duration);
+    ai->GetMoveTimer()->Reset(duration);
 }
 
 bool MovementAction::Flee(Unit *target)

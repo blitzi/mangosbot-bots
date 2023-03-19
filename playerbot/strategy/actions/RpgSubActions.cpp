@@ -29,9 +29,6 @@ void RpgHelper::AfterExecute(bool doDelay, bool waitForGroup, string nextAction)
         nextAction = "rpg cancel"; 
     
     SET_AI_VALUE(string, "next rpg action", nextAction);
-
-    if(doDelay)
-        setDelay(waitForGroup);
 }
 
 void RpgHelper::setFacingTo(GuidPosition guidPosition)
@@ -83,14 +80,6 @@ void RpgHelper::resetFacing(GuidPosition guidPosition)
     }
 }
 
-void RpgHelper::setDelay(bool waitForGroup)
-{
-    if (!ai->HasRealPlayerMaster() || (waitForGroup && ai->GetGroupMaster() == bot && bot->GetGroup()))
-        ai->SetActionDuration(sPlayerbotAIConfig.rpgDelay);
-    else
-        ai->SetActionDuration(sPlayerbotAIConfig.rpgDelay / 5);
-}
-
 bool RpgEmoteAction::Execute(Event& event)
 {
     rpg->BeforeExecute();
@@ -121,8 +110,6 @@ bool RpgEmoteAction::Execute(Event& event)
         rpg->AfterExecute();
     else if(unit && !bot->GetNPCIfCanInteractWith(rpg->guidP(), UNIT_NPC_FLAG_QUESTGIVER) && AI_VALUE(TravelTarget*, "travel target")->getEntry() == 620)
         rpg->AfterExecute(true,false, "rpg emote");
-
-    DoDelay();
 
     return true;
 }
@@ -181,8 +168,6 @@ bool RpgTaxiAction::Execute(Event& event)
 
     rpg->AfterExecute();
 
-    DoDelay();
-
     return true;
 }
 
@@ -204,8 +189,6 @@ bool RpgDiscoverAction::Execute(Event& event)
         return false;
 
     rpg->AfterExecute(true, true);
-
-    DoDelay();
 
     return bot->GetSession()->SendLearnNewTaxiNode(flightMaster);    
 }
@@ -233,8 +216,6 @@ bool RpgHealAction::Execute(Event& event)
     }
 
     rpg->AfterExecute(true, false);
-
-    DoDelay();
 
     return retVal;
 }
@@ -314,12 +295,10 @@ bool RpgTradeUsefulAction::Execute(Event& event)
         //else
         //   bot->Say("Start trade with" + chat->formatWorldobject(player), (bot->GetTeam() == ALLIANCE ? LANG_COMMON : LANG_ORCISH));
 
-        ai->SetActionDuration(sPlayerbotAIConfig.rpgDelay);
     }
 
     rpg->AfterExecute(isTrading, true, isTrading ? "rpg trade useful" : "rpg");
 
-    DoDelay();
 
     return isTrading;
 }
@@ -408,11 +387,6 @@ bool RpgItemAction::Execute(Event& event)
                     used = UseItem(item, guidP, nullptr, nullptr);
             }
         }
-    }
-
-    if (used)
-    {
-        SetDuration(sPlayerbotAIConfig.globalCoolDown);
     }
 
     return used;

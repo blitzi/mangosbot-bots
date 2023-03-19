@@ -6,7 +6,6 @@
 #include "CatDpsDruidStrategy.h"
 #include "CasterDruidStrategy.h"
 #include "GenericDruidNonCombatStrategy.h"
-#include "DruidReactionStrategy.h"
 #include "../NamedObjectContext.h"
 #include "DruidTriggers.h"
 #include "HealDruidStrategy.h"
@@ -27,7 +26,6 @@ namespace ai
             StrategyFactoryInternal()
             {
                 creators["nc"] = &druid::StrategyFactoryInternal::nc;
-                creators["react"] = &druid::StrategyFactoryInternal::react;
                 creators["cat aoe"] = &druid::StrategyFactoryInternal::cat_aoe;
                 creators["caster aoe"] = &druid::StrategyFactoryInternal::caster_aoe;
                 creators["caster debuff"] = &druid::StrategyFactoryInternal::caster_debuff;
@@ -42,7 +40,6 @@ namespace ai
 
         private:
             static Strategy* nc(PlayerbotAI* ai) { return new GenericDruidNonCombatStrategy(ai); }
-            static Strategy* react(PlayerbotAI* ai) { return new DruidReactionStrategy(ai); }
             static Strategy* cat_aoe(PlayerbotAI* ai) { return new CatAoeDruidStrategy(ai); }
             static Strategy* caster_aoe(PlayerbotAI* ai) { return new CasterDruidAoeStrategy(ai); }
             static Strategy* caster_debuff(PlayerbotAI* ai) { return new CasterDruidDebuffStrategy(ai); }

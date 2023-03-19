@@ -99,7 +99,6 @@ bool CastCustomSpellAction::Execute(Event& event)
     if (target != bot && !sServerFacade.IsInFront(bot, target, sPlayerbotAIConfig.sightDistance, CAST_ANGLE_IN_FRONT))
     {
         sServerFacade.SetFacingTo(bot, target);
-        SetDuration(sPlayerbotAIConfig.globalCoolDown);
         msg << "cast " << text;
         ai->HandleCommand(CHAT_MSG_WHISPER, msg.str(), *master);
         return true;
@@ -121,12 +120,9 @@ bool CastCustomSpellAction::Execute(Event& event)
 
     MotionMaster& mm = *bot->GetMotionMaster();
 
-    uint32 spellDuration = sPlayerbotAIConfig.globalCoolDown;
-
-    bool result = spell ? ai->CastSpell(spell, target, itemTarget,true, &spellDuration) : ai->CastSpell(text, target, itemTarget, true, &spellDuration);
+    bool result = spell ? ai->CastSpell(spell, target, itemTarget) : ai->CastSpell(text, target, itemTarget);
     if (result)
     {
-        SetDuration(spellDuration);
         msg << "Casting " << spellName.str();
 
         if (castCount > 1)
@@ -257,15 +253,10 @@ bool CastRandomSpellAction::castSpell(uint32 spellId, WorldObject* wo)
     uint32 spellDuration = sPlayerbotAIConfig.globalCoolDown;
 
     if (wo->GetObjectGuid().IsUnit())
-        executed = ai->CastSpell(spellId, (Unit*)(wo), nullptr, false, &spellDuration);
+        executed = ai->CastSpell(spellId, (Unit*)(wo), nullptr);
 
     if (!executed)
-        executed = ai->CastSpell(spellId, wo->GetPositionX(), wo->GetPositionY(), wo->GetPositionZ(), nullptr, false, &spellDuration);
-
-    if (executed)
-    {
-        SetDuration(spellDuration);
-    }
+        executed = ai->CastSpell(spellId, wo->GetPositionX(), wo->GetPositionY(), wo->GetPositionZ(), nullptr);
 
     return executed;
 }

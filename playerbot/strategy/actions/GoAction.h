@@ -11,6 +11,7 @@ namespace ai
 		GoAction(PlayerbotAI* ai) : MovementAction(ai, "go") {}
 		virtual bool Execute(Event& event) override;
         virtual bool isPossible() override { return true; }
+        virtual bool IgnoresCasting() { return true; }
 
 #ifdef GenerateBotHelp
         virtual string GetHelpName() { return "go"; } //Must equal iternal name

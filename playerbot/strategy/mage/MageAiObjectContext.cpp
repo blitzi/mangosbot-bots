@@ -6,7 +6,6 @@
 #include "FrostMageStrategy.h"
 #include "ArcaneMageStrategy.h"
 #include "GenericMageNonCombatStrategy.h"
-#include "MageReactionStrategy.h"
 #include "FireMageStrategy.h"
 #include "../generic/PullStrategy.h"
 #include "MageTriggers.h"
@@ -27,7 +26,6 @@ namespace ai
             StrategyFactoryInternal()
             {
                 creators["nc"] = &mage::StrategyFactoryInternal::nc;
-                creators["react"] = &mage::StrategyFactoryInternal::react;
                 creators["pull"] = &mage::StrategyFactoryInternal::pull;
                 creators["fire aoe"] = &mage::StrategyFactoryInternal::fire_aoe;
                 creators["frost aoe"] = &mage::StrategyFactoryInternal::frost_aoe;
@@ -40,7 +38,6 @@ namespace ai
 
         private:
             static Strategy* nc(PlayerbotAI* ai) { return new GenericMageNonCombatStrategy(ai); }
-            static Strategy* react(PlayerbotAI* ai) { return new MageReactionStrategy(ai); }
             static Strategy* pull(PlayerbotAI* ai) { return new PullStrategy(ai, "shoot"); }
             static Strategy* fire_aoe(PlayerbotAI* ai) { return new FireMageAoeStrategy(ai); }
             static Strategy* frost_aoe(PlayerbotAI* ai) { return new FrostMageAoeStrategy(ai); }

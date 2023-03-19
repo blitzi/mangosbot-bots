@@ -137,12 +137,6 @@ void Strategy::InitTriggers(std::list<TriggerNode*>& triggers, BotState state)
             InitDeadTriggers(triggers);
             break;
         }
-
-        case BotState::BOT_STATE_REACTION:
-        {
-            InitReactionTriggers(triggers);
-            break;
-        }
     }
 }
 
@@ -167,12 +161,6 @@ void Strategy::InitMultipliers(std::list<Multiplier*>& multipliers, BotState sta
             InitDeadMultipliers(multipliers);
             break;
         }
-
-        case BotState::BOT_STATE_REACTION:
-        {
-            InitReactionMultipliers(multipliers);
-            break;
-        }
     }
 }
 
@@ -193,11 +181,6 @@ ai::NextAction** Strategy::getDefaultActions(BotState state)
         case BotState::BOT_STATE_DEAD:
         {
             return GetDefaultDeadActions();
-        }
-
-        case BotState::BOT_STATE_REACTION:
-        {
-            return GetDefaultReactionActions();
         }
     }
 

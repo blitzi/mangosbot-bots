@@ -18,7 +18,6 @@
 #include "CheckValuesAction.h"
 #include "ChooseRpgTargetAction.h"
 #include "ChooseTravelTargetAction.h"
-#include "DelayAction.h"
 #include "GiveItemAction.h"
 #include "GreetAction.h"
 #include "ImbueAction.h"
@@ -142,7 +141,6 @@ namespace ai
             creators["reveal gathering item"] = &ActionContext::reveal_gathering_item;
             creators["outfit"] = &ActionContext::outfit;
             creators["random bot update"] = &ActionContext::random_bot_update;
-            creators["delay"] = &ActionContext::delay;
             creators["greet"] = &ActionContext::greet;
             creators["check values"] = &ActionContext::check_values;
             creators["ra"] = &ActionContext::ra;
@@ -391,7 +389,6 @@ namespace ai
         static Action* reveal_gathering_item(PlayerbotAI* ai) { return new RevealGatheringItemAction(ai); }
         static Action* outfit(PlayerbotAI* ai) { return new OutfitAction(ai); }
         static Action* random_bot_update(PlayerbotAI* ai) { return new RandomBotUpdateAction(ai); }
-        static Action* delay(PlayerbotAI* ai) { return new DelayAction(ai); }
         static Action* mount(PlayerbotAI *ai) { return new CastSpellAction(ai, "mount"); }
         static Action* auto_talents(PlayerbotAI* ai) { return new AutoSetTalentsAction(ai); }
 		static Action* auto_learn_spell(PlayerbotAI* ai) { return new AutoLearnSpellAction(ai); }

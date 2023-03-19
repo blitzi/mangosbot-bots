@@ -11,12 +11,14 @@ namespace ai
 		virtual bool Execute(Event& event);
         virtual bool isUseful();
         virtual bool CanDeadFollow(Unit* target);
+        virtual bool IgnoresCasting() { return true; }
 	};
 
 	class StopFollowAction : public MovementAction {
 	public:
 		StopFollowAction(PlayerbotAI* ai, string name = "stop follow") : MovementAction(ai, name) {}
 		virtual bool Execute(Event& event) { ai->StopMoving(); return true; };
+        virtual bool IgnoresCasting() { return true; }
 	};
 
     class FleeToMasterAction : public FollowAction {
@@ -25,6 +27,7 @@ namespace ai
 
         virtual bool Execute(Event& event);
         virtual bool isUseful();
+        virtual bool IgnoresCasting() { return true; }
     };
 
 }

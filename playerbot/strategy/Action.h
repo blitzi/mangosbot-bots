@@ -2,7 +2,6 @@
 #include "Event.h"
 #include "Value.h"
 #include "AiObject.h"
-#include "AiObject.h"
 #include "PlayerbotAIConfig.h"
 
 class Unit;
@@ -64,8 +63,9 @@ namespace ai
 
     public:
         virtual bool Execute(Event& event) { return true; }
-        virtual bool isPossible() { return true; }
+        virtual bool isPossible() { return CheckForCast(); }
         virtual bool isUseful() { return true; }
+        virtual bool IsCast() { return false; }
         virtual NextAction** getPrerequisites() { return NULL; }
         virtual NextAction** getAlternatives() { return NULL; }
         virtual NextAction** getContinuers() { return NULL; }
@@ -76,16 +76,11 @@ namespace ai
         virtual Value<Unit*>* GetTargetValue();
         virtual string GetTargetName() { return "self target"; }
         void MakeVerbose() { verbose = true; }
+        virtual bool IgnoresCasting() { return false; }
 
         void setRelevance(float relevance1) { relevance = relevance1; };
         virtual float getRelevance() { return relevance; }
-
-        bool IsReaction() const { return reaction; }
-        void SetReaction(bool inReaction) { reaction = inReaction; }
-
-        // Used when this action is executed as a reaction
-        virtual bool ShouldReactionInterruptCast() const { return false; }
-        virtual bool ShouldReactionInterruptMovement() const { return false; }
+        virtual bool ExecuteAndBreak() { return true; }
 
 #ifdef GenerateBotHelp
         virtual string GetHelpName() { return "dummy"; } //Must equal internal name
@@ -94,15 +89,12 @@ namespace ai
         virtual vector<string> GetUsedValues() { return {}; }
 #endif
 
-        uint32 GetDuration() const { return duration; }
-
     protected:
-        void SetDuration(uint32 inDuration) { duration = inDuration; }
+        bool CheckForCast();
 
     protected:
         bool verbose;
         float relevance = 0;
-        bool reaction = false;
 
     private:
         uint32 duration;

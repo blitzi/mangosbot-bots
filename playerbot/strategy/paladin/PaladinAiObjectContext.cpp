@@ -4,7 +4,6 @@
 #include "PaladinTriggers.h"
 #include "PaladinAiObjectContext.h"
 #include "GenericPaladinNonCombatStrategy.h"
-#include "PaladinReactionStrategy.h"
 #include "TankPaladinStrategy.h"
 #include "DpsPaladinStrategy.h"
 #include "PaladinBuffStrategies.h"
@@ -25,7 +24,6 @@ namespace ai
             StrategyFactoryInternal()
             {
                 creators["nc"] = &paladin::StrategyFactoryInternal::nc;
-                creators["react"] = &paladin::StrategyFactoryInternal::react;
                 creators["cure"] = &paladin::StrategyFactoryInternal::cure;
                 creators["boost"] = &paladin::StrategyFactoryInternal::boost;
                 creators["bthreat"] = &paladin::StrategyFactoryInternal::bthreat;
@@ -36,7 +34,6 @@ namespace ai
 
         private:
             static Strategy* nc(PlayerbotAI* ai) { return new GenericPaladinNonCombatStrategy(ai); }
-            static Strategy* react(PlayerbotAI* ai) { return new PaladinReactionStrategy(ai); }
             static Strategy* cure(PlayerbotAI* ai) { return new PaladinCureStrategy(ai); }
             static Strategy* boost(PlayerbotAI* ai) { return new PaladinBoostStrategy(ai); }
             static Strategy* bthreat(PlayerbotAI* ai) { return new PaladinBuffThreatStrategy(ai); }

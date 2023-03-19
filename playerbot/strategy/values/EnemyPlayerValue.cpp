@@ -9,30 +9,28 @@ using namespace std;
 list<ObjectGuid> EnemyPlayersValue::Calculate()
 {
     list<ObjectGuid> result;
-    if (ai->AllowActivity(ALL_ACTIVITY))
+
+    if (bot->IsInWorld() && !bot->IsBeingTeleported())
     {
-        if (bot->IsInWorld() && !bot->IsBeingTeleported())
+        // Check if we only need one attacker
+        bool getOne = false;
+        if (!qualifier.empty())
         {
-            // Check if we only need one attacker
-            bool getOne = false;
-            if (!qualifier.empty())
-            {
-                getOne = stoi(qualifier);
-            }
+            getOne = stoi(qualifier);
+        }
 
-            if (getOne)
-            {
-                // Try to get one enemy target
-                result = AI_VALUE2(list<ObjectGuid>, "possible attack targets", 1);
-                ApplyFilter(result, getOne);
-            }
+        if (getOne)
+        {
+            // Try to get one enemy target
+            result = AI_VALUE2(list<ObjectGuid>, "possible attack targets", 1);
+            ApplyFilter(result, getOne);
+        }
 
-            // If the one enemy player failed, retry with multiple possible attack targets
-            if (result.empty())
-            {
-                result = AI_VALUE(list<ObjectGuid>, "possible attack targets");
-                ApplyFilter(result, getOne);
-            }
+        // If the one enemy player failed, retry with multiple possible attack targets
+        if (result.empty())
+        {
+            result = AI_VALUE(list<ObjectGuid>, "possible attack targets");
+            ApplyFilter(result, getOne);
         }
     }
 

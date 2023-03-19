@@ -95,30 +95,6 @@ public:
 
             return message;
         }
-        if (message.find("@react=") == 0)
-        {
-            string strat = message.substr(message.find("=") + 1, message.find(" ") - (message.find("=") + 1));
-
-            if (!strat.empty())
-            {
-                if (ai->HasStrategy(strat, BotState::BOT_STATE_REACTION))
-                    return ChatFilter::Filter(message);
-            }
-
-            return message;
-        }
-        if (message.find("@noreact=") == 0)
-        {
-            string strat = message.substr(message.find("=") + 1, message.find(" ") - (message.find("=") + 1));
-
-            if (!strat.empty())
-            {
-                if (!ai->HasStrategy(strat, BotState::BOT_STATE_REACTION))
-                    return ChatFilter::Filter(message);
-            }
-
-            return message;
-        }
         if (message.find("@dead=") == 0)
         {
             string strat = message.substr(message.find("=") + 1, message.find(" ") - (message.find("=") + 1));

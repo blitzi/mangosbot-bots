@@ -48,7 +48,6 @@ namespace ai
             creators["co"] = &ChatTriggerContext::co;
             creators["nc"] = &ChatTriggerContext::nc;
             creators["de"] = &ChatTriggerContext::dead;
-            creators["react"] = &ChatTriggerContext::react;
             creators["all"] = &ChatTriggerContext::all;
             creators["trainer"] = &ChatTriggerContext::trainer;
             creators["attack"] = &ChatTriggerContext::attack;
@@ -176,7 +175,6 @@ namespace ai
         static Trigger* co(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "co"); }
         static Trigger* nc(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "nc"); }
         static Trigger* dead(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "de"); }
-        static Trigger* react(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "react"); }
         static Trigger* all(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "all"); }
         static Trigger* spells(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "spells"); }
         static Trigger* talents(PlayerbotAI* ai) { return new ChatCommandTrigger(ai, "talents"); }

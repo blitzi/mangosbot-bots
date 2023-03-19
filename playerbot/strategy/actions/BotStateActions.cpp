@@ -7,7 +7,6 @@ using namespace ai;
 
 bool SetCombatStateAction::Execute(Event& event)
 {
-    SetDuration(sPlayerbotAIConfig.reactDelay);
     ai->OnCombatStarted();
 
     //Set stay positon on location when combat starts.
@@ -25,7 +24,6 @@ bool SetCombatStateAction::Execute(Event& event)
 
 bool SetNonCombatStateAction::Execute(Event& event)
 {
-    SetDuration(sPlayerbotAIConfig.reactDelay);
     if (ai->IsStateActive(BotState::BOT_STATE_DEAD))
     {
         ai->OnResurrected();
@@ -46,7 +44,6 @@ bool SetNonCombatStateAction::Execute(Event& event)
 
 bool SetDeadStateAction::Execute(Event& event)
 {
-    SetDuration(sPlayerbotAIConfig.reactDelay);
     ai->OnDeath();
     return true;
 }

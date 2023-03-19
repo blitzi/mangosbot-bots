@@ -566,7 +566,7 @@ bool CheckMountStateAction::MountWithBestMount(const bool canFly)
     if (!bot->IsStopped())
     {
         ai->StopMoving();
-    }  
+    }
 
     if (mounts.empty() || (!mountSpells.empty() && MountSpeed(mountSpell, canFly) > MountSpeed(mountItem->GetProto(), canFly)))
     {
@@ -574,9 +574,8 @@ bool CheckMountStateAction::MountWithBestMount(const bool canFly)
         if (ai->CastSpell(spellId, bot))
         {
             sPlayerbotAIConfig.logEvent(ai, "CheckMountStateAction", sServerFacade.LookupSpellInfo(mountSpells.front())->SpellName[0], to_string(GetBestMountSpeed(canFly)));
-            SetDuration(GetSpellRecoveryTime(sServerFacade.LookupSpellInfo(mountSpells.front())));
             return true;
-        }        
+        }
         return false;
     }
     else
@@ -585,7 +584,6 @@ bool CheckMountStateAction::MountWithBestMount(const bool canFly)
         if (UseItemAuto(mount))
         {
             sPlayerbotAIConfig.logEvent(ai, "CheckMountStateAction", mount->GetProto()->Name1, to_string(GetBestMountSpeed(canFly)));
-            SetDuration(3000U); // 3s
             return true;
         }
     }

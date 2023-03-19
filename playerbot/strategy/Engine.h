@@ -124,5 +124,8 @@ namespace ai
     public:
 		bool testMode;
         bool initMode = true;
+
+    private:
+        float lastCastRelevance;
     };
 }

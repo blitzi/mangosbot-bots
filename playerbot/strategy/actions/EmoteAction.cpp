@@ -805,9 +805,6 @@ bool EmoteAction::Execute(Event& event)
 
 bool EmoteAction::isUseful()
 {
-    if (!ai->AllowActivity())
-        return false;
-
     time_t lastEmote = AI_VALUE2(time_t, "last emote", qualifier);
     return time(0) >= lastEmote;
 }

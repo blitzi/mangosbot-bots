@@ -130,41 +130,26 @@ bool FindCorpseAction::Execute(Event& event)
     //Actual mobing part.
     bool moved = false;
 
-    if (!ai->AllowActivity(ALL_ACTIVITY))
-    {
-        uint32 delay = sServerFacade.GetDistance2d(bot, corpse) / bot->GetSpeed(MOVE_RUN); //Time a bot would take to travel to it's corpse.
-        delay = min(delay, uint32(10 * MINUTE)); //Cap time to get to corpse at 10 minutes.
 
-        if (deadTime > delay)
-        {
-            bot->GetMotionMaster()->Clear();
-            bot->TeleportTo(moveToPos.getMapId(), moveToPos.getX(), moveToPos.getY(), moveToPos.getZ(), 0);
-        }
-
+#ifndef MANGOSBOT_ZERO
+    if (bot->IsMovingIgnoreFlying())
         moved = true;
-    }
+#else
+    if (bot->IsMoving())
+        moved = true;
+#endif
     else
     {
-#ifndef MANGOSBOT_ZERO
-        if (bot->IsMovingIgnoreFlying())
-            moved = true;
-#else
-        if (bot->IsMoving())
-            moved = true;
-#endif
-        else
+        if (deadTime < 10 * MINUTE) //Look for corpse up to 30 minutes.
         {
-            if (deadTime < 10 * MINUTE) //Look for corpse up to 30 minutes.
-            {
-                moved = MoveTo(moveToPos.getMapId(), moveToPos.getX(), moveToPos.getY(), moveToPos.getZ(), false, false);
-            }
-
-            if (!moved)
-            {
-                moved = ai->DoSpecificAction("spirit healer", Event(), true);
-            }
+            moved = MoveTo(moveToPos.getMapId(), moveToPos.getX(), moveToPos.getY(), moveToPos.getZ(), false, false);
         }
-    }   
+
+        if (!moved)
+        {
+            moved = ai->DoSpecificAction("spirit healer", Event(), true);
+        }
+    }
 
     return moved;
 }

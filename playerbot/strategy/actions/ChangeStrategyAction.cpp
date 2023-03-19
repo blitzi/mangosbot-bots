@@ -75,13 +75,6 @@ bool ChangeDeadStrategyAction::Execute(Event& event)
     return true;
 }
 
-bool ChangeReactionStrategyAction::Execute(Event& event)
-{
-    string text = event.getParam();
-    ai->ChangeStrategy(text, BotState::BOT_STATE_REACTION);
-    return true;
-}
-
 bool ChangeAllStrategyAction::Execute(Event& event)
 {
     string text = event.getParam();

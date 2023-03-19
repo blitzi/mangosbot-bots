@@ -378,12 +378,9 @@ void RandomPlayerbotMgr::LogPlayerLocation()
                 {
                     out << to_string(uint8(bot->GetPlayerbotAI()->GetGrouperType())) << ",";
                     out << to_string(uint8(bot->GetPlayerbotAI()->GetGuilderType())) << ",";
-                    out << (bot->GetPlayerbotAI()->AllowActivity(ALL_ACTIVITY) ? "active" : "inactive") << ",";
-                    out << (bot->GetPlayerbotAI()->IsActive() ? "active" : "delay") << ",";
                     out << bot->GetPlayerbotAI()->HandleRemoteCommand("state") << ",";
 
-                    if (bot->GetPlayerbotAI()->AllowActivity(ALL_ACTIVITY))
-                        activeBots++;
+                    activeBots++;
                 }
                 else
                 {
@@ -438,12 +435,9 @@ void RandomPlayerbotMgr::LogPlayerLocation()
             {
                 out << to_string(uint8(bot->GetPlayerbotAI()->GetGrouperType())) << ",";
                 out << to_string(uint8(bot->GetPlayerbotAI()->GetGuilderType())) << ",";
-                out << (bot->GetPlayerbotAI()->AllowActivity(ALL_ACTIVITY) ? "active" : "inactive") << ",";
-                out << (bot->GetPlayerbotAI()->IsActive() ? "active" : "delay") << ",";
                 out << bot->GetPlayerbotAI()->HandleRemoteCommand("state") << ",";
 
-                if (bot->GetPlayerbotAI()->AllowActivity(ALL_ACTIVITY))
-                    activeBots++;
+                activeBots++;
             }
             else
             {
@@ -525,9 +519,6 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool minimal)
                 if (!bot)
                     continue;
 
-                if (!bot->GetPlayerbotAI()->AllowActivity())
-                    continue;
-
                 string bracket = "level:" + to_string(bot->GetLevel() / 10);
 
                 float level = ((float)bot->GetLevel() + (bot->GetUInt32Value(PLAYER_NEXT_LEVEL_XP) ? ((float)bot->GetUInt32Value(PLAYER_XP) / (float)bot->GetUInt32Value(PLAYER_NEXT_LEVEL_XP)) : 0));
@@ -566,8 +557,6 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool minimal)
 
     if (onlineBotCount < (uint32)(sPlayerbotAIConfig.minRandomBots * 90 / 100))
         onlineBotFocus = 25;
-
-    SetAIInternalUpdateDelay(sPlayerbotAIConfig.randomBotUpdateInterval * (onlineBotFocus+25) * 10);
 
     PerformanceMonitorOperation *pmo = sPerformanceMonitor.start(PERF_MON_TOTAL,
         onlineBotCount < maxAllowedBotCount ? "RandomPlayerbotMgr::Login" : "RandomPlayerbotMgr::UpdateAIInternal");
@@ -672,17 +661,15 @@ void RandomPlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool minimal)
             {
                 Player* bot = i.second;
                 if (bot->GetPlayerbotAI())
-                    if (bot->GetPlayerbotAI()->AllowActivity(ALL_ACTIVITY))
-                        activeBots++;
+                    activeBots++;
             }
         for (auto i : GetPlayers())
         {
             Player* bot = i.second;
             if (!bot)
-                continue;           
+                continue;
             if (bot->GetPlayerbotAI())
-                if (bot->GetPlayerbotAI()->AllowActivity(ALL_ACTIVITY))
-                    activeBots++;
+                activeBots++;
         }
     }
     if(sPlayerbotAIConfig.turnInRpg)
@@ -719,7 +706,7 @@ uint32 RandomPlayerbotMgr::AddRandomBots(bool createLevel1)
     uint32 maxAllowedBotCount = GetEventValue(0, "bot_count");
     uint32 currentAllowedBotCount = std::min(1u, maxAllowedBotCount - (uint32)currentBots.size());
 
-    if (currentBots.size() < currentAllowedBotCount)
+    if (currentBots.size() < maxAllowedBotCount)
     {
         PlayerbotDatabase.AllowAsyncTransactions();
         PlayerbotDatabase.BeginTransaction(); 
@@ -807,14 +794,6 @@ uint32 RandomPlayerbotMgr::AddRandomBots(bool createLevel1)
 
         if (currentAllowedBotCount)
             currentAllowedBotCount = GetEventValue(0, "bot_count") - currentBots.size();
-
-        if(currentAllowedBotCount)
-#ifdef MANGOSBOT_TWO
-            sLog.outError("Not enough random bot accounts available. Need %d more!!", (uint32)ceil(currentAllowedBotCount / 10));
-#else
-            sLog.outError("Not enough random bot accounts available. Need %d more!!", (uint32)ceil(currentAllowedBotCount / 9));
-#endif
-      
     }
 
     return currentBots.size();
@@ -2402,8 +2381,7 @@ void RandomPlayerbotMgr::PrintStats()
         perRace[bot->getRace()]++;
         perClass[bot->getClass()]++;
 
-        if (bot->GetPlayerbotAI()->AllowActivity())
-            active++;
+        active++;
 
         if (bot->GetPlayerbotAI()->GetAiObjectContext()->GetValue<bool>("random bot update")->Get())
             update++;

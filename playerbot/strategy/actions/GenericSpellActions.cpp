@@ -53,7 +53,7 @@ bool CastSpellAction::Execute(Event& event)
                 castId = pSpellInfo->Id;
         }
 
-        executed = ai->CastSpell(castId, bot, nullptr, false, &spellDuration);
+        executed = ai->CastSpell(castId, bot, nullptr);
     }
     else
     {
@@ -95,12 +95,7 @@ bool CastSpellAction::Execute(Event& event)
             }
         }
 
-        executed = ai->CastSpell(spellName, GetTarget(), nullptr, false, &spellDuration);
-    }
-
-    if (executed)
-    {
-        SetDuration(spellDuration);
+        executed = ai->CastSpell(spellName, GetTarget(), nullptr);
     }
 
     return executed;
@@ -306,11 +301,6 @@ bool CastShootAction::Execute(Event& event)
         else if (CastSpellAction::Execute(event))
         {
             succeeded = true;
-        }
-
-        if (succeeded)
-        {
-            SetDuration(weaponDelay);
         }
     }
 

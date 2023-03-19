@@ -110,6 +110,8 @@ namespace ai
             }
         }
 
+        virtual bool IgnoresCasting() { return true; }
+
     protected:
         float distance;
         string spellName;

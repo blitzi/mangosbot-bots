@@ -324,11 +324,6 @@ void PlayerbotHolder::OnBotLogin(Player * const bot)
 #endif
     }
 
-    // check activity
-    ai->AllowActivity(ALL_ACTIVITY, true);
-    // set delay on login
-    ai->SetActionDuration(urand(2000, 4000));
-
     ai->TellMaster(BOT_TEXT("hello"));
 
     // bots join World chat if not solo oriented
@@ -565,6 +560,12 @@ string PlayerbotHolder::ProcessBotCommand(string cmd, ObjectGuid guid, ObjectGui
         {
             PlayerbotFactory factory(bot, bot->GetLevel());
             factory.Randomize(true);
+
+            if (bot->GetLevel() == 2)
+            {
+                int x = 0;
+            }
+
             return "ok";
         }
         else if (cmd == "refresh")
@@ -1007,7 +1008,6 @@ PlayerbotMgr::~PlayerbotMgr()
 
 void PlayerbotMgr::UpdateAIInternal(uint32 elapsed, bool minimal)
 {
-    SetAIInternalUpdateDelay(sPlayerbotAIConfig.reactDelay);
     CheckTellErrors(elapsed);
 }
 

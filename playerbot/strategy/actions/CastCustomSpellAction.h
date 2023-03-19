@@ -11,7 +11,7 @@ namespace ai
         CastCustomSpellAction(PlayerbotAI* ai, string name = "cast custom spell") : ChatCommandAction(ai, name) {}
         virtual bool Execute(Event& event) override;
         virtual string castString(WorldObject* target) { return "cast"; }
-        virtual uint32 getDuration() const { return 3000U; }
+        virtual bool IsCast() { return true; }
 
     protected:
         bool ncCast = false;

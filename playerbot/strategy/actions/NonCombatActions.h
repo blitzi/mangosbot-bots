@@ -36,7 +36,6 @@ namespace ai
                 if (sServerFacade.isMoving(bot))
                 {
                     ai->StopMoving();
-                    SetDuration(sPlayerbotAIConfig.globalCoolDown);
                     return false;
                 }
 
@@ -57,8 +56,7 @@ namespace ai
                     bot->GetSession()->HandleCancelMountAuraOpcode(emptyPacket);
                 }
 
-                ai->CastSpell(24355, bot);
-                SetDuration(drinkDuration);
+                ai->CastSpell(24355, bot);//Drink spell
                 bot->RemoveSpellCooldown(*pSpellInfo);
 
                 return true;
@@ -104,7 +102,6 @@ namespace ai
                 if (sServerFacade.isMoving(bot))
                 {
                     ai->StopMoving();
-                    SetDuration(sPlayerbotAIConfig.globalCoolDown);
                     return false;
                 }
 
@@ -125,8 +122,7 @@ namespace ai
                     bot->GetSession()->HandleCancelMountAuraOpcode(emptyPacket);
                 }
 
-                ai->CastSpell(24005, bot);
-                SetDuration(eatDuration);
+                ai->CastSpell(24005, bot);//Food Spell
                 bot->RemoveSpellCooldown(*pSpellInfo);
 
                 return true;

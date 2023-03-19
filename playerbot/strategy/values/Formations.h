@@ -63,6 +63,7 @@ namespace ai
     public:
         SetFormationAction(PlayerbotAI* ai) : ChatCommandAction(ai, "set formation") {}
         virtual bool Execute(Event& event) override;
+        virtual bool IgnoresCasting() { return true; }
     };
 };
 

@@ -19,6 +19,7 @@ namespace ai
         FollowChatShortcutAction(PlayerbotAI* ai) : MovementAction(ai, "follow chat shortcut") {}
         virtual bool Execute(Event& event);
         virtual bool isPossible() { return true; }
+        virtual bool IgnoresCasting() { return true; }
     };
 
     class StayChatShortcutAction : public ReturnPositionResetAction
@@ -26,6 +27,7 @@ namespace ai
     public:
         StayChatShortcutAction(PlayerbotAI* ai) : ReturnPositionResetAction(ai, "stay chat shortcut") {}
         virtual bool Execute(Event& event) override;
+        virtual bool IgnoresCasting() { return true; }
     };
 
     class GuardChatShortcutAction : public ReturnPositionResetAction

@@ -14,7 +14,7 @@ bool ChooseTravelTargetAction::Execute(Event& event)
     TravelTarget * oldTarget = context->GetValue<TravelTarget *>("travel target")->Get();
 
     //Select a new target to travel to. 
-    TravelTarget newTarget = TravelTarget(ai);   
+    TravelTarget newTarget = TravelTarget(ai);
     getNewTarget(&newTarget, oldTarget);
 
     //If the new target is not active we failed.
@@ -913,9 +913,6 @@ TravelDestination* ChooseTravelTargetAction::FindDestination(Player* bot, string
 
 bool ChooseTravelTargetAction::isUseful()
 {
-    if (!ai->AllowActivity(TRAVEL_ACTIVITY))
-        return false;
-
     if (bot->GetGroup() && !bot->GetGroup()->IsLeader(bot->GetObjectGuid()))
         if (ai->HasStrategy("follow", BotState::BOT_STATE_NON_COMBAT) || ai->HasStrategy("stay", BotState::BOT_STATE_NON_COMBAT) || ai->HasStrategy("guard", BotState::BOT_STATE_NON_COMBAT))
             return false;

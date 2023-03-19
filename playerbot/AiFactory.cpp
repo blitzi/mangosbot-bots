@@ -2,7 +2,6 @@
 #include "playerbot.h"
 #include "AiFactory.h"
 #include "strategy/AiObjectContext.h"
-#include "strategy/ReactionEngine.h"
 
 #include "strategy/priest/PriestAiObjectContext.h"
 #include "strategy/mage/MageAiObjectContext.h"
@@ -664,15 +663,4 @@ Engine* AiFactory::createDeadEngine(Player* player, PlayerbotAI* const facade, A
     Engine* deadEngine = new Engine(facade, AiObjectContext, BotState::BOT_STATE_DEAD);
     AddDefaultDeadStrategies(player, facade, deadEngine);
     return deadEngine;
-}
-
-void AiFactory::AddDefaultReactionStrategies(Player* player, PlayerbotAI* const facade, ReactionEngine* reactionEngine)
-{
-    reactionEngine->addStrategies("react", "chat", "avoid aoe", "potions", NULL);
-}
-
-ReactionEngine* AiFactory::createReactionEngine(Player* player, PlayerbotAI* const facade, AiObjectContext* AiObjectContext) {
-    ReactionEngine* reactionEngine = new ReactionEngine(facade, AiObjectContext, BotState::BOT_STATE_REACTION);
-    AddDefaultReactionStrategies(player, facade, reactionEngine);
-    return reactionEngine;
 }

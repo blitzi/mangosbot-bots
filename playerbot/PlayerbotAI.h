@@ -4,7 +4,6 @@
 #include "PlayerbotMgr.h"
 #include "PlayerbotAIBase.h"
 #include "strategy/AiObjectContext.h"
-#include "strategy/ReactionEngine.h"
 #include "strategy/ExternalEventHelper.h"
 #include "ChatFilter.h"
 #include "PlayerbotSecurity.h"
@@ -12,6 +11,7 @@
 #include "BotState.h"
 #include <stack>
 #include "strategy/IterateItemsMask.h"
+#include "strategy/Engine.h"
 
 class Player;
 class PlayerbotMgr;
@@ -225,20 +225,6 @@ enum class ActivePiorityType : uint8
     MAX_TYPE
 };
 
-enum ActivityType
-{
-    GRIND_ACTIVITY = 1,
-    RPG_ACTIVITY = 2,
-    TRAVEL_ACTIVITY = 3,
-    OUT_OF_PARTY_ACTIVITY = 4,
-    PACKET_ACTIVITY = 5,
-    DETAILED_MOVE_ACTIVITY = 6,
-    PARTY_ACTIVITY = 7,
-    REACT_ACTIVITY = 8,
-    ALL_ACTIVITY = 9,
-    MAX_ACTIVITY_TYPE 
-};
-
 enum BotRoles
 {
     BOT_ROLE_NONE = 0x00,
@@ -343,7 +329,6 @@ public:
     void InterruptSpell();
     void RemoveAura(string name);
     void RemoveShapeshift();
-    void WaitForSpellCast(Spell *spell);
     bool PlaySound(uint32 emote);
     bool PlayEmote(uint32 emote);
     void Ping(float x, float y);
@@ -389,11 +374,10 @@ public:
     bool CanCastSpell(uint32 spellid, float x, float y, float z, uint8 effectMask, bool checkHasSpell = true, Item* itemTarget = NULL, bool ignoreRange = false);
     bool CanCastVehicleSpell(uint32 spellid, Unit* target);
 
-    virtual bool CastSpell(string name, Unit* target, Item* itemTarget = NULL, bool waitForSpell = true, uint32* outSpellDuration = NULL);
-    bool CastSpell(uint32 spellId, Unit* target, Item* itemTarget = NULL, bool waitForSpell = true, uint32* outSpellDuration = NULL);
-    bool CastSpell(uint32 spellId, float x, float y, float z, Item* itemTarget = NULL, bool waitForSpell = true, uint32* outSpellDuration = NULL);
+    virtual bool CastSpell(string name, Unit* target, Item* itemTarget = NULL);
+    bool CastSpell(uint32 spellId, Unit* target, Item* itemTarget = NULL);
+    bool CastSpell(uint32 spellId, float x, float y, float z, Item* itemTarget = NULL);
     bool CastVehicleSpell(uint32 spellId, Unit* target);
-    bool CastVehicleSpell(uint32 spellId, float x, float y, float z);
 
     bool IsInVehicle(bool canControl = false, bool canCast = false, bool canAttack = false, bool canTurn = false, bool fixed = false);
 
@@ -402,6 +386,8 @@ public:
     bool HasSkill(SkillType skill);
     bool IsAllowedCommand(string text);
     float GetRange(string type);
+
+    bool IsCasting();
 
     static ReputationRank GetFactionReaction(FactionTemplateEntry const* thisTemplate, FactionTemplateEntry const* otherTemplate);
     static bool friendToAlliance(FactionTemplateEntry const* templateEntry) { return GetFactionReaction(templateEntry, sFactionTemplateStore.LookupEntry(1)) >= REP_NEUTRAL; }
@@ -464,8 +450,6 @@ public:
 
     ActivePiorityType GetPriorityType();
     pair<uint32,uint32> GetPriorityBracket(ActivePiorityType type);
-    bool AllowActive(ActivityType activityType);
-    bool AllowActivity(ActivityType activityType = ALL_ACTIVITY, bool checkNow = false);
 
     bool HasCheat(BotCheatMask mask) { return ((uint32)mask & (uint32)cheatMask) != 0 || ((uint32)mask & (uint32)sPlayerbotAIConfig.botCheatMask) != 0; }
     BotCheatMask GetCheat() { return cheatMask; }
@@ -478,6 +462,7 @@ public:
     bool IsOpposing(Player* player);
     static bool IsOpposing(uint8 race1, uint8 race2);
     PlayerbotSecurity* GetSecurity() { return &security; }
+    ShortTimeTracker* GetMoveTimer() { return &moveUpdateTimer; }
 
     Position GetJumpDestination() { return jumpDestination; }
     void SetJumpDestination(Position pos) { jumpDestination = pos; }
@@ -498,20 +483,12 @@ public:
     void OnDeath();
     void OnResurrected();
     
-    void SetActionDuration(const Action* action);
-    void SetActionDuration(uint32 duration);
-    
-private:
-    bool UpdateAIReaction(uint32 elapsed, bool minimal = false);
-    void UpdateFaceTarget(uint32 elapsed, bool minimal);
-
 protected:
 	Player* bot;
 	Player* master;
 	uint32 accountId;
     AiObjectContext* aiObjectContext;
     Engine* currentEngine;
-    ReactionEngine* reactionEngine;
     Engine* engines[(uint8)BotState::BOT_STATE_ALL];
     BotState currentState;
     ChatHelper chatHelper;
@@ -525,8 +502,6 @@ protected:
     map<string, time_t> whispers;
     pair<ChatMsg, time_t> currentChat;
     static set<string> unsecuredCommands;
-    bool allowActive[MAX_ACTIVITY_TYPE];
-    time_t allowActiveCheckTimer[MAX_ACTIVITY_TYPE];
     bool inCombat = false;
     bool isMoving = false;
     bool isWaiting = false;
@@ -534,6 +509,7 @@ protected:
     Position jumpDestination = Position();
     uint32 faceTargetUpdateDelay;
     bool isPlayerFriend = false;
+    ShortTimeTracker moveUpdateTimer;
 };
 
 template<typename T>

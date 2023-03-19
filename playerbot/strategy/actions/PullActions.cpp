@@ -79,8 +79,6 @@ bool PullStartAction::Execute(Event& event)
             else
             {
                 result = ai->DoSpecificAction(strategy->GetPreActionName(), event, true);
-                if(result)
-                    SetDuration(ai->GetAIInternalUpdateDelay());
             }
 
             // Set the pet on passive mode during the pull

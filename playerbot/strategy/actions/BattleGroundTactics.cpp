@@ -4756,7 +4756,6 @@ bool BGTactics::atFlag(std::vector<BattleBotPath*> const& vPaths, std::vector<ui
             Spell *spell = new Spell(bot, spellInfo, false);
             spell->m_targets.setGOTarget(go);
             spell->SpellStart(&spell->m_targets);
-            ai->WaitForSpellCast(spell);
 
             //WorldPacket data(CMSG_GAMEOBJ_USE);
             //data << go->GetObjectGuid();

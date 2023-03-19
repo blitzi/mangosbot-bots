@@ -22,7 +22,6 @@ namespace ai
         void InitDeadTriggers(std::list<TriggerNode*>& triggers) override;
         void InitReactionTriggers(std::list<TriggerNode*>& triggers) override;
 
-        virtual void OnStrategyAdded(BotState state) override;
         virtual void OnStrategyRemoved(BotState state) override;
     };
 

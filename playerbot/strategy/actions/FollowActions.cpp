@@ -120,7 +120,6 @@ bool FleeToMasterAction::Execute(Event& event)
     WorldPosition bosPos(bot);
     float distance = bosPos.fDist(targetPos);
 
-
     uint32 scale = 5;
     if (bot->GetGroup() && bot->GetGroup()->GetMembersCount() > 5)
         scale = bot->GetGroup()->GetMembersCount();
@@ -145,8 +144,7 @@ bool FleeToMasterAction::Execute(Event& event)
     else
         if (!urand(0, scale*6))
             ai->TellMasterNoFacing(BOT_TEXT("wait_travel_medium"), PlayerbotSecurityLevel::PLAYERBOT_SECURITY_ALLOW_ALL, false);
-           
-    SetDuration(3000U);
+
     return true;
 }
 

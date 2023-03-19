@@ -10,48 +10,46 @@ using namespace MaNGOS;
 list<ObjectGuid> AttackersValue::Calculate()
 {
     list<ObjectGuid> result;
-    if (ai->AllowActivity(ALL_ACTIVITY))
+
+    if(bot->IsInWorld() && !bot->IsBeingTeleported())
     {
-        if(bot->IsInWorld() && !bot->IsBeingTeleported())
+        set<Unit*> targets;
+
+        // Check if we only need one attacker
+        bool getOne = false;
+        if(!qualifier.empty())
         {
-            set<Unit*> targets;
+            getOne = stoi(qualifier);
+        }
 
-            // Check if we only need one attacker
-            bool getOne = false;
-            if(!qualifier.empty())
+        set<ObjectGuid> invalidTargets;
+
+        // Add the targets of the bot
+        AddTargetsOf(bot, targets, invalidTargets, getOne);
+
+        // Don't check for group member targets if we only need one
+        if (targets.empty() || !getOne)
+        {
+            // Add the targets of the members of the group
+            Group* group = bot->GetGroup();
+            if (group && !bot->InBattleGround())
             {
-                getOne = stoi(qualifier);
+                AddTargetsOf(group, targets, invalidTargets, getOne);
             }
 
-            set<ObjectGuid> invalidTargets;
+            Player* master = GetMaster();
+            if (master && (!group || master->GetGroup() != group))
+                AddTargetsOf(master, targets, invalidTargets, getOne);
+        }
 
-            // Add the targets of the bot
-            AddTargetsOf(bot, targets, invalidTargets, getOne);
-
-            // Don't check for group member targets if we only need one
-            if (targets.empty() || !getOne)
-            {
-                // Add the targets of the members of the group
-                Group* group = bot->GetGroup();
-                if (group && !bot->InBattleGround())
-                {
-                    AddTargetsOf(group, targets, invalidTargets, getOne);
-                }
-
-                Player* master = GetMaster();
-                if (master && (!group || master->GetGroup() != group))
-                    AddTargetsOf(master, targets, invalidTargets, getOne);
-            }
-
-            // Convert the targets to guids
-            for (Unit* target : targets)
-            {
-                result.push_back(target->GetObjectGuid());
-            }
+        // Convert the targets to guids
+        for (Unit* target : targets)
+        {
+            result.push_back(target->GetObjectGuid());
         }
     }
 
-	return result;
+    return result;
 }
 
 void AttackersValue::AddTargetsOf(Group* group, set<Unit*>& targets, set<ObjectGuid>& invalidTargets, bool getOne)

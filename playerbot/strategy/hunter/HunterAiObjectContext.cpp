@@ -5,7 +5,6 @@
 #include "HunterAiObjectContext.h"
 #include "DpsHunterStrategy.h"
 #include "GenericHunterNonCombatStrategy.h"
-#include "HunterReactionStrategy.h"
 #include "HunterBuffStrategies.h"
 #include "../NamedObjectContext.h"
 
@@ -24,7 +23,6 @@ namespace ai
             {
                 creators["dps"] = &hunter::StrategyFactoryInternal::dps;
                 creators["nc"] = &hunter::StrategyFactoryInternal::nc;
-                creators["react"] = &hunter::StrategyFactoryInternal::react;
                 creators["pull"] = &hunter::StrategyFactoryInternal::pull;
                 creators["aoe"] = &hunter::StrategyFactoryInternal::aoe;
                 creators["dps debuff"] = &hunter::StrategyFactoryInternal::dps_debuff;
@@ -37,7 +35,6 @@ namespace ai
             static Strategy* aoe(PlayerbotAI* ai) { return new DpsAoeHunterStrategy(ai); }
             static Strategy* dps(PlayerbotAI* ai) { return new DpsHunterStrategy(ai); }
             static Strategy* nc(PlayerbotAI* ai) { return new GenericHunterNonCombatStrategy(ai); }
-            static Strategy* react(PlayerbotAI* ai) { return new HunterReactionStrategy(ai); }
             static Strategy* pull(PlayerbotAI* ai) { return new PullStrategy(ai, "serpent sting"); }
             static Strategy* dps_debuff(PlayerbotAI* ai) { return new DpsHunterDebuffStrategy(ai); }
             static Strategy* boost(PlayerbotAI* ai) { return new HunterBoostStrategy(ai); }

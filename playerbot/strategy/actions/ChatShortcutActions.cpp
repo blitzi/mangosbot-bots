@@ -29,7 +29,6 @@ void ReturnPositionResetAction::PrintStrategies(PlayerbotAI* ai, Event& event)
     {
         ai->ChangeStrategy("?", BotState::BOT_STATE_NON_COMBAT);
         ai->ChangeStrategy("?", BotState::BOT_STATE_COMBAT);
-        ai->ChangeStrategy("?", BotState::BOT_STATE_REACTION);
     }
 }
 

@@ -16,30 +16,28 @@ using namespace MaNGOS;
 list<ObjectGuid> PossibleAttackTargetsValue::Calculate()
 {
     list<ObjectGuid> result;
-    if (ai->AllowActivity(ALL_ACTIVITY))
+
+    if (bot->IsInWorld() && !bot->IsBeingTeleported())
     {
-        if (bot->IsInWorld() && !bot->IsBeingTeleported())
+        // Check if we only need one possible attack target
+        bool getOne = false;
+        if (!qualifier.empty())
         {
-            // Check if we only need one possible attack target
-            bool getOne = false;
-            if (!qualifier.empty())
-            {
-                getOne = stoi(qualifier);
-            }
+            getOne = stoi(qualifier);
+        }
 
-            if (getOne)
-            {
-                // Try to get one possible attack target
-                result = AI_VALUE2(list<ObjectGuid>, "attackers", 1);
-                RemoveNonThreating(result, getOne);
-            }
+        if (getOne)
+        {
+            // Try to get one possible attack target
+            result = AI_VALUE2(list<ObjectGuid>, "attackers", 1);
+            RemoveNonThreating(result, getOne);
+        }
 
-            // If the one possible attack target failed, retry with multiple attackers
-            if (result.empty())
-            {
-                result = AI_VALUE(list<ObjectGuid>, "attackers");
-                RemoveNonThreating(result, getOne);
-            }
+        // If the one possible attack target failed, retry with multiple attackers
+        if (result.empty())
+        {
+            result = AI_VALUE(list<ObjectGuid>, "attackers");
+            RemoveNonThreating(result, getOne);
         }
     }
 

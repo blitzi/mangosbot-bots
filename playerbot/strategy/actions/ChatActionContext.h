@@ -115,7 +115,6 @@ namespace ai
             creators["co"] = &ChatActionContext::co;
             creators["nc"] = &ChatActionContext::nc;
             creators["de"] = &ChatActionContext::dead;
-            creators["react"] = &ChatActionContext::react;
             creators["all"] = &ChatActionContext::all;
             creators["trainer"] = &ChatActionContext::trainer;
             creators["attack my target"] = &ChatActionContext::attack_my_target;
@@ -230,7 +229,6 @@ namespace ai
         static Action* co(PlayerbotAI* ai) { return new ChangeCombatStrategyAction(ai); }
         static Action* nc(PlayerbotAI* ai) { return new ChangeNonCombatStrategyAction(ai); }
         static Action* dead(PlayerbotAI* ai) { return new ChangeDeadStrategyAction(ai); }
-        static Action* react(PlayerbotAI* ai) { return new ChangeReactionStrategyAction(ai); }
         static Action* all(PlayerbotAI* ai) { return new ChangeAllStrategyAction(ai); }
         static Action* spells(PlayerbotAI* ai) { return new ListSpellsAction(ai); }
         static Action* talents(PlayerbotAI* ai) { return new ChangeTalentsAction(ai); }
