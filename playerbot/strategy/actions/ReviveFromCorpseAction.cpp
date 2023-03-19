@@ -81,19 +81,6 @@ bool FindCorpseAction::Execute(Event& event)
             return false;
     }
 
-    uint32 dCount = AI_VALUE(uint32, "death count");
-
-    if (!ai->HasRealPlayerMaster())
-    {
-        if (dCount >= 5)
-        {
-            sLog.outBasic("Bot #%d %s:%d <%s>: died too many times and was sent to an inn", bot->GetGUIDLow(), bot->GetTeam() == ALLIANCE ? "A" : "H", bot->GetLevel(), bot->GetName());
-            context->GetValue<uint32>("death count")->Set(0);
-            sRandomPlayerbotMgr.RandomTeleportForRpg(bot, false);
-            return true;
-        }
-    }
-
     WorldPosition botPos(bot),corpsePos(corpse), moveToPos = corpsePos, masterPos(master);
     float reclaimDist = CORPSE_RECLAIM_RADIUS - 5.0f;
     float corpseDist = botPos.distance(corpsePos);
@@ -167,7 +154,7 @@ bool FindCorpseAction::Execute(Event& event)
 #endif
         else
         {
-            if (deadTime < 10 * MINUTE && dCount < 5) //Look for corpse up to 30 minutes.
+            if (deadTime < 10 * MINUTE) //Look for corpse up to 30 minutes.
             {
                 moved = MoveTo(moveToPos.getMapId(), moveToPos.getX(), moveToPos.getY(), moveToPos.getZ(), false, false);
             }

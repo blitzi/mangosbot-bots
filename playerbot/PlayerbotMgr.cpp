@@ -415,11 +415,6 @@ void PlayerbotHolder::OnBotLogin(Player * const bot)
             bot->GetPlayerbotAI()->SetPlayerFriend(true);
         else
             bot->GetPlayerbotAI()->SetPlayerFriend(false);
-
-        if (sPlayerbotAIConfig.instantRandomize && !sPlayerbotAIConfig.disableRandomLevels && !bot->GetTotalPlayedTime())
-        {
-            sRandomPlayerbotMgr.InstaRandomize(bot);
-        }
     }
 }
 

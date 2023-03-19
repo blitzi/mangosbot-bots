@@ -360,7 +360,6 @@ bool PlayerbotAIConfig::Initialize()
 	//SPP switches
     enableGreet = config.GetBoolDefault("AiPlayerbot.EnableGreet", false);
 	disableRandomLevels = config.GetBoolDefault("AiPlayerbot.DisableRandomLevels", false);
-    instantRandomize = config.GetBoolDefault("AiPlayerbot.InstantRandomize", false);
     randomBotRandomPassword = config.GetBoolDefault("AiPlayerbot.RandomBotRandomPassword", true);
     playerbotsXPrate = config.GetFloatDefault("AiPlayerbot.KillXPRate", 1.0f);
     botActiveAlone = config.GetIntDefault("AiPlayerbot.botActiveAlone", 10);
@@ -394,8 +393,6 @@ bool PlayerbotAIConfig::Initialize()
     autoLearnTrainerSpells = config.GetBoolDefault("AiPlayerbot.AutoLearnTrainerSpells", false);
     autoLearnQuestSpells = config.GetBoolDefault("AiPlayerbot.AutoLearnQuestSpells", false);
     autoDoQuests = config.GetBoolDefault("AiPlayerbot.AutoDoQuests", false);
-    syncLevelWithPlayers = config.GetBoolDefault("AiPlayerbot.SyncLevelWithPlayers", false);
-    syncLevelMaxAbove = config.GetIntDefault("AiPlayerbot.SyncLevelMaxAbove", 5);
     tweakValue = config.GetIntDefault("AiPlayerbot.TweakValue", 0);
     freeFood = config.GetBoolDefault("AiPlayerbot.FreeFood", true);
     talentsInPublicNote = config.GetBoolDefault("AiPlayerbot.TalentsInPublicNote", false);

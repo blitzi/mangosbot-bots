@@ -116,7 +116,6 @@ public:
     bool randomBotShowHelmet;
     bool randomBotShowCloak;
     bool disableRandomLevels;
-    bool instantRandomize;
     bool gearscorecheck;
 	bool randomBotPreQuests;
     float playerbotsXPrate;
@@ -154,7 +153,6 @@ public:
     bool autoLearnTrainerSpells;
     bool autoLearnQuestSpells;
     bool autoDoQuests;
-    bool syncLevelWithPlayers;
     uint32 syncLevelMaxAbove;
     bool freeFood;
     uint32 tweakValue; //Debugging config

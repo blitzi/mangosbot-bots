@@ -80,8 +80,6 @@ class RandomPlayerbotMgr : public PlayerbotHolder
         void Randomize(Player* bot);
         void RandomizeFirst(Player* bot);
         void UpdateGearSpells(Player* bot);
-        void ScheduleTeleport(uint32 bot, uint32 time = 0);
-        void ScheduleChangeStrategy(uint32 bot, uint32 time = 0);
         void HandleCommand(uint32 type, const string& text, Player& fromPlayer, string channelName = "", Team team = TEAM_BOTH_ALLOWED, uint32 lang = LANG_UNIVERSAL);
         string HandleRemoteCommand(string request);
         void OnPlayerLogout(Player* player);
@@ -98,15 +96,9 @@ class RandomPlayerbotMgr : public PlayerbotHolder
         void SetTradeDiscount(Player* bot, Player* master, uint32 value);
         uint32 GetTradeDiscount(Player* bot, Player* master);
         void Refresh(Player* bot);
-        void RandomTeleportForLevel(Player* bot, bool activeOnly);
-        void RandomTeleportForLevel(Player* bot) { return RandomTeleportForLevel(bot, true); }
-        void RandomTeleportForRpg(Player* bot, bool activeOnly);
-        void RandomTeleportForRpg(Player* bot) { return RandomTeleportForRpg(bot, true); }
         int GetMaxAllowedBotCount();
         bool ProcessBot(Player* player);
         void Revive(Player* player);
-        void ChangeStrategy(Player* player);
-        void ChangeStrategyOnce(Player* player);
         uint32 GetValue(Player* bot, string type);
         uint32 GetValue(uint32 bot, string type);
         string GetData(uint32 bot, string type);
@@ -141,8 +133,6 @@ class RandomPlayerbotMgr : public PlayerbotHolder
         float getActivityPercentage() { return activityMod * 100.0f; }
         void setActivityPercentage(float percentage) { activityMod = percentage / 100.0f; }
 
-        void PrintTeleportCache();
-
         void AddFacingFix(uint32 mapId, ObjectGuid guid) { facingFix[mapId].push_back(make_pair(guid,time(0))); }
 
         bool arenaTeamsDeleted, guildsDeleted = false;
@@ -164,13 +154,10 @@ class RandomPlayerbotMgr : public PlayerbotHolder
         time_t LfgCheckTimer;
         time_t PlayersCheckTimer;
         time_t EventTimeSyncTimer;
-        uint32 AddRandomBots();
+        uint32 AddRandomBots(bool onlyLowLevel);
         bool ProcessBot(uint32 bot);
         void ScheduleRandomize(uint32 bot, uint32 time);
-        void RandomTeleport(Player* bot);
-        void RandomTeleport(Player* bot, vector<WorldLocation> &locs, bool hearth = false, bool activeOnly = false);
         uint32 GetZoneLevel(uint16 mapId, float teleX, float teleY, float teleZ);
-        void PrepareTeleportCache();
         typedef void (RandomPlayerbotMgr::*ConsoleCommandHandler) (Player*);
     private:
         PlayerBotMap players;
